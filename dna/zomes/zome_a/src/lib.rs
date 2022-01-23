@@ -13,4 +13,10 @@ pub fn init_handler() -> ExternResult<InitCallbackResult> {
     Ok(InitCallbackResult::Pass)
 }
 
+
+#[hdk_extern]
+pub fn first_zome_fn(_: ()) -> ExternResult<i32> {
+    Ok(32)
+}
+
 entry_defs!(Path::entry_def());

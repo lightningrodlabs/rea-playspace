@@ -25,10 +25,10 @@ const BACKGROUND_COLOR = '#fbf9f7'
 
 const MAIN_FILE = path.join(__dirname, '../web/index.html')
 const SPLASH_FILE = path.join(__dirname, '../web/splashscreen.html')
-const LINUX_ICON_FILE = path.join(
-  __dirname,
-  '../web/logo/acorn-logo-desktop-512px.png'
-)
+// const LINUX_ICON_FILE = path.join(
+//   __dirname,
+//   '../web/logo/acorn-logo-desktop-512px.png'
+// )
 
 const DEVELOPMENT_UI_URL = process.env.EH_TEST_USER_2
   ? 'http://localhost:8081'
@@ -48,9 +48,9 @@ const createMainWindow = (): BrowserWindow => {
       nodeIntegration: true,
     },
   }
-  if (process.platform === 'linux') {
-    options.icon = LINUX_ICON_FILE
-  }
+  // if (process.platform === 'linux') {
+  //   options.icon = LINUX_ICON_FILE
+  // }
   const mainWindow = new BrowserWindow(options)
   // and load the index.html of the app.
   if (app.isPackaged) {
