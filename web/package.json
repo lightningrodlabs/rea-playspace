@@ -25,6 +25,8 @@
   "dependencies": {
     "electron": "^11.2.1",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "@msgpack/msgpack": "^2.7.1",
+    "blob-to-buffer": "^1.2.9"
   }
 }
