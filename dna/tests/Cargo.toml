@@ -9,8 +9,7 @@ edition = "2021"
 hdk_crud = "0.5.3"
 holo_hash = { version = "=0.0.12", features = ["encoding", "fixturators"] }
 hdk = "0.0.115"
-projects = { path = "../zomes/projects" }
-profiles = { path = "../zomes/profiles" }
+zomeA = { path = "../zomes/zomeA" }
 paste = "*"
 # use whatever serde hdk uses
 serde = "*"

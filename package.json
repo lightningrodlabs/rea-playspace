@@ -1,10 +1,10 @@
 {
-  "name": "acorn",
-  "version": "0.5.9-alpha",
-  "description": "Acorn is software that helps people create the future",
+  "name": "electron-holochain-template",
+  "version": "0.0.1",
+  "description": "This repository helps get started with electron and holochain",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/h-be/acorn.git"
+    "url": "git+https://github.com/Sprillow/electron-holochain-template.git"
   },
   "scripts": {
     "install-deps": "npm install && npm run dna-install && npm run web-install && npm run electron-install && npm run electron-tsc",
@@ -20,7 +20,7 @@
     "web-build": "cd web && npx webpack --config webpack.prod.js",
     "electron-install": "cd electron && npm install",
     "electron": "cd electron && npm run start",
-    "electron2": "cd electron && ACORN_TEST_USER_2=1 npm run start",
+    "electron2": "cd electron && EH_TEST_USER_2=1 npm run start",
     "electron-tsc": "cd electron && npm run tsc",
     "build": "bash scripts/build.sh"
   },

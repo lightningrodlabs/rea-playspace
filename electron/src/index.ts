@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import * as path from 'path'
 // import log from 'electron-log'
 import initAgent, {
@@ -8,7 +8,6 @@ import initAgent, {
 
 import {
   devOptions,
-  projectsDnaPath,
   prodOptions,
   stateSignalToText,
   BINARY_PATHS,
@@ -31,7 +30,7 @@ const LINUX_ICON_FILE = path.join(
   '../web/logo/acorn-logo-desktop-512px.png'
 )
 
-const DEVELOPMENT_UI_URL = process.env.ACORN_TEST_USER_2
+const DEVELOPMENT_UI_URL = process.env.EH_TEST_USER_2
   ? 'http://localhost:8081'
   : 'http://localhost:8080'
 
@@ -144,8 +143,4 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createMainWindow()
   }
-})
-
-ipcMain.handle('getProjectsPath', () => {
-  return projectsDnaPath
 })

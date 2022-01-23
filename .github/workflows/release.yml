@@ -32,12 +32,8 @@ jobs:
       # "upload" dna as build artifact
       - uses: actions/upload-artifact@master
         with:
-          name: profiles-artifact
-          path: dna/workdir/profiles.dna
-      - uses: actions/upload-artifact@master
-        with:
-          name: projects-artifact
-          path: dna/workdir/projects.dna
+          name: application-dna-artifact
+          path: dna/workdir/application.dna
 
   # upload the app package for each target os
   upload-assets:
@@ -51,17 +47,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      # rm the dna files from repository
-      - name: clearing precompiled dna files
-        run: |
-          rm dna/workdir/*.dna
       - uses: actions/download-artifact@master
         with:
-          name: profiles-artifact
-          path: dna/workdir
-      - uses: actions/download-artifact@master
-        with:
-          name: projects-artifact
+          name: application-dna-artifact
           path: dna/workdir
       - name: list downloads
         run: ls -R
@@ -72,15 +60,13 @@ jobs:
           npm install
           npm run web-install
           npm run electron-install
-        # if: ${{ runner.os == 'Windows' }}
-        # shell: bash
       - name: setup for codesigning (macos only)
         if: ${{ runner.os == 'macOs' }}
         uses:  figleafteam/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.HBE_APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.HBE_APPLE_CERTIFICATE_PASS }}
-      - name: build acorn (and notarize it- macos only)
+      - name: build electron application (and notarize it- macos only)
         env:
           APPLE_DEV_IDENTITY: ${{ secrets.APPLE_DEV_IDENTITY }}
           APPLE_ID_EMAIL: ${{ secrets.APPLE_ID_EMAIL }}

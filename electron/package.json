@@ -1,7 +1,7 @@
 {
-  "name": "acorn",
-  "version": "0.5.9-alpha",
-  "description": "Create the future",
+  "name": "electron-application-name",
+  "version": "0.0.1",
+  "description": "Electron application description goes here",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && electron .",
@@ -19,7 +19,7 @@
     "productName": "Acorn",
     "afterSign": "./afterSignHook.js",
     "appId": "com.harris-braun.acorn",
-    "copyright": "© 2020-2021 Harris-Braun Enterprises, LLC",
+    "copyright": "© 2022 So And So Ltd. ",
     "asarUnpack": "binaries/**/*",
     "files": [
       "dist/**/*",

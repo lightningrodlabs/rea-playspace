@@ -1,0 +1,18 @@
+[package]
+name = "zomeA"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+name = "zomeA"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk_crud = "0.5.3"
+holo_hash = { version = "=0.0.12", features = ["encoding", "fixturators"] }
+hdk = "0.0.115"
+paste = "*"
+# use whatever serde hdk uses
+serde = "*"
+thiserror = "1"
+chrono = "0.4.19"

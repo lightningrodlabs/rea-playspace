@@ -2,12 +2,23 @@ import * as path from 'path'
 import { app } from 'electron'
 import { HolochainRunnerOptions, StateSignal, PathOptions } from 'electron-holochain'
 
+
+const MAIN_APP_ID = 'main-app'
+const COMMUNITY_PROXY_URL =
+  'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
+// increment this version when an update to the application
+// requires to have a new DHT/DNA
+const DATABASES_VERSION_ID = '0-0-1'
+// increment this version when you want the application
+// to use a new keystore
+const KEYSTORE_VERSION_ID = '0-0-1'
+
 // these messages get seen on the splash page
 export enum StateSignalText {
-  IsFirstRun = 'Welcome to Acorn...',
+  IsFirstRun = 'Welcome to ThisApp...',
   IsNotFirstRun = 'Loading...',
   CreatingKeys = 'Creating cryptographic keys...',
-  RegisteringDna = 'Registering Profiles DNA to Holochain...',
+  RegisteringDna = 'Registering DNA to Holochain...',
   InstallingApp = 'Installing DNA bundle to Holochain...',
   EnablingApp = 'Enabling DNA...',
   AddingAppInterface = 'Attaching API network port...',
@@ -32,13 +43,9 @@ export function stateSignalToText(state: StateSignal): StateSignalText {
   }
 }
 
-const projectsDnaPath = app.isPackaged
-  ? path.join(app.getAppPath(), '../app.asar.unpacked/binaries/projects.dna')
-  : path.join(app.getAppPath(), '../dna/workdir/projects.dna')
-
-const profilesDnaPath = app.isPackaged
-  ? path.join(app.getAppPath(), '../app.asar.unpacked/binaries/profiles.dna')
-  : path.join(app.getAppPath(), '../dna/workdir/profiles.dna')
+const applicationDnaPath = app.isPackaged
+  ? path.join(app.getAppPath(), '../app.asar.unpacked/binaries/application.dna')
+  : path.join(app.getAppPath(), '../dna/workdir/application.dna')
 
 // in production
 // must point to unpacked versions, not in an asar archive
@@ -57,31 +64,31 @@ const BINARY_PATHS: PathOptions | undefined = app.isPackaged
     }
   : undefined
 
-const MAIN_APP_ID = 'main-app'
-const COMMUNITY_PROXY_URL =
-  'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
-
+// These options are in use when the application is under development
 const devOptions: HolochainRunnerOptions = {
-  dnaPath: profilesDnaPath, // preload
-  datastorePath: process.env.ACORN_TEST_USER_2
+  dnaPath: applicationDnaPath, // preload
+  datastorePath: process.env.EH_TEST_USER_2
     ? '../user2-data/databases'
     : path.join(__dirname, '../../user-data/databases'),
   appId: MAIN_APP_ID,
-  appWsPort: process.env.ACORN_TEST_USER_2 ? 8899 : 8888,
-  adminWsPort: process.env.ACORN_TEST_USER_2 ? 1236 : 1234,
-  keystorePath: process.env.ACORN_TEST_USER_2
+  appWsPort: process.env.EH_TEST_USER_2 ? 8899 : 8888,
+  adminWsPort: process.env.EH_TEST_USER_2 ? 1236 : 1234,
+  keystorePath: process.env.EH_TEST_USER_2
     ? '../user2-data/keystore'
     : path.join(__dirname, '../../user-data/keystore'),
   proxyUrl: COMMUNITY_PROXY_URL,
 }
+
+// These options are in use when the application is packaged
+// for shipping
 const prodOptions: HolochainRunnerOptions = {
-  dnaPath: profilesDnaPath, // preload
-  datastorePath: path.join(app.getPath('userData'), 'databases-0-5-9-alpha'),
+  dnaPath: applicationDnaPath, // preload
+  datastorePath: path.join(app.getPath('userData'), `databases-${DATABASES_VERSION_ID}`),
   appId: MAIN_APP_ID,
   appWsPort: 8889,
   adminWsPort: 1235,
-  keystorePath: path.join(app.getPath('userData'), 'keystore-0-5-9-alpha'),
+  keystorePath: path.join(app.getPath('userData'), `keystore-${KEYSTORE_VERSION_ID}`),
   proxyUrl: COMMUNITY_PROXY_URL,
 }
 
-export { projectsDnaPath, BINARY_PATHS, devOptions, prodOptions }
+export { applicationDnaPath, BINARY_PATHS, devOptions, prodOptions }
