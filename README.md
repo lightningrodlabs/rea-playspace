@@ -14,10 +14,13 @@ Global find and replace:
 This project is currently using:
 
 https://github.com/holochain/holochain/releases/tag/holochain-0.0.115
+
 https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.32
+
 https://docs.rs/hdk/0.0.115/hdk/index.html
 
 and electron 16
+
 https://www.electronjs.org/docs/latest/api/app
 
 
