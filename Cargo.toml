@@ -1,0 +1,11 @@
+[workspace]
+members = [
+  "dna/zomes/zomeA",
+  "dna/tests"
+]
+
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
