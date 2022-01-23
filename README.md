@@ -2,6 +2,14 @@
 
 This template gives you only what you need to get up and running with a new project that uses electron and holochain!
 
+## Set Up after Clone
+
+Global find and replace:
+
+`ElectronHolochainTemplate`: replace with the actual name you wish to see appear in users desktop launcher icons: e.g. "Acorn"
+
+
+
 ## Developers
 
 ### Run Locally and Develop on your Computer
@@ -46,6 +54,7 @@ To test backend:
 **electron**
 
 - `npm run electron-install`
+- `npm run electron-tsc` (needs to be re-run whenever electron folder source code changes)
 - `npm run electron`
 
 #### Multi-User Testing
