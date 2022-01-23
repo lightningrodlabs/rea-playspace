@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "dna/zomes/zomeA",
+  "dna/zomes/zome_a",
   "dna/tests"
 ]
 

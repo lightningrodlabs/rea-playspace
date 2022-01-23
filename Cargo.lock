@@ -4033,7 +4033,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "thiserror",
- "zomeA",
+ "zome_a",
 ]
 
 [[package]]
@@ -4660,7 +4660,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zomeA"
+name = "zome_a"
 version = "0.0.1"
 dependencies = [
  "chrono",

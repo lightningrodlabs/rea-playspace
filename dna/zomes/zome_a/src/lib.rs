@@ -1,10 +1,6 @@
 use hdk::prelude::*;
-use holo_hash::{AgentPubKeyB64, HeaderHashB64};
 
-use hdk_crud::{
-    retrieval::{fetch_links::FetchLinks, get_latest_for_entry::GetLatestEntry},
-    signals::{create_receive_signal_cap_grant, ActionSignal},
-};
+use hdk_crud::signals::create_receive_signal_cap_grant;
 
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {

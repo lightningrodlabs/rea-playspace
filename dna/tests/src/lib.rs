@@ -1,8 +1,7 @@
 #[cfg(test)]
 pub mod tests {
-    use ::fixt::prelude::*;
     use hdk::prelude::*;
-    use zomeA::*;
+    use zome_a::*;
 
     #[test]
     fn test_init_handler() {

@@ -1,10 +1,10 @@
 [package]
-name = "zomeA"
+name = "zome_a"
 version = "0.0.1"
 edition = "2021"
 
 [lib]
-name = "zomeA"
+name = "zome_a"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

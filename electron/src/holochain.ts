@@ -2,7 +2,6 @@ import * as path from 'path'
 import { app } from 'electron'
 import { HolochainRunnerOptions, StateSignal, PathOptions } from 'electron-holochain'
 
-
 const MAIN_APP_ID = 'main-app'
 const COMMUNITY_PROXY_URL =
   'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
@@ -15,7 +14,7 @@ const KEYSTORE_VERSION_ID = '0-0-1'
 
 // these messages get seen on the splash page
 export enum StateSignalText {
-  IsFirstRun = 'Welcome to ThisApp...',
+  IsFirstRun = 'Welcome to ElectronHolochainTemplate...',
   IsNotFirstRun = 'Loading...',
   CreatingKeys = 'Creating cryptographic keys...',
   RegisteringDna = 'Registering DNA to Holochain...',

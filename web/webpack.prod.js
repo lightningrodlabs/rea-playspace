@@ -22,7 +22,7 @@ module.exports = {
     }),
   ],
   entry: {
-    app: './src/index.js',
+    app: './src/index.tsx',
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
