@@ -64,8 +64,8 @@ jobs:
         if: ${{ runner.os == 'macOs' }}
         uses:  figleafteam/import-codesign-certs@v2
         with:
-          p12-file-base64: ${{ secrets.HBE_APPLE_CERTIFICATE_BASE64 }}
-          p12-password: ${{ secrets.HBE_APPLE_CERTIFICATE_PASS }}
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASS }}
       - name: build electron application (and notarize it- macos only)
         env:
           APPLE_DEV_IDENTITY: ${{ secrets.APPLE_DEV_IDENTITY }}
