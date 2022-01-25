@@ -18,7 +18,7 @@
   "build": {
     "productName": "ElectronHolochainTemplate",
     "afterSign": "./afterSignHook.js",
-    "appId": "com.some-domain.app-name",
+    "appId": "com.some-domain-name.app-name",
     "copyright": "© 2022 So And So Ltd. ",
     "asarUnpack": "binaries/**/*",
     "files": [
