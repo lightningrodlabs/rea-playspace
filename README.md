@@ -10,24 +10,11 @@ Global find and replace:
 
 `com.some-domain-name.app-name`: replace with an Apple ["bundle Id"](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids) that is registered on your Apple Developer account
 
+### App Icon Images
 
-## Versioning Information
-
-This project is currently using:
-
-https://github.com/holochain/holochain/releases/tag/holochain-0.0.115
-
-https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.32
-
-Lair Keystore Revision [v0.0.9 Nov 4, 2021](https://github.com/holochain/lair/releases/tag/v0.0.9)
-
-https://docs.rs/hdk/0.0.115/hdk/index.html
-
-and electron 16
-
-https://www.electronjs.org/docs/latest/api/app
-
-
+Replace `electron/build/icon.icns`. This one is utilized by MacOS.
+Replace `electron/build/icon.ico`. This one is utilized by Windows
+TODO: linux
 
 ## Developers
 
@@ -104,3 +91,41 @@ In order to get cross-platform builds, just tag your repository like `v0.0.1` an
 > The first two should be set as equivalents of `MACOS_CERTIFICATE` = `APPLE_CERTIFICATE_BASE64` and `MACOS_CERTIFICATE_PWD` = `APPLE_CERTIFICATE_PASS` as found in the following article, which also provides other instruction regarding this: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
 >
 > There is a sixth environment variable which is useful to set, like this: `DEBUG: electron-osx-sign*,electron-notarize*`. This allows for useful logging outputs from the signing and notarizing process. This env var is set automatically when running on CI, in the "Release" Github Action.
+
+
+### Versioning
+
+Each version of the app will either change, or not change, the paths to the user data folders in use by the application. 
+
+The user data will be located under `mova` in the platform specific appData folder, as specified by `appData` here: https://www.electronjs.org/docs/latest/api/app#appgetpathname
+
+It is then in a specific sub-folder that relates to one of two types of data: 
+- source chain and DHT -> `databases-${DATABASES_VERSION_NUMBER}`
+- private keys -> `keystore-${KEYSTORE_VERSION_NUMBER}`
+
+DATABASES_VERSION_NUMBER and KEYSTORE_VERSION_NUMBER are defined in `electron/src/holochain.ts` and can be modified as needed in order to jump to new versions of holochain, or a new app DNA.
+
+You can tweak DATABASES_VERSION_NUMBER and KEYSTORE_VERSION_NUMBER independently. 
+
+DATABASES_VERSION_NUMBER should be incremented when a new DNA is in use. It will cause users to have to re-create profiles and re-instate data they've previously added.
+
+KEYSTORE_VERSION_NUMBER should be incremented if the version of lair-keystore changes, and has a new key format. Or if you otherwise want users to have to switch and generate new keys.
+
+
+## Dependency Versions Information
+
+This project is currently using:
+
+https://github.com/holochain/holochain/releases/tag/holochain-0.0.115
+
+https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.32
+
+Lair Keystore Revision [v0.0.9 Nov 4, 2021](https://github.com/holochain/lair/releases/tag/v0.0.9)
+
+https://docs.rs/hdk/0.0.115/hdk/index.html
+
+and electron 16
+
+https://www.electronjs.org/docs/latest/api/app
+
+
