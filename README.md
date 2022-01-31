@@ -7,7 +7,7 @@ __Table of Contents__
   - [App Icon Images](#app-icon-images)
 - [Run Locally and Develop on your Computer](#run-locally-and-develop-on-your-computer)
 - [Multi User Development Testing](#multi-user-development-testing)
-- [Building / Packaging](#building-packaging)
+- [Building / Packaging](#building--packaging)
 - [Versioning for User Data](#versioning-for-user-data)
 - [Dependency Versions Information (Holochain etc)](#dependency-versions-information)
 
