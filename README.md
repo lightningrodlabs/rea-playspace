@@ -13,7 +13,9 @@ Global find and replace:
 ### App Icon Images
 
 Replace `electron/build/icon.icns`. This one is utilized by MacOS.
+
 Replace `electron/build/icon.ico`. This one is utilized by Windows
+
 TODO: linux
 
 ## Developers
