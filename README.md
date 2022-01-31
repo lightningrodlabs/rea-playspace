@@ -2,6 +2,15 @@
 
 This template gives you only what you need to get up and running with a new project that uses electron and holochain!
 
+__Table of Contents__
+- [Set Up after Clone](#set-up-after-clone)
+  - [App Icon Images](#app-icon-images)
+- [Run Locally and Develop on your Computer](#run-locally-and-develop-on-your-computer)
+- [Multi User Development Testing](#multi-user-development-testing)
+- [Building / Packaging](#building-packaging)
+- [Versioning for User Data](#versioning-for-user-data)
+- [Dependency Versions Information (Holochain etc)](#dependency-versions-information)
+
 ## Set Up after Clone
 
 Global find and replace:
@@ -18,9 +27,7 @@ Replace `electron/build/icon.ico`. This one is utilized by Windows
 
 TODO: linux
 
-## Developers
-
-### Run Locally and Develop on your Computer
+## Run Locally and Develop on your Computer
 
 _Prerequisites_
 
@@ -40,7 +47,7 @@ You can run `npm run user-data-reset` if you have user data in development, but 
 
 > NOTE: if you see a blank screen once electron launches the app, refresh the page (using View -> Reload or Cmd/Ctrl-R) to see app contents.
 
-#### Commands that are more specific to your use case:
+### Commands that are more specific to your use case:
 
 **dna**
 
@@ -65,7 +72,9 @@ To test backend:
 - `npm run electron-tsc` (needs to be re-run whenever electron folder source code changes)
 - `npm run electron`
 
-#### Multi-User Testing
+## Multi-User Development Testing
+Some features to develop and test require running two instances of the app simultaneously. The project is set up with that in mind.
+
 run the following commands in separate terminal instances (must have a running instance of acorn for the first user, either by running `npm run dev` or the below commands without the `2`):
 
 - `npm run web2`
@@ -73,7 +82,7 @@ run the following commands in separate terminal instances (must have a running i
 
 After running these commands, a `user2-data/` directory is created with user data. It too can be cleared by running `npm run user-data-reset`.
 
-### Building / Packaging
+## Building / Packaging
 
 To build:
 
@@ -95,7 +104,7 @@ In order to get cross-platform builds, just tag your repository like `v0.0.1` an
 > There is a sixth environment variable which is useful to set, like this: `DEBUG: electron-osx-sign*,electron-notarize*`. This allows for useful logging outputs from the signing and notarizing process. This env var is set automatically when running on CI, in the "Release" Github Action.
 
 
-### Versioning
+## Versioning For User Data
 
 Each version of the app will either change, or not change, the paths to the user data folders in use by the application. 
 
