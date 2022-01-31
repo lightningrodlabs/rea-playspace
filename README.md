@@ -111,16 +111,16 @@ Each version of the app will either change, or not change, the paths to the user
 The user data will be located under `mova` in the platform specific appData folder, as specified by `appData` here: https://www.electronjs.org/docs/latest/api/app#appgetpathname
 
 It is then in a specific sub-folder that relates to one of two types of data: 
-- source chain and DHT -> `databases-${DATABASES_VERSION_NUMBER}`
-- private keys -> `keystore-${KEYSTORE_VERSION_NUMBER}`
+- source chain and DHT -> `databases-${DATABASES_VERSION_ID}`
+- private keys -> `keystore-${KEYSTORE_VERSION_ID}`
 
-DATABASES_VERSION_NUMBER and KEYSTORE_VERSION_NUMBER are defined in `electron/src/holochain.ts` and can be modified as needed in order to jump to new versions of holochain, or a new app DNA.
+DATABASES_VERSION_ID and KEYSTORE_VERSION_ID are defined in `electron/src/holochain.ts` and can be modified as needed in order to jump to new versions of holochain, or a new app DNA.
 
-You can tweak DATABASES_VERSION_NUMBER and KEYSTORE_VERSION_NUMBER independently. 
+You can tweak DATABASES_VERSION_ID and KEYSTORE_VERSION_ID independently. 
 
-DATABASES_VERSION_NUMBER should be incremented when a new DNA is in use. It will cause users to have to re-create profiles and re-instate data they've previously added.
+DATABASES_VERSION_ID should be incremented when a new DNA is in use. It will cause users to have to re-create profiles and re-instate data they've previously added.
 
-KEYSTORE_VERSION_NUMBER should be incremented if the version of lair-keystore changes, and has a new key format. Or if you otherwise want users to have to switch and generate new keys.
+KEYSTORE_VERSION_ID should be incremented if the version of lair-keystore changes, and has a new key format. Or if you otherwise want users to have to switch and generate new keys.
 
 
 ## Dependency Versions Information
