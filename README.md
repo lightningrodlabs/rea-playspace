@@ -69,7 +69,7 @@ To test backend:
 **electron**
 
 - `npm run electron-install`
-- `npm run electron-tsc` (needs to be re-run whenever electron folder source code changes)
+- `npm run electron-tsc` (**needs to be re-run whenever electron folder source code changes**)
 - `npm run electron`
 
 ## Multi-User Development Testing
