@@ -60,12 +60,13 @@ jobs:
           npm install
           npm run web-install
           npm run electron-install
-      - name: setup for codesigning (macos only)
-        if: ${{ runner.os == 'macOs' }}
-        uses:  figleafteam/import-codesign-certs@v2
-        with:
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASS }}
+      # UNCOMMENT THIS SECTION FOR CODESIGNING AND NOTARIZING
+      # - name: setup for codesigning (macos only)
+      #   if: ${{ runner.os == 'macOs' }}
+      #   uses:  figleafteam/import-codesign-certs@v2
+      #   with:
+      #     p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+      #     p12-password: ${{ secrets.APPLE_CERTIFICATE_PASS }}
       - name: build electron application (and notarize it- macos only)
         env:
           APPLE_DEV_IDENTITY: ${{ secrets.APPLE_DEV_IDENTITY }}
