@@ -21,8 +21,6 @@ import {
 
 const BACKGROUND_COLOR = '#fbf9f7'
 
-
-
 const MAIN_FILE = path.join(__dirname, '../web/index.html')
 const SPLASH_FILE = path.join(__dirname, '../web/splashscreen.html')
 // const LINUX_ICON_FILE = path.join(
@@ -112,7 +110,7 @@ const createSplashWindow = (): BrowserWindow => {
 app.on('ready', async () => {
   const splashWindow = createSplashWindow()
   const opts = app.isPackaged ? prodOptions : devOptions
-  const statusEmitter = await initAgent(app, opts, BINARY_PATHS)
+  const { statusEmitter, shutdown } = await initAgent(app, opts, BINARY_PATHS)
   statusEmitter.on(STATUS_EVENT, (state: StateSignal) => {
     switch (state) {
       case StateSignal.IsReady:
