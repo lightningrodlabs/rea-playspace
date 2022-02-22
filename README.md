@@ -25,6 +25,13 @@ The UI will need to Query and Mutate the following which is a subset of the [Val
 - Process
 - Plan
 
+## Known Issues
+
+> Can use createEconomicEvent mutation and economicEvents query, but can't use Economic Resources.
+
+createEconomicEvent can't be passed a newInventoriedResource (which is the only way to persist an EconomicResource). It is a known bug in holo-rea and there is already [bit of discussion about a solution](https://github.com/holo-rea/holo-rea/issues/190) to the underlying problem.
+
+
 ## License
 [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 
