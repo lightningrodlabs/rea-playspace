@@ -1,0 +1,11 @@
+---
+manifest_version: "1"
+name: hrea-modeler-test
+uuid: 00000000-0000-0000-0000-000000000000
+properties: ~
+zomes:
+  - name: hrea_modeler
+    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_hrea_modelers.wasm
+
+  - name: profiles
+    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm

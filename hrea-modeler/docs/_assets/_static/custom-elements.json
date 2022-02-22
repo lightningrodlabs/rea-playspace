@@ -1,0 +1,3103 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/config.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "defaultConfig",
+          "type": {
+            "text": "HreaModelerConfig"
+          },
+          "default": "{\n  zomeName: 'hrea-modeler',\n  avatarMode: 'avatar',\n  additionalFields: [],\n  minNicknameLength: 3,\n}"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "defaultConfig",
+          "declaration": {
+            "name": "defaultConfig",
+            "module": "src/config.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/context.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "hrea-modelerStoreContext",
+          "type": {
+            "text": "Context<HreaModelerStore>"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "hrea-modelerStoreContext",
+          "declaration": {
+            "name": "hrea-modelerStoreContext",
+            "module": "src/context.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./types"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./context"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/create-hrea-modeler"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/update-hrea-modeler"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/my-hrea-modeler"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/search-agent"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/hrea-modeler-prompt"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/list-hrea-modelers"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/agent-avatar"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/holo-identicon"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./elements/hrea-modeler-detail"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./hrea-modeler-service"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./hrea-modeler-store"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./config"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mocks.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerZomeMock",
+          "members": [
+            {
+              "kind": "field",
+              "name": "cellId",
+              "type": {
+                "text": "CellId"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "myPubKeyB64"
+            },
+            {
+              "kind": "method",
+              "name": "create_hrea_modeler",
+              "parameters": [
+                {
+                  "name": "{ nickname }",
+                  "type": {
+                    "text": "{ nickname: string }"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "search_hrea_modelers",
+              "parameters": [
+                {
+                  "name": "{ nicknamePrefix }",
+                  "type": {
+                    "text": "{ nicknamePrefix: string }"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "get_my_hrea_modeler"
+            },
+            {
+              "kind": "method",
+              "name": "get_agent_hrea_modeler",
+              "parameters": [
+                {
+                  "name": "agent_address",
+                  "type": {
+                    "text": "AgentPubKeyB64"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "get_all_hrea_modelers"
+            },
+            {
+              "kind": "method",
+              "name": "findAgent",
+              "parameters": [
+                {
+                  "name": "agent_address",
+                  "type": {
+                    "text": "AgentPubKeyB64"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "callZome",
+              "return": {
+                "type": {
+                  "text": "Promise<any>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "zomeName",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "fnName",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "payload",
+                  "type": {
+                    "text": "any"
+                  }
+                },
+                {
+                  "name": "timeout",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "addSignalHandler",
+              "return": {
+                "type": {
+                  "text": "{ unsubscribe: () => void }"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "signalHandler",
+                  "type": {
+                    "text": "AppSignalCb"
+                  }
+                }
+              ]
+            }
+          ],
+          "superclass": {
+            "name": "CellClient",
+            "package": "@holochain-open-dev/cell-client"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerZomeMock",
+          "declaration": {
+            "name": "HreaModelerZomeMock",
+            "module": "src/mocks.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/hrea-modeler-service.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerService",
+          "members": [
+            {
+              "kind": "method",
+              "name": "getMyHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get my hrea-modeler, if it has been created"
+            },
+            {
+              "kind": "method",
+              "name": "getAgentHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "agentPubKey",
+                  "type": {
+                    "text": "AgentPubKeyB64"
+                  },
+                  "description": "the agent to get the hrea-modeler for"
+                }
+              ],
+              "description": "Get the hrea-modeler for the given agent, if they have created it"
+            },
+            {
+              "kind": "method",
+              "name": "getAgentsHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "agentPubKeys",
+                  "type": {
+                    "text": "AgentPubKeyB64[]"
+                  },
+                  "description": "the agents to get the hrea-modeler for"
+                }
+              ],
+              "description": "Get the hrea-modeler for the given agent"
+            },
+            {
+              "kind": "method",
+              "name": "searchHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nicknamePrefix",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "must be of at least 3 characters"
+                }
+              ],
+              "description": "Search hrea-modeler that start with nicknamePrefix"
+            },
+            {
+              "kind": "method",
+              "name": "getAllHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the hrea-modeler for all the agents in the DHT"
+            },
+            {
+              "kind": "method",
+              "name": "createHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  },
+                  "description": "the hrea-modeler to create"
+                }
+              ],
+              "description": "Create my hrea-modeler"
+            },
+            {
+              "kind": "method",
+              "name": "updateHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  },
+                  "description": "the hrea-modeler to create"
+                }
+              ],
+              "description": "Update my hrea-modeler"
+            },
+            {
+              "kind": "method",
+              "name": "callZome",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "fn_name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "payload",
+                  "type": {
+                    "text": "any"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerService",
+          "declaration": {
+            "name": "HreaModelerService",
+            "module": "src/hrea-modeler-service.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/hrea-modeler-store.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerStore",
+          "members": [
+            {
+              "kind": "field",
+              "name": "_service",
+              "type": {
+                "text": "HreaModelerService"
+              },
+              "privacy": "private",
+              "description": "Private",
+              "default": "new HreaModelerService(cellClient, this.config.zomeName)"
+            },
+            {
+              "kind": "field",
+              "name": "_knownHreaModelerStore",
+              "type": {
+                "text": "Writable<Dictionary<HreaModeler>>"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "myAgentPubKey",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "privacy": "public",
+              "description": "Static info"
+            },
+            {
+              "kind": "field",
+              "name": "knownHreaModeler",
+              "type": {
+                "text": "Readable<Dictionary<HreaModeler>>"
+              },
+              "privacy": "public",
+              "description": "Readable stores"
+            },
+            {
+              "kind": "field",
+              "name": "myHreaModeler",
+              "type": {
+                "text": "Readable<HreaModeler>"
+              },
+              "privacy": "public"
+            },
+            {
+              "kind": "method",
+              "name": "hrea-modelerOf",
+              "return": {
+                "type": {
+                  "text": "Readable<HreaModeler>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "agentPubKey",
+                  "type": {
+                    "text": "AgentPubKeyB64"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "config",
+              "type": {
+                "text": "HreaModelerConfig"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "fetchAllHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Fetches the hrea-modeler for all agents in the DHT\n\nYou can subscribe to `knowHreaModeler` to get updated with all the hrea-modeler when this call is done\n\nWarning! Can be very slow"
+            },
+            {
+              "kind": "method",
+              "name": "fetchAgentHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<HreaModeler | undefined>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "agentPubKey",
+                  "type": {
+                    "text": "AgentPubKeyB64"
+                  }
+                }
+              ],
+              "description": "Fetches the hrea-modeler for the given agent"
+            },
+            {
+              "kind": "method",
+              "name": "fetchAgentsHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "agentPubKeys",
+                  "type": {
+                    "text": "AgentPubKeyB64[]"
+                  }
+                }
+              ],
+              "description": "Fetches the hrea-modeler for the given agents in the DHT\n\nYou can subscribe to knowHreaModeler to get updated with all the hrea-modeler when this call is done\n\nUse this over `fetchAgentHreaModeler` when fetching multiple hrea-modeler, as it will be more performant"
+            },
+            {
+              "kind": "method",
+              "name": "fetchMyHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Fetch my hrea-modeler\n\nYou can subscribe to `myHreaModeler` to get updated with my hrea-modeler"
+            },
+            {
+              "kind": "method",
+              "name": "searchHreaModeler",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nicknamePrefix",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "must be of at least 3 characters"
+                }
+              ],
+              "description": "Search the hrea-modeler for the agent with nicknames starting with the given nicknamePrefix"
+            },
+            {
+              "kind": "method",
+              "name": "createHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  },
+                  "description": "hrea-modeler to be created"
+                }
+              ],
+              "description": "Create my hrea-modeler\n\nNote that there is no guarantee on nickname uniqness"
+            },
+            {
+              "kind": "method",
+              "name": "updateHreaModeler",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  },
+                  "description": "hrea-modeler to be created"
+                }
+              ],
+              "description": "Update my hrea-modeler"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerStore",
+          "declaration": {
+            "name": "HreaModelerStore",
+            "module": "src/hrea-modeler-store.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shim.d.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/types.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/agent-avatar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "AA",
+          "superclass": {
+            "name": "AgentAvatar",
+            "module": "/src/elements/agent-avatar"
+          },
+          "tagName": "agent-avatar",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "agent-pub-key",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. The public key identifying the agent whose hrea-modeler is going to be shown.",
+              "fieldName": "agentPubKey",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the avatar image in pixels.",
+              "fieldName": "size",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "agentPubKey",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. The public key identifying the agent whose hrea-modeler is going to be shown.",
+              "attribute": "agent-pub-key",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the avatar image in pixels.",
+              "attribute": "size",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_hrea_modeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () =>\n    this.store?.hrea-modelerOf(this.agentPubKey)\n  )",
+              "inheritedFrom": {
+                "name": "AgentAvatar",
+                "module": "src/elements/agent-avatar.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "agent-avatar",
+          "declaration": {
+            "name": "AA",
+            "module": "src/definitions/agent-avatar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/create-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "CP",
+          "superclass": {
+            "name": "CreateHreaModeler",
+            "module": "/src/elements/create-hrea-modeler"
+          },
+          "tagName": "create-hrea-modeler",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "CreateHreaModeler",
+                "module": "src/elements/create-hrea-modeler.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "CreateHreaModeler",
+                "module": "src/elements/create-hrea-modeler.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "createHreaModeler",
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  }
+                }
+              ],
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "CreateHreaModeler",
+                "module": "src/elements/create-hrea-modeler.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "hrea-modeler-created",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired after the hrea-modeler has been created. Detail will have this shape: { hrea-modeler: { nickname, fields } }",
+              "inheritedFrom": {
+                "name": "CreateHreaModeler",
+                "module": "src/elements/create-hrea-modeler.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "create-hrea-modeler",
+          "declaration": {
+            "name": "CP",
+            "module": "src/definitions/create-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/holo-identicon.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HI",
+          "superclass": {
+            "name": "HoloIdenticon",
+            "module": "/src/elements/holo-identicon"
+          },
+          "tagName": "holo-identicon",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "hash",
+              "type": {
+                "text": "HoloHashB64"
+              },
+              "description": "REQUIRED. The hash that will be converted to an identicon.",
+              "fieldName": "hash",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the identicon in pixels.",
+              "fieldName": "size",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "'square' | 'circle'"
+              },
+              "default": "'circle'",
+              "description": "Shape of the identicon.",
+              "fieldName": "shape",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "hash",
+              "type": {
+                "text": "HoloHashB64"
+              },
+              "description": "REQUIRED. The hash that will be converted to an identicon.",
+              "attribute": "hash",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the identicon in pixels.",
+              "attribute": "size",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'square' | 'circle'"
+              },
+              "default": "'circle'",
+              "description": "Shape of the identicon.",
+              "attribute": "shape",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_canvas",
+              "type": {
+                "text": "HTMLCanvasElement"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HoloIdenticon",
+                "module": "src/elements/holo-identicon.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "holo-identicon",
+          "declaration": {
+            "name": "HI",
+            "module": "src/definitions/holo-identicon.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/list-hrea-modelers.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LP",
+          "superclass": {
+            "name": "ListHreaModeler",
+            "module": "/src/elements/list-hrea-modelers"
+          },
+          "tagName": "list-hrea-modelers",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_allHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(\n    this,\n    () => this.store?.knownHreaModeler\n  )",
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "initials",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nickname",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "fireAgentSelected",
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "agent-selected",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the user selects an agent from the list. Detail will have this shape: { agentPubKey: 'uhCAkSEspAJks5Q8863Jg1RJhuJHJpFWzwDJkxVjVSk9JueU' }",
+              "inheritedFrom": {
+                "name": "ListHreaModeler",
+                "module": "src/elements/list-hrea-modelers.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "list-hrea-modelers",
+          "declaration": {
+            "name": "LP",
+            "module": "src/definitions/list-hrea-modelers.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/my-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "MP",
+          "superclass": {
+            "name": "MyHreaModeler",
+            "module": "/src/elements/my-hrea-modeler"
+          },
+          "tagName": "my-hrea-modeler",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "MyHreaModeler",
+                "module": "src/elements/my-hrea-modeler.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "MyHreaModeler",
+                "module": "src/elements/my-hrea-modeler.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_editing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "MyHreaModeler",
+                "module": "src/elements/my-hrea-modeler.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-hrea-modeler",
+          "declaration": {
+            "name": "MP",
+            "module": "src/definitions/my-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/hrea-modeler-detail.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "PD",
+          "superclass": {
+            "name": "HreaModelerDetail",
+            "module": "/src/elements/hrea-modeler-detail"
+          },
+          "tagName": "hrea-modeler-detail",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "agent-pub-key",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. Public key identifying the agent for which the hrea-modeler should be shown",
+              "fieldName": "agentPubKey",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "agentPubKey",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. Public key identifying the agent for which the hrea-modeler should be shown",
+              "attribute": "agent-pub-key",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_agentHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () =>\n    this.store?.hrea-modelerOf(this.agentPubKey)\n  )",
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getAdditionalFields",
+              "return": {
+                "type": {
+                  "text": "Dictionary<string>"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderAdditionalField",
+              "parameters": [
+                {
+                  "name": "fieldId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "fieldValue",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HreaModelerDetail",
+                "module": "src/elements/hrea-modeler-detail.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hrea-modeler-detail",
+          "declaration": {
+            "name": "PD",
+            "module": "src/definitions/hrea-modeler-detail.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/hrea-modeler-prompt.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "PP",
+          "superclass": {
+            "name": "HreaModelerPrompt",
+            "module": "/src/elements/hrea-modeler-prompt"
+          },
+          "tagName": "hrea-modeler-prompt",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "HreaModelerPrompt",
+                "module": "src/elements/hrea-modeler-prompt.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "HreaModelerPrompt",
+                "module": "src/elements/hrea-modeler-prompt.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "HreaModelerPrompt",
+                "module": "src/elements/hrea-modeler-prompt.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_myHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () => this.store?.myHreaModeler)",
+              "inheritedFrom": {
+                "name": "HreaModelerPrompt",
+                "module": "src/elements/hrea-modeler-prompt.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderPrompt",
+              "inheritedFrom": {
+                "name": "HreaModelerPrompt",
+                "module": "src/elements/hrea-modeler-prompt.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "hrea-modeler-prompt",
+          "declaration": {
+            "name": "PP",
+            "module": "src/definitions/hrea-modeler-prompt.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/search-agent.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "SA",
+          "superclass": {
+            "name": "SearchAgent",
+            "module": "/src/elements/search-agent"
+          },
+          "tagName": "search-agent",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "clear-on-select",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to clear the field when an agent is selected.",
+              "fieldName": "clearOnSelect",
+              "attribute": "clear-on-select",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "name": "include-myself",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to include my own agent as a possible agent to select.",
+              "fieldName": "includeMyself",
+              "attribute": "include-myself",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "name": "field-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Search agent'",
+              "description": "Label for the agent searching field.",
+              "fieldName": "fieldLabel",
+              "attribute": "field-label",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "clearOnSelect",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to clear the field when an agent is selected.",
+              "attribute": "clear-on-select",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "includeMyself",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to include my own agent as a possible agent to select.",
+              "attribute": "include-myself",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "fieldLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Search agent'",
+              "description": "Label for the agent searching field.",
+              "attribute": "field-label",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_knownHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(\n    this,\n    () => this.store?.knownHreaModeler\n  )",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_filteredAgents",
+              "type": {
+                "text": "Array<AgentHreaModeler>"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_currentFilter",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_lastSearchedPrefix",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_textField",
+              "type": {
+                "text": "TextField"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_overlay",
+              "type": {
+                "text": "MenuSurface"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "searchAgents",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nicknamePrefix",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onFilterChange",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onUsernameSelected",
+              "parameters": [
+                {
+                  "name": "agent",
+                  "type": {
+                    "text": "AgentHreaModeler"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "agent-selected",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the user selects some agent. Detail will have this shape: { agentPubKey: 'uhCAkSEspAJks5Q8863Jg1RJhuJHJpFWzwDJkxVjVSk9JueU' }",
+              "inheritedFrom": {
+                "name": "SearchAgent",
+                "module": "src/elements/search-agent.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "search-agent",
+          "declaration": {
+            "name": "SA",
+            "module": "src/definitions/search-agent.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/definitions/update-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "UP",
+          "superclass": {
+            "name": "UpdateHreaModeler",
+            "module": "/src/elements/update-hrea-modeler"
+          },
+          "tagName": "update-hrea-modeler",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store",
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store",
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties",
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_myHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () => this.store?.myHreaModeler)",
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "updateHreaModeler",
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "hrea-modeler-updated",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired after the hrea-modeler has been created. Detail will have this shape: { hrea-modeler: { nickname, fields } }",
+              "inheritedFrom": {
+                "name": "UpdateHreaModeler",
+                "module": "src/elements/update-hrea-modeler.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "update-hrea-modeler",
+          "declaration": {
+            "name": "UP",
+            "module": "src/definitions/update-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/agent-avatar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "AgentAvatar",
+          "members": [
+            {
+              "kind": "field",
+              "name": "agentPubKey",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. The public key identifying the agent whose hrea-modeler is going to be shown.",
+              "attribute": "agent-pub-key"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the avatar image in pixels.",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_hrea_modeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () =>\n    this.store?.hrea-modelerOf(this.agentPubKey)\n  )"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "agent-pub-key",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. The public key identifying the agent whose hrea-modeler is going to be shown.",
+              "fieldName": "agentPubKey"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the avatar image in pixels.",
+              "fieldName": "size"
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AgentAvatar",
+          "declaration": {
+            "name": "AgentAvatar",
+            "module": "src/elements/agent-avatar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/create-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A custom element that fires event on value change.",
+          "name": "CreateHreaModeler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "method",
+              "name": "createHreaModeler",
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  }
+                }
+              ],
+              "description": "Private properties"
+            }
+          ],
+          "events": [
+            {
+              "name": "hrea-modeler-created",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired after the hrea-modeler has been created. Detail will have this shape: { hrea-modeler: { nickname, fields } }"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "create-hrea-modeler",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CreateHreaModeler",
+          "declaration": {
+            "name": "CreateHreaModeler",
+            "module": "src/elements/create-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/edit-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "EditHreaModeler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "hrea-modeler",
+              "type": {
+                "text": "HreaModeler | undefined"
+              },
+              "description": "The hrea-modeler to be edited.",
+              "attribute": "hrea-modeler"
+            },
+            {
+              "kind": "field",
+              "name": "saveHreaModelerLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Save HreaModeler'",
+              "description": "Label for the save hrea-modeler button.",
+              "attribute": "save-hrea-modeler-label"
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_nicknameField",
+              "type": {
+                "text": "TextField"
+              },
+              "privacy": "private",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_existingUsernames",
+              "type": {
+                "text": "{ [key: string]: boolean }"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "_avatarFilePicker",
+              "type": {
+                "text": "HTMLInputElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_avatar",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "onAvatarUploaded"
+            },
+            {
+              "kind": "method",
+              "name": "avatarMode"
+            },
+            {
+              "kind": "method",
+              "name": "renderAvatar"
+            },
+            {
+              "kind": "method",
+              "name": "shouldSaveButtonBeEnabled"
+            },
+            {
+              "kind": "method",
+              "name": "textfieldToFieldId",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "field",
+                  "type": {
+                    "text": "TextField"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getAdditionalFieldsValues",
+              "return": {
+                "type": {
+                  "text": "Dictionary<string>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getAdditionalTextFields",
+              "return": {
+                "type": {
+                  "text": "Dictionary<TextField>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "fireSaveHreaModeler"
+            },
+            {
+              "kind": "method",
+              "name": "renderField",
+              "parameters": [
+                {
+                  "name": "fieldName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "save-hrea-modeler",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the save hrea-modeler button is clicked"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "hrea-modeler",
+              "type": {
+                "text": "HreaModeler | undefined"
+              },
+              "description": "The hrea-modeler to be edited.",
+              "fieldName": "hrea-modeler"
+            },
+            {
+              "name": "save-hrea-modeler-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Save HreaModeler'",
+              "description": "Label for the save hrea-modeler button.",
+              "fieldName": "saveHreaModelerLabel"
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "edit-hrea-modeler",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "EditHreaModeler",
+          "declaration": {
+            "name": "EditHreaModeler",
+            "module": "src/elements/edit-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/holo-identicon.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HoloIdenticon",
+          "members": [
+            {
+              "kind": "field",
+              "name": "hash",
+              "type": {
+                "text": "HoloHashB64"
+              },
+              "description": "REQUIRED. The hash that will be converted to an identicon.",
+              "attribute": "hash"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the identicon in pixels.",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'square' | 'circle'"
+              },
+              "default": "'circle'",
+              "description": "Shape of the identicon.",
+              "attribute": "shape"
+            },
+            {
+              "kind": "field",
+              "name": "_canvas",
+              "type": {
+                "text": "HTMLCanvasElement"
+              },
+              "privacy": "private"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "hash",
+              "type": {
+                "text": "HoloHashB64"
+              },
+              "description": "REQUIRED. The hash that will be converted to an identicon.",
+              "fieldName": "hash"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "Size of the identicon in pixels.",
+              "fieldName": "size"
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "'square' | 'circle'"
+              },
+              "default": "'circle'",
+              "description": "Shape of the identicon.",
+              "fieldName": "shape"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HoloIdenticon",
+          "declaration": {
+            "name": "HoloIdenticon",
+            "module": "src/elements/holo-identicon.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/list-hrea-modelers.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "ListHreaModeler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_allHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(\n    this,\n    () => this.store?.knownHreaModeler\n  )"
+            },
+            {
+              "kind": "method",
+              "name": "initials",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nickname",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "fireAgentSelected",
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "agent-selected",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the user selects an agent from the list. Detail will have this shape: { agentPubKey: 'uhCAkSEspAJks5Q8863Jg1RJhuJHJpFWzwDJkxVjVSk9JueU' }"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "list-hrea-modelers",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ListHreaModeler",
+          "declaration": {
+            "name": "ListHreaModeler",
+            "module": "src/elements/list-hrea-modelers.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/my-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "MyHreaModeler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_editing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Private properties"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hrea-modeler-detail",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MyHreaModeler",
+          "declaration": {
+            "name": "MyHreaModeler",
+            "module": "src/elements/my-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/hrea-modeler-detail.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerDetail",
+          "members": [
+            {
+              "kind": "field",
+              "name": "agentPubKey",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. Public key identifying the agent for which the hrea-modeler should be shown",
+              "attribute": "agent-pub-key"
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_agentHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () =>\n    this.store?.hrea-modelerOf(this.agentPubKey)\n  )"
+            },
+            {
+              "kind": "method",
+              "name": "getAdditionalFields",
+              "return": {
+                "type": {
+                  "text": "Dictionary<string>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderAdditionalField",
+              "parameters": [
+                {
+                  "name": "fieldId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "fieldValue",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "agent-pub-key",
+              "type": {
+                "text": "AgentPubKeyB64"
+              },
+              "description": "REQUIRED. Public key identifying the agent for which the hrea-modeler should be shown",
+              "fieldName": "agentPubKey"
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hrea-modeler-detail",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerDetail",
+          "declaration": {
+            "name": "HreaModelerDetail",
+            "module": "src/elements/hrea-modeler-detail.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/hrea-modeler-prompt.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerPrompt",
+          "slots": [
+            {
+              "description": "Will be displayed above the create-hrea-modeler form when the user is prompted with it",
+              "name": "hero"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_myHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () => this.store?.myHreaModeler)"
+            },
+            {
+              "kind": "method",
+              "name": "renderPrompt"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hrea-modeler-prompt",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerPrompt",
+          "declaration": {
+            "name": "HreaModelerPrompt",
+            "module": "src/elements/hrea-modeler-prompt.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/search-agent.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "SearchAgent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "clearOnSelect",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to clear the field when an agent is selected.",
+              "attribute": "clear-on-select"
+            },
+            {
+              "kind": "field",
+              "name": "includeMyself",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to include my own agent as a possible agent to select.",
+              "attribute": "include-myself"
+            },
+            {
+              "kind": "field",
+              "name": "fieldLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Search agent'",
+              "description": "Label for the agent searching field.",
+              "attribute": "field-label"
+            },
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_knownHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(\n    this,\n    () => this.store?.knownHreaModeler\n  )",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_filteredAgents",
+              "type": {
+                "text": "Array<AgentHreaModeler>"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_currentFilter",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "_lastSearchedPrefix",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "_textField",
+              "type": {
+                "text": "TextField"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_overlay",
+              "type": {
+                "text": "MenuSurface"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "searchAgents",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nicknamePrefix",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onFilterChange"
+            },
+            {
+              "kind": "method",
+              "name": "onUsernameSelected",
+              "parameters": [
+                {
+                  "name": "agent",
+                  "type": {
+                    "text": "AgentHreaModeler"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "agent-selected",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the user selects some agent. Detail will have this shape: { agentPubKey: 'uhCAkSEspAJks5Q8863Jg1RJhuJHJpFWzwDJkxVjVSk9JueU' }"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "clear-on-select",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to clear the field when an agent is selected.",
+              "fieldName": "clearOnSelect",
+              "attribute": "clear-on-select"
+            },
+            {
+              "name": "include-myself",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to include my own agent as a possible agent to select.",
+              "fieldName": "includeMyself",
+              "attribute": "include-myself"
+            },
+            {
+              "name": "field-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Search agent'",
+              "description": "Label for the agent searching field.",
+              "fieldName": "fieldLabel",
+              "attribute": "field-label"
+            },
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "search-agent",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SearchAgent",
+          "declaration": {
+            "name": "SearchAgent",
+            "module": "src/elements/search-agent.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/update-hrea-modeler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "UpdateHreaModeler",
+          "members": [
+            {
+              "kind": "field",
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "attribute": "store"
+            },
+            {
+              "kind": "field",
+              "name": "_loading",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "Private properties"
+            },
+            {
+              "kind": "field",
+              "name": "_myHreaModeler",
+              "privacy": "private",
+              "default": "new StoreSubscriber(this, () => this.store?.myHreaModeler)"
+            },
+            {
+              "kind": "method",
+              "name": "updateHreaModeler",
+              "parameters": [
+                {
+                  "name": "hrea-modeler",
+                  "type": {
+                    "text": "HreaModeler"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hrea-modeler-updated",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired after the hrea-modeler has been created. Detail will have this shape: { hrea-modeler: { nickname, fields } }"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "store",
+              "type": {
+                "text": "HreaModelerStore"
+              },
+              "description": "`HreaModelerStore` that is requested via context.\nOnly set this property if you want to override the store requested via context.",
+              "fieldName": "store"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "update-hrea-modeler",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "UpdateHreaModeler",
+          "declaration": {
+            "name": "UpdateHreaModeler",
+            "module": "src/elements/update-hrea-modeler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "test/mocks/index.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getAppWebsocket"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "getAppWebsocket",
+          "declaration": {
+            "name": "getAppWebsocket",
+            "module": "test/mocks/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "test/mocks/hrea-modeler.mock.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HreaModelerMock",
+          "members": [
+            {
+              "kind": "method",
+              "name": "create_hrea_modeler",
+              "parameters": [
+                {
+                  "name": "{ username }"
+                },
+                {
+                  "name": "provenance"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "search_hrea_modelers",
+              "parameters": [
+                {
+                  "name": "{ username_prefix }"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "get_my_hrea_modeler",
+              "parameters": [
+                {
+                  "name": "_"
+                },
+                {
+                  "name": "provenance"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "get_agent_hrea_modeler",
+              "parameters": [
+                {
+                  "name": "{ agent_address }"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "findAgent",
+              "parameters": [
+                {
+                  "name": "agent_address"
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "agents",
+              "type": {
+                "text": "array"
+              },
+              "default": "[]"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HreaModelerMock",
+          "declaration": {
+            "name": "HreaModelerMock",
+            "module": "test/mocks/hrea-modeler.mock.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/utils/image.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "resizeAndExport",
+          "parameters": [
+            {
+              "name": "img",
+              "type": {
+                "text": "HTMLImageElement"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "resizeAndExport",
+          "declaration": {
+            "name": "resizeAndExport",
+            "module": "src/elements/utils/image.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/elements/utils/shared-styles.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "sharedStyles",
+          "default": "css`\n  .row {\n    display: flex;\n    flex-direction: row;\n  }\n  .column {\n    display: flex;\n    flex-direction: column;\n  }\n  .small-margin {\n    margin-top: 6px;\n  }\n  .big-margin {\n    margin-top: 23px;\n  }\n\n  .fill {\n    flex: 1;\n    height: 100%;\n  }\n\n  .title {\n    font-size: 20px;\n  }\n\n  .center-content {\n    align-items: center;\n    justify-content: center;\n  }\n\n  .placeholder {\n    color: rgba(0, 0, 0, 0.7);\n  }\n\n  .label {\n    color: var(--mdc-text-field-label-ink-color, rgba(0, 0, 0, 0.6));\n    font-family: var(\n      --mdc-typography-caption-font-family,\n      var(--mdc-typography-font-family, Roboto, sans-serif)\n    );\n    font-size: var(--mdc-typography-caption-font-size, 0.79rem);\n    font-weight: var(--mdc-typography-caption-font-weight, 400);\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "sharedStyles",
+          "declaration": {
+            "name": "sharedStyles",
+            "module": "src/elements/utils/shared-styles.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

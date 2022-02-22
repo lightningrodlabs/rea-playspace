@@ -1,0 +1,12 @@
+[workspace]
+members = [
+  "crates/profiles",
+  "crates/zome",
+  "crates/types",
+]
+
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
