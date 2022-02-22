@@ -1,6 +1,9 @@
 # rea-playspace
 Holochain app to play with REA accounting.
 
+## Status
+Active development, POC.
+
 ##  Developers
 
 The backend is a bundled [Holo-REA](https://github.com/holo-rea/holo-rea) running in the [Holochain Launcher](https://github.com/holochain/launcher). 
@@ -9,7 +12,10 @@ The backend is a bundled [Holo-REA](https://github.com/holo-rea/holo-rea) runnin
 
 This project was scaffolded using the [RAD create tool](https://www.npmjs.com/package/@holochain-open-dev/create) which follows the patterns from [Holochain Open Dev](https://holochain-open-dev.github.io/).
 
-Pending POC - We are considering using [jointJS](https://www.jointjs.com), diagram modeling library, for the main portion of the UI. This will be confirmed in the coming days.
+## UI Design Ideas
+[Resource Flow Diagrams](https://write.as/economic-networks/visual-languages-resource-flow-diagrams). Each [process](https://www.valueflo.ws/concepts/processes/) should be configurable to have multiple inputs and outputs, each which represents [economicResources](https://www.valueflo.ws/concepts/resources/#unique-identifiers-for-resources).
+
+
 
 ## Valueflows Lingo
 

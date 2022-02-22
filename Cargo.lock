@@ -155,6 +155,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "hc_zome_profiles"
+version = "0.0.1"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=for-hc-v0.0.125#cc7caa4190cc6ef4cf6448b053c80240a2699090"
+dependencies = [
+ "derive_more",
+ "hc_zome_profiles_types",
+ "hdk",
+ "serde",
+]
+
+[[package]]
+name = "hc_zome_profiles_types"
+version = "0.0.1"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=for-hc-v0.0.125#cc7caa4190cc6ef4cf6448b053c80240a2699090"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "serde",
+]
+
+[[package]]
 name = "hdk"
 version = "0.0.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -441,6 +462,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7342d5883fbccae1cc37a2353b09c87c9b0f3afd73f5fb9bba687a1f733b029"
 dependencies = [
  "unicode-xid",
+]
+
+[[package]]
+name = "profiles"
+version = "0.0.1"
+dependencies = [
+ "hc_zome_profiles",
 ]
 
 [[package]]
