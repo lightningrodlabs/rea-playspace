@@ -12,6 +12,17 @@ The backend is a bundled [Holo-REA](https://github.com/holo-rea/holo-rea) runnin
 
 This project was scaffolded using the [RAD create tool](https://www.npmjs.com/package/@holochain-open-dev/create) which follows the patterns from [Holochain Open Dev](https://holochain-open-dev.github.io/).
 
+
+To connect the [Holochain Playground](https://www.npmjs.com/package/@holochain-playground/cli) to the running hrea.webhapp, run
+
+```
+npx @holochain-playground/cli ws://localhost:<admin port>
+```
+where `<admin port>` can be found in the holochain launcher.log and looks like
+
+```
+INFO - [UI] Connected to Holochain, Admin port = 15077, App URL = ws://localhost:15358/
+```
 ## UI Design Ideas
 [Resource Flow Diagrams](https://write.as/economic-networks/visual-languages-resource-flow-diagrams). Each [process](https://www.valueflo.ws/concepts/processes/) should be configurable to have multiple inputs and outputs, each which represents [economicResources](https://www.valueflo.ws/concepts/resources/#unique-identifiers-for-resources).
 
