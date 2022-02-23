@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+name = "projects"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "projects"
+
+[dependencies]
+serde = "1"
+derive_more = "0"
+chrono = {version = "0.4", features = ["serde"]}
+
+hdk = "0.0.118"
+holo_hash = { version = "0.0.15", features = ["encoding"] }

@@ -1,0 +1,17 @@
+---
+manifest_version: "1"
+name: rea-playspace
+description: ~
+roles:
+
+  - id: rea_playspace
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "../dna/workdir/rea_playspace.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 0
+
