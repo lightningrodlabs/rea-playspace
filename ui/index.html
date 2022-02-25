@@ -8,6 +8,10 @@
     />
     <meta name="Description" content="Put your description here." />
     <base href="/" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Material+Icons&display=block"
+      rel="stylesheet"
+    />
 
     <style>
       html,
@@ -22,8 +26,10 @@
   </head>
 
   <body>
-    <holochain-app></holochain-app>
-
-    <script type="module" src="./out-tsc/holochain-app.js"></script>
+    <hrea-app></hrea-app>
+    <script type="module">
+      import { HreaApp } from './out-tsc/hrea-app.js';
+      customElements.define('hrea-app', HreaApp);
+    </script>
   </body>
 </html>
