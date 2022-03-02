@@ -2,6 +2,8 @@
 
 This template gives you only what you need to get up and running with a new project that uses electron and holochain!
 
+[IMPORTANT! Check Dependency Versions Information (Holochain etc)](#dependency-versions-information)
+
 __Table of Contents__
 - [Set Up after Clone](#set-up-after-clone)
   - [App Icon Images](#app-icon-images)
@@ -9,7 +11,7 @@ __Table of Contents__
 - [Multi User Development Testing](#multi-user-development-testing)
 - [Building / Packaging](#building--packaging)
 - [Versioning for User Data](#versioning-for-user-data)
-- [Dependency Versions Information (Holochain etc)](#dependency-versions-information)
+- [IMPORTANT! Dependency Versions Information (Holochain etc)](#dependency-versions-information)
 
 ## Set Up after Clone
 
