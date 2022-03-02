@@ -127,13 +127,13 @@ KEYSTORE_VERSION_ID should be incremented if the version of lair-keystore change
 
 This project is currently using:
 
-https://github.com/holochain/holochain/releases/tag/holochain-0.0.115
+https://github.com/holochain/holochain/releases/tag/holochain-0.0.126
 
-https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.32
+https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.35
 
 Lair Keystore Revision [v0.0.9 Nov 4, 2021](https://github.com/holochain/lair/releases/tag/v0.0.9)
 
-https://docs.rs/hdk/0.0.115/hdk/index.html
+https://docs.rs/hdk/0.0.122/hdk/index.html
 
 and electron 16
 
