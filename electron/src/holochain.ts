@@ -42,9 +42,9 @@ export function stateSignalToText(state: StateSignal): StateSignalText {
   }
 }
 
-const applicationDnaPath = app.isPackaged
-  ? path.join(app.getAppPath(), '../app.asar.unpacked/binaries/application.dna')
-  : path.join(app.getAppPath(), '../dna/workdir/application.dna')
+const happPath = app.isPackaged
+  ? path.join(app.getAppPath(), '../app.asar.unpacked/binaries/application.happ')
+  : path.join(app.getAppPath(), '../happ/workdir/application.happ')
 
 // in production
 // must point to unpacked versions, not in an asar archive
@@ -65,7 +65,7 @@ const BINARY_PATHS: PathOptions | undefined = app.isPackaged
 
 // These options are in use when the application is under development
 const devOptions: HolochainRunnerOptions = {
-  dnaPath: applicationDnaPath, // preload
+  happPath: happPath, // preload
   datastorePath: process.env.EH_TEST_USER_2
     ? '../user2-data/databases'
     : path.join(__dirname, '../../user-data/databases'),
@@ -81,7 +81,7 @@ const devOptions: HolochainRunnerOptions = {
 // These options are in use when the application is packaged
 // for shipping
 const prodOptions: HolochainRunnerOptions = {
-  dnaPath: applicationDnaPath, // preload
+  happPath: happPath, // preload
   datastorePath: path.join(app.getPath('userData'), `databases-${DATABASES_VERSION_ID}`),
   appId: MAIN_APP_ID,
   appWsPort: 8889,
@@ -90,4 +90,4 @@ const prodOptions: HolochainRunnerOptions = {
   proxyUrl: COMMUNITY_PROXY_URL,
 }
 
-export { applicationDnaPath, BINARY_PATHS, devOptions, prodOptions }
+export { happPath, BINARY_PATHS, devOptions, prodOptions }

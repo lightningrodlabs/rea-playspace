@@ -1,10 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import * as path from 'path'
 // import log from 'electron-log'
-import initAgent, {
-  StateSignal,
-  STATUS_EVENT,
-} from 'electron-holochain'
+import initAgent, { StateSignal, STATUS_EVENT } from 'electron-holochain'
 
 import {
   devOptions,
@@ -18,6 +15,10 @@ import {
 // eslint-disable-line global-require
 // app.quit()
 // }
+
+process.on('uncaughtException', (e) => {
+  console.error('an unhandled error occurred:', e)
+})
 
 const BACKGROUND_COLOR = '#fbf9f7'
 
@@ -110,6 +111,8 @@ const createSplashWindow = (): BrowserWindow => {
 app.on('ready', async () => {
   const splashWindow = createSplashWindow()
   const opts = app.isPackaged ? prodOptions : devOptions
+  // shutdown will be called automatically on application
+  // quit. It is just here in case you must control it manually
   const { statusEmitter, shutdown } = await initAgent(app, opts, BINARY_PATHS)
   statusEmitter.on(STATUS_EVENT, (state: StateSignal) => {
     switch (state) {

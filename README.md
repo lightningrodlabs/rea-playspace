@@ -52,13 +52,13 @@ You can run `npm run user-data-reset` if you have user data in development, but 
 **dna**
 
 - Have rust language (stable) installed on your system, then...
-- `npm run dna-install`: installs wasm32 compilation target for rust as well as the Holochain CLI
-- `npm run dna-pack`: compiles zomes into wasm and packages each one into a dna using Holochain CLI 
-- `npm run dna-reset`: runs `dna-pack` and clears user data (Run this anytime you change the code in `dna` folder during development)
+- `npm run happ-install`: installs wasm32 compilation target for rust as well as the Holochain CLI
+- `npm run happ-pack`: compiles zomes into wasm and packages each one into a dna using Holochain CLI 
+- `npm run happ-reset`: runs `happ-pack` and clears user data (Run this anytime you change the code in `happ` folder during development)
 
 To test backend:
 
-- `npm run dna-test`: runs unit tests
+- `npm run happ-test`: runs unit tests
 
 **web** (user interface)
 
