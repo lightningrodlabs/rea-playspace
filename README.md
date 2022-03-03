@@ -2,6 +2,8 @@
 
 This template gives you only what you need to get up and running with a new project that uses electron and holochain!
 
+Check out the video walkthrough, just note that some minor details may have changed since then, but it will still be super useful to understand how to utilize this template: https://www.youtube.com/watch?v=jFraPKl2rPk.
+
 [IMPORTANT! Check Dependency Versions Information (Holochain etc)](#dependency-versions-information)
 
 __Table of Contents__
