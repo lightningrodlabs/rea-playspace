@@ -38,8 +38,8 @@ const App = () => {
   }
 
   return (
-      <div>
-        <h2>App</h2>
+      <div id="app">
+        <h2>REA Playspace</h2>
         {handleLoad()}
       </div>
   );
