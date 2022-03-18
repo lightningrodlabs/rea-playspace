@@ -39,7 +39,9 @@ const App = () => {
 
   return (
       <div id="app">
-        <h2>REA Playspace</h2>
+        <center>
+          <h2>REA Playspace</h2>
+        </center>
         {handleLoad()}
       </div>
   );

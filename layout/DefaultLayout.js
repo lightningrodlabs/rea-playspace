@@ -1,32 +1,66 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useRef, useEffect, useMemo} from 'react';
 import { gql, useQuery} from '@apollo/client';
 import ReactFlow, {
+  ReactFlowProvider,
   addEdge,
   Background,
   useNodesState,
   useEdgesState,
 } from 'react-flow-renderer';
 import { nodes as initialNodes, edges as initialEdges } from './initial-elements';
-import AddProcessModal from '../components/AddProcessModal';
+import ProcessNode from '../components/nodes/ProcessNode';
 
-const onInit = (reactFlowInstance) => console.log('flow loaded:', reactFlowInstance);
+let id = 0;
+const getId = () => `node_${id++}`;
 
 const DefaultLayout = () => {
-  const [isProcessOpen, setIsProcessOpen] = useState(false);
-  const [isCommitmentOpen, setIsCommitmentOpen] = useState(false);
+  const reactFlowWrapper = useRef(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const onConnect = (params) => setEdges((eds) => addEdge(params, eds));
 
-  const DEFAULT_QUERY = gql`
-    query getAgent {
-      myAgent {
-        id
-        name
-      }
-    }
-   `;
+  const nodeTypes = useMemo(() => ({ processNode: ProcessNode, }), []); 
 
-   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-   const onConnect = (params) => setEdges((eds) => addEdge(params, eds));
+  useEffect(() => {
+    let element = document.getElementsByClassName('react-flow__container')[0];
+    // element.addEventListener("dblclick", clickToAddProcess);
+    element.style.position = "relative";
+  }, []);
+	
+  const addProcess = useCallback(
+    (event) => {
+      event.preventDefault();
+      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();  
+      console.log(reactFlowBounds);
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top
+      });
+
+      const type = 'processNode'
+      const newNode = {
+        id: getId(),
+        type,
+        position,
+        data: { 
+          label: `Process node`
+        }
+      };
+
+      setNodes((nds) => nds.concat(newNode))
+    },
+    [reactFlowInstance]
+  );
+
+  // const DEFAULT_QUERY = gql`
+  //   query getAgent {
+  //     myAgent {
+  //       id
+  //       name
+  //     }
+  //   }
+  //  `;
    
   // function Agent() {
   //   const { loading, error, data } =  useQuery(DEFAULT_QUERY);
@@ -48,30 +82,29 @@ const DefaultLayout = () => {
     width: "1500px"
   };
 
-  function toggleProcessModal() {
-    setIsProcessOpen(!isProcessOpen);
-  }
-  function toggleCommitmentModal() {
-    console.log("close commitment");
-    setIsCommitmentOpen(!isCommitmentOpen);
-  }
 
   return (
     <div>
-      <button style={{marginLeft: "30px"}} onClick={toggleProcessModal}>Add Process</button>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onInit={onInit}
-        fitView
-        attributionPosition="top-right"
-        style={layoutStyle}>
-        <Background color="#aaa" gap={16} />
-      </ReactFlow>
-      <AddProcessModal isProcessOpen={isProcessOpen} toggleProcessModal={toggleProcessModal} isCommitmentOpen={isCommitmentOpen} toggleCommitmentModal={toggleCommitmentModal}/>
+      <ReactFlowProvider>
+        <ReactFlow
+          id="flow-canvas"
+          className="reactflow-wrapper"
+          ref={reactFlowWrapper}
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onInit={setReactFlowInstance}
+          onPaneClick={addProcess}
+          zoomOnDoubleClick={false}
+          fitView
+          attributionPosition="top-right"
+          style={layoutStyle}>
+          <Background color="#aaa" gap={16} />
+        </ReactFlow>
+      </ReactFlowProvider>
     </div>
   );
 }

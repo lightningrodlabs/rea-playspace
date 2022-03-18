@@ -3,7 +3,6 @@ import Modal from "react-modal";
 Modal.setAppElement("#root");
 
 const AddCommitmentModal = (props) => {
-  console.log(props.type)
   return <Modal
     style={{
       overlay: {zIndex: 2000},
@@ -19,7 +18,7 @@ const AddCommitmentModal = (props) => {
     isOpen={props.isCommitmentOpen}
     onRequestClose={props.toggleCommitmentModal}
     contentLabel={props.type}>
-    <h1>{props.title}</h1>
+    <h1>{props.type}</h1>
     <form>
       <label>
         Name:
