@@ -32,7 +32,6 @@ const DefaultLayout = () => {
     (event) => {
       event.preventDefault();
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();  
-      console.log(reactFlowBounds);
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top
