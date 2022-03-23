@@ -6,14 +6,14 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Connection,
-  ReactFlowProps,
   ReactFlowInstance,
-  Node,
   XYPosition
 } from 'react-flow-renderer';
 import BlankAddModal from '../components/modals/BlankAddModal';
 import ProcessNode from '../components/nodes/ProcessNode';
+import CreateEconomicResource from '../CreateEconomicResource';
 import { nodes as initialNodes, edges as initialEdges } from '../data/initial-elements';
+
 let id = 0;
 const getId = () => `node_${id++}`;
 
@@ -43,7 +43,6 @@ const FlowLayout: React.FC<Props> = (props) => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
     element.style.position = "relative";
   }, []);
-
 
   // click viewport -> get location
   // open modal
@@ -120,8 +119,12 @@ const FlowLayout: React.FC<Props> = (props) => {
         isOpen={addingNode} 
         toggleModal={toggleModal} 
         handleAddNode={handleAddNode} 
-        myAgentId={props.myAgentId} 
-        setCurrentNodeName={setCurrentNodeName}/>
+        >  
+        <CreateEconomicResource 
+          myAgentId={props.myAgentId} 
+          setCurrentNodeName={setCurrentNodeName} 
+          closeModal={toggleModal}/>
+        </BlankAddModal>
     </div>
   );
 }

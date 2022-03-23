@@ -1,16 +1,14 @@
 import { SlButton } from "@shoelace-style/shoelace/dist/react";
 import React from "react";
 import Modal from "react-modal";
-import CreateEconomicResource from "../../CreateEconomicResource";
+import CreateEconomicResource, { CreateEconomicResourceProps } from "../../CreateEconomicResource";
 
 Modal.setAppElement("#root");
 
 interface Props {
   isOpen: boolean;
-  myAgentId: string;
   handleAddNode: () => void;
   toggleModal: () => void;
-  setCurrentNodeName: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
 const BlankAddModal:React.FC<Props>  = (props) => {
@@ -21,10 +19,7 @@ const BlankAddModal:React.FC<Props>  = (props) => {
       isOpen={props.isOpen}
       onAfterClose={props.handleAddNode}
     >
-    <CreateEconomicResource 
-      myAgentId={props.myAgentId} 
-      setCurrentNodeName={props.setCurrentNodeName} 
-      closeModal={props.toggleModal}/>
+      <>{props.children}</>
     </Modal>
   );
 }
