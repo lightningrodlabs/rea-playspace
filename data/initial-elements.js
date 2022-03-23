@@ -16,6 +16,7 @@ export const nodes = [
   },
   {
     id: '2',
+    type: 'default',
     data: {
       label: (
         <>
@@ -27,38 +28,31 @@ export const nodes = [
   },
   {
     id: '3',
+    type: 'default',
+    position: { x: 250, y: 200 },
     data: {
       label: (
         <>
-          This one has a <strong>custom style</strong>
+          This is a default node
         </>
       ),
-    },
-    position: { x: 400, y: 100 },
-    style: {
-      background: '#D6D5E6',
-      color: '#333',
-      border: '1px solid #222138',
-      width: 180,
     },
   },
   {
     id: '4',
-    position: { x: 250, y: 200 },
+    type: 'default',
     data: {
-      label: 'Another default node',
-    },
-  },
-  {
-    id: '5',
-    data: {
-      label: 'Node id: 5',
+      label: (
+        <>
+          This is node 4
+        </>
+      ),
     },
     position: { x: 250, y: 325 },
   },
   {
-    id: '6',
-    type: 'output',
+    id: '5',
+    type: 'default',
     data: {
       label: (
         <>
@@ -69,9 +63,15 @@ export const nodes = [
     position: { x: 100, y: 480 },
   },
   {
-    id: '7',
+    id: '6',
     type: 'output',
-    data: { label: 'Another output node' },
+    data: { 
+      label: (
+        <>
+          Another <strong>output node</strong>
+        </>
+      ),
+    },
     position: { x: 400, y: 450 },
   },
 ];
@@ -101,15 +101,5 @@ export const edges = [
     target: '6',
     type: 'smoothstep',
     label: 'smooth step edge',
-  },
-  {
-    id: 'e5-7',
-    source: '5',
-    target: '7',
-    type: 'step',
-    style: { stroke: '#f6ab6c' },
-    label: 'a step edge',
-    animated: true,
-    labelStyle: { fill: '#f6ab6c', fontWeight: 700 },
-  },
+  }
 ];
