@@ -2,47 +2,50 @@ lockfileVersion: 5.3
 
 specifiers:
   '@apollo/client': ^3.5.10
-  '@babel/core': ^7.5.5
+  '@babel/core': ^7.17.8
+  '@babel/plugin-syntax-flow': ^7.16.7
+  '@babel/plugin-transform-react-jsx': ^7.17.3
   '@babel/preset-env': 7.5.5
-  '@babel/preset-react': ^7.12.13
-  '@msgpack/msgpack': ^2.7.1
-  '@pmmmwh/react-refresh-webpack-plugin': ^0.5.3
-  '@shoelace-style/shoelace': ^2.0.0-beta.70
+  '@babel/preset-react': ^7.16.7
+  '@msgpack/msgpack': ^2.7.2
+  '@pmmmwh/react-refresh-webpack-plugin': ^0.5.4
+  '@shoelace-style/shoelace': ^2.0.0-beta.72
   '@types/jest': ^27.4.1
-  '@types/node': ^17.0.21
-  '@types/react': ^17.0.39
-  '@types/react-dom': ^17.0.4
+  '@types/node': ^17.0.23
+  '@types/react': ^17.0.43
+  '@types/react-dom': ^17.0.14
   '@types/react-modal': ^3.13.1
-  '@types/react-router-dom': ^5.1.7
+  '@types/react-router-dom': ^5.3.3
   '@valueflows/vf-graphql-holochain': 0.0.1-alpha.4
-  babel-loader: ^8.0.6
+  babel-loader: ^8.2.4
   blob-to-buffer: ^1.2.9
-  css-loader: ^3.2.0
-  electron: ^11.2.1
+  css-loader: ^3.6.0
+  electron: ^11.5.0
   graphql: ^16.3.0
   prettier: 2.2.1
-  react: ^16.12.0
-  react-dom: ^16.12.0
-  react-flow-renderer: ^10.0.3
+  react: ^16.14.0
+  react-dom: ^16.14.0
+  react-flow-renderer: ^10.0.7
   react-modal: ^3.14.4
   react-refresh: 0.10.0
-  react-refresh-typescript: ^2.0.2
-  react-router-dom: ^6.2.2
+  react-refresh-typescript: ^2.0.4
+  react-router-dom: ^6.3.0
   react-scripts: 5.0.0
-  style-loader: ^1.0.0
+  style-loader: ^1.3.0
   terser: 4.4.2
-  ts-loader: ^8.0.18
-  typescript: ^4.2.3
-  webpack: ^4.43.0
-  webpack-cli: ^3.3.6
-  webpack-dev-server: ^3.11.0
+  ts-loader: ^8.3.0
+  typescript: ^4.6.3
+  webpack: ^4.46.0
+  webpack-cli: ^3.3.12
+  webpack-dev-server: ^3.11.3
   webpack-merge: ^4.2.2
+  ws: ^8.5.0
 
 dependencies:
   '@apollo/client': 3.5.10_graphql@16.3.0+react@16.14.0
   '@msgpack/msgpack': 2.7.2
   '@shoelace-style/shoelace': 2.0.0-beta.72
-  '@valueflows/vf-graphql-holochain': 0.0.1-alpha.4_graphql@16.3.0
+  '@valueflows/vf-graphql-holochain': 0.0.1-alpha.4_graphql@16.3.0+ws@8.5.0
   blob-to-buffer: 1.2.9
   electron: 11.5.0
   graphql: 16.3.0
@@ -51,10 +54,13 @@ dependencies:
   react-flow-renderer: 10.0.7_react-dom@16.14.0+react@16.14.0
   react-modal: 3.14.4_react-dom@16.14.0+react@16.14.0
   react-router-dom: 6.3.0_react-dom@16.14.0+react@16.14.0
-  react-scripts: 5.0.0_7e9bcb131cdcbb92c0cb5dec63d8639d
+  react-scripts: 5.0.0_37c562e7ac5bcd88cb3740fd2d61b0da
+  ws: 8.5.0
 
 devDependencies:
   '@babel/core': 7.17.8
+  '@babel/plugin-syntax-flow': 7.16.7_@babel+core@7.17.8
+  '@babel/plugin-transform-react-jsx': 7.17.3_@babel+core@7.17.8
   '@babel/preset-env': 7.5.5_@babel+core@7.17.8
   '@babel/preset-react': 7.16.7_@babel+core@7.17.8
   '@pmmmwh/react-refresh-webpack-plugin': 0.5.4_2fa0d36f70fb0ce5409dce10fc1ff3ae
@@ -691,7 +697,6 @@ packages:
     dependencies:
       '@babel/core': 7.17.8
       '@babel/helper-plugin-utils': 7.16.7
-    dev: false
 
   /@babel/plugin-syntax-import-meta/7.10.4_@babel+core@7.17.8:
     resolution: {integrity: sha512-Yqfm+XDx0+Prh3VSeEQCPU81yC+JWZ2pDPFSS4ZdpfZhp4MkFMaDC1UqseovEKwSUpnIL7+vK+Clp7bfh0iD7g==}
@@ -1630,12 +1635,12 @@ packages:
       graphql: 16.3.0
     dev: false
 
-  /@holochain/client/0.3.2:
+  /@holochain/client/0.3.2_ws@8.5.0:
     resolution: {integrity: sha512-tBmfgRMcHn/yujiQ4ugolAEbE4WMznIGRt+F8gpPNNAzC263xt+CLa6G3KslcfUc4tKD+XCr5c9z3wkZP/MMzw==}
     dependencies:
       '@msgpack/msgpack': 2.7.2
       cross-fetch: 3.1.5
-      isomorphic-ws: 4.0.1
+      isomorphic-ws: 4.0.1_ws@8.5.0
     transitivePeerDependencies:
       - encoding
       - ws
@@ -2649,14 +2654,14 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: false
 
-  /@valueflows/vf-graphql-holochain/0.0.1-alpha.4_graphql@16.3.0:
+  /@valueflows/vf-graphql-holochain/0.0.1-alpha.4_graphql@16.3.0+ws@8.5.0:
     resolution: {integrity: sha512-+srjuWWBInqIBkRTdt5wH9pgJOkCrKjPmKoZqeeZolWLXJ+bC1nzjFLOoRky//0Tl/m489rkzw0+SVFfCM9POQ==}
     peerDependencies:
       graphql: '>=14'
     dependencies:
       '@graphql-tools/schema': 8.3.6_graphql@16.3.0
       '@graphql-tools/utils': 8.6.5_graphql@16.3.0
-      '@holochain/client': 0.3.2
+      '@holochain/client': 0.3.2_ws@8.5.0
       '@valueflows/vf-graphql': 0.9.0-alpha.2_graphql@16.3.0
       buffer: 6.0.3
       dataloader: 1.4.0
@@ -5225,7 +5230,7 @@ packages:
       source-map: 0.6.1
     dev: false
 
-  /eslint-config-react-app/7.0.0_d0062e76d70ab01651d408ef76fbe2be:
+  /eslint-config-react-app/7.0.0_dd4c43c1685b81f22a5592c66a4e9789:
     resolution: {integrity: sha512-xyymoxtIt1EOsSaGag+/jmcywRuieQoA2JbPCjnw9HukFj9/97aGPoZVFioaotzk1K5Qt9sHO5EutZbkrAXS0g==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -5239,7 +5244,7 @@ packages:
       babel-preset-react-app: 10.0.1
       confusing-browser-globals: 1.0.11
       eslint: 8.12.0
-      eslint-plugin-flowtype: 8.0.3_eslint@8.12.0
+      eslint-plugin-flowtype: 8.0.3_208f7be97c72158078ddc5718ecd0567
       eslint-plugin-import: 2.25.4_eslint@8.12.0
       eslint-plugin-jest: 25.7.0_376793c692fafbde76e94b5cf79c8e11
       eslint-plugin-jsx-a11y: 6.5.1_eslint@8.12.0
@@ -5269,7 +5274,7 @@ packages:
       find-up: 2.1.0
     dev: false
 
-  /eslint-plugin-flowtype/8.0.3_eslint@8.12.0:
+  /eslint-plugin-flowtype/8.0.3_208f7be97c72158078ddc5718ecd0567:
     resolution: {integrity: sha512-dX8l6qUL6O+fYPtpNRideCFSpmWOUVx5QcaGLVqe/vlDiBSe4vYljDWDETwnyFzpl7By/WVIu6rcrniCgH9BqQ==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -5277,6 +5282,8 @@ packages:
       '@babel/plugin-transform-react-jsx': ^7.14.9
       eslint: ^8.1.0
     dependencies:
+      '@babel/plugin-syntax-flow': 7.16.7_@babel+core@7.17.8
+      '@babel/plugin-transform-react-jsx': 7.17.3_@babel+core@7.17.8
       eslint: 8.12.0
       lodash: 4.17.21
       string-natural-compare: 3.0.1
@@ -7085,10 +7092,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /isomorphic-ws/4.0.1:
+  /isomorphic-ws/4.0.1_ws@8.5.0:
     resolution: {integrity: sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==}
     peerDependencies:
       ws: '*'
+    dependencies:
+      ws: 8.5.0
     dev: false
 
   /istanbul-lib-coverage/3.2.0:
@@ -10077,7 +10086,7 @@ packages:
       react: 16.14.0
     dev: false
 
-  /react-scripts/5.0.0_7e9bcb131cdcbb92c0cb5dec63d8639d:
+  /react-scripts/5.0.0_37c562e7ac5bcd88cb3740fd2d61b0da:
     resolution: {integrity: sha512-3i0L2CyIlROz7mxETEdfif6Sfhh9Lfpzi10CtcGs1emDQStmZfWjJbAIMtRD0opVUjQuFWqHZyRZ9PPzKCFxWg==}
     engines: {node: '>=14.0.0'}
     hasBin: true
@@ -10104,7 +10113,7 @@ packages:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 8.12.0
-      eslint-config-react-app: 7.0.0_d0062e76d70ab01651d408ef76fbe2be
+      eslint-config-react-app: 7.0.0_dd4c43c1685b81f22a5592c66a4e9789
       eslint-webpack-plugin: 3.1.1_eslint@8.12.0+webpack@5.70.0
       file-loader: 6.2.0_webpack@5.70.0
       fs-extra: 10.0.1

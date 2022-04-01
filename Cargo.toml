@@ -1,7 +1,8 @@
 [workspace]
+resolver = "2"
 members = [
-  "happ/zomes/zome_a",
-  "happ/tests"
+    "happ/zomes/projects",
+    "happ/zomes/profiles",
 ]
 
 [profile.dev]
