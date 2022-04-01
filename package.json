@@ -1,5 +1,5 @@
 {
-  "name": "electron-holochain-template",
+  "name": "rea-playspace",
   "version": "0.0.1",
   "description": "This repository helps get started with electron and holochain",
   "repository": {
@@ -7,24 +7,24 @@
     "url": "git+https://github.com/Sprillow/electron-holochain-template.git"
   },
   "scripts": {
-    "install-deps": "npm install && npm run happ-install && npm run web-install && npm run electron-install && npm run electron-tsc",
+    "install-deps": "pnpm install && pnpm run happ-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
     "dev": "pm2-dev pm2.config.js",
     "happ-install": "bash scripts/install-hc-tools.sh",
     "happ-test": "bash scripts/happ-test.sh",
     "happ-pack": "bash scripts/happ-pack.sh",
-    "happ-reset": "npm run happ-pack && npm run user-data-reset",
+    "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
-    "web-install": "cd web && npm install",
+    "web-install": "cd web && pnpm install",
     "web": "cd web && ADMIN_WS_PORT=1234 APP_WS_PORT=8888 npx webpack-dev-server --config webpack.dev.js",
     "web2": "cd web && ADMIN_WS_PORT=1236 APP_WS_PORT=8899 npx webpack-dev-server --config webpack.dev.js",
-    "web-build": "cd web && npx webpack --config webpack.prod.js",
-    "electron-install": "cd electron && npm install",
-    "electron": "cd electron && npm run start",
-    "electron2": "cd electron && EH_TEST_USER_2=1 npm run start",
-    "electron-tsc": "cd electron && npm run tsc",
+    "web-build": "cd web && pnpx webpack --config webpack.prod.js",
+    "electron-install": "cd electron && pnpm install",
+    "electron": "cd electron && pnpm run start",
+    "electron2": "cd electron && EH_TEST_USER_2=1 pnpm run start",
+    "electron-tsc": "cd electron && pnpm run tsc",
     "build": "bash scripts/build.sh"
   },
-  "author": "Connor Turland <connor@sprillow.com>",
+  "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0",
   "dependencies": {
     "pm2": "^5.1.1"
