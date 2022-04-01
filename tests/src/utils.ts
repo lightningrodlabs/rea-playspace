@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const reaPlayspaceDna = path.join(__dirname, "../../dna/workdir/rea_playspace.dna");
+export const reaPlayspaceDna = path.join(__dirname, "../../happ/workdir/application.dna");
 
 
 export const config = Config.gen();
