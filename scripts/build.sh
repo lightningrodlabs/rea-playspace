@@ -17,10 +17,10 @@ bash scripts/copy-binaries.sh
 
 # ui
 rm -rf electron/web
-npm run web-build
+pnpm run web-build
 cp -r web/dist electron/web
 
 # build the electron application
 cd electron
-npm run build
+pnpm run build
 

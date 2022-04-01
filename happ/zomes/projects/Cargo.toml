@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "projects"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "projects"
+
+[dependencies]
+chrono = {version = "0.4", features = ['alloc', 'std']}
+derive_more = "0.99"
+serde = "1.0.123"
+
+hdk = {version = "0.0.123", features = ["encoding"]}

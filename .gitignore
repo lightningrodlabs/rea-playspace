@@ -4,6 +4,7 @@ out/
 user2-data
 user-data
 electron/web
+.cargo
 
 dna/workdir/*.dna
 

@@ -25,7 +25,7 @@ module.exports = {
     app: './src/index.tsx',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.mjs'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
   node: {
     fs: 'empty',
