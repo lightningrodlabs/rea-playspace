@@ -16,7 +16,7 @@
   },
   "license": "CAL-1.0",
   "build": {
-    "productName": "ElectronHolochainTemplate",
+    "productName": "rea-playspace",
     "afterSign": "./afterSignHook.js",
     "appId": "com.some-domain-name.app-name",
     "copyright": "© 2022 So And So Ltd. ",

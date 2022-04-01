@@ -14,7 +14,7 @@ const KEYSTORE_VERSION_ID = '0-0-1'
 
 // these messages get seen on the splash page
 export enum StateSignalText {
-  IsFirstRun = 'Welcome to ElectronHolochainTemplate...',
+  IsFirstRun = 'Welcome to rea-playspace...',
   IsNotFirstRun = 'Loading...',
   CreatingKeys = 'Creating cryptographic keys...',
   RegisteringDna = 'Registering DNA to Holochain...',
