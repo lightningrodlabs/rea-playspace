@@ -22,7 +22,7 @@ module.exports = {
     app: './src/index.tsx',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.mjs'],
   },
   output: {
     filename: 'main.js',
@@ -39,6 +39,11 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: "javascript/auto"
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,

@@ -22,6 +22,7 @@ import Resources from "./routes/Resources";
 import NewResource from "./routes/NewResource";
 import ResourceTransfer from "./routes/ResourceTransfer";
 import FlowLayout from "./routes/FlowLayout";
+import { REACT_APP_HC_APP_ID, APP_PORT } from './holochainConf';
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
@@ -36,7 +37,7 @@ const App: React.FC<Props> = () => {
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject>>();
 
   const connect = async () => {
-    let { dnaConfig, conductorUri } = await autoConnect();
+    let { dnaConfig, conductorUri } = await autoConnect(`ws://localhost:${APP_PORT}`, REACT_APP_HC_APP_ID);
     const schema = await bindSchema({ dnaConfig, conductorUri });
     const link = new SchemaLink({ schema });
     const cache = new InMemoryCache();
