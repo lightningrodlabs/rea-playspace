@@ -19,8 +19,8 @@ export default (orchestrator: Orchestrator<any>) =>  {
 
     await s.shareAllNodes([alice_player, bob_player]);
 
-    const alice = alice_happ.cells.find(cell => cell.cellRole.includes('/rea_playspace.dna')) as Cell;
-    const bob = bob_happ.cells.find(cell => cell.cellRole.includes('/rea_playspace.dna')) as Cell;
+    const alice = alice_happ.cells.find(cell => cell.cellRole.includes('/application.dna')) as Cell;
+    const bob = bob_happ.cells.find(cell => cell.cellRole.includes('/application.dna')) as Cell;
 
     let commitment = {
         // vf:Commitment

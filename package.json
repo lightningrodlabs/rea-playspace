@@ -4,16 +4,24 @@
   "description": "This repository helps get started with electron and holochain",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sprillow/electron-holochain-template.git"
+    "url": "git+https://github.com/lightningrodlabs/rea-playspace.git"
   },
+  "private": true,
+  "workspaces": [
+    "web",
+    "tests"
+  ],
   "scripts": {
-    "install-deps": "pnpm install && pnpm run happ-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
+    "install-deps": "pnpm install && pnpm run happ-install && && pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
     "dev": "pm2-dev pm2.config.js",
     "happ-install": "bash scripts/install-hc-tools.sh",
     "happ-test": "bash scripts/happ-test.sh",
+    "happ-test-ts": "cd tests && pnpm test",
     "happ-pack": "bash scripts/happ-pack.sh",
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
+    "tests-install": "cd tests && pnpm install",
+    "test": "cd web && pnpm test",
     "web-install": "cd web && pnpm install",
     "web": "cd web && ADMIN_WS_PORT=1234 APP_WS_PORT=8888 npx webpack-dev-server --config webpack.dev.js",
     "web2": "cd web && ADMIN_WS_PORT=1236 APP_WS_PORT=8899 npx webpack-dev-server --config webpack.dev.js",
@@ -27,6 +35,6 @@
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0",
   "dependencies": {
-    "pm2": "^5.1.1"
+    "pm2": "^5.2.0"
   }
 }
