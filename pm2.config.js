@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'web-gui',
-      script: 'npm run web',
+      script: 'pnpm run web',
       ignore_watch: ['.'],
       env: {
         NODE_ENV: 'development',
