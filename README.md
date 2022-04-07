@@ -4,6 +4,10 @@
 
 The REA Playspace is an electron based environment that lets people play with the concepts behind [Valueflows](https://www.valueflo.ws/).
 
+This is based on a modified version of the [electron-holochain-template](https://github.com/Sprillow/electron-holochain-template). We took the webhapp we were building, shoehorned it into the `web` directory, converted it over to a vitejs project, moved over to pnpm, and we added a nix-shell setup.
+
+In the process of moving things over, I found a few [interesting differences between the project structure of webhapps and electron-holochain-template apps](https://hackmd.io/JXX0M-nwS1i048eqTS6BLA).
+
 ## Set Up after Clone
 
 Global find and replace:
