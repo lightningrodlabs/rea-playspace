@@ -1,23 +1,38 @@
 
-name: Cargo tests
+name: Tryorama tests
 
 on: [ push, pull_request ]
 
 jobs:
-  cargo_test:
+  tryorama_test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     steps:
-     - uses: actions/checkout@v2
-     - uses: actions-rs/toolchain@v1
-       with:
-         toolchain: 1.58
-         target: wasm32-unknown-unknown
-
-     - run: rustup update stable
-     - run: rustc --version
-     - run: cargo --version
-     - run: rustup component list --installed
-     - run: rustup show
-
-     - run: ./scripts/happ-test.sh
+    - name: Fetch source code
+      uses: actions/checkout@v2
+    - name: Use Nix
+      uses: cachix/install-nix-action@v16
+      with:
+        nix_path: nixpkgs=channel:nixos-21.11
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Configure Nix substituters
+      run: |
+        set -xe
+        mkdir -p ~/.config/nix/
+        cp ./.github/nix.conf ~/.config/nix/
+    - uses: cachix/cachix-action@v10
+      with:
+        name: holochain-ci
+    - name: Prepare Nix environment
+      run: nix-shell --command "echo Completed"
+    - name: Install deps
+      run: nix-shell --command "pnpm run tests-install"
+    - name: Run all tests
+      run: nix-shell --command "pnpm run happ-test-ts"
