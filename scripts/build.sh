@@ -4,7 +4,7 @@
 # over in happ/workdir
 # are already pre-compiled and up to date
 # In CI this is handled via .github/workflows/release.yml
-# where it calls install-hc-tools and and happ-pack
+# where it calls happ-pack
 
 # ensure all necessary binaries are packaged in the app
 rm -rf electron/binaries
