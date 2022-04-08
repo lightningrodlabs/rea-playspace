@@ -1,17 +1,14 @@
 ---
 manifest_version: "1"
-name: rea_playspace
+name: reaplayspacehapp
 description: ~
 roles:
 
-  - id: rea_playspace
+  - id: reaplayspace
     provisioning:
       strategy: create
       deferred: false
     dna:
       bundled: "../workdir/application.dna"
-      properties: ~
-      uuid: ~
-      version: ~
       clone_limit: 0
 

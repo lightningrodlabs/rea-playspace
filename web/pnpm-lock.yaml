@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@holochain-open-dev/core-types': ^0.2.0
-  '@holochain/client': 0.3.2
+  '@holochain/client': ^0.3.2
   '@msgpack/msgpack': ^2.7.2
   '@shoelace-style/shoelace': ^2.0.0-beta.72
   '@types/jest': ^27.4.1
