@@ -2,7 +2,7 @@ import * as path from 'path'
 import { app } from 'electron'
 import { HolochainRunnerOptions, StateSignal, PathOptions } from 'electron-holochain'
 
-const MAIN_APP_ID = 'main-app'
+const MAIN_APP_ID = 'rea-playspace'
 const COMMUNITY_PROXY_URL =
   'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
 // increment this version when an update to the application
@@ -67,13 +67,13 @@ const BINARY_PATHS: PathOptions | undefined = app.isPackaged
 const devOptions: HolochainRunnerOptions = {
   happPath: happPath, // preload
   datastorePath: process.env.EH_TEST_USER_2
-    ? '../user2-data/databases'
+    ? '../../user2-data/databases'
     : path.join(__dirname, '../../user-data/databases'),
   appId: MAIN_APP_ID,
   appWsPort: process.env.EH_TEST_USER_2 ? 8899 : 8888,
   adminWsPort: process.env.EH_TEST_USER_2 ? 1236 : 1234,
   keystorePath: process.env.EH_TEST_USER_2
-    ? '../user2-data/keystore'
+    ? '../../user2-data/keystore'
     : path.join(__dirname, '../../user-data/keystore'),
   proxyUrl: COMMUNITY_PROXY_URL,
 }
@@ -84,7 +84,7 @@ const prodOptions: HolochainRunnerOptions = {
   happPath: happPath, // preload
   datastorePath: path.join(app.getPath('userData'), `databases-${DATABASES_VERSION_ID}`),
   appId: MAIN_APP_ID,
-  appWsPort: 8889,
+  appWsPort: 8888,
   adminWsPort: 1235,
   keystorePath: path.join(app.getPath('userData'), `keystore-${KEYSTORE_VERSION_ID}`),
   proxyUrl: COMMUNITY_PROXY_URL,
