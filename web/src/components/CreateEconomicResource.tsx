@@ -12,9 +12,6 @@ const CreateEconomicResource: React.FC<CreateEconomicResourceProps> = ({
   myAgentId, setCurrentNodeName, closeModal
 }) => {
   const navigate = useNavigate();
-  // const [createER, createERmutationStatus] = useMutation(
-  //   CREATE_ECONOMIC_RESOURCES
-  // );
 
   const [image, setImage] = useState("");
   const [quantity, setQuantity] = useState(1);

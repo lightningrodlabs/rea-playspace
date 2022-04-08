@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import "./App.css";
-//import EconomicResourceList from "./EconomicResourceList";
-//import CreateEconomicResource from "./CreateEconomicResource";
-import Header from "./Header";
-import LeftScreenNavMenu from "./LeftScreenNavMenu";
+import Header from "./components/Header";
+import LeftScreenNavMenu from "./components/LeftScreenNavMenu";
 //import { SlButton } from "@shoelace-style/shoelace/dist/react";
-import Resources from "./routes/Resources";
-import NewResource from "./routes/NewResource";
-import ResourceTransfer from "./routes/ResourceTransfer";
-import FlowLayout from "./routes/FlowLayout";
 import { APP_ID, ZOME_NAME, ADMIN_PORT, APP_PORT } from './holochainConf';
-import { AdminWebsocket, AppWebsocket, HoloHash, CellId } from '@holochain/client';
-import { app } from "electron";
+import { AdminWebsocket, AppWebsocket, InstalledAppInfo, InstalledCell } from '@holochain/client';
+import Knowledge from "./routes/Knowledge";
+import Plan from "./routes/Plan";
+import Observation from "./routes/Observation";
+import Resources from "./components/Resources";
+import NewResource from "./components/NewResource";
+
 const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
 
@@ -41,6 +40,10 @@ function StringToHash(s: string): Uint8Array {
 const App: React.FC<Props> = () => {
   const [myAgentId, setMyAgentId] = useState<string>();
   const [client, setClient] = useState<AppWebsocket>();
+  const [result, setResult] = useState("");
+  const [appInfo, setAppInfo] = useState<InstalledAppInfo>();
+  const [cellData, setCellData] = useState<InstalledCell>();
+  const [loading, setLoading] = useState(true);
 
   const connect = async () => {
     const adminWs = await AdminWebsocket.connect(ADMIN_WS_URL);
@@ -54,71 +57,77 @@ const App: React.FC<Props> = () => {
       console.log('app websocket closed');
     })
 
-    if (adminWs.client.socket.readyState === adminWs.client.socket.OPEN
-      && appWs.client.socket.readyState === appWs.client.socket.OPEN) {
-      const appIds = await adminWs.listActiveApps();
-      const infos = await Promise.all(
-        appIds.map(async installed_app_id => {
-          const appInfo = await appWs.appInfo({ installed_app_id });
-          return {
-            ...appInfo,
-            cellIdString: HashToString(appInfo.cell_data[0].cell_id[0]) + ':' + HashToString(appInfo.cell_data[0].cell_id[1])
-          };
-        })
-      );
-      console.log(infos);
-      const cellIds = await adminWs.listCellIds();
-      console.log (cellIds);
-
-      const appDnas = await adminWs.listDnas();
-      console.log(appDnas);
-      
+    // this stinks but works for now.
+    // Check every 100ms and only then get app info or else app_info etc would just get missed.
+    while (!(adminWs.client.socket.readyState === adminWs.client.socket.OPEN
+      && appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
+        continue;
     }
+    const app_info = await appWs.appInfo({ installed_app_id: APP_ID })
+    setAppInfo(app_info)
+    // this always fails on the first load. I need to change and save this file in order for appInfo to be available
+    const cell_data = app_info.cell_data[0]
+    setCellData(cell_data)
     
-    //const zome_res = await client.callZome()
+    // Test 
+    const res = await appWs.callZome({
+      cap_secret: null as any,
+      cell_id: cell_data.cell_id,
+      zome_name: 'projects',
+      fn_name: 'fetch',
+      provenance: cellData.cell_id[1],
+      payload: null as any,
+    }, 30000)
+    setResult(res)
+    setLoading(false)
     
     // @ts-ignore
     setClient(appWs);
-    setMyAgentId('hello');
+    setMyAgentId('hello'); // maybe get rid of this?
   };
 
-  useEffect(() => {
-    connect();
-  }, []);
-
-  if (!client) {
-    return <div>Making websocket connection...</div>;
-  }
+  useEffect(()=>{
+    connect()
+  },[])
 
   return (
     <BrowserRouter>
-      <div className="container">
-        <Header name={myAgentId} />
-        <div className="below-header">
-          <LeftScreenNavMenu />
+        <div className="container">
+          <Header name="shane" />
+          <div className="below-header">
+            <LeftScreenNavMenu />
 
-          <div className="main-panel">
-              <Routes>
-                <Route
-                  path="/flow"
-                  element={<FlowLayout myAgentId={myAgentId}/>}
-                />
-                <Route
-                  path="/resources"
-                  element={<Resources myAgentId={myAgentId} />}
-                />
-                <Route
-                  path="/resources/transfer"
-                  element={<ResourceTransfer myAgentId={myAgentId} />}
-                />
-                <Route
-                  path="/resources/new"
-                  element={<NewResource myAgentId={myAgentId} />}
-                />
-              </Routes>
+            <div className="main-panel">
+              <p>{loading ? "Loading..." : `Fetched From Zome ${result}`}</p>
+                <Routes>
+                  <Route
+                    path="/knowledge"
+                    element={<Knowledge />}>
+                  </Route>
+                  <Route
+                    path="/plan"
+                    element={<Plan />}>
+                  </Route>
+                  <Route
+                    path="/"
+                    element={<Observation />}>
+                  </Route>
+                  <Route
+                    path="/resources"
+                    element={<Resources />}
+                  />
+                  {/* <Route
+                    path="/resources/transfer"
+                    element={<ResourceTransfer />}
+                  /> */}
+                  <Route
+                    path="/resources/new"
+                    element={<NewResource />}
+                  />
+                </Routes>
+            </div>
           </div>
         </div>
-      </div>
     </BrowserRouter>
   );
 };

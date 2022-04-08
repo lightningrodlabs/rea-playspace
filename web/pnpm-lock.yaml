@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@holochain-open-dev/core-types': ^0.2.0
   '@holochain/client': ^0.3.2
   '@msgpack/msgpack': ^2.7.2
   '@shoelace-style/shoelace': ^2.0.0-beta.72
@@ -19,15 +20,18 @@ specifiers:
   react-dom: ^16.14.0
   react-flow-renderer: ^10.0.7
   react-modal: ^3.14.4
+  react-redux: 7.2.8
   react-refresh: 0.10.0
   react-refresh-typescript: ^2.0.4
   react-router-dom: ^6.3.0
+  redux: ^4.1.2
   terser: 4.4.2
   typescript: ^4.6.3
   vite: ^2.9.0
   ws: ^8.5.0
 
 dependencies:
+  '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
   '@holochain/client': 0.3.2_ws@8.5.0
   '@msgpack/msgpack': 2.7.2
   '@shoelace-style/shoelace': 2.0.0-beta.72
@@ -38,7 +42,9 @@ dependencies:
   react-dom: 16.14.0_react@16.14.0
   react-flow-renderer: 10.0.7_react-dom@16.14.0+react@16.14.0
   react-modal: 3.14.4_react-dom@16.14.0+react@16.14.0
+  react-redux: 7.2.8_react-dom@16.14.0+react@16.14.0
   react-router-dom: 6.3.0_react-dom@16.14.0+react@16.14.0
+  redux: 4.1.2
   ws: 8.5.0
 
 devDependencies:
@@ -361,6 +367,16 @@ packages:
       '@floating-ui/core': 0.5.1
     dev: false
 
+  /@holochain-open-dev/core-types/0.2.0_ws@8.5.0:
+    resolution: {integrity: sha512-bNWIFkr+rSJUls2IhmkMlvghxnEBlOtdEG6uQI+5/vQI77wJF6S1knaLsI0qRIWrTigVbfraKJlkx6ayGb0jrw==}
+    dependencies:
+      '@holochain/client': 0.3.2_ws@8.5.0
+      js-base64: 3.7.2
+    transitivePeerDependencies:
+      - encoding
+      - ws
+    dev: false
+
   /@holochain/client/0.3.2_ws@8.5.0:
     resolution: {integrity: sha512-tBmfgRMcHn/yujiQ4ugolAEbE4WMznIGRt+F8gpPNNAzC263xt+CLa6G3KslcfUc4tKD+XCr5c9z3wkZP/MMzw==}
     dependencies:
@@ -446,6 +462,13 @@ packages:
     resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
     dev: true
 
+  /@types/hoist-non-react-statics/3.3.1:
+    resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
+    dependencies:
+      '@types/react': 17.0.43
+      hoist-non-react-statics: 3.3.2
+    dev: false
+
   /@types/jest/27.4.1:
     resolution: {integrity: sha512-23iPJADSmicDVrWk+HT58LMJtzLAnB2AgIzplQuq/bSrGaxCrlvRFjGbXmamnnk/mAmCdLStiGqggu28ocUyiw==}
     dependencies:
@@ -463,7 +486,6 @@ packages:
 
   /@types/prop-types/15.7.4:
     resolution: {integrity: sha512-rZ5drC/jWjrArrS8BR6SIr4cWpW09RNTYt9AMZo3Jwwif+iacXAqgVjm0B0Bv/S1jhDXKHqRVNCbACkJ89RAnQ==}
-    dev: true
 
   /@types/react-dom/17.0.14:
     resolution: {integrity: sha512-H03xwEP1oXmSfl3iobtmQ/2dHF5aBHr8aUMwyGZya6OW45G+xtdzmq6HkncefiBt5JU8DVyaWl/nWZbjZCnzAQ==}
@@ -476,6 +498,15 @@ packages:
     dependencies:
       '@types/react': 17.0.43
     dev: true
+
+  /@types/react-redux/7.1.23:
+    resolution: {integrity: sha512-D02o3FPfqQlfu2WeEYwh3x2otYd2Dk1o8wAfsA0B1C2AJEFxE663Ozu7JzuWbznGgW248NaOF6wsqCGNq9d3qw==}
+    dependencies:
+      '@types/hoist-non-react-statics': 3.3.1
+      '@types/react': 17.0.43
+      hoist-non-react-statics: 3.3.2
+      redux: 4.1.2
+    dev: false
 
   /@types/react-router-dom/5.3.3:
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
@@ -498,11 +529,9 @@ packages:
       '@types/prop-types': 15.7.4
       '@types/scheduler': 0.16.2
       csstype: 3.0.11
-    dev: true
 
   /@types/scheduler/0.16.2:
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
-    dev: true
 
   /@types/trusted-types/2.0.2:
     resolution: {integrity: sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==}
@@ -706,7 +735,6 @@ packages:
 
   /csstype/3.0.11:
     resolution: {integrity: sha512-sa6P2wJ+CAbgyy4KFssIb/JNMLxFvKF1pCYCSXS8ZMuqZnMsrxqI2E5sPyoTpxoPU/gVZMzr2zjOfg8GIZOMsw==}
-    dev: true
 
   /d3-array/3.1.3:
     resolution: {integrity: sha512-qwW+3phQqmogYyRDI9hC8AWNeTdyYexazuq/dDM7QgujVDVexwNOxVMUJt+0BRpCw/4S4+byuYTV51kttK/Bzw==}
@@ -1422,6 +1450,12 @@ packages:
       '@babel/runtime': 7.17.8
     dev: false
 
+  /hoist-non-react-statics/3.3.2:
+    resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
+    dependencies:
+      react-is: 16.13.1
+    dev: false
+
   /http-cache-semantics/4.1.0:
     resolution: {integrity: sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==}
     dev: false
@@ -1493,6 +1527,10 @@ packages:
       jest-get-type: 27.5.1
       pretty-format: 27.5.1
     dev: true
+
+  /js-base64/3.7.2:
+    resolution: {integrity: sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==}
+    dev: false
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -1802,7 +1840,6 @@ packages:
 
   /react-is/17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
-    dev: true
 
   /react-lifecycles-compat/3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
@@ -1821,6 +1858,28 @@ packages:
       react-dom: 16.14.0_react@16.14.0
       react-lifecycles-compat: 3.0.4
       warning: 4.0.3
+    dev: false
+
+  /react-redux/7.2.8_react-dom@16.14.0+react@16.14.0:
+    resolution: {integrity: sha512-6+uDjhs3PSIclqoCk0kd6iX74gzrGc3W5zcAjbrFgEdIjRSQObdIwfx80unTkVUYvbQ95Y8Av3OvFHq1w5EOUw==}
+    peerDependencies:
+      react: ^16.8.3 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.17.8
+      '@types/react-redux': 7.1.23
+      hoist-non-react-statics: 3.3.2
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
+      react-is: 17.0.2
     dev: false
 
   /react-refresh-typescript/2.0.4_aa63bb2d090c9dc34d16843ed02a3ce9:
@@ -1883,6 +1942,12 @@ packages:
       safe-buffer: 5.1.2
       string_decoder: 1.1.1
       util-deprecate: 1.0.2
+    dev: false
+
+  /redux/4.1.2:
+    resolution: {integrity: sha512-SH8PglcebESbd/shgf6mii6EIoRM0zrQyjcuQ+ojmfxjTtE0z9Y8pa62iA/OJ58qjP6j27uyW4kUF4jl/jd6sw==}
+    dependencies:
+      '@babel/runtime': 7.17.8
     dev: false
 
   /regenerator-runtime/0.13.9:

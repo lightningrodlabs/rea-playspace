@@ -1,14 +1,12 @@
 import React from "react";
 import { SlButton } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import EconomicResourceList from "../EconomicResourceList";
+import EconomicResourceList from "./EconomicResourceList";
 import MainPanelHeader from "../components/MainPanelHeader";
 
-export type ResourcesProps = {
-  myAgentId: string;
-};
+export type ResourcesProps = {}
 
-const Resources: React.FC<ResourcesProps> = ({ myAgentId }) => {
+const Resources: React.FC<ResourcesProps> = () => {
   return (
     <>
       <MainPanelHeader>
@@ -23,7 +21,7 @@ const Resources: React.FC<ResourcesProps> = ({ myAgentId }) => {
           </Link>
         </div>
       </MainPanelHeader>
-      <EconomicResourceList myAgentId={myAgentId} />
+      {/* <EconomicResourceList myAgentId={myAgentId} /> */}
     </>
   );
 };

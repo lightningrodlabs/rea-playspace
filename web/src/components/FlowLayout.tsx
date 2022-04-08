@@ -9,9 +9,9 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import BlankAddModal from '../components/modals/BlankAddModal';
-import ProcessNode from '../components/nodes/ProcessNode';
-import CreateEconomicResource from '../CreateEconomicResource';
+import BlankAddModal from './modals/BlankAddModal';
+import ProcessNode from './nodes/ProcessNode';
+import CreateEconomicResource from './CreateEconomicResource';
 import { nodes as initialNodes, edges as initialEdges } from '../data/initial-elements';
 
 let id = 0;
@@ -43,6 +43,42 @@ const FlowLayout: React.FC<Props> = (props) => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
     element.style.position = "relative";
   }, []);
+
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    console.log('dragover');
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+      console.log('drop');
+      if (reactFlowWrapper && reactFlowWrapper.current) {
+        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+        const name = event.dataTransfer.getData('application/reactflow');
+
+        // check if the dropped element is valid
+        if (typeof name === 'undefined' || !name) {
+          return;
+        }
+        if (reactFlowInstance) {
+          const position = reactFlowInstance.project({
+            x: event.clientX - reactFlowBounds.left,
+            y: event.clientY - reactFlowBounds.top,
+          });
+          const newNode = {
+            id: getId(),
+            position:position!,
+            data: { label: (<>{name}</>) },
+          };
+
+          setNodes((nds) => nds.concat(newNode));
+    }
+    }
+  },
+    [reactFlowInstance]
+  );
 
   // click viewport -> get location
   // open modal
@@ -94,7 +130,7 @@ const FlowLayout: React.FC<Props> = (props) => {
     width: "1200px"
   };
   return (
-    <div>
+    <div style={{flex:5}}>
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
           <ReactFlow
@@ -106,7 +142,10 @@ const FlowLayout: React.FC<Props> = (props) => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onInit={setReactFlowInstance}
-            onPaneClick={(event:any) => handleSetPosition(event)}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            // uncomment to allow for click to create resource
+            //onPaneClick={(event:any) => handleSetPosition(event)}
             zoomOnDoubleClick={false}
             fitView
             attributionPosition="top-right"
