@@ -8,8 +8,7 @@ electron/web
 
 dna/workdir/*.dna
 
-web/dist/*.js
-web/dist/*.js.map
+web/dist/*
 
 target/
 back/.cargo/
