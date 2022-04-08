@@ -36,6 +36,10 @@ pub struct Content {
     data: String,
 }
 
+#[hdk_extern]
+pub fn fetch(_:()) -> ExternResult<i32> {
+  Ok(32)
+}
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {

@@ -12,9 +12,8 @@
     "tests"
   ],
   "scripts": {
-    "install-deps": "pnpm install && pnpm run happ-install && && pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
+    "install-deps": "pnpm install && pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
     "dev": "pm2-dev pm2.config.js",
-    "happ-install": "bash scripts/install-hc-tools.sh",
     "happ-test": "# bash scripts/happ-test.sh # We have no tests in that folder right now because our tests use the happ-test-ts below.",
     "happ-test-ts": "cd tests && pnpm test",
     "happ-pack": "bash scripts/happ-pack.sh",
@@ -31,7 +30,8 @@
     "electron": "cd electron && pnpm run start",
     "electron2": "cd electron && EH_TEST_USER_2=1 pnpm run start",
     "electron-tsc": "cd electron && pnpm run tsc",
-    "build": "bash scripts/build.sh"
+    "build": "bash scripts/build.sh",
+    "e-build": "bash scripts/happ-pack.sh && bash scripts/shuffle-happ.sh"
   },
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0",
