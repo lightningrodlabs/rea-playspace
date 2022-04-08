@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  pm2: ^5.2.0
+  pm2: ^5.1.1
 
 dependencies:
   pm2: 5.2.0

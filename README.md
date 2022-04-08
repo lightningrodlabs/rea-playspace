@@ -1,25 +1,16 @@
-# Your Project Name Here
+# REA Playspace
 
-This template gives you only what you need to get up and running with a new project that uses electron and holochain!
+[![CI](https://github.com/lightningrodlabs/rea-playspace/actions/workflows/test.yml/badge.svg)](https://github.com/lightningrodlabs/rea-playspace/actions/)
 
-Check out the video walkthrough, just note that some minor details may have changed since then, but it will still be super useful to understand how to utilize this template: https://www.youtube.com/watch?v=jFraPKl2rPk.
+The REA Playspace is an electron based environment that lets people play with the concepts behind [Valueflows](https://www.valueflo.ws/).
 
-[IMPORTANT! Check Dependency Versions Information (Holochain etc)](#dependency-versions-information)
+This is based on a modified version of the [electron-holochain-template](https://github.com/Sprillow/electron-holochain-template). We took the webhapp we were building, shoehorned it into the `web` directory, converted it over to a vitejs project, moved over to pnpm, and we added a nix-shell setup.
 
-__Table of Contents__
-- [Set Up after Clone](#set-up-after-clone)
-  - [App Icon Images](#app-icon-images)
-- [Run Locally and Develop on your Computer](#run-locally-and-develop-on-your-computer)
-- [Multi User Development Testing](#multi-user-development-testing)
-- [Building / Packaging](#building--packaging)
-- [Versioning for User Data](#versioning-for-user-data)
-- [IMPORTANT! Dependency Versions Information (Holochain etc)](#dependency-versions-information)
+In the process of moving things over, I found a few [interesting differences between the project structure of webhapps and electron-holochain-template apps](https://hackmd.io/JXX0M-nwS1i048eqTS6BLA).
 
 ## Set Up after Clone
 
 Global find and replace:
-
-`rea-playspace`: replace with the actual name you wish to see appear in users desktop launcher icons: e.g. "Acorn"
 
 `com.some-domain-name.app-name`: replace with an Apple ["bundle Id"](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids) that is registered on your Apple Developer account
 
@@ -33,56 +24,53 @@ TODO: linux
 
 ## Run Locally and Develop on your Computer
 
-_Prerequisites_
+- `nix-shell`
+- `pnpm run install-deps`
+- `pnpm run web`
 
-- Have rust language (stable) installed on your system
-- Have nodejs version 14 installed on your system
+In another terminal run:
 
-Then run
+- `nix-shell`
+- `pnpm run electron`
 
-- `npm run install-deps`
-- `npm run dev`
-
-In the future, just run `npm run dev` anytime to develop.
-
-When you run `npm run dev` a `user-data/` directory is created and this is where user data including private keys, and also data generated through use of the app is stored.
+A `user-data/` directory is created and this is where user data including private keys, and also data generated through use of the app is stored.
 
 You can run `npm run user-data-reset` if you have user data in development, but you want to clear it, and start over with fresh identities.
 
 > NOTE: if you see a blank screen once electron launches the app, refresh the page (using View -> Reload or Cmd/Ctrl-R) to see app contents.
 
-### Commands that are more specific to your use case:
+### Specific pnpm scripts:
+
+It's assumed that you're using the `nix-shell` to run these.
 
 **dna**
 
-- Have rust language (stable) installed on your system, then...
-- `npm run happ-install`: installs wasm32 compilation target for rust as well as the Holochain CLI
-- `npm run happ-pack`: compiles zomes into wasm and packages each one into a dna using Holochain CLI 
-- `npm run happ-reset`: runs `happ-pack` and clears user data (Run this anytime you change the code in `happ` folder during development)
+- `pnpm run happ-pack`: compiles zomes into wasm and packages each one into a dna using Holochain CLI
+- `pnpm run happ-reset`: runs `happ-pack` and clears user data (Run this anytime you change the code in `happ` folder during development)
 
 To test backend:
 
-- `npm run happ-test`: runs unit tests
+- `pnpm run happ-test-ts`: runs the Tryorama typescript tests of the dnas.
+- `pnpm run happ-test-cargo`: runs the cargo unit tests (Currently not used)
 
 **web** (user interface)
 
-- Use nodejs version 14
-- `npm run web-install`
-- `npm run web`
+- `pnpm run web-install`
+- `pnpm run web`
 
 **electron**
 
-- `npm run electron-install`
-- `npm run electron-tsc` (**needs to be re-run whenever electron folder source code changes**)
-- `npm run electron`
+- `pnpm run electron-install`
+- `pnpm run electron-tsc` (**needs to be re-run whenever electron folder source code changes**)
+- `pnpm run electron`
 
 ## Multi-User Development Testing
 Some features to develop and test require running two instances of the app simultaneously. The project is set up with that in mind.
 
-run the following commands in separate terminal instances (must have a running instance of acorn for the first user, either by running `npm run dev` or the below commands without the `2`):
+run the following commands in separate terminal instances (must have a running instance of acorn for the first user, by running or the below commands without the `2`):
 
-- `npm run web2`
-- `npm run electron2`
+- `pnpm run web2`
+- `pnpm run electron2`
 
 After running these commands, a `user2-data/` directory is created with user data. It too can be cleared by running `npm run user-data-reset`.
 
@@ -90,7 +78,14 @@ After running these commands, a `user2-data/` directory is created with user dat
 
 To build:
 
-- `npm run build`
+- `nix-shell`
+- `pnpm run build-all`: runs everything needed to build a complete executable
+
+Or you can run each of these commands individually:
+
+- `pnpm run web-build`: compiles the react app and packages it into the `web/dist` folder
+- `pnpm run happ-pack`: compiles zomes into wasm and packages each one into a dna using Holochain CLI
+- `pnpm run build`: compiles electron and bundles the built happ and the built web app.
 
 The packaged executables can be found in `electron/out`.
 
@@ -131,7 +126,7 @@ KEYSTORE_VERSION_ID should be incremented if the version of lair-keystore change
 
 This project is currently using:
 
-https://github.com/holochain/holochain/releases/tag/holochain-0.0.126
+https://github.com/holochain/holochain/releases/tag/holochain-0.0.127
 
 https://github.com/Sprillow/holochain-runner/releases/tag/v0.0.35
 

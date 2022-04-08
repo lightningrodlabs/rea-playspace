@@ -6,10 +6,10 @@ user-data
 electron/web
 .cargo
 
-dna/workdir/*.dna
+happ/workdir/application.dna
+happ/workdir/application.happ
 
-web/dist/*.js
-web/dist/*.js.map
+web/dist/*
 
 target/
 back/.cargo/

@@ -12,12 +12,13 @@
     "tests"
   ],
   "scripts": {
-    "install-deps": "pnpm install && pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
+    "install-deps": "pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
     "dev": "pm2-dev pm2.config.js",
-    "happ-test": "# bash scripts/happ-test.sh # We have no tests in that folder right now because our tests use the happ-test-ts below.",
+    "happ-test-cargo": "# bash scripts/happ-test.sh # We have no tests in that folder right now because our dna tests use the happ-test-ts below.",
     "happ-test-ts": "cd tests && pnpm test",
     "happ-pack": "bash scripts/happ-pack.sh",
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
+    "happ-run": "electron/node_modules/electron-holochain/binaries/holochain-runner ./happ/workdir/application.happ ./user-data/databases --admin-ws-port 1234 --app-ws-port 8888 --app-id rea-playspace --keystore-path ./user-data/keystore/",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
     "tests-install": "cd tests && pnpm install",
     "test": "cd web && pnpm test",
@@ -36,6 +37,6 @@
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0",
   "dependencies": {
-    "pm2": "^5.2.0"
+    "pm2": "^5.1.1"
   }
 }

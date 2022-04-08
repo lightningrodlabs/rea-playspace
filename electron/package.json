@@ -1,7 +1,7 @@
 {
-  "name": "electron-application-name",
+  "name": "rea-playspace",
   "version": "0.0.1",
-  "description": "Electron application description goes here",
+  "description": "REA Playspace let's anyone explore the concepts behind Valueflows.",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && electron .",
