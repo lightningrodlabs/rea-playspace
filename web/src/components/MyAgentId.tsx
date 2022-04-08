@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
-import { WHO_AM_I } from "../graphql/queries";
+import { WHO_AM_I } from "./graphql/queries";
 
 export type MyAgentIdProps = {
   setMyAgentId: React.Dispatch<React.SetStateAction<string | undefined>>;

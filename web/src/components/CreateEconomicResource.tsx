@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { CREATE_ECONOMIC_RESOURCES } from "../graphql/queries";
 import { SlButton, SlCard, SlInput } from "@shoelace-style/shoelace/dist/react";
 import { useNavigate } from "react-router-dom";
 
@@ -13,10 +12,8 @@ export type CreateEconomicResourceProps = {
 const CreateEconomicResource: React.FC<CreateEconomicResourceProps> = ({
   myAgentId, setCurrentNodeName, closeModal
 }) => {
-  //const navigate = useNavigate();
-  const [createER, createERmutationStatus] = useMutation(
-    CREATE_ECONOMIC_RESOURCES
-  );
+  const navigate = useNavigate();
+
 
   const [image, setImage] = useState("");
   const [quantity, setQuantity] = useState(1);

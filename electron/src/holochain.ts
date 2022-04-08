@@ -2,7 +2,7 @@ import * as path from 'path'
 import { app } from 'electron'
 import { HolochainRunnerOptions, StateSignal, PathOptions } from 'electron-holochain'
 
-const MAIN_APP_ID = 'main-app'
+const MAIN_APP_ID = 'rea-playspace'
 const COMMUNITY_PROXY_URL =
   'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
 // increment this version when an update to the application

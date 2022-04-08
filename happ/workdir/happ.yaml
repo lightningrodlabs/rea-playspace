@@ -1,6 +1,6 @@
 ---
 manifest_version: "1"
-name: rea-playspace
+name: rea_playspace
 description: ~
 roles:
 

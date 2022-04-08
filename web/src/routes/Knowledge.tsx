@@ -1,15 +1,13 @@
 import React from "react";
-import Resources from "../../../src/components/Resources";
+import Resources from "../components/Resources";
 
-interface Props {
-  myAgentId: string;
-}
+interface Props {}
 
-const Knowledge: React.FC<Props> = ({myAgentId}) => {
+const Knowledge: React.FC<Props> = () => {
 
   return(
     <div>
-      <Resources myAgentId={myAgentId} />
+      <Resources />
     </div>
   )
 }

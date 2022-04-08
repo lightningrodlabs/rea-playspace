@@ -9,7 +9,7 @@ import {
   SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
 import { useMutation } from "@apollo/client";
-import {UPDATE_ECONOMIC_RESOURCES} from "../graphql/queries";
+import { UPDATE_ECONOMIC_RESOURCES } from "./graphql/queries";
 
 export type ResourceListTableItemProps = {
   resource: any;

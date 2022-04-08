@@ -2,17 +2,18 @@ import React from "react";
 import FlowLayout from "../components/FlowLayout";
 import Pallet from "../components/Pallet";
 
-interface Props {
-  myAgentId: string;
-}
+interface Props {}
 
-const Plan: React.FC<Props> = ({myAgentId}) => {
+const Plan: React.FC<Props> = () => {
 
   return(
-    <div style={{display:"flex"}}>
-      <Pallet myAgentId={myAgentId}/>
-      <FlowLayout myAgentId={myAgentId}/>
+    <div>
+      <p>Plan</p>
     </div>
+    // <div style={{display:"flex"}}>
+    //   <Pallet myAgentId={myAgentId}/>
+    //   <FlowLayout myAgentId={myAgentId}/>
+    // </div>
   )
 }
 

@@ -11,7 +11,7 @@ module.exports = async function (params) {
   console.log('afterSign hook triggered', params)
 
   // TODO: pull this instead from the package.json where it is already defined
-  const appId = 'com.some-domain-name.app-name'
+  const appId = 'com.lightningroblabs.rea-playspace'
 
   const appPath = path.join(
     params.appOutDir,

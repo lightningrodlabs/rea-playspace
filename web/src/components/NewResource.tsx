@@ -4,11 +4,9 @@ import { Link } from "react-router-dom";
 import CreateEconomicResource from "./CreateEconomicResource";
 import MainPanelHeader from "./MainPanelHeader";
 
-export type NewResourceProps = {
-  myAgentId: string;
-};
+export type NewResourceProps = {}
 
-const NewResource: React.FC<NewResourceProps> = ({ myAgentId }) => {
+const NewResource: React.FC<NewResourceProps> = () => {
   return (
     <>
       <MainPanelHeader>
@@ -17,7 +15,7 @@ const NewResource: React.FC<NewResourceProps> = ({ myAgentId }) => {
           <SlButton variant="primary">View Resources</SlButton>
         </Link>
       </MainPanelHeader>
-      {/* <CreateEconomicResource myAgentId={myAgentId} /> */}
+      <CreateEconomicResource />
     </>
   );
 };

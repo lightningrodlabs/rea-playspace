@@ -18,8 +18,8 @@
   "build": {
     "productName": "rea-playspace",
     "afterSign": "./afterSignHook.js",
-    "appId": "com.some-domain-name.app-name",
-    "copyright": "© 2022 So And So Ltd. ",
+    "appId": "com.lightningroblabs.rea-playspace",
+    "copyright": "© 2022 Lightningrod Labs Ltd. ",
     "asarUnpack": "binaries/**/*",
     "files": [
       "dist/**/*",

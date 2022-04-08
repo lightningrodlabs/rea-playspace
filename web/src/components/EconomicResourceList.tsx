@@ -8,7 +8,7 @@ import {
   SlInput,
 } from "@shoelace-style/shoelace/dist/react";
 import ResourceListTableItem from "./ResourceListTableItem";
-import useEconomicResources from "../hooks/useEconomicResources";
+import useEconomicResources from "./hooks/useEconomicResources";
 
 export type EconomicResourceListProps = {
   myAgentId: string;
