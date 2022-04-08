@@ -8,8 +8,6 @@ import {
   SlMenu,
   SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
-import { useMutation } from "@apollo/client";
-import { UPDATE_ECONOMIC_RESOURCES } from "./graphql/queries";
 
 export type ResourceListTableItemProps = {
   resource: any;
@@ -20,7 +18,7 @@ const ResourceListTableItem: React.FC<ResourceListTableItemProps> = ({
   resource,
   myAgentId,
 }) => {
-  const [callAdjust, mutationStatus] = useMutation(UPDATE_ECONOMIC_RESOURCES);
+  //const [callAdjust, mutationStatus] = useMutation(UPDATE_ECONOMIC_RESOURCES);
   // for tracking the persisted value
   const [originalQuantity, setOriginalQuantity] = useState(
     +resource.accountingQuantity.hasNumericalValue
@@ -34,18 +32,18 @@ const ResourceListTableItem: React.FC<ResourceListTableItemProps> = ({
 
   //
   const update = async () => {
-    await callAdjust({
-      variables: {
-        event: {
-          action: quantityAdjustment > 0 ? "raise" : "lower",
-          provider: myAgentId,
-          receiver: myAgentId,
-          resourceQuantity: { hasNumericalValue: Math.abs(quantityAdjustment) },
-          resourceInventoriedAs: resource.id,
-          hasPointInTime: new Date(),
-        },
-      },
-    });
+    // await callAdjust({
+    //   variables: {
+    //     event: {
+    //       action: quantityAdjustment > 0 ? "raise" : "lower",
+    //       provider: myAgentId,
+    //       receiver: myAgentId,
+    //       resourceQuantity: { hasNumericalValue: Math.abs(quantityAdjustment) },
+    //       resourceInventoriedAs: resource.id,
+    //       hasPointInTime: new Date(),
+    //     },
+    //   },
+    // });
     // update original, so that the save button hides
     setOriginalQuantity(quantityAbsolute);
   };

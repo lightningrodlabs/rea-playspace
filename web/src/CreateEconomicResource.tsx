@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { CREATE_ECONOMIC_RESOURCES } from "./graphql/queries";
 import { SlButton, SlCard, SlInput } from "@shoelace-style/shoelace/dist/react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,47 +12,47 @@ const CreateEconomicResource: React.FC<CreateEconomicResourceProps> = ({
   myAgentId, setCurrentNodeName, closeModal
 }) => {
   const navigate = useNavigate();
-  const [createER, createERmutationStatus] = useMutation(
-    CREATE_ECONOMIC_RESOURCES
-  );
+  // const [createER, createERmutationStatus] = useMutation(
+  //   CREATE_ECONOMIC_RESOURCES
+  // );
 
   const [image, setImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [resourceName, setResourceName] = useState("");
 
-  if (createERmutationStatus.loading)
-    return <div>Creating economic resource...</div>;
-  if (createERmutationStatus.error) return <p>ERROR</p>;
+  // if (createERmutationStatus.loading)
+  //   return <div>Creating economic resource...</div>;
+  // if (createERmutationStatus.error) return <p>ERROR</p>;
 
-  const create = async () => {
-    await createER({
-      variables: {
-        event: {
-          action: "raise",
-          provider: myAgentId,
-          receiver: myAgentId,
-          resourceQuantity: { hasNumericalValue: quantity },
-          resourceClassifiedAs: "https://something",
-          hasPointInTime: new Date(),
-        },
-        newInventoriedResource: {
-          // TODO: remove this hack
-          // once `name` exists
-          note: resourceName,
-          image: image,
-        },
-      },
-    });
-    setCurrentNodeName(resourceName);
-    closeModal();
-    // navigate("/resources");
-    // window.location.reload();
-  };
+  // const create = async () => {
+  //   await createER({
+  //     variables: {
+  //       event: {
+  //         action: "raise",
+  //         provider: myAgentId,
+  //         receiver: myAgentId,
+  //         resourceQuantity: { hasNumericalValue: quantity },
+  //         resourceClassifiedAs: "https://something",
+  //         hasPointInTime: new Date(),
+  //       },
+  //       newInventoriedResource: {
+  //         // TODO: remove this hack
+  //         // once `name` exists
+  //         note: resourceName,
+  //         image: image,
+  //       },
+  //     },
+  //   });
+  //   setCurrentNodeName(resourceName);
+  //   closeModal();
+  //   // navigate("/resources");
+  //   // window.location.reload();
+  // };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     if (resourceName && image && typeof quantity !== "undefined") {
-      create();
+      //create();
 
     }
   };

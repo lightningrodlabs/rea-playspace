@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/client";
 import {
   SlButton,
   SlCard,
@@ -9,7 +8,6 @@ import {
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MainPanelHeader from "../components/MainPanelHeader";
-import { CREATE_ECONOMIC_EVENT } from "../graphql/queries";
 import useEconomicResources from "../hooks/useEconomicResources";
 
 export type ResourceTransferProps = {
@@ -40,16 +38,16 @@ const ResourceList: React.FC<ResourceListProps> = ({ econResources }) => {
 
 const ResourceTransfer: React.FC<ResourceTransferProps> = ({ myAgentId }) => {
   const navigate = useNavigate();
-  const [createEE, createEEmutationStatus] = useMutation(CREATE_ECONOMIC_EVENT);
+  //const [createEE, createEEmutationStatus] = useMutation(CREATE_ECONOMIC_EVENT);
   const econResources = useEconomicResources();
 
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>("");
   const [quantity, setQuantity] = useState();
 
-  if (createEEmutationStatus.loading)
-    return <div>Creating economic resource...</div>;
-  if (createEEmutationStatus.error) return <p>ERROR</p>;
+  // if (createEEmutationStatus.loading)
+  //   return <div>Creating economic resource...</div>;
+  // if (createEEmutationStatus.error) return <p>ERROR</p>;
 
   const create = async () => {
     if (!from || !to || typeof quantity === "undefined") {
@@ -57,20 +55,20 @@ const ResourceTransfer: React.FC<ResourceTransferProps> = ({ myAgentId }) => {
     }
     const [fromAgentId, fromResourceId] = from.split(VALUE_SEPARATOR);
     const [toAgentId, toResourceId] = to.split(VALUE_SEPARATOR);
-    await createEE({
-      variables: {
-        event: {
-          action: "transfer",
-          provider: fromAgentId,
-          receiver: toAgentId,
-          resourceInventoriedAs: fromResourceId,
-          toResourceInventoriedAs: toResourceId,
-          resourceQuantity: { hasNumericalValue: quantity },
-          // resourceClassifiedAs: "https://something",
-          hasPointInTime: new Date(),
-        },
-      },
-    });
+    // await createEE({
+    //   variables: {
+    //     event: {
+    //       action: "transfer",
+    //       provider: fromAgentId,
+    //       receiver: toAgentId,
+    //       resourceInventoriedAs: fromResourceId,
+    //       toResourceInventoriedAs: toResourceId,
+    //       resourceQuantity: { hasNumericalValue: quantity },
+    //       // resourceClassifiedAs: "https://something",
+    //       hasPointInTime: new Date(),
+    //     },
+    //   },
+    // });
     navigate("/resources");
     window.location.reload();
   };
@@ -106,9 +104,7 @@ const ResourceTransfer: React.FC<ResourceTransferProps> = ({ myAgentId }) => {
                 setFrom(e.target.value);
               }}
             >
-              {econResources.data && (
-                <ResourceList econResources={econResources.data} />
-              )}
+
             </SlSelect>
             <br />
             <SlSelect
