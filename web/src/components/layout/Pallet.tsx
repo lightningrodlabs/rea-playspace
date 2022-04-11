@@ -1,6 +1,6 @@
 import React from 'react';
-import PalletNode from './PalletNode';
-import ResourceListTableItem from './ResourceListTableItem';
+import PalletNode from '../PalletNode';
+import ResourceListTableItem from '../knowledge/ResourceSpecificationListTableItem';
 
 interface Props {
   myAgentId: string

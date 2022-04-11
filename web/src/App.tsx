@@ -3,18 +3,18 @@ import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Header from "./components/Header";
-import LeftScreenNavMenu from "./components/LeftScreenNavMenu";
+import Header from "./components/layout/Header";
+import LeftScreenNavMenu from "./components/layout/LeftScreenNavMenu";
 import { APP_ID, APP_PORT } from './holochainConf';
 import {  AppWebsocket, InstalledCell } from '@holochain/client';
 import Knowledge from "./routes/Knowledge";
 import Plan from "./routes/Plan";
 import Observation from "./routes/Observation";
-import Resources from "./components/Resources";
-import NewResource from "./components/NewResource";
+import Resources from "./components/knowledge/ResourceSpecification";
 import { HashToString, sleep100 } from "./utils";
 import HoloService from "./service";
 import Binding from "./routes/Binding";
+import NewResourceSpecification from "./components/knowledge/NewResourceSpecification";
 
 // const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
@@ -90,7 +90,7 @@ const App: React.FC<Props> = () => {
                   /> */}
                   <Route
                     path="/resources/new"
-                    element={<NewResource />}
+                    element={<NewResourceSpecification />}
                   />
                 </Routes>
             </div>
