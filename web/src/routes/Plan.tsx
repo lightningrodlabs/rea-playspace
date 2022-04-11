@@ -1,6 +1,6 @@
 import React from "react";
-import FlowLayout from "../components/FlowLayout";
-import Pallet from "../components/Pallet";
+import FlowLayout from "../components/layout/FlowLayout";
+import Pallet from "../components/layout/Pallet";
 
 interface Props {
   myAgentId: string

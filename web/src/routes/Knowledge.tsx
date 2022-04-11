@@ -1,6 +1,5 @@
 import React from "react";
-import Resources from "../components/Resources";
-import Pallet from "../components/Pallet";
+import ResourceSpecification from "../components/knowledge/ResourceSpecification";
 
 interface Props {
 }
@@ -9,7 +8,7 @@ const Knowledge: React.FC<Props> = () => {
 
   return(
     <div>
-      <Resources />
+      <ResourceSpecification />
     </div>
   )
 }

@@ -8,13 +8,14 @@ import {
   SlMenu,
   SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
+import {ResourceSpecification} from "../../types/valueflows"
 
-export type ResourceListTableItemProps = {
+export type ResourceSpecificationListTableItemProps = {
   resource: any;
   myAgentId: string;
 };
 
-const ResourceListTableItem: React.FC<ResourceListTableItemProps> = ({
+const ResourceSpecificationListTableItem: React.FC<ResourceSpecificationListTableItemProps> = ({
   resource,
   myAgentId,
 }) => {
@@ -116,4 +117,4 @@ const ResourceListTableItem: React.FC<ResourceListTableItemProps> = ({
   );
 };
 
-export default ResourceListTableItem;
+export default ResourceSpecificationListTableItem;

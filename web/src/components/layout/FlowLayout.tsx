@@ -9,10 +9,10 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import BlankAddModal from './modals/BlankAddModal';
-import ProcessNode from './nodes/ProcessNode';
-import CreateEconomicResource from './CreateEconomicResource';
-import { nodes as initialNodes, edges as initialEdges } from '../data/initial-elements';
+import BlankAddModal from '../modals/BlankAddModal';
+import ProcessNode from '../nodes/ProcessNode';
+import CreateEconomicResource from '../CreateEconomicResource';
+import { nodes as initialNodes, edges as initialEdges } from '../../data/initial-elements';
 
 let id = 0;
 const getId = () => `node_${id++}`;
