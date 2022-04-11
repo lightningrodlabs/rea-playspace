@@ -46,16 +46,14 @@ export default (orchestrator: Orchestrator<any>) =>  {
         original_header_hash: create_output.header_hash,
         updated_project: {
           "id": "deserunt pariatur commodo fugiat",
-  "name": "irure eu"
-}
+          "name": "irure eu"
+        }
       }
     );
     t.ok(update_output.header_hash);
     t.ok(update_output.entry_hash);
     await sleep(50);
 
-      
-    
     // Alice delete the project
     await alice.call(
       "projects",
