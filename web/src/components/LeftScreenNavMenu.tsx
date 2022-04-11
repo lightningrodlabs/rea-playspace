@@ -12,7 +12,13 @@ const LeftScreenNavMenu: React.FC<LeftScreenNavMenuProps> = ({}) => {
   return (
     <div className="left-screen-nav-menu">
       <SlMenu>
-      <Link to="/knowledge">
+        <Link to="/binding">
+          <SlMenuItem value="Binding Test">
+            <SlIcon slot="prefix" name="activity" />
+            Binding Test
+          </SlMenuItem>
+        </Link>
+        <Link to="/knowledge">
           <SlMenuItem value="Knowledge">
             <SlIcon slot="prefix" name="node-plus" />
             Knowledge

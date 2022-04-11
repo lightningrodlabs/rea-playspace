@@ -1,20 +1,22 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
 import LeftScreenNavMenu from "./components/LeftScreenNavMenu";
-//import { SlButton } from "@shoelace-style/shoelace/dist/react";
-import { APP_ID, ZOME_NAME, ADMIN_PORT, APP_PORT } from './holochainConf';
-import { AdminWebsocket, AppWebsocket, InstalledAppInfo, InstalledCell } from '@holochain/client';
+import { APP_ID, APP_PORT } from './holochainConf';
+import {  AppWebsocket, InstalledCell } from '@holochain/client';
 import Knowledge from "./routes/Knowledge";
 import Plan from "./routes/Plan";
 import Observation from "./routes/Observation";
 import Resources from "./components/Resources";
 import NewResource from "./components/NewResource";
+import { HashToString, sleep100 } from "./utils";
+import HoloService from "./service";
+import Binding from "./routes/Binding";
 
-const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
+// const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
 
 setBasePath(
@@ -23,90 +25,56 @@ setBasePath(
 
 interface Props {}
 
-function HashToString(buff: Uint8Array): string {
-  return buff.reduce((prev: string, curr: number) => {
-    return prev + curr.toString(16).padStart(2, '0');
-  }, '');
-}
-
-function StringToHash(s: string): Uint8Array {
-  const b = new Uint8Array(Math.ceil(s.length/2));
-  for (let i = 0; i < b.byteLength; i++) {
-    b[i] = parseInt(s.slice(i*2,(i*2)+2),16);
-  }
-  return b;
-}
-
 const App: React.FC<Props> = () => {
-  const [myAgentId, setMyAgentId] = useState<string>();
-  const [client, setClient] = useState<AppWebsocket>();
-  const [result, setResult] = useState("");
-  const [appInfo, setAppInfo] = useState<InstalledAppInfo>();
-  const [cellData, setCellData] = useState<InstalledCell>();
+  const [service, setService]= useState<HoloService>();
   const [loading, setLoading] = useState(true);
 
-  const connect = async () => {
-    const adminWs = await AdminWebsocket.connect(ADMIN_WS_URL);
-    console.log('admin websocket opened');
+  const init = async () => {
     const appWs = await AppWebsocket.connect(APP_WS_URL);
-    console.log('app websocket opened');
-    adminWs.client.socket.addEventListener('close', () => {
-      console.log('admin websocket closed');
-    });
     appWs.client.socket.addEventListener('close', () => {
       console.log('app websocket closed');
-    })
+    });
 
-    // this stinks but works for now.
-    // Check every 100ms and only then get app info or else app_info etc would just get missed.
-    while (!(adminWs.client.socket.readyState === adminWs.client.socket.OPEN
-      && appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
-        continue;
+    // check every 100ms for ready connection. Proceed when ready
+    while (!(appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
+        await sleep100();
     }
-    const app_info = await appWs.appInfo({ installed_app_id: APP_ID })
-    setAppInfo(app_info)
-    // this always fails on the first load. I need to change and save this file in order for appInfo to be available
-    const cell_data = app_info.cell_data[0]
-    setCellData(cell_data)
-    
-    // Test 
-    const res = await appWs.callZome({
-      cap_secret: null as any,
-      cell_id: cell_data.cell_id,
-      zome_name: 'projects',
-      fn_name: 'fetch',
-      provenance: cellData.cell_id[1],
-      payload: null as any,
-    }, 30000)
-    setResult(res)
-    setLoading(false)
-    
-    // @ts-ignore
-    setClient(appWs);
-    setMyAgentId('hello'); // maybe get rid of this?
+
+    const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
+    const cell_data: InstalledCell = app_info.cell_data[0];
+    setService(new HoloService(appWs, cell_data, cell_data.cell_id[1]));
+    setLoading(false);
   };
+  
+  useEffect(() => {
+    init();
+  }, []);
 
-  useEffect(()=>{
-    connect()
-  },[])
-
-  return (
-    <BrowserRouter>
+  const Main = () => {
+    if (loading) {
+      return (<p>"Loading..."</p>);
+    }
+    return (
+      <BrowserRouter>
         <div className="container">
-          <Header name="shane" />
+          <Header name={HashToString(service.agentPubKey)} />
           <div className="below-header">
             <LeftScreenNavMenu />
 
             <div className="main-panel">
-              <p>{loading ? "Loading..." : `Fetched From Zome ${result}`}</p>
                 <Routes>
+                  <Route
+                    path="/binding"
+                    element={<Binding  service={service}/>}
+                    >
+                  </Route>    
                   <Route
                     path="/knowledge"
                     element={<Knowledge />}>
                   </Route>
                   <Route
                     path="/plan"
-                    element={<Plan />}>
+                    element={<Plan myAgentId={HashToString(service.agentPubKey)}/>}>
                   </Route>
                   <Route
                     path="/"
@@ -128,7 +96,12 @@ const App: React.FC<Props> = () => {
             </div>
           </div>
         </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    );
+  }
+
+  return (
+    <Main />
   );
 };
 

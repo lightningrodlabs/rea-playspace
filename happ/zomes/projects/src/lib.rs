@@ -37,11 +37,6 @@ pub struct Content {
 }
 
 #[hdk_extern]
-pub fn fetch(_:()) -> ExternResult<i32> {
-  Ok(32)
-}
-
-#[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
   let path = Path::try_from(input.path.clone())?;
   path.ensure()?;
@@ -115,10 +110,7 @@ pub fn get_thing(path_str: String) -> ExternResult<Tree<Content>> {
     let mut tree = Tree::new(val);
     build_tree(&mut tree, 0, root_path)?;
     Ok(tree)
-
 }
-
-
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct Tree<T> 

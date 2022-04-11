@@ -18,7 +18,6 @@ pub fn get_project(entry_hash: EntryHashB64) -> ExternResult<Option<Project>> {
   }
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NewProjectOutput {
   header_hash: HeaderHashB64,
@@ -38,7 +37,6 @@ pub fn create_project(project: Project) -> ExternResult<NewProjectOutput> {
 
   Ok(output)
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateProjectInput {
