@@ -12,7 +12,12 @@ export interface Thing {
 }
 
 // Maps to AddOutput and NewProjectOutput structs
-export interface HoloOutput {
+export interface AddOutput {
+  header_hash: HoloHashB64,
+  entry_hash: HoloHashB64
+}
+
+export interface NewProjectOutput {
   header_hash: HoloHashB64,
   entry_hash: HoloHashB64
 }

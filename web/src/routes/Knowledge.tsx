@@ -1,7 +1,9 @@
 import React from "react";
 import Resources from "../components/Resources";
+import Pallet from "../components/Pallet";
 
-interface Props {}
+interface Props {
+}
 
 const Knowledge: React.FC<Props> = () => {
 
