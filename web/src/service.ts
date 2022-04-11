@@ -1,6 +1,6 @@
 import { EntryHashB64, HeaderHashB64 } from "@holochain-open-dev/core-types";
 import { AppWebsocket, CellId, HoloHashB64, InstalledCell } from "@holochain/client";
-import { AddOutput, Content, NewProjectOutput, Project, ThingInput, Tree, UpdateProjectInput } from "./types/types";
+import { AddOutput, Content, NewProjectOutput, Project, ThingInput, Tree, UpdateProjectInput } from "./types/holochain";
 import { HashToString } from "./utils";
 
 class HoloService {

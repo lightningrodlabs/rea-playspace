@@ -11,6 +11,7 @@ entry_defs![
   Project::entry_def()
 ];
 
+// Actual blob of data stored on the DHT
 #[hdk_entry(id = "thing")]
 #[derive(Clone)]
 #[serde(rename_all = "camelCase")]
@@ -18,18 +19,21 @@ pub struct Thing {
   pub data: String,
 }
 
+// returned after successful write to DHT
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddOutput {
   header_hash: HeaderHashB64,
   entry_hash: EntryHashB64,
 }
 
+// Passed in from UI
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ThingInput {
   path: String,
   data: String,
 }
 
+// Sent back to UI
 #[derive(Clone, Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Content {
     name: String,
@@ -54,12 +58,6 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
 
   Ok(output)
 
-}
-
-fn _get_entry_hashes(path: &Path, tag: LinkTag) -> ExternResult<Vec<EntryHashB64>> {
-  let links = get_links(path.path_entry_hash()?, Some(tag))?;
-  let entry_hashes = links.into_iter().map(|l| l.target.as_hash().clone().into()).collect();
-  Ok(entry_hashes)
 }
 
 fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {

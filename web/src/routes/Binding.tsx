@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import HoloService from "../service";
-import { AddOutput, Content, ThingInput, Tree } from "../types/types";
+import { AddOutput, Content, ThingInput, Tree } from "../types/holochain";
 
 interface Props {
   service: HoloService
