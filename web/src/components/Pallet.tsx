@@ -1,5 +1,4 @@
 import React from 'react';
-import useEconomicResources from '../hooks/useEconomicResources';
 import PalletNode from './PalletNode';
 import ResourceListTableItem from './ResourceListTableItem';
 
@@ -25,10 +24,13 @@ const Pallet: React.FC<Props> = ({myAgentId}) => {
     margin: "5px"
   }
 
-  const { data, loading, error } = useEconomicResources();
-  if (loading) return <div>Listing economic resources...</div>;
-  if (error) return <p>ERROR</p>;
-  if (!data) return <p>Not found</p>;
+  // turn this into some kind of hook to get something?
+  // const { data, loading, error } = useEconomicResources();
+  // if (loading) return <div>Listing economic resources...</div>;
+  // if (error) return <p>ERROR</p>;
+  // if (!data) return <p>Not found</p>;
+
+  const data = [{'id':'1', 'note': 'some text'}, {'id': '2', 'note': 'other text'}];
 
   return (
     <aside style={palletStyles}>
