@@ -14,8 +14,8 @@ interface Props {
 const ProcessNode: React.FC<Props> = ({data}) => {
 
   const nodeStyles = {
-    border: "1px solid green",
-    background: "lightgreen",
+    border: "1px solid orange",
+    background: "rgb(255, 213, 128)",
     margin: "5px",
     borderRadius: "10px"
   }
