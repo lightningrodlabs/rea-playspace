@@ -58,15 +58,15 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = ({servic
     await service.put_thing(input);
     //incId();
     clearState();
-    navigate('/knowledge');
+    navigate('/');
   }
 
   return (
     <>
       <MainPanelHeader>
         <h2>New Resource Specification</h2>
-        <Link to="/processes">
-          <SlButton variant="primary">View Resources</SlButton>
+        <Link to="/">
+          <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
       <SlCard className="create-resource">

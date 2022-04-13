@@ -9,9 +9,8 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import BlankAddModal from '../modals/BlankAddModal';
+import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
-import CreateEconomicResource from '../CreateEconomicResource';
 import ResourceNode from '../nodes/ResourceNode';
 
 let id = 0;
@@ -27,7 +26,7 @@ interface NodeData {
   }
 }
 
-const FlowLayout: React.FC<Props> = (props) => {
+const FlowCanvas: React.FC<Props> = (props) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -37,7 +36,11 @@ const FlowLayout: React.FC<Props> = (props) => {
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
-  const nodeTypes = useMemo(() => ({ process: ProcessNode, resource: ResourceNode }), []); 
+  const nodeTypes = useMemo(() => ({ 
+    process: ProcessNode, 
+    resource: ResourceNode,
+    agent: AgentNode 
+  }), []); 
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -92,17 +95,16 @@ const FlowLayout: React.FC<Props> = (props) => {
   // generate node with location
 	
   // on flow view click
-  const handleSetPosition = (event:any): void => {
+  const handleSetPosition = async (event:any) => {
       event.preventDefault();
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds: DOMRect = reactFlowWrapper.current!.getBoundingClientRect();
         if (reactFlowInstance) {
           const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top
+            x: event.clientX - reactFlowBounds.left+10,
+            y: event.clientY - reactFlowBounds.top + 10
           });
-          setCurrentPosition(position);
-          toggleModal();
+          await setCurrentPosition(position);
         }
       }
     }
@@ -127,13 +129,16 @@ const FlowLayout: React.FC<Props> = (props) => {
   }
 
   const layoutStyle = {
-    margin: "30px",
     border: "black 1px solid",
-    height: "500px",
-    width: "1200px"
+    height: "800px",
+    width: "auto"
   };
+
+  const style = {
+    flexGrow:23
+  }
   return (
-    <div style={{flex:5}}>
+    <div style={style}>
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
           <ReactFlow
@@ -148,7 +153,7 @@ const FlowLayout: React.FC<Props> = (props) => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             // uncomment to allow for click to create resource
-            //onPaneClick={(event:any) => handleSetPosition(event)}
+            // onPaneClick={(event:any) => handleSetPosition(event)}
             zoomOnDoubleClick={false}
             fitView
             attributionPosition="top-right"
@@ -157,7 +162,7 @@ const FlowLayout: React.FC<Props> = (props) => {
           </ReactFlow>
         </div>
       </ReactFlowProvider>
-      <BlankAddModal 
+      {/* <BlankAddModal 
         isOpen={addingNode} 
         toggleModal={toggleModal} 
         handleAddNode={handleAddNode} 
@@ -166,9 +171,9 @@ const FlowLayout: React.FC<Props> = (props) => {
           myAgentId={props.myAgentId} 
           setCurrentNodeName={setCurrentNodeName} 
           closeModal={toggleModal}/>
-        </BlankAddModal>
+        </BlankAddModal> */}
     </div>
   );
 }
 
-export default FlowLayout;
+export default FlowCanvas;

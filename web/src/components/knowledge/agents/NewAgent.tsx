@@ -2,35 +2,32 @@ import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../../layout/MainPanelHeader";
-import { ResourceSpecification } from "../../../types/valueflows";
+import { Agent, } from "../../../types/valueflows";
 import HoloService from "../../../service";
 import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
 
-export type NewResourceSpecificationProps = {
+export type NewAgentProps = {
   service: HoloService;
 }
 
 const initialState = {
-  id: 'rs-',
+  id: 'ag-',
   name: '',
   image: '',
-  resourceClassifiedAs: '',
-  defaultUnitOfResource: '',
-  defaultUnitOfEffort: '',
+  primaryLocation: '',
   note: ''
 }
 
-const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({service}) => {
+const NewAgent: React.FC<NewAgentProps> = ({service}) => {
   const [
-    {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
+    {id, name, image, primaryLocation, note}, setState
   ] = useState(initialState);
 
 
   const navigate = useNavigate();
 
   const clearState = () => {
-    console.log('clearing')
     setState({ ...initialState });
   };
 
@@ -53,11 +50,11 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
     e.preventDefault()
     //getResourceSpecificationListSize();
     console.log(id);
-    const rs: ResourceSpecification =  {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note};
-    const path: string = 'resourceSpecification.' + id;
+    const ag: Agent =  {id, name, note};
+    const path: string = 'agent.' + id;
     const input: ThingInput = {
       path,
-      data: JSON.stringify(rs)
+      data: JSON.stringify(ag)
     }
     await service.put_thing(input);
     clearState();
@@ -96,38 +93,22 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
         />
         <br />
         <SlInput
+          required
           label="Image"
           name="image"
           // @ts-ignore
           onSlInput={onChange}
           value={image}
-         
-        />
-        <br />
-        <SlInput
-          label='Resource Classified As'
-          name='resourceClassifiedAs'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={resourceClassifiedAs}
           
         />
         <br />
         <SlInput
-          label='Default Unit Of Resource'
-          name='defaultUnitOfResource'
+          required
+          label="Primary Location"
+          name="primaryLocation"
           // @ts-ignore
           onSlInput={onChange}
-          value={defaultUnitOfResource}
-         
-        />
-        <br />
-        <SlInput
-          label='Default Unit Of Effort'
-          name='defaultUnitOfEffort'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={defaultUnitOfEffort}
+          value={primaryLocation}
         />
         <br />
         <SlTextarea
@@ -147,6 +128,6 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
   );
 };
 
-export default NewResourceSpecification;
+export default NewAgent;
 
 

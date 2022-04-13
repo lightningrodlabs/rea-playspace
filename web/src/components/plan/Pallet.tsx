@@ -1,6 +1,8 @@
+import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import HoloService from '../../service';
-import { ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
+import { Agent, ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
 import { buildTree } from '../../utils';
 import PalletNode from '../PalletNode';
 
@@ -12,7 +14,8 @@ interface Props {
 const Pallet: React.FC<Props> = ({myAgentId, service}) => {
 
   const [resources, setResources] = useState<ResourceSpecification[]>([]);
-  const [processes, setProcesses] = useState<ProcessSpecification[]>([])
+  const [processes, setProcesses] = useState<ProcessSpecification[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([])
 
   const onDragStart = (event:DragEvent, name: string, type: string) => {
     const data = {name, type};
@@ -39,8 +42,18 @@ const Pallet: React.FC<Props> = ({myAgentId, service}) => {
       setProcesses(processes);
     }
 
+    const getAgents = async () => {
+      const result = await service.get_thing('agent');
+      const jsTree = buildTree(result.tree, result.tree[0]);
+      const agents = jsTree.children.map((e) => {
+        return JSON.parse(e.val.data) as Agent;
+      });
+      setAgents(agents);
+    }
+
     getResources();
     getProcesses();
+    getAgents();
   }, []);
 
 const resourcePalletNodeStyles = {
@@ -57,45 +70,77 @@ const processPalletNodeStyles = {
   borderRadius: "10px"
 }
 
-  function renderNodes(list, type) {
-    if (list.length > 0) {
-      return (list.map((item: any) => (
-        <div 
-        onDragStart={(event: any) => onDragStart(event, item.name, type)} 
-        draggable
-        style={type === 'resource' ? resourcePalletNodeStyles : processPalletNodeStyles}>
-          <PalletNode
-            key={item.id}
-            thing={item}
+const agentPalletNodeStyles = {
+  border: "1px solid blue",
+  background: "lightblue",
+  margin: "5px",
+  borderRadius: "10px"
+}
 
+function pickStyle(type: string) {
+  if (type === 'resource') return resourcePalletNodeStyles;
+  if (type === 'process') return processPalletNodeStyles;
+  if (type === 'agent') return agentPalletNodeStyles;
+}
+
+function renderNodes(list, type) {
+  if (list.length > 0) {
+    return (list.map((item: any) => (
+      <div 
+      onDragStart={(event: any) => onDragStart(event, item.name, type)} 
+      draggable
+      style={pickStyle(type)}>
+        <PalletNode
+          key={item.id}
+          thing={item}
         />
-        </div>
-      )));
-    }
-    return (<p style={{textAlign: "center"}}>No items</p>);
+      </div>
+    )));
   }
+  return (<p style={{textAlign: "center"}}>No items</p>);
+}
 
 
   const palletStyles = {
-    flex:1,
+    flexGrow:1,
     border: "1px solid black"
   }
 
   const categoryStyles = {
     border: "1px solid black",
     background: "lightgray",
-    margin: "5px",
-    padding: "5px"
+    padding: "5px",
+    textAlign: "center"
   }
 
 
   return (
     <aside style={palletStyles}>
-      <div style={categoryStyles}><strong>Resources</strong></div>
+      <div style={categoryStyles}>
+      <h2>Resources
+        <Link to="/resources/new">
+          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+        </Link>
+      </h2>
+      </div>
       {renderNodes(resources, 'resource')}
       <br/>
-      <div style={categoryStyles}><strong>Processes</strong></div>
+      <div style={categoryStyles}>
+        <h2>Processes
+        <Link to="/processes/new">
+          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+        </Link>
+        </h2>
+      </div>
       {renderNodes(processes, 'process')}
+      <div style={categoryStyles}>
+        <h2>Agents
+        <Link to="/agents/new">
+          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+        </Link>
+        </h2>
+      </div>
+      {renderNodes(agents, 'agent')}
     </aside>
   )
 }
