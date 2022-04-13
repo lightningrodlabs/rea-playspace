@@ -1,29 +1,25 @@
 import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import MainPanelHeader from "../layout/MainPanelHeader";
-import { ResourceSpecification } from "../../types/valueflows";
-import HoloService from "../../service";
-import { ThingInput } from "../../types/holochain";
+import MainPanelHeader from "../../layout/MainPanelHeader";
+import { ProcessSpecification } from "../../../types/valueflows";
+import HoloService from "../../../service";
+import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
 
-export type NewResourceSpecificationProps = {
+export type NewProcessSpecificationProps = {
   service: HoloService;
 }
 
 const initialState = {
-  id: 'rs-',
+  id: 'ps-',
   name: '',
-  image: '',
-  resourceClassifiedAs: '',
-  defaultUnitOfResource: '',
-  defaultUnitOfEffort: '',
   note: ''
 }
 
-const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({service}) => {
+const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = ({service}) => {
   const [
-    {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
+    {id, name, note}, setState
   ] = useState(initialState);
 
 
@@ -53,8 +49,8 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
     e.preventDefault()
     //getResourceSpecificationListSize();
     console.log(id);
-    const rs: ResourceSpecification =  {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note};
-    const path: string = 'resourceSpecification.' + id;
+    const rs: ProcessSpecification =  {id, name, note};
+    const path: string = 'processSpecification.' + id;
     const input: ThingInput = {
       path,
       data: JSON.stringify(rs)
@@ -62,14 +58,14 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
     await service.put_thing(input);
     //incId();
     clearState();
-    navigate('/resources');
+    navigate('/knowledge');
   }
 
   return (
     <>
       <MainPanelHeader>
         <h2>New Resource Specification</h2>
-        <Link to="/resources">
+        <Link to="/processes">
           <SlButton variant="primary">View Resources</SlButton>
         </Link>
       </MainPanelHeader>
@@ -96,41 +92,6 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
           
         />
         <br />
-        <SlInput
-          label="Image"
-          name="image"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={image}
-         
-        />
-        <br />
-        <SlInput
-          label='Resource Classified As'
-          name='resourceClassifiedAs'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={resourceClassifiedAs}
-          
-        />
-        <br />
-        <SlInput
-          label='Default Unit Of Resource'
-          name='defaultUnitOfResource'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={defaultUnitOfResource}
-         
-        />
-        <br />
-        <SlInput
-          label='Default Unit Of Effort'
-          name='defaultUnitOfEffort'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={defaultUnitOfEffort}
-        />
-        <br />
         <SlTextarea
           label='Note'
           name='note'
@@ -148,6 +109,6 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
   );
 };
 
-export default NewResourceSpecification;
+export default NewProcessSpecification;
 
 

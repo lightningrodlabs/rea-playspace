@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import { SlButton } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import MainPanelHeader from "../layout/MainPanelHeader";
+import MainPanelHeader from "../../layout/MainPanelHeader";
 import ResourceSpecificationList from "./ResourceSpecificationList";
-import HoloService from "../../service";
+import HoloService from "../../../service";
 
 export type ResourceSpecificationProps = {
   service: HoloService

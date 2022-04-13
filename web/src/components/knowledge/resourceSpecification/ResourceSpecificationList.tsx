@@ -1,8 +1,8 @@
-import HoloService from "../../service";
+import HoloService from "../../../service";
 import React, { useEffect, useState } from "react";
-import { ResourceSpecification } from "../../types/valueflows";
-import { buildTree } from "../../utils";
-import { TreeNode } from "../../types/holochain";
+import { ResourceSpecification } from "../../../types/valueflows";
+import { buildTree } from "../../../utils";
+import { TreeNode } from "../../../types/holochain";
 
 
 export type ResourceSpecificationListProps = {
@@ -36,11 +36,9 @@ const ResourcesSpecificationList: React.FC<ResourceSpecificationListProps> = ({s
     }
     return (<p>Loading...</p>)
   }
-    
-
+  
   return (
     <>
-      <p>I am a list!</p>
       <ul>
         {list.map((child,i) => <li key={i}>{child.val.name}</li>)}
       </ul>
