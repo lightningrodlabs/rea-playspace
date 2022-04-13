@@ -70,7 +70,7 @@ const App: React.FC<Props> = () => {
                   </Route>    
                   <Route
                     path="/knowledge"
-                    element={<Knowledge />}>
+                    element={<Knowledge service={service}/>}>
                   </Route>
                   <Route
                     path="/plan"
@@ -82,7 +82,7 @@ const App: React.FC<Props> = () => {
                   </Route>
                   <Route
                     path="/resources"
-                    element={<Resources />}
+                    element={<Resources service={service}/>}
                   />
                   {/* <Route
                     path="/resources/transfer"
@@ -90,7 +90,7 @@ const App: React.FC<Props> = () => {
                   /> */}
                   <Route
                     path="/resources/new"
-                    element={<NewResourceSpecification />}
+                    element={<NewResourceSpecification service={service}/>}
                   />
                 </Routes>
             </div>

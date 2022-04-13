@@ -7,7 +7,7 @@ import {
 } from "@shoelace-style/shoelace/dist/react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import MainPanelHeader from "../components/MainPanelHeader";
+import MainPanelHeader from "./layout/MainPanelHeader";
 import useEconomicResources from "../hooks/useEconomicResources";
 
 export type ResourceTransferProps = {

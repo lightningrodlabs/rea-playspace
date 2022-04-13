@@ -7,7 +7,7 @@ import {
   SlIcon,
   SlInput,
 } from "@shoelace-style/shoelace/dist/react";
-import ResourceListTableItem from "./ResourceListTableItem";
+import ResourceListTableItem from "./knowledge/ResourceSpecificationListTableItem";
 import useEconomicResources from "./hooks/useEconomicResources";
 
 export type EconomicResourceListProps = {

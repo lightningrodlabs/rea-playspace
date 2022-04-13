@@ -1,14 +1,16 @@
 import React from "react";
 import ResourceSpecification from "../components/knowledge/ResourceSpecification";
+import HoloService from "../service";
 
 interface Props {
+  service: HoloService;
 }
 
-const Knowledge: React.FC<Props> = () => {
+const Knowledge: React.FC<Props> = ({service}) => {
 
   return(
     <div>
-      <ResourceSpecification />
+      <ResourceSpecification service={service}/>
     </div>
   )
 }

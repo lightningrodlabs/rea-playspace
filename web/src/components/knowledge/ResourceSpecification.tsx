@@ -1,12 +1,17 @@
-import React from "react";
+import React, {useState} from "react";
 import { SlButton } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../layout/MainPanelHeader";
 import ResourceSpecificationList from "./ResourceSpecificationList";
+import HoloService from "../../service";
 
-export type ResourceSpecificationProps = {}
+export type ResourceSpecificationProps = {
+  service: HoloService
+}
 
-const ResourceSpecification: React.FC<ResourceSpecificationProps> = () => {
+const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({service}) => {
+  const [listSize, setListSize] = useState<number>()
+
   return (
     <>
       <MainPanelHeader>
@@ -17,7 +22,7 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = () => {
           </Link>
         </div>
       </MainPanelHeader>
-      <ResourceSpecificationList />
+      <ResourceSpecificationList service={service}/>
     </>
   );
 };
