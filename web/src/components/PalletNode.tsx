@@ -5,12 +5,15 @@ export type PalletNodeProps = {
 };
 
 const PalletNode: React.FC<PalletNodeProps> = ({thing}) => {
+
+  const styles = {
+    padding: "4px",
+    textAlign: "center"
+  }
   return (
-    <div className="resource-list-table-item">
-      <div className="resource-list-resource-name">
+      <div style={styles}>
         {thing.name}
       </div>
-    </div>
   );
 };
 

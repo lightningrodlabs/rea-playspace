@@ -4,19 +4,15 @@ import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
-import LeftScreenNavMenu from "./components/layout/LeftScreenNavMenu";
 import { APP_ID, APP_PORT } from './holochainConf';
 import {  AppWebsocket, InstalledCell } from '@holochain/client';
-import Knowledge from "./routes/Knowledge";
-import Plan from "./routes/Plan";
-import Observation from "./routes/Observation";
-import ResourceSpecification from "./components/knowledge/resourceSpecification/ResourceSpecification"
 import { HashToString, sleep100 } from "./utils";
 import HoloService from "./service";
-import Binding from "./routes/Binding";
 import NewResourceSpecification from "./components/knowledge/resourceSpecification/NewResourceSpecification";
 import ProcessSpecification from "./components/knowledge/processSpecification/ProcessSpecification";
 import NewProcessSpecification from "./components/knowledge/processSpecification/NewProcessSpecification";
+import Home from "./Home";
+import NewAgent from "./components/knowledge/agents/NewAgent";
 
 // const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
@@ -61,30 +57,18 @@ const App: React.FC<Props> = () => {
         <div className="container">
           <Header name={HashToString(service.agentPubKey)} />
           <div className="below-header">
-            <LeftScreenNavMenu />
-
+            {/* <LeftScreenNavMenu /> */}
+            
             <div className="main-panel">
-                <Routes>
-                  <Route
-                    path="/binding"
-                    element={<Binding  service={service}/>}
-                    >
-                  </Route>    
-                  <Route
-                    path="/knowledge"
-                    element={<Knowledge service={service}/>}>
+                <Routes>  
+                <Route
+                    path="/"
+                    element={<Home myAgentId={HashToString(service.agentPubKey)} service={service}/>}>
                   </Route>
+
                   <Route
-                    path="/plan"
-                    element={<Plan myAgentId={HashToString(service.agentPubKey)} service={service}/>}>
-                  </Route>
-                  <Route
-                    path="/observation"
-                    element={<Observation />}>
-                  </Route>
-                  <Route
-                    path="/resources"
-                    element={<ResourceSpecification service={service}/>}
+                    path="/agents/new"
+                    element={<NewAgent service={service}/>}
                   />
                   <Route
                     path="/resources/new"
