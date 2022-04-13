@@ -14,8 +14,8 @@ interface Props {
 const ResourceNode: React.FC<Props> = ({data}) => {
 
   const nodeStyles = {
-    border: "1px solid orange",
-    background: "rgb(255, 213, 128)",
+    border: "1px solid green",
+    background: "lightgreen",
     margin: "5px",
     borderRadius: "10px"
   }
