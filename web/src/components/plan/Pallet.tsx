@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import HoloService from '../../service';
-import service from '../../service';
-import { TreeNode } from '../../types/holochain';
 import { ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
 import { buildTree } from '../../utils';
 import PalletNode from '../PalletNode';
@@ -21,11 +19,6 @@ const Pallet: React.FC<Props> = ({myAgentId, service}) => {
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
   };
-
-  const palletStyles = {
-    flex:1,
-    border: "1px solid black"
-  }
 
   useEffect(()=>{
     const getResources = async () => {
@@ -50,29 +43,58 @@ const Pallet: React.FC<Props> = ({myAgentId, service}) => {
     getProcesses();
   }, []);
 
+const resourcePalletNodeStyles = {
+    border: "1px solid green",
+    background: "lightgreen",
+    margin: "5px",
+    borderRadius: "10px"
+}
+
+const processPalletNodeStyles = {
+  border: "1px solid orange",
+  background: "rgb(255, 213, 128)",
+  margin: "5px",
+  borderRadius: "10px"
+}
 
   function renderNodes(list, type) {
     if (list.length > 0) {
       return (list.map((item: any) => (
         <div 
         onDragStart={(event: any) => onDragStart(event, item.name, type)} 
-        draggable>
+        draggable
+        style={type === 'resource' ? resourcePalletNodeStyles : processPalletNodeStyles}>
           <PalletNode
             key={item.id}
             thing={item}
+
         />
         </div>
       )));
     }
-    return (<p>Loading...</p>);
+    return (<p style={{textAlign: "center"}}>No items</p>);
+  }
+
+
+  const palletStyles = {
+    flex:1,
+    border: "1px solid black"
+  }
+
+  const categoryStyles = {
+    border: "1px solid black",
+    background: "lightgray",
+    margin: "5px",
+    padding: "5px"
   }
 
 
   return (
     <aside style={palletStyles}>
-      <div><strong>Resources</strong></div><br/>
+      <div style={categoryStyles}><strong>Resources</strong></div>
       {renderNodes(resources, 'resource')}
-      <div><strong>Processes</strong></div><br/>
+      <br/>
+      <div style={categoryStyles}><strong>Processes</strong></div>
       {renderNodes(processes, 'process')}
     </aside>
   )
