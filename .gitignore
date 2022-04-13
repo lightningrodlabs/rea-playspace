@@ -6,9 +6,6 @@ user-data
 electron/web
 .cargo
 
-happ/workdir/application.dna
-happ/workdir/application.happ
-
 web/dist/*
 
 target/
