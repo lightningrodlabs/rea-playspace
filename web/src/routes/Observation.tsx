@@ -6,7 +6,7 @@ const Observation: React.FC<Props> = () => {
 
   return(
     <div>
-      <p>Observation</p>
+      <p>Observation - TODO</p>
     </div>
   )
 }

@@ -28,7 +28,7 @@ const ResourceNode: React.FC<Props> = ({data}) => {
         onConnect={(params) => console.log('handle onConnect', params)}
       />
       <div style={nodeStyles}>
-        <p><strong>Name: </strong>{data.name}</p>
+        <p style={{paddingLeft: "2px", paddingRight: "2px"}}><strong>{data.name}</strong></p>
       </div>
       <Handle
         type="source"

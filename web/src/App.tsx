@@ -79,7 +79,7 @@ const App: React.FC<Props> = () => {
                     element={<Plan myAgentId={HashToString(service.agentPubKey)} service={service}/>}>
                   </Route>
                   <Route
-                    path="/"
+                    path="/observation"
                     element={<Observation />}>
                   </Route>
                   <Route
