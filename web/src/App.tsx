@@ -10,11 +10,13 @@ import {  AppWebsocket, InstalledCell } from '@holochain/client';
 import Knowledge from "./routes/Knowledge";
 import Plan from "./routes/Plan";
 import Observation from "./routes/Observation";
-import Resources from "./components/knowledge/ResourceSpecification";
+import ResourceSpecification from "./components/knowledge/resourceSpecification/ResourceSpecification"
 import { HashToString, sleep100 } from "./utils";
 import HoloService from "./service";
 import Binding from "./routes/Binding";
-import NewResourceSpecification from "./components/knowledge/NewResourceSpecification";
+import NewResourceSpecification from "./components/knowledge/resourceSpecification/NewResourceSpecification";
+import ProcessSpecification from "./components/knowledge/processSpecification/ProcessSpecification";
+import NewProcessSpecification from "./components/knowledge/processSpecification/NewProcessSpecification";
 
 // const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
@@ -82,15 +84,19 @@ const App: React.FC<Props> = () => {
                   </Route>
                   <Route
                     path="/resources"
-                    element={<Resources service={service}/>}
+                    element={<ResourceSpecification service={service}/>}
                   />
-                  {/* <Route
-                    path="/resources/transfer"
-                    element={<ResourceTransfer />}
-                  /> */}
                   <Route
                     path="/resources/new"
                     element={<NewResourceSpecification service={service}/>}
+                  />
+                  <Route
+                    path="/processes"
+                    element={<ProcessSpecification service={service}/>}
+                  />
+                  <Route
+                    path="/processes/new"
+                    element={<NewProcessSpecification service={service}/>}
                   />
                 </Routes>
             </div>
