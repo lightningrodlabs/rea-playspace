@@ -12,7 +12,7 @@ import ReactFlow, {
 import BlankAddModal from '../modals/BlankAddModal';
 import ProcessNode from '../nodes/ProcessNode';
 import CreateEconomicResource from '../CreateEconomicResource';
-import { nodes as initialNodes, edges as initialEdges } from '../../data/initial-elements';
+import ResourceNode from '../nodes/ResourceNode';
 
 let id = 0;
 const getId = () => `node_${id++}`;
@@ -29,15 +29,15 @@ interface NodeData {
 
 const FlowLayout: React.FC<Props> = (props) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   const [addingNode, setAddingNode] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
-  const nodeTypes = useMemo(() => ({ processNode: ProcessNode, }), []); 
+  const nodeTypes = useMemo(() => ({ process: ProcessNode, resource: ResourceNode }), []); 
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -56,10 +56,11 @@ const FlowLayout: React.FC<Props> = (props) => {
       console.log('drop');
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const name = event.dataTransfer.getData('application/reactflow');
+        const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+        console.log(data.type);
 
         // check if the dropped element is valid
-        if (typeof name === 'undefined' || !name) {
+        if (typeof data.name === 'undefined' || !data.name) {
           return;
         }
         if (reactFlowInstance) {
@@ -67,10 +68,12 @@ const FlowLayout: React.FC<Props> = (props) => {
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
           });
+          console.log(data.name, data.type);
           const newNode = {
             id: getId(),
+            type: data.type,
             position:position!,
-            data: { label: (<>{name}</>) },
+            data: { label: (<>{data.name}</>), name: data.name },
           };
 
           setNodes((nds) => nds.concat(newNode));
