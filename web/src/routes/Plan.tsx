@@ -1,16 +1,18 @@
 import React from "react";
 import FlowLayout from "../components/layout/FlowLayout";
-import Pallet from "../components/layout/Pallet";
+import Pallet from "../components/plan/Pallet";
+import HoloService from "../service";
 
 interface Props {
-  myAgentId: string
+  myAgentId: string,
+  service: HoloService,
 }
 
-const Plan: React.FC<Props> = ({myAgentId}) => {
+const Plan: React.FC<Props> = ({myAgentId, service}) => {
 
   return(
     <div style={{display:"flex"}}>
-      <Pallet myAgentId={myAgentId}/>
+      <Pallet myAgentId={myAgentId} service={service}/>
       <FlowLayout myAgentId={myAgentId}/>
     </div>
   )
