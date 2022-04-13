@@ -19,6 +19,7 @@
     "happ-pack": "bash scripts/happ-pack.sh",
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "happ-run": "electron/node_modules/electron-holochain/binaries/holochain-runner ./happ/workdir/application.happ ./user-data/databases --admin-ws-port 1234 --app-ws-port 8888 --app-id rea-playspace --keystore-path ./user-data/keystore/",
+    "happ-run2": "EH_TEST_USER_2=1 electron/node_modules/electron-holochain/binaries/holochain-runner ./happ/workdir/application.happ ./user2-data/databases --admin-ws-port 1236 --app-ws-port 8899 --app-id rea-playspace --keystore-path ./user2-data/keystore/",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
     "tests-install": "cd tests && pnpm install",
     "test": "cd web && pnpm test",
