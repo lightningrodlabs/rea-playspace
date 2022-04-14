@@ -8,8 +8,7 @@ import { APP_ID, APP_PORT } from './holochainConf';
 import {  AppWebsocket, InstalledCell } from '@holochain/client';
 import { HashToString, sleep100 } from "./utils";
 import HoloService from "./service";
-import NewResourceSpecification from "./components/knowledge/resourceSpecification/NewResourceSpecification";
-import ProcessSpecification from "./components/knowledge/processSpecification/ProcessSpecification";
+import NewResourceSpecification from "./NewResourceSpecification";
 import NewProcessSpecification from "./components/knowledge/processSpecification/NewProcessSpecification";
 import Home from "./Home";
 import NewAgent from "./components/knowledge/agents/NewAgent";
@@ -73,10 +72,6 @@ const App: React.FC<Props> = () => {
                   <Route
                     path="/resources/new"
                     element={<NewResourceSpecification service={service}/>}
-                  />
-                  <Route
-                    path="/processes"
-                    element={<ProcessSpecification service={service}/>}
                   />
                   <Route
                     path="/processes/new"

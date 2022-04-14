@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import MainPanelHeader from "../../layout/MainPanelHeader";
-import { ResourceSpecification } from "../../../types/valueflows";
-import HoloService from "../../../service";
-import { ThingInput } from "../../../types/holochain";
+import MainPanelHeader from "./components/layout/MainPanelHeader";
+import { ResourceSpecification } from "./types/valueflows";
+import HoloService from "./service";
+import { ThingInput } from "./types/holochain";
 import { useNavigate } from "react-router-dom";
 
 export type NewResourceSpecificationProps = {

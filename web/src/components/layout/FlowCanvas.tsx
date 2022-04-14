@@ -101,7 +101,7 @@ const FlowCanvas: React.FC<Props> = (props) => {
         const reactFlowBounds: DOMRect = reactFlowWrapper.current!.getBoundingClientRect();
         if (reactFlowInstance) {
           const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left+10,
+            x: event.clientX - reactFlowBounds.left + 10,
             y: event.clientY - reactFlowBounds.top + 10
           });
           await setCurrentPosition(position);

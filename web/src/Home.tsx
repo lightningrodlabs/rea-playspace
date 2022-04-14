@@ -1,6 +1,6 @@
 import React from "react";
 import FlowCanvas from "./components/layout/FlowCanvas";
-import Pallet from "./components/plan/Pallet";
+import Pallet from "./components/layout/Pallet";
 import HoloService from "./service";
 
 interface Props {
