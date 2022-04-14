@@ -1,33 +1,32 @@
 import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import MainPanelHeader from "../../layout/MainPanelHeader";
-import { Agent, } from "../../../types/valueflows";
+import MainPanelHeader from "../MainPanelHeader";
+import { ProcessSpecification } from "../../../types/valueflows";
 import HoloService from "../../../service";
 import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
 
-export type NewAgentProps = {
+export type NewProcessSpecificationProps = {
   service: HoloService;
 }
 
 const initialState = {
-  id: 'ag-',
+  id: 'ps-',
   name: '',
-  image: '',
-  primaryLocation: '',
   note: ''
 }
 
-const NewAgent: React.FC<NewAgentProps> = ({service}) => {
+const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = ({service}) => {
   const [
-    {id, name, image, primaryLocation, note}, setState
+    {id, name, note}, setState
   ] = useState(initialState);
 
 
   const navigate = useNavigate();
 
   const clearState = () => {
+    console.log('clearing')
     setState({ ...initialState });
   };
 
@@ -50,13 +49,14 @@ const NewAgent: React.FC<NewAgentProps> = ({service}) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
     console.log(id);
-    const ag: Agent =  {id, name, note};
-    const path: string = 'agent.' + id;
+    const rs: ProcessSpecification =  {id, name, note};
+    const path: string = 'processSpecification.' + id;
     const input: ThingInput = {
       path,
-      data: JSON.stringify(ag)
+      data: JSON.stringify(rs)
     }
     await service.put_thing(input);
+    //incId();
     clearState();
     navigate('/');
   }
@@ -92,25 +92,6 @@ const NewAgent: React.FC<NewAgentProps> = ({service}) => {
           
         />
         <br />
-        <SlInput
-          required
-          label="Image"
-          name="image"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={image}
-          
-        />
-        <br />
-        <SlInput
-          required
-          label="Primary Location"
-          name="primaryLocation"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={primaryLocation}
-        />
-        <br />
         <SlTextarea
           label='Note'
           name='note'
@@ -128,6 +109,6 @@ const NewAgent: React.FC<NewAgentProps> = ({service}) => {
   );
 };
 
-export default NewAgent;
+export default NewProcessSpecification;
 
 

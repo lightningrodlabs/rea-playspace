@@ -8,10 +8,11 @@ import { APP_ID, APP_PORT } from './holochainConf';
 import {  AppWebsocket, InstalledCell } from '@holochain/client';
 import { HashToString, sleep100 } from "./utils";
 import HoloService from "./service";
-import NewResourceSpecification from "./NewResourceSpecification";
-import NewProcessSpecification from "./components/knowledge/processSpecification/NewProcessSpecification";
 import Home from "./Home";
-import NewAgent from "./components/knowledge/agents/NewAgent";
+import NewAgent from "./components/layout/create/NewAgent";
+import NewResourceSpecification from "./components/layout/create/NewResourceSpecification";
+import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
+
 
 // const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 const APP_WS_URL = `ws://localhost:${APP_PORT}`;
