@@ -26,17 +26,12 @@ const Pallet: React.FC<Props> = () => {
 
   useEffect(()=>{
     const getResources = async () => {
-      try {
-        const result: Array<RustNode> = await zomeApi.get_thing('resourceSpecification');
-        console.log('result', result);
-        const jsTree = buildTree(result, result[0]);
-        const resources = jsTree.children.map((e) => {
-          return JSON.parse(e.val.data) as ResourceSpecification;
-        });
-        setResources(resources);
-    } catch (e) {
-      console.error(e);
-    }
+      const result: Array<RustNode> = await zomeApi.get_thing('resourceSpecification');
+      const jsTree = buildTree(result, result[0]);
+      const resources = jsTree.children.map((e) => {
+        return JSON.parse(e.val.data) as ResourceSpecification;
+      });
+      setResources(resources);
     }
   
     const getProcesses = async () => {
