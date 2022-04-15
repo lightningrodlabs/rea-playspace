@@ -9,24 +9,18 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
+import BlankAddModal from '../modals/BlankAddModal';
 import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
-import ResourceNode from '../nodes/ResourceNode';
+import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 
 let id = 0;
 const getId = () => `node_${id++}`;
 
 interface Props {
-  myAgentId: string;
 }
 
-interface NodeData {
-  data: {
-    label: Element
-  }
-}
-
-const FlowCanvas: React.FC<Props> = (props) => {
+const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -38,7 +32,7 @@ const FlowCanvas: React.FC<Props> = (props) => {
 
   const nodeTypes = useMemo(() => ({ 
     process: ProcessNode, 
-    resource: ResourceNode,
+    resourceSpecification: ResourceSpecificationNode,
     agent: AgentNode 
   }), []); 
 
@@ -49,29 +43,33 @@ const FlowCanvas: React.FC<Props> = (props) => {
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
-    console.log('dragover');
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
   const onDrop = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
       console.log('drop');
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
         const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-        console.log(data.type);
+        //console.log(data.type);
 
         // check if the dropped element is valid
         if (typeof data.name === 'undefined' || !data.name) {
           return;
-        }
+        }        
+
         if (reactFlowInstance) {
           const position = reactFlowInstance.project({
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
           });
-          console.log(data.name, data.type);
+
+          //console.log(data.name, data.type);
+          // create and persist node
+          await persistNode(data);
+          
           const newNode = {
             id: getId(),
             type: data.type,
@@ -80,19 +78,39 @@ const FlowCanvas: React.FC<Props> = (props) => {
           };
 
           setNodes((nds) => nds.concat(newNode));
-    }
+      }
     }
   },
     [reactFlowInstance]
   );
 
-  // click viewport -> get location
-  // open modal
-  // enter data
-  // save name to state
-  // submit to graphql
-  // close modal
-  // generate node with location
+  const persistNode = async (data: any) => {
+    console.log(data);
+
+    if (data.type === 'resourceSpecification') {
+
+    }
+
+    if (data.type === 'agent') {
+
+    }
+
+    if (data.type === 'process') {
+      console.log(data.type);
+      toggleModal();
+      // const newProcess: Process = {
+      //   id: '',
+      //   name: string,
+      //   finished: boolean,
+      //   note?: string,
+      //   classifiedAs?: string,
+      //   inScopeOf?: string,
+      //   basedOn: ProcessSpecification
+      // }
+      
+    }
+  }
+  
 	
   // on flow view click
   const handleSetPosition = async (event:any) => {
@@ -162,16 +180,11 @@ const FlowCanvas: React.FC<Props> = (props) => {
           </ReactFlow>
         </div>
       </ReactFlowProvider>
-      {/* <BlankAddModal 
+      <BlankAddModal 
         isOpen={addingNode} 
         toggleModal={toggleModal} 
         handleAddNode={handleAddNode} 
-        >  
-        <CreateEconomicResource 
-          myAgentId={props.myAgentId} 
-          setCurrentNodeName={setCurrentNodeName} 
-          closeModal={toggleModal}/>
-        </BlankAddModal> */}
+        >{selectType()}</BlankAddModal>
     </div>
   );
 }
