@@ -49,7 +49,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
     //getResourceSpecificationListSize();
     console.log(id);
     const rs: ProcessSpecification =  {id, name, note};
-    const path: string = 'processSpecification.' + id;
+    const path: string = 'root.processSpecification.' + id;
     const input: ThingInput = {
       path,
       data: JSON.stringify(rs)
@@ -63,7 +63,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   return (
     <>
       <MainPanelHeader>
-        <h2>New Resource Specification</h2>
+        <h2>New Process Specification</h2>
         <Link to="/">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>

@@ -11,7 +11,7 @@ interface Props {
   data: Data
 }
 
-const ResourceNode: React.FC<Props> = ({data}) => {
+const ResourceSpecificationNode: React.FC<Props> = ({data}) => {
 
   const nodeStyles = {
     border: "1px solid green",
@@ -40,4 +40,4 @@ const ResourceNode: React.FC<Props> = ({data}) => {
   );
 }
 
-export default ResourceNode;
+export default ResourceSpecificationNode;

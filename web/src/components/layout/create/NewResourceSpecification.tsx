@@ -39,22 +39,10 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  // this would break in a network setting
-  // how do you deal with unique IDs in a DHT
-  // const getResourceSpecificationListSize = async () => {
-  //   const result = await service.get_thing('resourceSpecification');
-  //   if (result.tree.length > id) {
-  //     id = result.tree.length;
-  //   }
-  // }
-
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-    //getResourceSpecificationListSize();
-    console.log(id);
     const rs: ResourceSpecification =  {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note};
-    const path: string = 'resourceSpecification.' + id;
+    const path: string = 'root.resourceSpecification.' + id;
     const input: ThingInput = {
       path,
       data: JSON.stringify(rs)
