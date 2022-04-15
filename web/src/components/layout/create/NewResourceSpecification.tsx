@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
-import MainPanelHeader from "./components/layout/MainPanelHeader";
-import { ResourceSpecification } from "./types/valueflows";
-import HoloService from "./service";
-import { ThingInput } from "./types/holochain";
 import { useNavigate } from "react-router-dom";
+import ZomeApi from "../../../api/zomeApi";
+import { ResourceSpecification } from "../../../types/valueflows";
+import { ThingInput } from "../../../types/holochain";
+import MainPanelHeader from "../MainPanelHeader";
+import { getZomeApi } from "../../../hcWebsockets";
 
 export type NewResourceSpecificationProps = {
-  service: HoloService;
 }
 
 const initialState = {
@@ -21,7 +21,7 @@ const initialState = {
   note: ''
 }
 
-const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({service}) => {
+const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => {
   const [
     {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
@@ -59,7 +59,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = ({serv
       path,
       data: JSON.stringify(rs)
     }
-    await service.put_thing(input);
+    await getZomeApi().put_thing(input);
     clearState();
     navigate('/');
   }

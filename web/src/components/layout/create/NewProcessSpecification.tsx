@@ -3,13 +3,12 @@ import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
 import { ProcessSpecification } from "../../../types/valueflows";
-import HoloService from "../../../service";
 import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
+import ZomeApi from "../../../api/zomeApi";
+import { getZomeApi } from "../../../hcWebsockets";
 
-export type NewProcessSpecificationProps = {
-  service: HoloService;
-}
+export type NewProcessSpecificationProps = {}
 
 const initialState = {
   id: 'ps-',
@@ -17,7 +16,7 @@ const initialState = {
   note: ''
 }
 
-const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = ({service}) => {
+const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   const [
     {id, name, note}, setState
   ] = useState(initialState);
@@ -55,7 +54,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = ({servic
       path,
       data: JSON.stringify(rs)
     }
-    await service.put_thing(input);
+    await getZomeApi().put_thing(input);
     //incId();
     clearState();
     navigate('/');

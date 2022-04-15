@@ -1,21 +1,22 @@
 import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import HoloService from '../../service';
+import ZomeApi from '../../api/zomeApi';
+import { getZomeApi } from '../../hcWebsockets';
+import { Content, RustNode, Tree } from '../../types/holochain';
 import { Agent, ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
 import { buildTree } from '../../utils';
 import PalletNode from '../PalletNode';
 
-interface Props {
-  myAgentId: string,
-  service: HoloService
-}
+interface Props {}
 
-const Pallet: React.FC<Props> = ({myAgentId, service}) => {
+const Pallet: React.FC<Props> = () => {
 
   const [resources, setResources] = useState<ResourceSpecification[]>([]);
   const [processes, setProcesses] = useState<ProcessSpecification[]>([]);
   const [agents, setAgents] = useState<Agent[]>([])
+
+  const zomeApi: ZomeApi = getZomeApi();
 
   const onDragStart = (event:DragEvent, name: string, type: string) => {
     const data = {name, type};
@@ -25,17 +26,22 @@ const Pallet: React.FC<Props> = ({myAgentId, service}) => {
 
   useEffect(()=>{
     const getResources = async () => {
-      const result = await service.get_thing('resourceSpecification');
-      const jsTree = buildTree(result.tree, result.tree[0]);
-      const resources = jsTree.children.map((e) => {
-        return JSON.parse(e.val.data) as ResourceSpecification;
-      });
-      setResources(resources);
+      try {
+        const result: Array<RustNode> = await zomeApi.get_thing('resourceSpecification');
+        console.log('result', result);
+        const jsTree = buildTree(result, result[0]);
+        const resources = jsTree.children.map((e) => {
+          return JSON.parse(e.val.data) as ResourceSpecification;
+        });
+        setResources(resources);
+    } catch (e) {
+      console.error(e);
+    }
     }
   
     const getProcesses = async () => {
-      const result = await service.get_thing('processSpecification');
-      const jsTree = buildTree(result.tree, result.tree[0]);
+      const result = await zomeApi.get_thing('processSpecification');
+      const jsTree = buildTree(result, result[0]);
       const processes = jsTree.children.map((e) => {
         return JSON.parse(e.val.data) as ProcessSpecification;
       });
@@ -43,8 +49,8 @@ const Pallet: React.FC<Props> = ({myAgentId, service}) => {
     }
 
     const getAgents = async () => {
-      const result = await service.get_thing('agent');
-      const jsTree = buildTree(result.tree, result.tree[0]);
+      const result = await zomeApi.get_thing('agent');
+      const jsTree = buildTree(result, result[0]);
       const agents = jsTree.children.map((e) => {
         return JSON.parse(e.val.data) as Agent;
       });
@@ -109,8 +115,7 @@ function renderNodes(list, type) {
   const categoryStyles = {
     border: "1px solid black",
     background: "lightgray",
-    padding: "5px",
-    textAlign: "center"
+    padding: "5px"
   }
 
 
@@ -119,7 +124,7 @@ function renderNodes(list, type) {
       <div style={categoryStyles}>
       <h2>Resources
         <Link to="/resources/new">
-          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+          <SlIconButton name="plus-square-fill" label="Settings" />
         </Link>
       </h2>
       </div>
@@ -128,7 +133,7 @@ function renderNodes(list, type) {
       <div style={categoryStyles}>
         <h2>Processes
         <Link to="/processes/new">
-          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+          <SlIconButton name="plus-square-fill" label="Settings"/>
         </Link>
         </h2>
       </div>
@@ -136,7 +141,7 @@ function renderNodes(list, type) {
       <div style={categoryStyles}>
         <h2>Agents
         <Link to="/agents/new">
-          <SlIconButton name="plus-square-fill" label="Settings" style={{ fontSize: '2rem' }}/>
+          <SlIconButton name="plus-square-fill" label="Settings" />
         </Link>
         </h2>
       </div>

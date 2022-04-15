@@ -3,12 +3,13 @@ import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
 import { Agent, } from "../../../types/valueflows";
-import HoloService from "../../../service";
+import HoloService from "../../../api/zomeApi";
 import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
+import ZomeApi from "../../../api/zomeApi";
+import { getZomeApi } from "../../../hcWebsockets";
 
 export type NewAgentProps = {
-  service: HoloService;
 }
 
 const initialState = {
@@ -19,7 +20,7 @@ const initialState = {
   note: ''
 }
 
-const NewAgent: React.FC<NewAgentProps> = ({service}) => {
+const NewAgent: React.FC<NewAgentProps> = () => {
   const [
     {id, name, image, primaryLocation, note}, setState
   ] = useState(initialState);
@@ -56,7 +57,7 @@ const NewAgent: React.FC<NewAgentProps> = ({service}) => {
       path,
       data: JSON.stringify(ag)
     }
-    await service.put_thing(input);
+    await getZomeApi().put_thing(input);
     clearState();
     navigate('/');
   }

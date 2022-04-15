@@ -2,46 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { getAgentPubKey, getAppWs, getZomeApi, setAgentPubKey, setCellId, setZomeApi } from './hcWebsockets';
+import { sleep100 } from './utils';
+import { APP_ID } from './holochainConf';
+import ZomeApi from './api/zomeApi';
 
+getAppWs().then(async(appWs)=> {
+  appWs.client.socket.addEventListener('close', () => {
+    console.log('app websocket closed');
+  });
 
-// // initialize the appWs with the signals handler
-// const signalCallback = signalsHandlers(store)
+  const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
 
-// getAppWs(signalCallback).then(async (client) => {
-//   try {
-//     const profilesInfo = await client.appInfo({
-//       installed_app_id: MAIN_APP_ID,
-//     })
-//     const { cell_id: cellId } = profilesInfo.cell_data.find(
-//       ({ role_id }) => role_id === PROFILES_ROLE_ID
-//     )
-//     const [_dnaHash, agentPubKey] = cellId
-//     // cache buffer version of agentPubKey
-//     setAgentPubKey(agentPubKey)
-//     const cellIdString = cellIdToString(cellId)
-//     store.dispatch(setProfilesCellId(cellIdString))
-//     // all functions of the Profiles DNA
-//     const profilesZomeApi = new ProfilesZomeApi(client)
-
-//     const profiles = await profilesZomeApi.profile.fetchAgents(cellId)
-//     store.dispatch(fetchAgents(cellIdString, profiles))
-//     const profile = await profilesZomeApi.profile.whoami(cellId)
-//     store.dispatch(whoami(cellIdString, profile))
-//     const agentAddress = await profilesZomeApi.profile.fetchAgentAddress(cellId)
-//     store.dispatch(fetchAgentAddress(cellIdString, agentAddress))
-//     // which projects do we have installed?
-//     const projectCellIds = await getProjectCellIdStrings()
-//     store.dispatch(setProjectsCellIds(projectCellIds))
-//   } catch (e) {
-//     console.error(e)
-//     return
-//   }
-// })
-
-ReactDOM.render(
-  <React.StrictMode>
-      <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+  const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
+  setAgentPubKey(agentPubKey);
+  setCellId(app_info.cell_data[0].cell_id);
+  setZomeApi(new ZomeApi(appWs));
+  
+  ReactDOM.render(
+    <App />,
+    document.getElementById('root')
+  );
+});
 

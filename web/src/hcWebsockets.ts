@@ -1,4 +1,5 @@
-import { AppWebsocket, AdminWebsocket  } from '@holochain/client'
+import { AppWebsocket, AdminWebsocket, CellId, AgentPubKey  } from '@holochain/client'
+import ZomeApi from './api/zomeApi'
 import { APP_PORT, ADMIN_PORT } from './holochainConf'
 
 // export for use by holochainMiddleware (redux)
@@ -9,7 +10,9 @@ const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`
 
 let appWs: AppWebsocket
 let adminWs: AdminWebsocket
-let agentPubKey
+let agentPubKey: AgentPubKey
+let cellId: CellId
+let zomeApi: ZomeApi
 
 export async function getAdminWs(): Promise<AdminWebsocket> {
   if (adminWs) {
@@ -40,6 +43,7 @@ export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
           installed_app_id: 'rea_playspace'
         })
       }
+      // break from setInterval once data acquired
     }, 60000)
     appWs.client.socket.addEventListener('close', () => {
       console.log('app websocket closed')
@@ -48,10 +52,26 @@ export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
   }
 }
 
-export function getAgentPubKey() {
+export function getAgentPubKey(): AgentPubKey {
   return agentPubKey
 }
 
 export function setAgentPubKey(setAs) {
   agentPubKey = setAs
+}
+
+export function getCellId() {
+  return cellId;
+}
+
+export function setCellId(setAs) {
+  cellId = setAs
+}
+
+export function getZomeApi() {
+  return zomeApi;
+}
+
+export function setZomeApi(setAs) {
+  zomeApi = setAs
 }
