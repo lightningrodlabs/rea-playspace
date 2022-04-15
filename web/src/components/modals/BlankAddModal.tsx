@@ -1,7 +1,5 @@
-import { SlButton } from "@shoelace-style/shoelace/dist/react";
 import React from "react";
 import Modal from "react-modal";
-import CreateEconomicResource, { CreateEconomicResourceProps } from "../../CreateEconomicResource";
 
 Modal.setAppElement("#root");
 

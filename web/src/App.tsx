@@ -23,7 +23,7 @@ const App: React.FC<Props> = () => {
           <Header />
           <div className="below-header">
             <div className="main-panel">
-                <Routes>  
+              <Routes>  
                 <Route
                     path="/"
                     element={<Home />}>

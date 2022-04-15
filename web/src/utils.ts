@@ -4,25 +4,6 @@ export const sleep100 = async () => {
   return new Promise((resolve) => setTimeout(resolve, 100))
 }
 
-// @Jill - I think we can get rid of these. 
-// import { AgentPubKey } from '@holochain/client' defines a UInt8Array
-// as AgentPubKey. So we are now saving it as an AgentPubKey and using
-// it as-is in the zome calls
-
-// export function HashToString(buff: Uint8Array): string {
-//   return buff.reduce((prev: string, curr: number) => {
-//     return prev + curr.toString(16).padStart(2, '0');
-//   }, '');
-// }
-
-// export function StringToHash(s: string): Uint8Array {
-//   const b = new Uint8Array(Math.ceil(s.length/2));
-//   for (let i = 0; i < b.byteLength; i++) {
-//     b[i] = parseInt(s.slice(i*2,(i*2)+2),16);
-//   }
-//   return b;
-// }
-
 // tweak this into the shape we want???
 export function buildTree(tree: Array<RustNode>, node: RustNode): TreeNode {
   let t: TreeNode = { val: node.val, children: [] };

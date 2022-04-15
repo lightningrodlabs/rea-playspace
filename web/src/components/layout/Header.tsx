@@ -10,7 +10,6 @@ export type HeaderProps = {};
 
 const Header: React.FC<HeaderProps> = () => {
 
-  console.log(getAgentPubKey());
   return (
     <div className="header">
       <SlAvatar
