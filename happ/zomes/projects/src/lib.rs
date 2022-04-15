@@ -1,6 +1,6 @@
 use hdk::prelude::*;
 use holo_hash::{EntryHashB64, HeaderHashB64};
-
+use tracing::{info};
 mod project;
 
 use project::Project;
@@ -42,6 +42,7 @@ pub struct Content {
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
+  info!("putting thing with path {}", input.path.clone());
   let path = Path::try_from(input.path.clone())?;
   path.ensure()?;
   let thing = Thing{data: input.data};
@@ -97,6 +98,7 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
 
 #[hdk_extern]
 pub fn get_thing(path_str: String) -> ExternResult<Tree<Content>> {
+  info!("getting thing with path {}", path_str.clone());
   let root_path = Path::from(path_str.clone());
     let val = Content {
         name: String::from(path_str),
