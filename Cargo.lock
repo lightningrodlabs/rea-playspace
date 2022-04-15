@@ -634,6 +634,7 @@ dependencies = [
  "holo_hash",
  "paste",
  "serde",
+ "tracing",
 ]
 
 [[package]]
