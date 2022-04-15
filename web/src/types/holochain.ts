@@ -32,12 +32,17 @@ export interface ThingInput {
   data: String
 }
 
+export type Tree<T> = {
+  tree: Array<T>
+}
+
 export type RustNode = {
   idx: number;
   val: any;
   parent: null | number;
   children: Array<number>;
 };
+
 export type TreeNode = {
   val: any;
   children: Array<TreeNode>;

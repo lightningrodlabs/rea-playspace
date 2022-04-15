@@ -1,19 +1,16 @@
 import React from "react";
 import FlowCanvas from "./components/layout/FlowCanvas";
 import Pallet from "./components/layout/Pallet";
-import HoloService from "./service";
+import { getAgentPubKey } from "./hcWebsockets";
 
-interface Props {
-  myAgentId: string,
-  service: HoloService,
-}
+interface Props {}
 
-const Home: React.FC<Props> = ({myAgentId, service}) => {
+const Home: React.FC<Props> = () => {
 
   return(
     <div style={{display:"flex"}}>
-      <Pallet myAgentId={myAgentId} service={service}/>
-      <FlowCanvas myAgentId={myAgentId}/>
+      <Pallet />
+      <FlowCanvas myAgentId={getAgentPubKey()}/>
     </div>
   )
 }
