@@ -1,8 +1,8 @@
 import { AppWebsocket, AdminWebsocket, CellId, AgentPubKey  } from '@holochain/client'
 import ZomeApi from './api/zomeApi'
 import { APP_PORT, ADMIN_PORT } from './holochainConf'
+import { sleep100 } from './utils'
 
-// export for use by holochainMiddleware (redux)
 // @ts-ignore
 export const APP_WS_URL = `ws://localhost:${APP_PORT}`
 // @ts-ignore
@@ -19,11 +19,9 @@ export async function getAdminWs(): Promise<AdminWebsocket> {
     return adminWs
   } else {
     adminWs = await AdminWebsocket.connect(ADMIN_WS_URL)
-    setInterval(() => {
-      if (adminWs.client.socket.readyState === adminWs.client.socket.OPEN) {
-        adminWs.listDnas()
-      }
-    }, 60000)
+    while (!(adminWs.client.socket.readyState === adminWs.client.socket.OPEN)) {
+      sleep100();
+    } 
     adminWs.client.socket.addEventListener('close', () => {
       console.log('admin websocket closed')
     })
@@ -35,16 +33,10 @@ export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
   if (appWs) {
     return appWs
   } else {
-    // undefined is for default request timeout
     appWs = await AppWebsocket.connect(APP_WS_URL, undefined, signalsHandler)
-    setInterval(() => {
-      if (appWs.client.socket.readyState === appWs.client.socket.OPEN) {
-        appWs.appInfo({
-          installed_app_id: 'rea_playspace'
-        })
-      }
-      // break from setInterval once data acquired
-    }, 60000)
+    while (!(appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
+      await sleep100();
+    }
     appWs.client.socket.addEventListener('close', () => {
       console.log('app websocket closed')
     })

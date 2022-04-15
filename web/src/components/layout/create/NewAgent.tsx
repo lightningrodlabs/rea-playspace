@@ -50,9 +50,8 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
-    console.log(id);
     const ag: Agent =  {id, name, note};
-    const path: string = 'agent.' + id;
+    const path: string = 'root.agent.' + id;
     const input: ThingInput = {
       path,
       data: JSON.stringify(ag)
