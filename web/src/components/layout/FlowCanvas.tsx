@@ -110,7 +110,6 @@ const FlowCanvas: React.FC<Props> = () => {
       
     }
   }
-  
 	
   // on flow view click
   const handleSetPosition = async (event:any) => {
@@ -184,7 +183,7 @@ const FlowCanvas: React.FC<Props> = () => {
         isOpen={addingNode} 
         toggleModal={toggleModal} 
         handleAddNode={handleAddNode} 
-        >{selectType()}</BlankAddModal>
+        >{}</BlankAddModal>
     </div>
   );
 }

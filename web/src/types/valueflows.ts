@@ -46,13 +46,15 @@ export interface OutputCommitment extends TimeBase, ReaBase, Commitment {
 
 // Observation
 export interface Process extends TimeBase {
-  id: string,
-  name: string,
-  finished: boolean,
-  note?: string,
-  classifiedAs?: string,
-  inScopeOf?: string,
-  basedOn: ProcessSpecification
+  id: string, // who knows?? GUID (gweed)
+  name: string, // get from process spec
+  finished: boolean, // defaults to false
+  note?: string, // text-area
+  classifiedAs?: string, // don't display
+  inScopeOf?: string, // can be all sorts of things GUID. Thing picker, typeahead maybe? 
+  basedOn: ProcessSpecification, // ID of a process specification
+  inputCommitments: Array<InputCommitment>, // Add button on left
+  outputCommitments: Array<OutputCommitment> // add button on right
 }
 
 export interface EconomicResource {
