@@ -29,6 +29,8 @@
     "web": "cd ui && pnpx vite",
     "web2": "cd ui && pnpx vite --mode dev2",
     "web-build": "cd ui && pnpx vite build",
+    "web-zip": "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
+    "webhapp-pack": "pnpm run web-zip && hc web-app pack workdir/",
     "electron-install": "cd electron && pnpm install",
     "electron": "set -o allexport; . environments/.env; set +o allexport; cd electron && pnpm run start",
     "electron2": "set -o allexport; . environments/.env.dev2; set +o allexport; cd electron && EH_TEST_USER_2=1 pnpm run start",
