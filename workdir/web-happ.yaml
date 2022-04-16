@@ -2,6 +2,6 @@
 manifest_version: "1"
 name: rea-playspace
 ui:
-  bundled: "../ui/dist.zip"
+  bundled: "../ui/ui.zip"
 happ_manifest:
-  bundled: "./rea-playspace.happ"
+  bundled: "../happ/workdir/application.happ"

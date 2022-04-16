@@ -6,7 +6,8 @@ user-data
 electron/web
 .cargo
 
-web/dist/*
+ui/dist/*
+ui/ui.zip
 
 target/
 back/.cargo/
