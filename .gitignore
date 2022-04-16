@@ -9,6 +9,8 @@ electron/web
 ui/dist/*
 ui/ui.zip
 
+workdir/rea-playspace.webhapp
+
 target/
 back/.cargo/
 back/2-conductor-config.yml
