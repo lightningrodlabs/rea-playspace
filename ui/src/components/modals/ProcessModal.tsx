@@ -14,7 +14,11 @@ const initialState = {
   basedOn: ''
 }
 
-const ProcessModal: React.FC = () => {
+interface Props {
+  closeModal: () => void;
+}
+
+const ProcessModal: React.FC<Props> = ({closeModal}) => {
   const [
     {id, name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
@@ -39,6 +43,7 @@ const ProcessModal: React.FC = () => {
     }
     await getZomeApi().put_thing(input);
     clearState();
+    closeModal();
   }
 
   return (
