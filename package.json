@@ -21,6 +21,7 @@
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "happ-run": "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",
     "happ-run2": "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; . scripts/happ-run.sh'",
+    "holochain-playground": "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
     "tests-install": "cd tests && pnpm install",
     "test": "cd ui && pnpm test",
