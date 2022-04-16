@@ -43,7 +43,6 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   //   }
   // }
 
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();

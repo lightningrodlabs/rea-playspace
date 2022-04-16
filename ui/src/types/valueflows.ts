@@ -52,9 +52,9 @@ export interface Process extends TimeBase {
   note?: string, // text-area
   classifiedAs?: string, // don't display
   inScopeOf?: string, // can be all sorts of things GUID. Thing picker, typeahead maybe? 
-  basedOn: ProcessSpecification, // ID of a process specification
-  inputCommitments: Array<InputCommitment>, // Add button on left
-  outputCommitments: Array<OutputCommitment> // add button on right
+  basedOn: string, // ID of a process specification
+  inputCommitments?: Array<InputCommitment>, // Add button on left
+  outputCommitments?: Array<OutputCommitment> // add button on right
 }
 
 export interface EconomicResource {

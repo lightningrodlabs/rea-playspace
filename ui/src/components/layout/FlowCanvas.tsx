@@ -9,7 +9,9 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import BlankAddModal from '../modals/BlankAddModal';
+import ModalContainer from '../modals/ModalContainer';
+import BlankAddModal from '../modals/ModalContainer';
+import ProcessModal from '../modals/ProcessModal';
 import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
@@ -25,6 +27,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
+  const [type, setType] = useState<string>();
   const [addingNode, setAddingNode] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
@@ -84,9 +87,44 @@ const FlowCanvas: React.FC<Props> = () => {
     [reactFlowInstance]
   );
 
-  const persistNode = async (data: any) => {
-    console.log(data);
+  const selectModalComponent = () => {
+    console.log('type', type);
+    switch (type) {
+      case 'process':
+        return <ProcessModal />;
+      case 'resourceSpecification':
+        return <ResourceModal />;
+      case 'agent':
+        return <AgentModal />;
+      default:
+        return (
+        <>
+          <p>GTFO!</p>
+        </>);
+    }
+  }
 
+  const ResourceModal: React.FC = () => {
+
+    return (
+      <>
+        <p>I am a resource Modal</p>
+      </>
+    );
+  }
+
+  const AgentModal: React.FC = () => {
+
+    return (
+      <>
+        <p>I am a agent Modal</p>
+      </>
+    );
+  }
+
+  const persistNode = async (data: any) => {
+    setType(data.type);
+    toggleModal();
     if (data.type === 'resourceSpecification') {
 
     }
@@ -96,18 +134,7 @@ const FlowCanvas: React.FC<Props> = () => {
     }
 
     if (data.type === 'process') {
-      console.log(data.type);
       toggleModal();
-      // const newProcess: Process = {
-      //   id: '',
-      //   name: string,
-      //   finished: boolean,
-      //   note?: string,
-      //   classifiedAs?: string,
-      //   inScopeOf?: string,
-      //   basedOn: ProcessSpecification
-      // }
-      
     }
   }
 	
@@ -179,11 +206,11 @@ const FlowCanvas: React.FC<Props> = () => {
           </ReactFlow>
         </div>
       </ReactFlowProvider>
-      <BlankAddModal 
+      <ModalContainer 
         isOpen={addingNode} 
         toggleModal={toggleModal} 
         handleAddNode={handleAddNode} 
-        >{}</BlankAddModal>
+        >{selectModalComponent()}</ModalContainer>
     </div>
   );
 }
