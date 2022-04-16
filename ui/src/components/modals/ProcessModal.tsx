@@ -16,9 +16,10 @@ const initialState = {
 
 interface Props {
   closeModal: () => void;
+  handleAddNode: () => void;
 }
 
-const ProcessModal: React.FC<Props> = ({closeModal}) => {
+const ProcessModal: React.FC<Props> = ({closeModal, handleAddNode}) => {
   const [
     {id, name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
@@ -42,6 +43,7 @@ const ProcessModal: React.FC<Props> = ({closeModal}) => {
       data: JSON.stringify(process)
     }
     await getZomeApi().put_thing(input);
+    handleAddNode();
     clearState();
     closeModal();
   }
