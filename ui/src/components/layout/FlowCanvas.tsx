@@ -43,7 +43,6 @@ const FlowCanvas: React.FC<Props> = () => {
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
     element.style.position = "relative";
-
   }, []);
 
   const onDragOver = useCallback((event) => {
@@ -79,7 +78,6 @@ const FlowCanvas: React.FC<Props> = () => {
       [reactFlowInstance]
     );
 
-
   const selectModalComponent = () => {
     switch (type) {
       case 'process':
@@ -88,35 +86,7 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ResourceModal />;
       case 'agent':
         return <AgentModal />;
-      default:
-        return (
-        <>
-          <p>GTFO!</p>
-        </>);
-    }
   }
-
-  // const persistNode = async (data: any) => {
-
-  //   if (data.type === 'resourceSpecification') {}
-  //   if (data.type === 'agent') {}
-  //   if (data.type === 'process') {}
-  // }
-	
-  // on flow view click
-  // const handleSetPosition = async (event:any) => {
-  //     event.preventDefault();
-  //     if (reactFlowWrapper && reactFlowWrapper.current) {
-  //       const reactFlowBounds: DOMRect = reactFlowWrapper.current!.getBoundingClientRect();
-  //       if (reactFlowInstance) {
-  //         const position = reactFlowInstance.project({
-  //           x: event.clientX - reactFlowBounds.left + 10,
-  //           y: event.clientY - reactFlowBounds.top + 10
-  //         });
-  //         await setCurrentPosition(position);
-  //       }
-  //     }
-  //   }
 
   // // gets called when modal closes. Uses name and position state to generate new node
   function handleAddNode() {
@@ -148,6 +118,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const style = {
     flexGrow:23
   }
+
   return (
     <div style={style}>
       <ReactFlowProvider>
@@ -163,8 +134,6 @@ const FlowCanvas: React.FC<Props> = () => {
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            // uncomment to allow for click to create resource
-            // onPaneClick={(event:any) => handleSetPosition(event)}
             zoomOnDoubleClick={false}
             fitView
             attributionPosition="top-right"
@@ -176,7 +145,6 @@ const FlowCanvas: React.FC<Props> = () => {
       <ModalContainer 
         isOpen={isModelOpen} 
         closeModal={closeModal}
-        setShouldAddNode={setShouldAddNode}
         >{selectModalComponent()}</ModalContainer>
     </div>
   );

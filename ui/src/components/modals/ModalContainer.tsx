@@ -7,15 +7,9 @@ Modal.setAppElement("#root");
 interface Props {
   isOpen: boolean;
   closeModal: () => void;
-  setShouldAddNode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, setShouldAddNode, children}) => {
-
-  function exitHandler() {
-    setShouldAddNode(false);
-    closeModal();
-  }
+const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
 
   return (
     <Modal
@@ -33,7 +27,7 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, setShouldAddNode, 
       shouldCloseOnEsc={true}
       shouldCloseOnOverlayClick={true}
     >
-      <SlIconButton name="x-square-fill" onClick={exitHandler}/>
+      <SlIconButton name="x-square-fill" onClick={closeModal}/>
       <>{children}</>
     </Modal>
   );
