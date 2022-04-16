@@ -28,7 +28,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   const [type, setType] = useState<string>();
-  const [addingNode, setAddingNode] = useState(false);
+  const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
@@ -91,7 +91,7 @@ const FlowCanvas: React.FC<Props> = () => {
     console.log('type', type);
     switch (type) {
       case 'process':
-        return <ProcessModal />;
+        return <ProcessModal closeModal={closeModal}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':
@@ -124,7 +124,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const persistNode = async (data: any) => {
     setType(data.type);
-    toggleModal();
+    openModal();
     if (data.type === 'resourceSpecification') {
 
     }
@@ -134,24 +134,23 @@ const FlowCanvas: React.FC<Props> = () => {
     }
 
     if (data.type === 'process') {
-      toggleModal();
     }
   }
 	
   // on flow view click
-  const handleSetPosition = async (event:any) => {
-      event.preventDefault();
-      if (reactFlowWrapper && reactFlowWrapper.current) {
-        const reactFlowBounds: DOMRect = reactFlowWrapper.current!.getBoundingClientRect();
-        if (reactFlowInstance) {
-          const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left + 10,
-            y: event.clientY - reactFlowBounds.top + 10
-          });
-          await setCurrentPosition(position);
-        }
-      }
-    }
+  // const handleSetPosition = async (event:any) => {
+  //     event.preventDefault();
+  //     if (reactFlowWrapper && reactFlowWrapper.current) {
+  //       const reactFlowBounds: DOMRect = reactFlowWrapper.current!.getBoundingClientRect();
+  //       if (reactFlowInstance) {
+  //         const position = reactFlowInstance.project({
+  //           x: event.clientX - reactFlowBounds.left + 10,
+  //           y: event.clientY - reactFlowBounds.top + 10
+  //         });
+  //         await setCurrentPosition(position);
+  //       }
+  //     }
+  //   }
 
   // gets called when modal closes. Uses name and position state to generate new node
   function handleAddNode() {
@@ -168,8 +167,12 @@ const FlowCanvas: React.FC<Props> = () => {
     setCurrentPosition(undefined);
   }
 
-  function toggleModal() {
-    setAddingNode(!addingNode);
+  function openModal() {
+    setIsModalOpen(true);
+  }
+
+  function closeModal() {
+    setIsModalOpen(false);
   }
 
   const layoutStyle = {
@@ -207,8 +210,8 @@ const FlowCanvas: React.FC<Props> = () => {
         </div>
       </ReactFlowProvider>
       <ModalContainer 
-        isOpen={addingNode} 
-        toggleModal={toggleModal} 
+        isOpen={isModelOpen} 
+        closeModal={closeModal} 
         handleAddNode={handleAddNode} 
         >{selectModalComponent()}</ModalContainer>
     </div>
