@@ -1,5 +1,5 @@
 {
-  "name": "rea-playspace",
+  "name": "rea-playspace-electron",
   "version": "0.0.1",
   "description": "REA Playspace let's anyone explore the concepts behind Valueflows.",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
   },
   "license": "CAL-1.0",
   "build": {
-    "productName": "rea-playspace",
+    "productName": "rea-playspace-electron",
     "afterSign": "./afterSignHook.js",
     "appId": "com.lightningroblabs.rea-playspace",
     "copyright": "© 2022 Lightningrod Labs Ltd. ",
