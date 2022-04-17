@@ -1,4 +1,4 @@
-import { setPriority } from 'os';
+import { NONAME } from 'dns';
 import React, {useState, useCallback, useRef, useEffect, useMemo} from 'react';
 import ReactFlow, {
   ReactFlowProvider,
@@ -10,6 +10,11 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
+import ZomeApi from '../../api/zomeApi';
+import { getZomeApi } from '../../hcWebsockets';
+import { RustNode } from '../../types/holochain';
+import { Process } from '../../types/valueflows';
+import { buildTree } from '../../utils';
 import AgentModal from '../modals/AgentModal';
 import ModalContainer from '../modals/ModalContainer';
 import ProcessModal from '../modals/ProcessModal';
@@ -34,6 +39,8 @@ const FlowCanvas: React.FC<Props> = () => {
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
+  const zomeApi: ZomeApi = getZomeApi();
+
   const nodeTypes = useMemo(() => ({ 
     process: ProcessNode, 
     resourceSpecification: ResourceSpecificationNode,
@@ -45,6 +52,37 @@ const FlowCanvas: React.FC<Props> = () => {
     element.style.position = "relative";
   }, []);
 
+  const onInit = async (reactFlowInstance) => {
+    setReactFlowInstance(reactFlowInstance);
+    const result: Array<RustNode> = await zomeApi.get_thing('root.plan.p1.process');
+    const jsTree = buildTree(result, result[0]);
+    const nodes = jsTree.children.map((e) => {
+      return JSON.parse(e.val.data) as Process;
+    });
+    nodes.forEach((node) => {
+      const position = reactFlowInstance.project({
+        x: Math.floor(Math.random() * 1100),
+        y: Math.floor(Math.random() * 800)
+      });
+
+      const newNode = {
+        id: node.id,
+        type: 'process',
+        position: position,
+        data: { label: (<>{node.name}</>), name: node.name},
+      };
+      setNodes((nds) => nds.concat(newNode));
+    });
+  };
+
+  function openModal() {
+    setIsModalOpen(true);
+  }
+
+  function closeModal() {
+    setIsModalOpen(false);
+  }
+
   const onDragOver = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -53,7 +91,6 @@ const FlowCanvas: React.FC<Props> = () => {
   const onDrop = useCallback(
     async (event) => {
       event.preventDefault();
-      console.log('drop');
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
         const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
@@ -74,8 +111,7 @@ const FlowCanvas: React.FC<Props> = () => {
           openModal();
         }
       }
-    },
-      [reactFlowInstance]
+    },[reactFlowInstance]
     );
 
   const selectModalComponent = () => {
@@ -86,9 +122,9 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ResourceModal />;
       case 'agent':
         return <AgentModal />;
+    }
   }
 
-  // // gets called when modal closes. Uses name and position state to generate new node
   function handleAddNode() {
     const newNode = {
       id: getId(),
@@ -99,14 +135,6 @@ const FlowCanvas: React.FC<Props> = () => {
     setNodes((nds) => nds.concat(newNode));
     setCurrentNodeName("");
     setCurrentPosition(undefined);
-  }
-
-  function openModal() {
-    setIsModalOpen(true);
-  }
-
-  function closeModal() {
-    setIsModalOpen(false);
   }
 
   const layoutStyle = {
@@ -131,7 +159,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onInit={setReactFlowInstance}
+            onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
             zoomOnDoubleClick={false}
