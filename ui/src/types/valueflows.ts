@@ -28,7 +28,8 @@ export interface Plan {
   name: string,
   due?: Date,
   created: Date,
-  note?: string
+  note?: string,
+  processes?: Map<string, Process>
 }
 
 export interface InputCommitment extends TimeBase, ReaBase, Commitment {
@@ -53,6 +54,7 @@ export interface Process extends TimeBase {
   classifiedAs?: string, // don't display
   inScopeOf?: string, // can be all sorts of things GUID. Thing picker, typeahead maybe? 
   basedOn: string, // ID of a process specification
+  plannedWithin: string, // ID of a Plan
   inputCommitments?: Array<InputCommitment>, // Add button on left
   outputCommitments?: Array<OutputCommitment> // add button on right
 }
