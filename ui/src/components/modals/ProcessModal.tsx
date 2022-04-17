@@ -1,5 +1,6 @@
 import { SlButton, SlCard, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
+import { XYPosition } from 'react-flow-renderer';
 import { getZomeApi } from '../../hcWebsockets';
 import { ThingInput } from '../../types/holochain';
 import { Process } from '../../types/valueflows';
@@ -15,11 +16,12 @@ const initialState = {
 }
 
 interface Props {
+  position: XYPosition;
   closeModal: () => void;
   handleAddNode: () => void;
 }
 
-const ProcessModal: React.FC<Props> = ({closeModal, handleAddNode}) => {
+const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) => {
   const [
     {id, name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
@@ -43,6 +45,13 @@ const ProcessModal: React.FC<Props> = ({closeModal, handleAddNode}) => {
       data: JSON.stringify(process)
     }
     await getZomeApi().put_thing(input);
+    const meta = {position};
+    const metaPath = `${path}.meta`;
+    const metaInput: ThingInput = {
+      path: metaPath,
+      data: JSON.stringify(meta)
+    }
+    await getZomeApi().put_thing(metaInput);
     handleAddNode();
     clearState();
     closeModal();
