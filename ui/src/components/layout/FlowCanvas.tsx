@@ -110,13 +110,15 @@ const FlowCanvas: React.FC<Props> = () => {
           openModal();
         }
       }
-    },[reactFlowInstance]
-    );
+    },
+    [reactFlowInstance]
+  );
+    
 
   const selectModalComponent = () => {
     switch (type) {
       case 'process':
-        return <ProcessModal closeModal={closeModal} handleAddNode={handleAddNode}/>;
+        return <ProcessModal position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':
