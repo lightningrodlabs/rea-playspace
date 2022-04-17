@@ -9,11 +9,6 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import ZomeApi from '../../api/zomeApi';
-import { getZomeApi } from '../../hcWebsockets';
-import { RustNode } from '../../types/holochain';
-import { Process } from '../../types/valueflows';
-import { buildTree } from '../../utils';
 import AgentModal from '../modals/AgentModal';
 import ModalContainer from '../modals/ModalContainer';
 import ProcessModal from '../modals/ProcessModal';
@@ -21,11 +16,13 @@ import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
+import getDataStore, { DataStore } from "../../data/store";
 
 let id = 0;
 const getId = () => `node_${id++}`;
 
-interface Props {}
+interface Props {
+};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -36,9 +33,8 @@ const FlowCanvas: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
+  const [store, setStore] = useState<DataStore>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
-
-  const zomeApi: ZomeApi = getZomeApi();
 
   const nodeTypes = useMemo(() => ({ 
     process: ProcessNode, 
@@ -53,25 +49,24 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-    const result: Array<RustNode> = await zomeApi.get_thing('root.plan.p1.process');
-    const jsTree = buildTree(result, result[0]);
-    const nodes = jsTree.children.map((e) => {
-      return JSON.parse(e.val.data) as Process;
+    getDataStore().then(async (store) => {
+      setStore(store);
     });
-    nodes.forEach((node) => {
-      const position = reactFlowInstance.project({
-        x: Math.floor(Math.random() * 1100),
-        y: Math.floor(Math.random() * 800)
-      });
+    
+    // nodes.forEach((node) => {
+    //   const position = reactFlowInstance.project({
+    //     x: Math.floor(Math.random() * 1100),
+    //     y: Math.floor(Math.random() * 800)
+    //   });
 
-      const newNode = {
-        id: node.id,
-        type: 'process',
-        position: position,
-        data: { label: (<>{node.name}</>), name: node.name},
-      };
-      setNodes((nds) => nds.concat(newNode));
-    });
+    //   const newNode = {
+    //     id: node.id,
+    //     type: 'process',
+    //     position: position,
+    //     data: { label: (<>{node.name}</>), name: node.name},
+    //   };
+    //   setNodes((nds) => nds.concat(newNode));
+    // });
   };
 
   function openModal() {
