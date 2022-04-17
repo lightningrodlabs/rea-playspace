@@ -1,18 +1,19 @@
 import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ZomeApi from '../../api/zomeApi';
-import { getZomeApi } from '../../hcWebsockets';
 import { Agent, ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
 import PalletNode from '../PalletNode';
+import { DataStore } from "../../data/store";
 
 interface Props {
+  store: DataStore,
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>
 }
 
 const Pallet: React.FC<Props> = ({
+  store,
   resourceSpecifications, 
   processSpecifications, 
   agents}) => {
@@ -54,11 +55,11 @@ const Pallet: React.FC<Props> = ({
     if (list.length > 0) {
       return (list.map((item: any) => (
         <div 
+        key={item.id}
         onDragStart={(event: any) => onDragStart(event, item.name, type)} 
         draggable
         style={pickStyle(type)}>
           <PalletNode
-            key={item.id}
             thing={item}
           />
         </div>

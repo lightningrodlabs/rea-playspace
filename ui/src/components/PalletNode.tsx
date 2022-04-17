@@ -11,7 +11,7 @@ const PalletNode: React.FC<PalletNodeProps> = ({thing}) => {
     textAlign: "center"
   }
   return (
-      <div style={styles}>
+      <div key={thing.id} style={styles}>
         {thing.name}
       </div>
   );
