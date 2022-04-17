@@ -21,11 +21,14 @@ import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
+import DataStore from "../../data/store";
 
 let id = 0;
 const getId = () => `node_${id++}`;
 
-interface Props {}
+interface Props {
+  store: DataStore
+};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);

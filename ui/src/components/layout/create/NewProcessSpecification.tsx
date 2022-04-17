@@ -5,7 +5,6 @@ import MainPanelHeader from "../MainPanelHeader";
 import { ProcessSpecification } from "../../../types/valueflows";
 import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
-import ZomeApi from "../../../api/zomeApi";
 import { getZomeApi } from "../../../hcWebsockets";
 
 export type NewProcessSpecificationProps = {}
