@@ -27,7 +27,6 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
   ] = useState(initialState);
 
   const clearState = () => {
-    console.log('clearing')
     setState({ ...initialState });
   };
 
@@ -45,11 +44,10 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
       data: JSON.stringify(process)
     }
     await getZomeApi().put_thing(input);
-    const meta = {position};
-    const metaPath = `${path}.meta`;
+    const metaPath = `${path}.position.current`;
     const metaInput: ThingInput = {
       path: metaPath,
-      data: JSON.stringify(meta)
+      data: JSON.stringify(position)
     }
     await getZomeApi().put_thing(metaInput);
     handleAddNode();
