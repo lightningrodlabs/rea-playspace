@@ -1,29 +1,36 @@
 import ZomeApi from "../api/zomeApi";
 import { getZomeApi } from "../hcWebsockets";
 import { RustNode, ThingInput } from "../types/holochain";
-import { Agent, ProcessSpecification, ResourceSpecification, Plan, Process } from "../types/valueflows";
+import { Guid } from "guid-typescript";
+import { AgentShape, Agent, ProcessSpecificationShape, ProcessSpecification, ResourceSpecificationShape, ResourceSpecification, PlanShape, Plan, ProcessShape, Process } from "../types/valueflows";
 
-/* 
+/** 
+ * Root interface, if we ever add more root level objects and indices, we'll need to
+ * add them here.
+ *
+ * Elements in the root follow paths that correspond to their paths in the dht:
+ *  * root.processSpecification.get('ps1')
+ *  * root.plan.get('p1').process.get('pr1').committedInputs.get('c1');
+ */
+interface Root {
+  resourceSpecification: Map<Guid, ResourceSpecification>,
+  processSpecification: Map<Guid, ProcessSpecification>,
+  agent: Map<Guid, Agent>,
+  plan: Map<Guid, Plan>,
+}
 
-Elements in the root follow paths that correspond to their paths in the dht:
- * root.processSpecification.get('ps1')
- * root.plan.get('p1').process.get('pr1').committedInputs.get('c1');
-
-*/
-class Root {
-  public resourceSpecification: Map<string, ResourceSpecification>;
-  public processSpecification: Map<string, ProcessSpecification>;
-  public agent: Map<string, Agent>;
-  public plan: Map<string, Plan>;
-
-  constructor() {
-    this.resourceSpecification = new Map<string, ResourceSpecification>();
-    this.processSpecification = new Map<string, ProcessSpecification>();
-    this.agent = new Map<string, Agent>();
-    this.plan = new Map<string, Plan>();
+function makeRoot(): Root {
+  return {
+    resourceSpecification: new Map<Guid, ResourceSpecification>(),
+    processSpecification: new Map<Guid, ProcessSpecification>(),
+    agent: new Map<Guid, Agent>(),
+    plan: new Map<Guid, Plan>()
   }
 }
 
+/**
+ * Data store object
+ */
 export default class DataStore {
 
   private zomeApi: ZomeApi;
@@ -31,7 +38,7 @@ export default class DataStore {
   
   constructor(zomeApi?: ZomeApi) {
     this.zomeApi = zomeApi ? zomeApi : getZomeApi();
-    this.root = new Root();
+    this.root = makeRoot();
   }
 
   protected async putThing(path: string, data: string) {
@@ -43,15 +50,10 @@ export default class DataStore {
   }
 
   protected async createRoot() {
-    const root = {}
-      const rootInput: ThingInput = {
-        path: 'root',
-        data: JSON.stringify(root)
-      }
-      await this.zomeApi.put_thing(rootInput);
+    await this.putThing('root', JSON.stringify({}));
   }
 
-  public getProcessSpecification(id: string): ProcessSpecification {
+  public getProcessSpecification(id: Guid): ProcessSpecification {
     return this.root.processSpecification.get(id);
   }
 
@@ -78,7 +80,7 @@ export default class DataStore {
     );
   }
 
-  public getResourceSpecification(id: string): ResourceSpecification {
+  public getResourceSpecification(id: Guid): ResourceSpecification {
     return this.root.resourceSpecification.get(id);
   }
 
@@ -93,12 +95,12 @@ export default class DataStore {
   public async setResourceSpecification(item: ResourceSpecification) {
     this.root.resourceSpecification.set(item.id, item);
     await this.putThing(
-      `root.resourceSpecification.${item.id}`,
+      `root.resourceSpecification.${item.id.toString()}`,
       JSON.stringify(item)
     );
   }
 
-  public getAgent(id: string): Agent {
+  public getAgent(id: Guid): Agent {
     return this.root.agent.get(id);
   }
 
@@ -118,7 +120,11 @@ export default class DataStore {
     );
   }
 
-  public getPlan(id: string): Plan {
+  public fetchPlan() {
+
+  }
+
+  public getPlan(id: Guid): Plan {
     return this.root.plan.get(id);
   }
 
@@ -128,6 +134,13 @@ export default class DataStore {
 
   /**
    * Updates or adds a Plan to our root and updates the DHT.
+   * 
+   * TODO: If this plan object has all of of its child objects, currently this
+   * will save everything including those child objects which should be split off
+   * into other objects. This can be fixed in several ways:
+   * 1) Make classes that make sure only the right fields should be serialized.
+   * 2) Make things all be in flat indices under the root, except for meta data
+   *    and also 1) with regard to meta.
    * @param item 
    */
   public async setPlan(item: Plan) {
@@ -139,7 +152,8 @@ export default class DataStore {
   }
 
   /**
-   * Takes the data we receive in the following format and hydrates the data structure with it:
+   * Takes the data we receive in the following format and hydrates the data
+   * structure with it:
    * const example = [
    *   { "idx": 0, "val": { "name": "root", "data": "{}" }, "parent": null, "children": [1, 6, 7, 9] },
    *   { "idx": 1, "val": { "name": "plan", "data": "" }, "parent": 0, "children": [2] },
@@ -154,46 +168,111 @@ export default class DataStore {
    *   { "idx": 10, "val": { "name": "rs-0001", "data": "{\"id\":\"rs-0001\",\"name\":\"Amaranth Seeds\",\"image\":\"\",\"resourceClassifiedAs\":\"\",\"defaultUnitOfResource\":\"\",\"defaultUnitOfEffort\":\"\",\"note\":\"\"}" }, "parent": 9, "children": [] }
    * ];
    * 
-   * Since we know what our tree is going to look like ahead of time, we can make some assumptions.
+   * Since we know what our tree is going to look like ahead of time, we can make
+   * some assumptions.
+   * 
+   * TODO: One other reason to switch to a flat structure is just because having
+   * this tree at the data layer doesn't really help us, it only seems to add a
+   * layer of complexity since everything has to be referenced from the path to
+   * the object. It also makes the path itself be dependent on the IDs of the the
+   * containing node, it might be nicer if the objects could update themselves
+   * without their parent being involved.
+   * 
+   * TODO: Right now, there's no way to refresh a particular node from the DHT
+   * without fetching the whole tree structure again, we should remedy that.
    * 
    * @param res response from ZomeAPI
    */
   protected hydrateFromZome(res: RustNode[]) {
+    // Placeholders will have no data set, and they will always be under the root level
+    const placeholders = ['agent', 'resourceSpecification', 'processSpecification', 'plan'];
+    // An array of parallel objects and references to deserilzed objects
+    const parallelObjects = new Array<{}>();
+
+    // Cycle through the result array and construct/deserialize the objects
+    // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const parent = node.parent;
       const {name, data} = node.val;
 
-      if(parent !== null && data != '') {
-        const klass = res[parent].val.name;
-        switch (klass) {
+      // Temporarily assign an empty object
+      let deserializedObject: Object = new Object();
+
+      // Deserialize if not an empty string (if this is a link in a path in the DHT)
+      if (data != "") {
+        deserializedObject = JSON.parse(data);
+      }
+
+      // Assign to the parallel objects array
+      parallelObjects[i] = deserializedObject;
+
+      // If it has a parent then place a reference to it in the parent object
+      if (parent !== null) {
+        const parentName = res[parent].val.name;
+        switch (parentName) {
           case 'agent': {
-            this.root.agent.set(name, JSON.parse(data) as Agent);
-            break;
-          }
-          case 'processSpecification': {
-            this.root.processSpecification.set(name, JSON.parse(data) as ProcessSpecification);
+            parallelObjects[parent][name] = new Agent(deserializedObject as AgentShape);
             break;
           }
           case 'resourceSpecification': {
-            this.root.resourceSpecification.set(name, JSON.parse(data) as ResourceSpecification);
+            parallelObjects[parent][name] = new ResourceSpecification(deserializedObject as ResourceSpecificationShape);
+            break;
+          }
+          case 'processSpecification': {
+            parallelObjects[parent][name] = new ProcessSpecification(deserializedObject as ProcessSpecificationShape);
             break;
           }
           case 'plan': {
-            this.root.plan.set(name, JSON.parse(data) as Plan);
+            parallelObjects[parent][name] = new Plan(deserializedObject as PlanShape);
             break;
           }
           case 'process': {
-            const process: Process = JSON.parse(data) as Process;
-            const plan_id: string = process.plannedWithin;
-            if (plan_id !== undefined) {
-              const plan = this.root.plan.get(plan_id);
-              if (!('processes' in plan)){
-                plan.processes = new Map<string, Process>();
-              }
-              const processes = plan.processes.set(name, process);
-            }
+            parallelObjects[parent][name] = new Process(deserializedObject as ProcessShape);
             break;
           }
+          default: {
+            parallelObjects[parent][name] = deserializedObject;
+          }
+        }
+      }
+    });
+
+    const tempRoot = parallelObjects[0];
+
+    // Take the references we have for each placholder in the temp root and place them in their respective indices 
+    placeholders.forEach((placeholder) => {
+      let entries = [];
+      switch (placeholder) {
+        case 'agent': {
+          entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, Agent] => {
+            return [Guid.parse(value[0]), value[1] as Agent];
+          })
+          this.root[placeholder] = new Map<Guid, Agent>(entries);
+          break;
+        }
+        case 'resourceSpecification': {
+          entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, ResourceSpecification] => {
+            return [Guid.parse(value[0]), value[1] as ResourceSpecification];
+          })
+          this.root[placeholder] = new Map<Guid, ResourceSpecification>(entries);
+          break;
+        }
+        case 'processSpecification': {
+          entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, ProcessSpecification] => {
+            return [Guid.parse(value[0]), value[1] as ProcessSpecification];
+          })
+          this.root[placeholder] = new Map<Guid, ProcessSpecification>(entries);
+          break;
+        }
+        case 'plan': {
+          entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, Plan] => {
+            return [Guid.parse(value[0]), value[1] as Plan];
+          })
+          this.root[placeholder] = new Map<Guid, Plan>(entries);
+          break;
+        }
+        default: {
+          throw new Error("Unkown placeholder type. Please add a case to handle a new index.");
         }
       }
     });
@@ -202,7 +281,7 @@ export default class DataStore {
   /**
    * Checks to see if we have anything in our DHT and chain, if not sets it up.
    */
-  public async getOrCreateRoot() {
+  public async fetchOrCreateRoot() {
     // check if root object exists
     const res = await this.zomeApi.get_thing('root');
     if (res[0].val.data === '') {
@@ -210,7 +289,7 @@ export default class DataStore {
       console.log('root does not exist. creating...');
       await this.createRoot();
       await this.setPlan({
-        id: 'p1',
+        id: Guid.create(),
         name: 'There is no plan B.',
         created: new Date()
       });

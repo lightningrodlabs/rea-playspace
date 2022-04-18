@@ -15,7 +15,7 @@ const Home: React.FC<Props> = () => {
   useEffect(()=>{
     const store = new DataStore();
     setStore(store);
-    store.getOrCreateRoot().then(()=>{
+    store.fetchOrCreateRoot().then(()=>{
       setResourceSpecifications(store.getResourceSpecifications());
       setProcessSpecifications(store.getProcessSpecifications());
       setAgents(store.getAgents());
