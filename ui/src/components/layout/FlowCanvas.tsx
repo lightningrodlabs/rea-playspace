@@ -12,7 +12,6 @@ import ReactFlow, {
 import ZomeApi from '../../api/zomeApi';
 import { getZomeApi } from '../../hcWebsockets';
 import { RustNode } from '../../types/holochain';
-import { Process } from '../../types/valueflows';
 import { buildTree } from '../../utils';
 import AgentModal from '../modals/AgentModal';
 import ModalContainer from '../modals/ModalContainer';
@@ -53,26 +52,31 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-    const result: Array<RustNode> = await zomeApi.get_thing('root.plan.p1.process');
+    const path = 'root.plan';
+    const result: Array<RustNode> = await zomeApi.get_thing(path);
+    console.log(result);
     const jsTree = buildTree(result, result[0]);
-    const nodes = jsTree.children.map((e) => {
-      return JSON.parse(e.val.data) as Process;
-    });
-    nodes.forEach((node) => {
-      const position = reactFlowInstance.project({
-        x: Math.floor(Math.random() * 1100),
-        y: Math.floor(Math.random() * 800)
-      });
+    console.log(jsTree);
 
-      const newNode = {
-        id: node.id,
-        type: 'process',
-        position: position,
-        data: { label: (<>{node.name}</>), name: node.name},
-      };
-      setNodes((nds) => nds.concat(newNode));
+    const nodes = jsTree.children.map((e) => {
+      console.log(e.val.name);
+      return JSON.parse(e.val.data);
     });
-  };
+
+    // const position = reactFlowInstance.project({
+    //   x: place[0].x,
+    //   y: place[0].y
+    // });
+  
+    //     // What should name be? Name of Process, or name of ProcessSpecification?
+    const newNode = {
+      // id: node.id,
+      // type: 'process',
+      // position: position,
+      // data: { label: (<>{node.name}</>), name: node.name},
+    }
+   // setNodes((nds) => nds.concat(newNode));
+  }
 
   function openModal() {
     setIsModalOpen(true);
@@ -131,7 +135,7 @@ const FlowCanvas: React.FC<Props> = () => {
       id: getId(),
       type,
       position: currentPosition,
-      data: { label: (<>{currentNodeName}</>), name: currentNodeName },
+      data: { label: 'Process', name: currentNodeName },
     };
     setNodes((nds) => nds.concat(newNode));
     setCurrentNodeName("");
