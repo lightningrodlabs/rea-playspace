@@ -36,11 +36,11 @@ const FlowCanvas: React.FC<Props> = () => {
   const [store, setStore] = useState<DataStore>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
-  const nodeTypes = useMemo(() => ({ 
-    process: ProcessNode, 
+  const nodeTypes = useMemo(() => ({
+    process: ProcessNode,
     resourceSpecification: ResourceSpecificationNode,
-    agent: AgentNode 
-  }), []); 
+    agent: AgentNode
+  }), []);
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -52,7 +52,7 @@ const FlowCanvas: React.FC<Props> = () => {
     getDataStore().then(async (store) => {
       setStore(store);
     });
-    
+
     // nodes.forEach((node) => {
     //   const position = reactFlowInstance.project({
     //     x: Math.floor(Math.random() * 1100),
@@ -92,7 +92,7 @@ const FlowCanvas: React.FC<Props> = () => {
         // check if the dropped element is valid
         if (typeof data.name === 'undefined' || !data.name) {
           return;
-        }        
+        }
 
         if (reactFlowInstance) {
           const position = reactFlowInstance.project({
@@ -108,7 +108,7 @@ const FlowCanvas: React.FC<Props> = () => {
     },
     [reactFlowInstance]
   );
-    
+
 
   const selectModalComponent = () => {
     switch (type) {
@@ -166,8 +166,8 @@ const FlowCanvas: React.FC<Props> = () => {
           </ReactFlow>
         </div>
       </ReactFlowProvider>
-      <ModalContainer 
-        isOpen={isModelOpen} 
+      <ModalContainer
+        isOpen={isModelOpen}
         closeModal={closeModal}
         >{selectModalComponent()}</ModalContainer>
     </div>

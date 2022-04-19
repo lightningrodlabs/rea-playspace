@@ -61,7 +61,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlInput
@@ -71,7 +71,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={image}
-          
+
         />
         <br />
         <SlTextarea

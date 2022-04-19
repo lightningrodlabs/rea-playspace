@@ -32,9 +32,9 @@ const AddCommitmentModal = (props) => {
       <h1>Create New {capitalize(props.type)} Commitment</h1>
       <form>
         <label>Notes</label>
-        <textarea 
-          name="Notes" 
-          placeholder="Notes" 
+        <textarea
+          name="Notes"
+          placeholder="Notes"
         />
         <select name="Action" id="action" defaultValue={"Select Action"}>
           <option value="transfer">Transfer</option>

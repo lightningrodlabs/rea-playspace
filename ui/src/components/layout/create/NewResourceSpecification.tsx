@@ -62,7 +62,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlInput
@@ -71,7 +71,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={image}
-         
+
         />
         <br />
         <SlInput
@@ -80,7 +80,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={resourceClassifiedAs}
-          
+
         />
         <br />
         <SlInput
@@ -89,7 +89,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={defaultUnitOfResource}
-         
+
         />
         <br />
         <SlInput

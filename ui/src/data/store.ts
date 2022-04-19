@@ -6,7 +6,7 @@ import { RustNode, ThingInput } from "../types/holochain";
 import { Guid } from "guid-typescript";
 import { AgentShape, Agent, ProcessSpecificationShape, ProcessSpecification, ResourceSpecificationShape, ResourceSpecification, PlanShape, Plan, ProcessShape, Process } from "../types/valueflows";
 
-/** 
+/**
  * Root interface, if we ever add more root level objects and indices, we'll need to
  * add them here.
  *
@@ -76,8 +76,8 @@ export class DataStore {
 
   /**
    * Builds and puts a ThingInput
-   * @param path 
-   * @param data 
+   * @param path
+   * @param data
    */
   protected async putThing(path: string, data: string) {
     const itemThing: ThingInput = {
@@ -111,8 +111,8 @@ export class DataStore {
 
   /**
    * Updates or adds a ProcessSpecification to our root and updates the DHT.
-   * 
-   * @param item 
+   *
+   * @param item
    */
   public async setProcessSpecification(item: ProcessSpecification) {
     this.root.processSpecification.set(item.id, item);
@@ -132,7 +132,7 @@ export class DataStore {
 
   /**
    * Updates or adds a ResourceSpecification to our root and updates the DHT.
-   * @param item 
+   * @param item
    */
   public async setResourceSpecification(item: ResourceSpecification) {
     this.root.resourceSpecification.set(item.id, item);
@@ -152,7 +152,7 @@ export class DataStore {
 
   /**
    * Updates or adds an Agent to our root and updates the DHT.
-   * @param item 
+   * @param item
    */
   public async setAgent(item: Agent) {
     this.root.agent.set(item.id, item);
@@ -176,7 +176,7 @@ export class DataStore {
 
   /**
    * Updates or adds a Plan to our root and updates the DHT.
-   * 
+   *
    * @param item
    */
   public async setPlan(item: Plan) {
@@ -203,13 +203,13 @@ export class DataStore {
    *   { "idx": 9, "val": { "name": "resourceSpecification", "data": "" }, "parent": 0, "children": [10] },
    *   { "idx": 10, "val": { "name": "rs-0001", "data": "{\"id\":\"rs-0001\",\"name\":\"Amaranth Seeds\",\"image\":\"\",\"resourceClassifiedAs\":\"\",\"defaultUnitOfResource\":\"\",\"defaultUnitOfEffort\":\"\",\"note\":\"\"}" }, "parent": 9, "children": [] }
    * ];
-   * 
+   *
    * Since we know what our tree is going to look like ahead of time, we can make
    * some assumptions.
-   * 
+   *
    * TODO: Right now, there's no way to refresh a particular node from the DHT
    * without fetching the whole tree structure again, we should remedy that.
-   * 
+   *
    * @param res response from ZomeAPI
    */
   protected hydrateFromZome(res: RustNode[]) {
@@ -270,7 +270,7 @@ export class DataStore {
     const tempRoot = parallelObjects[0];
     console.log(parallelObjects);
 
-    // Take the references we have for each placholder in the temp root and place them in their respective indices 
+    // Take the references we have for each placholder in the temp root and place them in their respective indices
     placeholders.forEach((placeholder) => {
       let entries = [];
       // Make sure the objects were transforming exist
@@ -326,7 +326,7 @@ export class DataStore {
       } catch (e) {
         console.log(e);
       }
-      
+
       await this.setPlan(new Plan({
         name: 'There is no plan B.'
       }));
