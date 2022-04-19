@@ -39,7 +39,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const rs: ResourceSpecification =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
-    await (await getDataStore()).setResourceSpecification(rs);
+    await getDataStore().setResourceSpecification(rs);
     clearState();
     navigate('/');
   }

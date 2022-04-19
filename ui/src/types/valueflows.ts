@@ -1,4 +1,33 @@
 import { Guid } from "guid-typescript";
+import { XYPosition } from 'react-flow-renderer';
+
+/**
+ * Root interface, if we ever add more root level objects and indices, we'll need to
+ * add them here.
+ *
+ * Elements in the root follow paths that correspond to their paths in the dht:
+ *  * root.processSpecification.get('ps1')
+ *  * root.plan.get('p1').process.get('pr1').committedInputs.get('c1');
+ */
+export class Root {
+  resourceSpecification: Map<Guid, ResourceSpecification>;
+  processSpecification: Map<Guid, ProcessSpecification>;
+  agent: Map<Guid, Agent>;
+  plan: Map<Guid, Plan>;
+  data: {};
+  path: 'root';
+
+  constructor() {
+    this.resourceSpecification = new Map<Guid, ResourceSpecification>();
+    this.processSpecification = new Map<Guid, ProcessSpecification>();
+    this.agent = new Map<Guid, Agent>();
+    this.plan = new Map<Guid, Plan>();
+  }
+
+  public toJSON(){
+    return this.data;
+  }
+}
 
 // Knowledge
 export interface AgentShape {
@@ -165,6 +194,23 @@ export interface OutputCommitmentShape extends TimeBase, ReaBase, CommitmentShap
   outputOf?: ProcessShape,
 }
 
+// Need a MetaShape interface
+export class Meta {
+  public path: string;
+  public position: XYPosition;
+
+  constructor(parentPath: string, data: {position: XYPosition}) {
+    this.path = `${parentPath}.meta`;
+    this.position = data.position;
+  }
+
+  public toJSON() {
+    return {
+      position: this.position
+    };
+  }
+}
+
 // Plan Classes
 export class Plan implements PlanShape {
   id: Guid;
@@ -214,7 +260,7 @@ export class Process implements ProcessShape {
   due?: Date;
   inputCommitments?: Map<string, InputCommitmentShape>; // Add button on left
   outputCommitments?: Map<string, OutputCommitmentShape>; // add button on right
-  meta?: {};
+  meta?: {position: XYPosition};
 
   constructor (init: ProcessShape) {
     this.id = init.id ? Guid.parse(''+init.id) : Guid.create();
@@ -252,6 +298,10 @@ export class Process implements ProcessShape {
       hasPointInTime: this.hasPointInTime,
       due: this.due
     };
+  }
+
+  public getMetaAsMeta(): Meta {
+    return new Meta(this.path, this.meta);
   }
 }
 
@@ -330,3 +380,20 @@ interface EconomicEventShape extends TimeBase, ReaBase {
   toLocation?: GeoPoint,
   state?: string
 }
+
+/**
+ * Takes an object of Record<string, T> and maps it to Map<Guid, T>
+ * @param obj
+ * @returns
+ */
+export function objectEntriesToMap<T> (obj: Record<string, T>): Map<Guid, T> {
+  return new Map<Guid, T>(
+    Object.entries(obj).map(
+      (keyValuePair): [Guid, T] => {
+        return [Guid.parse(keyValuePair[0]), keyValuePair[1] as T];
+      }
+    )
+  );
+}
+
+export type PathedData = Agent | ResourceSpecification | ProcessSpecification | Plan | Process | Meta;

@@ -49,9 +49,8 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-    getDataStore().then(async (store) => {
-      setStore(store);
-    });
+    let store = getDataStore();
+    setStore(store);
 
     // nodes.forEach((node) => {
     //   const position = reactFlowInstance.project({

@@ -1,9 +1,9 @@
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import getDataStore from './data/store';
+import { initConnection } from './data/store';
 
-getDataStore().then(() => {
+initConnection().then(() => {
   ReactDOM.render(
     <App />,
     document.getElementById('root')

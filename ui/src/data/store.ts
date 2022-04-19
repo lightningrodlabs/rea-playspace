@@ -4,41 +4,28 @@ import { APP_ID } from '../holochainConf';
 import { getZomeApi } from "../hcWebsockets";
 import { RustNode, ThingInput } from "../types/holochain";
 import { Guid } from "guid-typescript";
-import { AgentShape, Agent, ProcessSpecificationShape, ProcessSpecification, ResourceSpecificationShape, ResourceSpecification, PlanShape, Plan, ProcessShape, Process } from "../types/valueflows";
-
-/**
- * Root interface, if we ever add more root level objects and indices, we'll need to
- * add them here.
- *
- * Elements in the root follow paths that correspond to their paths in the dht:
- *  * root.processSpecification.get('ps1')
- *  * root.plan.get('p1').process.get('pr1').committedInputs.get('c1');
- */
-class Root {
-  resourceSpecification: Map<Guid, ResourceSpecification>;
-  processSpecification: Map<Guid, ProcessSpecification>;
-  agent: Map<Guid, Agent>;
-  plan: Map<Guid, Plan>;
-  data: {};
-
-  constructor() {
-    this.resourceSpecification = new Map<Guid, ResourceSpecification>();
-    this.processSpecification = new Map<Guid, ProcessSpecification>();
-    this.agent = new Map<Guid, Agent>();
-    this.plan = new Map<Guid, Plan>();
-  }
-
-  public toJSON(){
-    return this.data;
-  }
-}
+import {
+  PathedData,
+  Root,
+  AgentShape,
+  Agent,
+  ProcessSpecificationShape,
+  ProcessSpecification,
+  ResourceSpecificationShape,
+  ResourceSpecification,
+  PlanShape,
+  Plan,
+  ProcessShape,
+  Process,
+  objectEntriesToMap
+} from "../types/valueflows";
 
 let dataStore: DataStore;
 
 /**
  * Initialize our WS connection and set up the Zome API client
  */
-async function initConnection(): Promise<ZomeApi> {
+export async function initConnection(): Promise<ZomeApi> {
   const appWs = await getAppWs();
   const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
   const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
@@ -53,10 +40,9 @@ async function initConnection(): Promise<ZomeApi> {
  * Fetches the DataStore or initialtiazes a new one
  * @returns DataStore
  */
-export default async function getDataStore(): Promise<DataStore> {
+export default function getDataStore(): DataStore {
   if (dataStore == undefined) {
-    const zomeApi = await initConnection();
-    dataStore = new DataStore(zomeApi);
+    dataStore = new DataStore();
   }
   return dataStore;
 }
@@ -75,17 +61,18 @@ export class DataStore {
   }
 
   /**
-   * Builds and puts a ThingInput
-   * @param path
-   * @param data
+   * Puts any object that knows it's path and how to properly serialize itself
+   * @param item
    */
-  protected async putThing(path: string, data: string) {
+  public async put(item: PathedData | Root) {
     const itemThing: ThingInput = {
-      path: path,
-      data: data
+      path: item.path,
+      data: JSON.stringify(item)
     };
     await this.zomeApi.put_thing(itemThing);
   }
+
+  // Root helpers
 
   /**
    * Creates a root object
@@ -96,10 +83,10 @@ export class DataStore {
 
   public async setRoot(data: {}) {
     this.root.data = data;
-    const json = JSON.stringify(this.root.data);
-    console.log(json)
-    await this.putThing('root', json);
+    this.put(this.root);
   }
+
+  // ProcessSprecification helpers
 
   public getProcessSpecification(id: Guid): ProcessSpecification {
     return this.root.processSpecification.get(id);
@@ -116,11 +103,10 @@ export class DataStore {
    */
   public async setProcessSpecification(item: ProcessSpecification) {
     this.root.processSpecification.set(item.id, item);
-    await this.putThing(
-      item.path,
-      JSON.stringify(item)
-    );
+    await this.put(item);
   }
+
+  // ResourceSpecification helpers
 
   public getResourceSpecification(id: Guid): ResourceSpecification {
     return this.root.resourceSpecification.get(id);
@@ -136,11 +122,11 @@ export class DataStore {
    */
   public async setResourceSpecification(item: ResourceSpecification) {
     this.root.resourceSpecification.set(item.id, item);
-    await this.putThing(
-      item.path,
-      JSON.stringify(item)
-    );
+    await this.put(item);
   }
+
+
+  // Agent helpers
 
   public getAgent(id: Guid): Agent {
     return this.root.agent.get(id);
@@ -156,11 +142,10 @@ export class DataStore {
    */
   public async setAgent(item: Agent) {
     this.root.agent.set(item.id, item);
-    await this.putThing(
-      item.path,
-      JSON.stringify(item)
-    );
+    await this.put(item);
   }
+
+  // Plan helpers
 
   public fetchPlan() {
 
@@ -181,34 +166,34 @@ export class DataStore {
    */
   public async setPlan(item: Plan) {
     this.root.plan.set(item.id, item);
-    await this.putThing(
-      item.path,
-      JSON.stringify(item)
-    );
+    await this.put(item);
   }
 
+  // Process helpers
+
+  public async setProcess(item: Process) {
+    this.root.plan.get(item.plannedWithin).process[''+item.id] = item;
+    await this.put(item);
+    await this.put(item.getMetaAsMeta());
+  }
+
+  // DisplayAgent helpers
+
+  // DisplayResource helpers
+
+  // Data helpers/transformers
+
   /**
-   * Takes the data we receive in the following format and hydrates the data
-   * structure with it:
-   * const example = [
-   *   { "idx": 0, "val": { "name": "root", "data": "{}" }, "parent": null, "children": [1, 6, 7, 9] },
-   *   { "idx": 1, "val": { "name": "plan", "data": "" }, "parent": 0, "children": [2] },
-   *   { "idx": 2, "val": { "name": "p1", "data": "{\"id\":\"p1\",\"name\":\"There is no plan B.\",\"created\":\"2022-04-16T02:05:48.695Z\"}" }, "parent": 1, "children": [3] },
-   *   { "idx": 3, "val": { "name": "process", "data": "" }, "parent": 2, "children": [4] },
-   *   { "idx": 4, "val": { "name": "p-426146548", "data": "{\"id\":\"p-426146548\",\"name\":\"Boil\",\"finished\":false,\"note\":\"\",\"classifiedAs\":\"\",\"inScopeOf\":\"\",\"basedOn\":\"\"}" }, "parent": 3, "children": [5] },
-   *   { "idx": 5, "val": { "name": "meta", "data": "{\"position\":{\"x\":793.78125,\"y\":347}}" }, "parent": 4, "children": [] },
-   *   { "idx": 6, "val": { "name": "agent", "data": "" }, "parent": 0, "children": [] },
-   *   { "idx": 7, "val": { "name": "processSpecification", "data": "" }, "parent": 0, "children": [8] },
-   *   { "idx": 8, "val": { "name": "ps-0001", "data": "{\"id\":\"ps-0001\",\"name\":\"Boil\",\"note\":\"Make it real hot\"}" }, "parent": 7, "children": [] },
-   *   { "idx": 9, "val": { "name": "resourceSpecification", "data": "" }, "parent": 0, "children": [10] },
-   *   { "idx": 10, "val": { "name": "rs-0001", "data": "{\"id\":\"rs-0001\",\"name\":\"Amaranth Seeds\",\"image\":\"\",\"resourceClassifiedAs\":\"\",\"defaultUnitOfResource\":\"\",\"defaultUnitOfEffort\":\"\",\"note\":\"\"}" }, "parent": 9, "children": [] }
-   * ];
+   * Takes the data we receive from the Zome API and hydrates the root structure.
    *
    * Since we know what our tree is going to look like ahead of time, we can make
    * some assumptions.
    *
    * TODO: Right now, there's no way to refresh a particular node from the DHT
-   * without fetching the whole tree structure again, we should remedy that.
+   * without fetching the whole tree structure again, we should remedy that. This
+   * will mean separating this function into multiple stages, the first half is
+   * general, but the second half will only apply to objects stored in the root
+   * indices in the Map<Guid, X>s.
    *
    * @param res response from ZomeAPI
    */
@@ -226,7 +211,7 @@ export class DataStore {
       const {name, data} = node.val;
 
       // Temporarily assign an empty object
-      let deserializedObject: Object = new Object();
+      let deserializedObject: Object = {};
 
       // Deserialize if not an empty string (if this is a link in a path in the DHT)
       if (data != "") {
@@ -267,49 +252,21 @@ export class DataStore {
       }
     });
 
+    const ObjectToMapTranformations = [
+      {placeholder: 'agent', type: Agent },
+      {placeholder: 'resourceSpecification', type: ResourceSpecification },
+      {placeholder: 'processSpecification', type: ProcessSpecification },
+      {placeholder: 'plan', type: Plan }
+    ];
+
     const tempRoot = parallelObjects[0];
     console.log(parallelObjects);
 
-    // Take the references we have for each placholder in the temp root and place them in their respective indices
-    placeholders.forEach((placeholder) => {
-      let entries = [];
-      // Make sure the objects were transforming exist
+    for( let {placeholder, type} of ObjectToMapTranformations) {
       if (tempRoot.hasOwnProperty(placeholder)) {
-        switch (placeholder) {
-          case 'agent': {
-            entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, Agent] => {
-              return [Guid.parse(value[0]), value[1] as Agent];
-            })
-            this.root[placeholder] = new Map<Guid, Agent>(entries);
-            break;
-          }
-          case 'resourceSpecification': {
-            entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, ResourceSpecification] => {
-              return [Guid.parse(value[0]), value[1] as ResourceSpecification];
-            })
-            this.root[placeholder] = new Map<Guid, ResourceSpecification>(entries);
-            break;
-          }
-          case 'processSpecification': {
-            entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, ProcessSpecification] => {
-              return [Guid.parse(value[0]), value[1] as ProcessSpecification];
-            })
-            this.root[placeholder] = new Map<Guid, ProcessSpecification>(entries);
-            break;
-          }
-          case 'plan': {
-            entries = Object.entries(tempRoot[placeholder]).map((value): [Guid, Plan] => {
-              return [Guid.parse(value[0]), value[1] as Plan];
-            })
-            this.root[placeholder] = new Map<Guid, Plan>(entries);
-            break;
-          }
-          default: {
-            throw new Error("Unkown placeholder type. Please add a case to handle a new index.");
-          }
-        }
+        this.root[placeholder] = objectEntriesToMap<typeof type>(tempRoot[placeholder]);
       }
-    });
+    }
   }
 
   /**
