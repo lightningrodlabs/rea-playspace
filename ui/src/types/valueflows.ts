@@ -76,8 +76,16 @@ export class Agent implements AgentShape {
     this.primaryLocation = init.primaryLocation ? init.primaryLocation : undefined;
   }
 
+  static getPrefix(): string {
+    return 'root.agent';
+  }
+
+  static getPath(id: Guid): string {
+    return `${Agent.getPrefix()}.${id}`;
+  }
+
   get path(): string {
-    return `root.agent.${this.id}`;
+    return Agent.getPath(this.id);
   }
 
   public toJSON(): AgentShape {
@@ -113,8 +121,16 @@ export class ResourceSpecification implements ResourceSpecificationShape {
     this.defaultUnitOfEffort = init.defaultUnitOfEffort ? init.defaultUnitOfEffort : undefined;
   }
 
+  static getPrefix(): string {
+    return 'root.resourceSpecification';
+  }
+
+  static getPath(id: Guid): string {
+    return `${Agent.getPrefix()}.${id}`;
+  }
+
   get path(): string {
-    return `root.resourceSpecification.${this.id}`;
+    return ResourceSpecification.getPath(this.id);
   }
 
   public toJSON(): ResourceSpecificationShape {
@@ -144,8 +160,16 @@ export class ProcessSpecification implements ProcessSpecificationShape {
     this.note = init.note ? init.note: undefined;
   }
 
+  static getPrefix(): string {
+    return 'root.processSpecification';
+  }
+
+  static getPath(id: Guid): string {
+    return `${ProcessSpecification.getPrefix()}.${id}`;
+  }
+
   get path(): string {
-    return `root.processSpecification.${this.id}`;
+    return ProcessSpecification.getPath(this.id);
   }
 
   public toJSON(): ProcessSpecificationShape {
@@ -229,8 +253,16 @@ export class Plan implements PlanShape {
     this.process = init.process ? init.process: undefined;
   }
 
+  static getPrefix(): string {
+    return 'root.plan';
+  }
+
+  static getPath(id: Guid): string {
+    return `${Plan.getPrefix()}.${id}`;
+  }
+
   get path(): string {
-    return `root.plan.${this.id}`;
+    return Plan.getPath(this.id);
   }
 
   public toJSON(): PlanShape {
@@ -278,8 +310,16 @@ export class Process implements ProcessShape {
     this.due = init.due;
   }
 
+  static getPrefix(planId: Guid): string {
+    return `root.plan.${planId}`;
+  }
+
+  static getPath(planId: Guid, id: Guid): string {
+    return `${Process.getPrefix(planId)}.${id}`;
+  }
+
   get path(): string {
-    return `root.plan.${this.plannedWithin}.process.${this.id}`;
+    return Process.getPath(this.plannedWithin, this.id);
   }
 
   public toJSON(): ProcessShape {
@@ -304,6 +344,8 @@ export class Process implements ProcessShape {
     return new Meta(this.path, this.meta);
   }
 }
+
+// Need DisplayedAgent and DisplayedResource for UI
 
 // TODO: Commitment Classes and everything else below
 
@@ -396,4 +438,4 @@ export function objectEntriesToMap<T> (obj: Record<string, T>): Map<Guid, T> {
   );
 }
 
-export type PathedData = Agent | ResourceSpecification | ProcessSpecification | Plan | Process | Meta;
+export type PathedData = Root | Agent | ResourceSpecification | ProcessSpecification | Plan | Process | Meta;

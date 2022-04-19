@@ -64,7 +64,7 @@ export class DataStore {
    * Puts any object that knows it's path and how to properly serialize itself
    * @param item
    */
-  public async put(item: PathedData | Root) {
+  public async put(item: PathedData) {
     const itemThing: ThingInput = {
       path: item.path,
       data: JSON.stringify(item)
@@ -72,31 +72,64 @@ export class DataStore {
     await this.zomeApi.put_thing(itemThing);
   }
 
+
   // Root helpers
 
   /**
-   * Creates a root object
+   * Checks to see if we have anything in our DHT and chain, if not sets it up.
+   */
+   public async fetchOrCreateRoot() {
+    // check if root object exists
+    const res = await this.zomeApi.get_thing('root');
+    if (res[0].val.data === '') {
+      // if it doesn't, create it and a placeholder plan
+      console.log('root does not exist. creating...');
+      try {
+        await this.createRoot();
+      } catch (e) {
+        console.log(e);
+      }
+
+      await this.setPlan(new Plan({
+        name: 'There is no plan B.'
+      }));
+    } else  {
+      // We Have the data, lets hydrate it
+      this.hydrateFromZome(res);
+      console.log('root', this.root);
+    }
+  }
+
+  /**
+   * Creates an empty root object
    */
   protected async createRoot() {
     await this.setRoot({});
   }
 
+  /**
+   * Sets the data on the root object
+   * @param data
+   */
   public async setRoot(data: {}) {
     this.root.data = data;
     this.put(this.root);
   }
 
+
   // ProcessSprecification helpers
+
+  public async fetchProcessSpecification(id: Guid) {
+    const res = await this.zomeApi.get_thing(ProcessSpecification.getPath(id));
+    console.log(res);
+    // TODO: Need to hydrate
+  }
 
   public getProcessSpecification(id: Guid): ProcessSpecification {
     return this.root.processSpecification.get(id);
   }
 
-  public getProcessSpecifications(): Array<ProcessSpecification> {
-    return Array.from(this.root.processSpecification.values());
-  }
-
-  /**
+   /**
    * Updates or adds a ProcessSpecification to our root and updates the DHT.
    *
    * @param item
@@ -106,14 +139,27 @@ export class DataStore {
     await this.put(item);
   }
 
+  public async fetchProcessSpecifications() {
+    const res = await this.zomeApi.get_thing(ProcessSpecification.getPrefix());
+    console.log(res);
+    // TODO: Need to hydrate
+  }
+
+  public getProcessSpecifications(): Array<ProcessSpecification> {
+    return Array.from(this.root.processSpecification.values());
+  }
+
+
   // ResourceSpecification helpers
+
+  public async fetchResourceSpecification(id: Guid) {
+    const res = await this.zomeApi.get_thing(ResourceSpecification.getPath(id));
+    console.log(res);
+    // TODO: Need to hydrate
+  }
 
   public getResourceSpecification(id: Guid): ResourceSpecification {
     return this.root.resourceSpecification.get(id);
-  }
-
-  public getResourceSpecifications(): Array<ResourceSpecification> {
-    return Array.from(this.root.resourceSpecification.values());
   }
 
   /**
@@ -125,15 +171,27 @@ export class DataStore {
     await this.put(item);
   }
 
+  public async fetchResourceSpecifications() {
+    const res = await this.zomeApi.get_thing(ResourceSpecification.getPrefix());
+    console.log(res);
+    // TODO: Need to hydrate
+  }
+
+  public getResourceSpecifications(): Array<ResourceSpecification> {
+    return Array.from(this.root.resourceSpecification.values());
+  }
+
 
   // Agent helpers
 
-  public getAgent(id: Guid): Agent {
-    return this.root.agent.get(id);
+  public async fetchAgent(id: Guid) {
+    const res = await this.zomeApi.get_thing(Agent.getPath(id));
+    console.log(res);
+    // TODO: Need to hydrate
   }
 
-  public getAgents(): Array<Agent> {
-    return Array.from(this.root.agent.values());
+  public getAgent(id: Guid): Agent {
+    return this.root.agent.get(id);
   }
 
   /**
@@ -144,6 +202,17 @@ export class DataStore {
     this.root.agent.set(item.id, item);
     await this.put(item);
   }
+
+  public async fetchAgents() {
+    const res = await this.zomeApi.get_thing(Agent.getPrefix());
+    console.log(res);
+    // TODO: Need to hydrate
+  }
+
+  public getAgents(): Array<Agent> {
+    return Array.from(this.root.agent.values());
+  }
+
 
   // Plan helpers
 
@@ -177,9 +246,9 @@ export class DataStore {
     await this.put(item.getMetaAsMeta());
   }
 
-  // DisplayAgent helpers
+  // DisplayedAgent helpers
 
-  // DisplayResource helpers
+  // DisplayedResource helpers
 
   // Data helpers/transformers
 
@@ -269,28 +338,4 @@ export class DataStore {
     }
   }
 
-  /**
-   * Checks to see if we have anything in our DHT and chain, if not sets it up.
-   */
-  public async fetchOrCreateRoot() {
-    // check if root object exists
-    const res = await this.zomeApi.get_thing('root');
-    if (res[0].val.data === '') {
-      // if it doesn't, create it and a placeholder plan
-      console.log('root does not exist. creating...');
-      try {
-        await this.createRoot();
-      } catch (e) {
-        console.log(e);
-      }
-
-      await this.setPlan(new Plan({
-        name: 'There is no plan B.'
-      }));
-    } else  {
-      // We Have the data, lets hydrate it
-      this.hydrateFromZome(res);
-      console.log('root', this.root);
-    }
-  }
 }
