@@ -31,7 +31,7 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
       <>{children}</>
     </Modal>
   );
-} 
+}
 
 export default ModalContainer;
 

@@ -3,9 +3,8 @@ import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
 import { ProcessSpecification } from "../../../types/valueflows";
-import { ThingInput } from "../../../types/holochain";
 import { useNavigate } from "react-router-dom";
-import { getZomeApi } from "../../../hcWebsockets";
+import getDataStore from "../../../data/store";
 
 export type NewProcessSpecificationProps = {}
 
@@ -34,14 +33,8 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
-    const rs: ProcessSpecification =  new ProcessSpecification({name, note});
-    const path: string = 'root.processSpecification.' + rs.id;
-    const input: ThingInput = {
-      path,
-      data: JSON.stringify(rs)
-    }
-    await getZomeApi().put_thing(input);
-    //incId();
+    const ps: ProcessSpecification =  new ProcessSpecification({name, note});
+    await getDataStore().setProcessSpecification(ps);
     clearState();
     navigate('/');
   }
@@ -65,7 +58,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlTextarea

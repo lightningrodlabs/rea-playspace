@@ -9,25 +9,19 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition
 } from 'react-flow-renderer';
-import ZomeApi from '../../api/zomeApi';
-import { getZomeApi } from '../../hcWebsockets';
-import { RustNode } from '../../types/holochain';
-import { buildTree } from '../../utils';
 import AgentModal from '../modals/AgentModal';
-import ModalContainer from '../modals/ModalContainer';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
-import DataStore from "../../data/store";
+import getDataStore, { DataStore } from "../../data/store";
+import ModalContainer from '../modals/ModalContainer';
 
 let id = 0;
 const getId = () => `node_${id++}`;
 
-interface Props {
-  store: DataStore
-};
+interface Props {};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -38,15 +32,14 @@ const FlowCanvas: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
+  const [store, setStore] = useState<DataStore>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
-  const zomeApi: ZomeApi = getZomeApi();
-
-  const nodeTypes = useMemo(() => ({ 
-    process: ProcessNode, 
+  const nodeTypes = useMemo(() => ({
+    process: ProcessNode,
     resourceSpecification: ResourceSpecificationNode,
-    agent: AgentNode 
-  }), []); 
+    agent: AgentNode
+  }), []);
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -55,30 +48,12 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-    const path = 'root.plan';
-    const result: Array<RustNode> = await zomeApi.get_thing(path);
-    console.log(result);
-    const jsTree = buildTree(result, result[0]);
-    console.log(jsTree);
+    let store = getDataStore();
+    setStore(store);
 
-    const nodes = jsTree.children.map((e) => {
-      console.log(e.val.name);
-      return JSON.parse(e.val.data);
-    });
-
-    // const position = reactFlowInstance.project({
-    //   x: place[0].x,
-    //   y: place[0].y
-    // });
-  
-    //     // What should name be? Name of Process, or name of ProcessSpecification?
-    const newNode = {
-      // id: node.id,
-      // type: 'process',
-      // position: position,
-      // data: { label: (<>{node.name}</>), name: node.name},
-    }
-   // setNodes((nds) => nds.concat(newNode));
+    store.fetchPlan()
+    
+    // TODO turn elements of plan into nodes and edges to render
   }
 
   function openModal() {
@@ -104,7 +79,7 @@ const FlowCanvas: React.FC<Props> = () => {
         // check if the dropped element is valid
         if (typeof data.name === 'undefined' || !data.name) {
           return;
-        }        
+        }
 
         if (reactFlowInstance) {
           const position = reactFlowInstance.project({
@@ -120,7 +95,7 @@ const FlowCanvas: React.FC<Props> = () => {
     },
     [reactFlowInstance]
   );
-    
+
 
   const selectModalComponent = () => {
     switch (type) {
@@ -178,8 +153,8 @@ const FlowCanvas: React.FC<Props> = () => {
           </ReactFlow>
         </div>
       </ReactFlowProvider>
-      <ModalContainer 
-        isOpen={isModelOpen} 
+      <ModalContainer
+        isOpen={isModelOpen}
         closeModal={closeModal}
         >{selectModalComponent()}</ModalContainer>
     </div>
@@ -187,3 +162,4 @@ const FlowCanvas: React.FC<Props> = () => {
 }
 
 export default FlowCanvas;
+
