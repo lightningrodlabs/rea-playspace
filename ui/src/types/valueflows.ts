@@ -146,7 +146,7 @@ export interface ProcessShape extends TimeBase {
   note?: string, // text-area
   finished: boolean, // defaults to false
   classifiedAs?: string, // don't display
-  inScopeOf?: Guid, // can be all sorts of things GUID. Thing picker, typeahead maybe? 
+  inScopeOf?: Guid, // can be all sorts of things GUID. Thing picker, typeahead maybe?
   basedOn: Guid, // ID of a process specification
   plannedWithin: Guid, // ID of a Plan
 }
@@ -205,7 +205,7 @@ export class Process implements ProcessShape {
   finished: boolean; // defaults to false
   note?: string; // text-area
   classifiedAs?: string; // don't display
-  inScopeOf?: Guid; // can be all sorts of things GUID. Thing picker, typeahead maybe? 
+  inScopeOf?: Guid; // can be all sorts of things GUID. Thing picker, typeahead maybe?
   basedOn: Guid; // ID of a process specification
   plannedWithin: Guid; // ID of a Plan
   hasBegining?: Date;
@@ -244,7 +244,7 @@ export class Process implements ProcessShape {
       note: this.note,
       finished: this.finished,
       classifiedAs: this.classifiedAs,
-      inScopeOf: this.inScopeOf, 
+      inScopeOf: this.inScopeOf,
       basedOn: this.basedOn,
       plannedWithin: this.plannedWithin,
       hasBegining: this.hasBegining,
@@ -317,7 +317,7 @@ interface CommitmentShape extends TimeBase, ReaBase {
   note?: string,
   agreedIn?: string,
   atLocation?: GeoPoint,
-  state?: string 
+  state?: string
 }
 
 interface EconomicEventShape extends TimeBase, ReaBase {

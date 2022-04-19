@@ -58,7 +58,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlTextarea

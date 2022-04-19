@@ -14,8 +14,8 @@ interface Props {
 
 const Pallet: React.FC<Props> = ({
   store,
-  resourceSpecifications, 
-  processSpecifications, 
+  resourceSpecifications,
+  processSpecifications,
   agents}) => {
 
   const onDragStart = (event:DragEvent, name: string, type: string) => {
@@ -54,9 +54,9 @@ const Pallet: React.FC<Props> = ({
   function renderNodes(list, type) {
     if (list.length > 0) {
       return (list.map((item: any) => (
-        <div 
+        <div
         key={item.id}
-        onDragStart={(event: any) => onDragStart(event, item.name, type)} 
+        onDragStart={(event: any) => onDragStart(event, item.name, type)}
         draggable
         style={pickStyle(type)}>
           <PalletNode

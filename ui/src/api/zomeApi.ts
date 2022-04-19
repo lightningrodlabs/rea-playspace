@@ -12,7 +12,7 @@ export default class ZomeApi {
 
   public async put_thing (input: ThingInput): Promise<AddOutput> {
     return await callZome(this.appWs, 'projects', 'put_thing', input) as Promise<AddOutput>;
-  }; 
+  };
 
   public async get_thing (path_str: string) : Promise<Array<RustNode>> {
     return (await callZome(this.appWs,'projects', 'get_thing', path_str)).tree as Promise<Array<RustNode>>;
