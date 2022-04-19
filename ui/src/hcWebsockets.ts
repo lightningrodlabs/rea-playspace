@@ -21,7 +21,7 @@ export async function getAdminWs(): Promise<AdminWebsocket> {
     adminWs = await AdminWebsocket.connect(ADMIN_WS_URL)
     while (!(adminWs.client.socket.readyState === adminWs.client.socket.OPEN)) {
       sleep100();
-    } 
+    }
     adminWs.client.socket.addEventListener('close', () => {
       console.log('admin websocket closed')
     })

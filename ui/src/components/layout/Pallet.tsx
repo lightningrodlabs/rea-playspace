@@ -6,14 +6,12 @@ import PalletNode from '../PalletNode';
 import DataStore from "../../data/store";
 
 interface Props {
-  store: DataStore,
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>
 }
 
 const Pallet: React.FC<Props> = ({
-  store,
   resourceSpecifications, 
   processSpecifications, 
   agents}) => {
@@ -54,9 +52,9 @@ const Pallet: React.FC<Props> = ({
   function renderNodes(list, type) {
     if (list.length > 0) {
       return (list.map((item: any) => (
-        <div 
+        <div
         key={item.id}
-        onDragStart={(event: any) => onDragStart(event, item.name, type)} 
+        onDragStart={(event: any) => onDragStart(event, item.name, type)}
         draggable
         style={pickStyle(type)}>
           <PalletNode

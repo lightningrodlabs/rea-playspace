@@ -2,17 +2,14 @@ import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import ZomeApi from "../../../api/zomeApi";
 import { ResourceSpecification } from "../../../types/valueflows";
-import { ThingInput } from "../../../types/holochain";
 import MainPanelHeader from "../MainPanelHeader";
-import { getZomeApi } from "../../../hcWebsockets";
+import getDataStore from "../../../data/store";
 
 export type NewResourceSpecificationProps = {
 }
 
 const initialState = {
-  id: 'rs-',
   name: '',
   image: '',
   resourceClassifiedAs: '',
@@ -23,7 +20,7 @@ const initialState = {
 
 const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => {
   const [
-    {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
+    {name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
 
 
@@ -41,13 +38,8 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const rs: ResourceSpecification =  {id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note};
-    const path: string = 'root.resourceSpecification.' + id;
-    const input: ThingInput = {
-      path,
-      data: JSON.stringify(rs)
-    }
-    await getZomeApi().put_thing(input);
+    const rs: ResourceSpecification =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
+    await getDataStore().setResourceSpecification(rs);
     clearState();
     navigate('/');
   }
@@ -62,16 +54,6 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
       </MainPanelHeader>
       <SlCard className="create-resource">
       <form onSubmit={handleSubmit}>
-      <br />
-        <SlInput
-          required
-          label="ID"
-          name="id"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={id}
-          
-        />
         <br />
         <SlInput
           required
@@ -80,7 +62,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlInput
@@ -89,7 +71,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={image}
-         
+
         />
         <br />
         <SlInput
@@ -98,7 +80,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={resourceClassifiedAs}
-          
+
         />
         <br />
         <SlInput
@@ -107,7 +89,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           // @ts-ignore
           onSlInput={onChange}
           value={defaultUnitOfResource}
-         
+
         />
         <br />
         <SlInput

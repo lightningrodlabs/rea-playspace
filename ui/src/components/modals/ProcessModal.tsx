@@ -66,7 +66,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
           // @ts-ignore
           onSlInput={onChange}
           value={id}
-          
+
         />
         <br />
         <SlInput
@@ -76,7 +76,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlInput

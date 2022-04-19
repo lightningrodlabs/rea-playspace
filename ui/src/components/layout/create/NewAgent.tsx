@@ -2,18 +2,14 @@ import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
-import { Agent, } from "../../../types/valueflows";
-import HoloService from "../../../api/zomeApi";
-import { ThingInput } from "../../../types/holochain";
+import { Agent } from "../../../types/valueflows";
 import { useNavigate } from "react-router-dom";
-import ZomeApi from "../../../api/zomeApi";
-import { getZomeApi } from "../../../hcWebsockets";
+import getDataStore from "../../../data/store";
 
 export type NewAgentProps = {
 }
 
 const initialState = {
-  id: 'ag-',
   name: '',
   image: '',
   primaryLocation: '',
@@ -22,7 +18,7 @@ const initialState = {
 
 const NewAgent: React.FC<NewAgentProps> = () => {
   const [
-    {id, name, image, primaryLocation, note}, setState
+    {name, image, primaryLocation, note}, setState
   ] = useState(initialState);
 
 
@@ -37,26 +33,11 @@ const NewAgent: React.FC<NewAgentProps> = () => {
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  // this would break in a network setting
-  // how do you deal with unique IDs in a DHT
-  // const getResourceSpecificationListSize = async () => {
-  //   const result = await service.get_thing('resourceSpecification');
-  //   if (result.tree.length > id) {
-  //     id = result.tree.length;
-  //   }
-  // }
-
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
-    const ag: Agent =  {id, name, note};
-    const path: string = 'root.agent.' + id;
-    const input: ThingInput = {
-      path,
-      data: JSON.stringify(ag)
-    }
-    await getZomeApi().put_thing(input);
+    const ag: Agent =  new Agent({name, note});
+    await getDataStore().setAgent(ag);
     clearState();
     navigate('/');
   }
@@ -72,15 +53,6 @@ const NewAgent: React.FC<NewAgentProps> = () => {
       <SlCard className="create-resource">
       <form onSubmit={handleSubmit}>
       <br />
-        <SlInput
-          required
-          label="ID"
-          name="id"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={id}
-          
-        />
         <br />
         <SlInput
           required
@@ -89,7 +61,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={name}
-          
+
         />
         <br />
         <SlInput
@@ -99,7 +71,15 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={image}
-          
+
+        />
+        <br />
+        <SlTextarea
+          label='Note'
+          name='note'
+          // @ts-ignore
+          onSlInput={onChange}
+          value={note}
         />
         <br />
         <SlInput
@@ -109,14 +89,6 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           // @ts-ignore
           onSlInput={onChange}
           value={primaryLocation}
-        />
-        <br />
-        <SlTextarea
-          label='Note'
-          name='note'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={note}
         />
         <br />
         <SlButton type="submit" variant="primary">
