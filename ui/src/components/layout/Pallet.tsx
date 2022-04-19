@@ -3,17 +3,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
 import PalletNode from '../PalletNode';
-import { DataStore } from "../../data/store";
 
 interface Props {
-  store: DataStore,
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>
 }
 
 const Pallet: React.FC<Props> = ({
-  store,
   resourceSpecifications,
   processSpecifications,
   agents}) => {

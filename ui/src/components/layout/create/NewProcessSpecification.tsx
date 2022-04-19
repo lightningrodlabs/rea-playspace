@@ -34,7 +34,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
     e.preventDefault()
     //getResourceSpecificationListSize();
     const ps: ProcessSpecification =  new ProcessSpecification({name, note});
-    await (await getDataStore()).setProcessSpecification(ps);
+    await getDataStore().setProcessSpecification(ps);
     clearState();
     navigate('/');
   }

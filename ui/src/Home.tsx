@@ -10,12 +10,10 @@ const Home: React.FC<Props> = () => {
   const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
   const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [store, setStore] = useState<DataStore>();
 
   useEffect(()=>{
-    getDataStore().then(async (store) => {
-      setStore(store);
-      await store.fetchOrCreateRoot();
+    const store: DataStore = getDataStore();
+    store.fetchOrCreateRoot().then(async () => {
       setResourceSpecifications(store.getResourceSpecifications());
       setProcessSpecifications(store.getProcessSpecifications());
       setAgents(store.getAgents());
@@ -25,7 +23,6 @@ const Home: React.FC<Props> = () => {
   return(
     <div style={{display:"flex"}}>
       <Pallet
-        store={store}
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
         agents={agents}
