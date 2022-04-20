@@ -1,9 +1,10 @@
 import { SlButton, SlCard, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
+import getDataStore from '../../data/store';
 import { getZomeApi } from '../../hcWebsockets';
 import { ThingInput } from '../../types/holochain';
-import { Process } from '../../types/valueflows';
+import { Process, ProcessShape } from '../../types/valueflows';
 
 const initialState = {
   id: '',
@@ -18,7 +19,7 @@ const initialState = {
 interface Props {
   position: XYPosition;
   closeModal: () => void;
-  handleAddNode: () => void;
+  handleAddNode: (item: ThingInput) => void;
 }
 
 const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) => {
@@ -37,20 +38,15 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const process: Process =  {id, name, finished, note, classifiedAs, inScopeOf, basedOn};
-    const path: string = 'root.plan.p1.process.' + id;
+    const process: Process =  new Process({name, finished, note, classifiedAs, inScopeOf, basedOn} as ProcessShape);
+    const planId = getDataStore().getRoot()['planId'];
+    const path: string = `root.plan.${planId}.process.${process.id}`;
     const input: ThingInput = {
       path,
       data: JSON.stringify(process)
     }
     await getZomeApi().put_thing(input);
-    const metaPath = `${path}.position.current`;
-    const metaInput: ThingInput = {
-      path: metaPath,
-      data: JSON.stringify(position)
-    }
-    await getZomeApi().put_thing(metaInput);
-    handleAddNode();
+    handleAddNode(input);
     clearState();
     closeModal();
   }

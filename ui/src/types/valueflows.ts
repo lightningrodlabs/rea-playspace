@@ -449,8 +449,8 @@ export class DisplayNode implements DisplayNodeShape, PathedData {
     this.id = init.id ? init.id : Guid.raw();
     this.position = init.position;
     this.vfPath = init.vfPath;
-    this.type = this.type;
-    this.data = this.data;
+    this.type = init.type;
+    this.data = init.data;
   }
 
   static getPrefix(planId: string): string {

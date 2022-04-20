@@ -28,8 +28,8 @@ export interface UpdateProjectInput {
 }
 
 export interface ThingInput {
-  path: String,
-  data: String
+  path: string,
+  data: string
 }
 
 export type Tree<T> = {

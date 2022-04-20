@@ -13,13 +13,12 @@ import AgentModal from '../modals/AgentModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
-import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
-import getDataStore, { DataStore } from "../../data/store";
+import getDataStore from "../../data/store";
 import ModalContainer from '../modals/ModalContainer';
-import { Process, DisplayNode, DisplayEdge, PathedData, ObjectTransformations, ObjectTypeMap } from "../../types/valueflows";
-
-let id = 0;
+import { DisplayNode, DisplayEdge, PathedData, ObjectTransformations, ObjectTypeMap } from "../../types/valueflows";
+import ProcessSpecificationNode from '../nodes/ProcessSpecificationNode';
+import { ThingInput } from '../../types/holochain';
 
 interface Props {};
 
@@ -31,15 +30,16 @@ const FlowCanvas: React.FC<Props> = () => {
   const [type, setType] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
-  const [currentPath, setCurrentPath] = useState<string>();
+  //const [currentPath, setCurrentPath] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
   const nodeTypes = useMemo(() => ({
-    process: ProcessNode,
+    processSpecification: ProcessSpecificationNode,
     resourceSpecification: ResourceSpecificationNode,
     agent: AgentNode
   }), []);
+
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -52,19 +52,16 @@ const FlowCanvas: React.FC<Props> = () => {
     let store = getDataStore();
     await store.fetchOrCreateRoot();
 
-    const planId = (await store.getRoot())['planId']; // undefined
+    const planId = await store.getRoot()['planId'];
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
 
     const nodes = displayNodes.map((node) => {
-      const type = node.path.split('.').at(-2);
-      console.log('node! ', node);
-      const vfObject = store.getCursor(node.vfPath);
       return {
         id: node.id,
-        type: type,
+        type: node.type,
         position: node.position,
-        data: { label: (<>{vfObject.name}</>), name: vfObject.name},
+        data: node.data,
       };
     });
 
@@ -93,11 +90,9 @@ const FlowCanvas: React.FC<Props> = () => {
         const {item, type} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
         const T = ObjectTypeMap[type];
         const transformer = ObjectTransformations[type];
-        console.log(type, item, transformer);
 
         const data: typeof T = transformer(item);
 
-        console.log(data);
         // check if the dropped element is valid
         if (typeof data.name === 'undefined' || !data.name) {
           return;
@@ -110,8 +105,8 @@ const FlowCanvas: React.FC<Props> = () => {
           });
           setCurrentPosition(position);
           setCurrentNodeName(data.name);
-          setCurrentPath(data.path);
-          setType(data.type);
+          //setCurrentPath(data.path);
+          setType(type);
           openModal();
         }
       }
@@ -131,34 +126,26 @@ const FlowCanvas: React.FC<Props> = () => {
     }
   }
 
-  function handleAddNode() {
-    const store = getDataStore();
+  function handleAddNode(item: ThingInput) {
+    // Item is whatever has just been entered in the modal
+    // and has already been stored on the DHT by this point
 
-    const currentObject = store.getCursor(currentPath);
-    const currentPlanId = store.getRoot()['planID'];
-
-    let newObject = currentObject;
-
-    // TODO: NEed to pipe in data from modal form
-    if (type === 'processSpecification') {
-      newObject = new Process({
-        name: currentNodeName,
-        finished: false,
-        basedOn: currentObject.id,
-        plannedWithin: currentPlanId
-      });
-    }
-
+    // Create react flow node object
     const node = {
-      vfPath: currentPath,
-      type: type,
+      vfPath: item.path,
+      type,
       position: currentPosition,
-      data: { label: (<>{currentNodeName}</>), name: currentNodeName }
+      data: { label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: currentNodeName }
     };
+    // Create an HDK entry version of the node
+    const newNode = new DisplayNode(node)
+    // Persist to DHT
+    getDataStore().set(newNode);
 
-    store.set(new DisplayNode(node));
-
+    // Add to local state to render new node on canvas
     setNodes((nds) => nds.concat(node as any));
+
+    // reset node state
     setCurrentNodeName("");
     setCurrentPosition(undefined);
   }
