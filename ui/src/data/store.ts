@@ -251,7 +251,7 @@ export class DataStore {
     await this.put(this.root);
   }
 
-  public async getRoot() {
+  public getRoot() {
     return this.root.data
   }
 

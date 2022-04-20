@@ -29,7 +29,7 @@ const Pallet: React.FC<Props> = ({
       borderRadius: "10px"
   }
 
-  const processPalletNodeStyles = {
+  const processSpecificationPalletNodeStyles = {
     border: "1px solid orange",
     background: "rgb(255, 213, 128)",
     margin: "5px",
@@ -45,7 +45,7 @@ const Pallet: React.FC<Props> = ({
 
   function pickStyle(type: string) {
     if (type === 'resourceSpecification') return resourceSpecificationPalletNodeStyles;
-    if (type === 'process') return processPalletNodeStyles;
+    if (type === 'processSpecification') return processSpecificationPalletNodeStyles;
     if (type === 'agent') return agentPalletNodeStyles;
   }
 

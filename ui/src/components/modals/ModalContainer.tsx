@@ -24,8 +24,6 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
         }
       }}
       isOpen={isOpen}
-      shouldCloseOnEsc={true}
-      shouldCloseOnOverlayClick={true}
     >
       <SlIconButton name="x-square-fill" onClick={closeModal}/>
       <>{children}</>
