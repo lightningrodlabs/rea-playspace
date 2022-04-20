@@ -17,6 +17,7 @@ import AgentNode from '../nodes/AgentNode';
 import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import getDataStore, { DataStore } from "../../data/store";
+import { DisplayNode, DisplayEdge } from "../../types/valueflows";
 
 let id = 0;
 const getId = () => `node_${id++}`;
@@ -49,23 +50,27 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
+
     let store = getDataStore();
-    setStore(store);
+    // XXX: This is happening before the data is loaded into the data store.
+    const planId = store.getRoot()['planId']
+    const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
+    const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
 
-    // nodes.forEach((node) => {
-    //   const position = reactFlowInstance.project({
-    //     x: Math.floor(Math.random() * 1100),
-    //     y: Math.floor(Math.random() * 800)
-    //   });
+    const nodes = displayNodes.map((node) => {
+      const type = node.path.split('.').at(-2);
+      const vfObject = store.getCursor(node.vfPath);
+      return {
+        id: node.id,
+        type: type,
+        position: node.position,
+        data: { label: (<>{vfObject.name}</>), name: vfObject.name},
+      };
+    });
 
-    //   const newNode = {
-    //     id: node.id,
-    //     type: 'process',
-    //     position: position,
-    //     data: { label: (<>{node.name}</>), name: node.name},
-    //   };
-    //   setNodes((nds) => nds.concat(newNode));
-    // });
+    setStore(store); // do we need this?
+    setNodes(nodes);
+    setEdges(displayEdges);
   };
 
   function openModal() {
@@ -121,13 +126,19 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   function handleAddNode() {
-    const newNode = {
-      id: getId(),
-      type,
+
+    // TODO: we need the path to the original object dropped onto the canvas then we can get a cursor to it.
+
+    const node = {
+      vfPath: 'yo',
+      type: type,
       position: currentPosition,
-      data: { label: (<>{currentNodeName}</>), name: currentNodeName },
+      data: { label: (<>{currentNodeName}</>), name: currentNodeName }
     };
-    setNodes((nds) => nds.concat(newNode));
+
+    store.set(new DisplayNode(node));
+
+    setNodes((nds) => nds.concat(node as any));
     setCurrentNodeName("");
     setCurrentPosition(undefined);
   }
