@@ -31,6 +31,8 @@ export async function initConnection(): Promise<void> {
   setAgentPubKey(agentPubKey);
   setCellId(app_info.cell_data[0].cell_id);
   setZomeApi(zomeApi);
+  dataStore = new DataStore();
+  await dataStore.fetchOrCreateRoot();
 }
 
 /**
@@ -58,6 +60,7 @@ export class DataStore {
   }
 
   public getCursor(path: string): any {
+    console.log('pre-slug path', path);
     const pathSlugs: Array<string> = path.split('.');
     const first: string = pathSlugs.shift();
     const traversed = [];
@@ -66,7 +69,7 @@ export class DataStore {
       throw new Error("Path is malformed. All paths should start with 'root'.");
     }
     traversed.push(first);
-
+    console.log('pathSlugs', pathSlugs);
     for (let slug of pathSlugs) {
       if (Object.hasOwn(cursor, slug)) {
         cursor = cursor[slug];
@@ -90,6 +93,7 @@ export class DataStore {
   public async fetchSingle(path: string): Promise<PathedData> {
     const type = path.split('.').at(-2);
     const res = await this.zomeApi.get_thing(path);
+    console.log('res', res);
     this.hydrateFromZome(res);
     return this.getCursor(path);
   }
@@ -211,6 +215,7 @@ export class DataStore {
   // Display* helpers
 
   public getDisplayNodes(planId: string): DisplayNode[] {
+    console.log('--->', planId);
     return Object.values(this.getCursor(DisplayNode.getPrefix(planId)));
   }
 
@@ -230,11 +235,10 @@ export class DataStore {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
       const plan = new Plan({
-        name: 'There is no plan B.'
+        name: 'Default Plan Name'
       });
       await this.setRoot({planId: plan.id});
       await this.set(plan);
-
     } else  {
       // We have the data, lets hydrate it
       this.hydrateFromZome(res);
@@ -250,10 +254,11 @@ export class DataStore {
     await this.put(this.root);
   }
 
-  public getRoot() {
-    return this.root.data;
+  public async getRoot() {
+    const response = await this.fetchSingle('root');
+    console.log('roooot now?: ', response);
+    return this.root.data
   }
-
 
   // Data helpers/transformers
 
@@ -289,6 +294,7 @@ export class DataStore {
    * @param res response from ZomeAPI
    */
   protected hydrateFromZome(res: RustNode[]) {
+    console.log('hydrateFromZome');
 
     // An array of parallel objects and references to deserilzed objects
     const parallelObjects = new Array<Object>();
@@ -298,9 +304,10 @@ export class DataStore {
     res.forEach((node: RustNode, i: number) => {
       const parent = node.parent;
       const {name, data} = node.val;
+      // console.log('name: ', name, 'data: ', data);
       const path = this.getRustNodePath(i, res);
       const parentPath = this.getParentPath(path);
-      console.log(path, parentPath);
+      console.log('path: ', path, 'parentPath: ', parentPath);
 
       // Temporarily assign an empty object
       let deserializedObject: Object = {};
@@ -312,17 +319,20 @@ export class DataStore {
 
       // Assign to the parallel objects array
       parallelObjects[i] = deserializedObject;
-
+      console.log('parentPath: ', parentPath);
       if (parentPath.length > 0) {
         const parentCursor = this.getCursor(parentPath);
         const parentName = this.getLastPart(parentPath);
         if (parentName in objectTransformations) {
+          console.log('parentName: ', parentName);
           parentCursor[name] = objectTransformations[parentName](deserializedObject);
         } else {
           parentCursor[name] = deserializedObject;
         }
       }
+      if (parentPath.length === 0) {
+        console.log('hey!! I should deal with data:{}!');
+      }
     });
-
   }
 }
