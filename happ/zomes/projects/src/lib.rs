@@ -1,6 +1,6 @@
 use hdk::prelude::*;
 use holo_hash::{EntryHashB64, HeaderHashB64};
-
+use tracing::{info};
 mod project;
 
 use project::Project;
@@ -11,6 +11,7 @@ entry_defs![
   Project::entry_def()
 ];
 
+// Actual blob of data stored on the DHT
 #[hdk_entry(id = "thing")]
 #[derive(Clone)]
 #[serde(rename_all = "camelCase")]
@@ -18,18 +19,21 @@ pub struct Thing {
   pub data: String,
 }
 
+// returned after successful write to DHT
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddOutput {
   header_hash: HeaderHashB64,
   entry_hash: EntryHashB64,
 }
 
+// Passed in from UI
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ThingInput {
   path: String,
   data: String,
 }
 
+// Sent back to UI
 #[derive(Clone, Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Content {
     name: String,
@@ -38,6 +42,7 @@ pub struct Content {
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
+  info!("putting thing with path {}", input.path.clone());
   let path = Path::try_from(input.path.clone())?;
   path.ensure()?;
   let thing = Thing{data: input.data};
@@ -54,12 +59,6 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
 
   Ok(output)
 
-}
-
-fn _get_entry_hashes(path: &Path, tag: LinkTag) -> ExternResult<Vec<EntryHashB64>> {
-  let links = get_links(path.path_entry_hash()?, Some(tag))?;
-  let entry_hashes = links.into_iter().map(|l| l.target.as_hash().clone().into()).collect();
-  Ok(entry_hashes)
 }
 
 fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
@@ -99,6 +98,7 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
 
 #[hdk_extern]
 pub fn get_thing(path_str: String) -> ExternResult<Tree<Content>> {
+  info!("getting thing with path {}", path_str.clone());
   let root_path = Path::from(path_str.clone());
     let val = Content {
         name: String::from(path_str),

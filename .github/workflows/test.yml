@@ -1,7 +1,7 @@
 
 name: Tryorama tests
 
-on: [ push, pull_request ]
+on: [ pull_request ]
 
 jobs:
   tryorama_test:

@@ -28,27 +28,27 @@ export interface UpdateProjectInput {
 }
 
 export interface ThingInput {
-  path: String,
-  data: String
+  path: string,
+  data: string
 }
 
-export interface Node<T> {
-  idx: number,
-  val: T,
-  parent: number | null,
-  children: number[],
+export type Tree<T> = {
+  tree: Array<T>
 }
-export interface Tree<T> {
-  tree: Node<T>[]
-}
+
+export type RustNode = {
+  idx: number;
+  val: any;
+  parent: null | number;
+  children: Array<number>;
+};
+
+export type TreeNode = {
+  val: any;
+  children: Array<TreeNode>;
+};
 
 export interface Content {
   name: string,
   data: string,
-}
-
-export enum action {
-  work,
-  accept,
-  use
 }
