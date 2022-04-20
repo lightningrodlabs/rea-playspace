@@ -12,7 +12,6 @@ pub fn get_project(entry_hash: EntryHashB64) -> ExternResult<Option<Project>> {
       let project: Project = element.entry()
         .to_app_option()?
         .ok_or(WasmError::Guest("Could not deserialize element to Project.".into()))?;
-    
       Ok(Some(project))
     }
   }
@@ -57,7 +56,6 @@ pub fn update_project(input: UpdateProjectInput) -> ExternResult<NewProjectOutpu
 
   Ok(output)
 }
-
 
 #[hdk_extern]
 pub fn delete_project(header_hash: HeaderHashB64) -> ExternResult<HeaderHash> {

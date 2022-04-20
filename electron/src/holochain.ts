@@ -66,15 +66,11 @@ const BINARY_PATHS: PathOptions | undefined = app.isPackaged
 // These options are in use when the application is under development
 const devOptions: HolochainRunnerOptions = {
   happPath: happPath, // preload
-  datastorePath: process.env.EH_TEST_USER_2
-    ? '../../user2-data/databases'
-    : path.join(__dirname, '../../user-data/databases'),
-  appId: MAIN_APP_ID,
-  appWsPort: process.env.EH_TEST_USER_2 ? 8899 : 8888,
-  adminWsPort: process.env.EH_TEST_USER_2 ? 1236 : 1234,
-  keystorePath: process.env.EH_TEST_USER_2
-    ? '../../user2-data/keystore'
-    : path.join(__dirname, '../../user-data/keystore'),
+  datastorePath: path.join(__dirname, '../../', process.env.REA_PLAYSPACE_DATASTORE_PATH as string),
+  appId: process.env.REA_PLAYSPACE_APP_ID,
+  appWsPort: Number.parseInt(process.env.REA_PLAYSPACE_APP_WS_PORT),
+  adminWsPort: Number.parseInt(process.env.REA_PLAYSPACE_ADMIN_WS_PORT),
+  keystorePath: path.join(__dirname, '../../', process.env.REA_PLAYSPACE_KEYSTORE_PATH as string),
   proxyUrl: COMMUNITY_PROXY_URL,
 }
 
