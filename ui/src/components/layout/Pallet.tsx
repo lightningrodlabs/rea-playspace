@@ -1,7 +1,7 @@
 import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Agent, ProcessSpecification, ResourceSpecification } from '../../types/valueflows';
+import { Agent, ProcessSpecification, ResourceSpecification, PathedData } from '../../types/valueflows';
 import PalletNode from '../PalletNode';
 import DataStore from "../../data/store";
 
@@ -12,12 +12,12 @@ interface Props {
 }
 
 const Pallet: React.FC<Props> = ({
-  resourceSpecifications, 
-  processSpecifications, 
+  resourceSpecifications,
+  processSpecifications,
   agents}) => {
 
-  const onDragStart = (event:DragEvent, name: string, type: string) => {
-    const data = {name, type};
+  const onDragStart = (event:DragEvent, item: PathedData, type: string) => {
+    const data = {item, type};
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
   };
@@ -54,7 +54,7 @@ const Pallet: React.FC<Props> = ({
       return (list.map((item: any) => (
         <div
         key={item.id}
-        onDragStart={(event: any) => onDragStart(event, item.name, type)}
+        onDragStart={(event: any) => onDragStart(event, item, type)}
         draggable
         style={pickStyle(type)}>
           <PalletNode
@@ -95,7 +95,7 @@ const Pallet: React.FC<Props> = ({
         </Link>
         </h2>
       </div>
-      {renderNodes(processSpecifications, 'process')}
+      {renderNodes(processSpecifications, 'processSpecification')}
       <div style={categoryStyles}>
         <h2>Agents
         <Link to="/agents/new">

@@ -13,7 +13,7 @@ import {
   Process,
   DisplayNode,
   DisplayEdge,
-  objectTransformations,
+  ObjectTransformations,
   RootShape
 } from "../types/valueflows";
 import { Path } from "react-router-dom";
@@ -60,7 +60,6 @@ export class DataStore {
   }
 
   public getCursor(path: string): any {
-    console.log('pre-slug path', path);
     const pathSlugs: Array<string> = path.split('.');
     const first: string = pathSlugs.shift();
     const traversed = [];
@@ -69,7 +68,6 @@ export class DataStore {
       throw new Error("Path is malformed. All paths should start with 'root'.");
     }
     traversed.push(first);
-    console.log('pathSlugs', pathSlugs);
     for (let slug of pathSlugs) {
       if (Object.hasOwn(cursor, slug)) {
         cursor = cursor[slug];
@@ -215,7 +213,6 @@ export class DataStore {
   // Display* helpers
 
   public getDisplayNodes(planId: string): DisplayNode[] {
-    console.log('--->', planId);
     return Object.values(this.getCursor(DisplayNode.getPrefix(planId)));
   }
 
@@ -255,8 +252,6 @@ export class DataStore {
   }
 
   public async getRoot() {
-    const response = await this.fetchSingle('root');
-    console.log('roooot now?: ', response);
     return this.root.data
   }
 
@@ -294,7 +289,6 @@ export class DataStore {
    * @param res response from ZomeAPI
    */
   protected hydrateFromZome(res: RustNode[]) {
-    console.log('hydrateFromZome');
 
     // An array of parallel objects and references to deserilzed objects
     const parallelObjects = new Array<Object>();
@@ -304,10 +298,8 @@ export class DataStore {
     res.forEach((node: RustNode, i: number) => {
       const parent = node.parent;
       const {name, data} = node.val;
-      // console.log('name: ', name, 'data: ', data);
       const path = this.getRustNodePath(i, res);
       const parentPath = this.getParentPath(path);
-      console.log('path: ', path, 'parentPath: ', parentPath);
 
       // Temporarily assign an empty object
       let deserializedObject: Object = {};
@@ -319,19 +311,17 @@ export class DataStore {
 
       // Assign to the parallel objects array
       parallelObjects[i] = deserializedObject;
-      console.log('parentPath: ', parentPath);
-      if (parentPath.length > 0) {
+      if (parentPath !== "") {
         const parentCursor = this.getCursor(parentPath);
         const parentName = this.getLastPart(parentPath);
-        if (parentName in objectTransformations) {
-          console.log('parentName: ', parentName);
-          parentCursor[name] = objectTransformations[parentName](deserializedObject);
+        if (parentName in ObjectTransformations) {
+          const instance = ObjectTransformations[parentName](deserializedObject);
+          parentCursor[name] = instance;
         } else {
           parentCursor[name] = deserializedObject;
         }
-      }
-      if (parentPath.length === 0) {
-        console.log('hey!! I should deal with data:{}!');
+      } else {
+        this.root.data = deserializedObject;
       }
     });
   }

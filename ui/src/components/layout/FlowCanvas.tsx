@@ -17,10 +17,9 @@ import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import getDataStore, { DataStore } from "../../data/store";
 import ModalContainer from '../modals/ModalContainer';
-import { DisplayNode, DisplayEdge } from "../../types/valueflows";
+import { Process, DisplayNode, DisplayEdge, PathedData, ObjectTransformations, ObjectTypeMap } from "../../types/valueflows";
 
 let id = 0;
-const getId = () => `node_${id++}`;
 
 interface Props {};
 
@@ -32,6 +31,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [type, setType] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
+  const [currentPath, setCurrentPath] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
@@ -51,9 +51,8 @@ const FlowCanvas: React.FC<Props> = () => {
 
     let store = getDataStore();
     await store.fetchOrCreateRoot();
-    // XXX: This is happening before the data is loaded into the data store.
+
     const planId = (await store.getRoot())['planId']; // undefined
-    console.log('----->', planId);
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
 
@@ -91,8 +90,14 @@ const FlowCanvas: React.FC<Props> = () => {
       event.preventDefault();
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+        const {item, type} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+        const T = ObjectTypeMap[type];
+        const transformer = ObjectTransformations[type];
+        console.log(type, item, transformer);
 
+        const data: typeof T = transformer(item);
+
+        console.log(data);
         // check if the dropped element is valid
         if (typeof data.name === 'undefined' || !data.name) {
           return;
@@ -104,7 +109,8 @@ const FlowCanvas: React.FC<Props> = () => {
             y: event.clientY - reactFlowBounds.top,
           });
           setCurrentPosition(position);
-          setCurrentNodeName(data.name)
+          setCurrentNodeName(data.name);
+          setCurrentPath(data.path);
           setType(data.type);
           openModal();
         }
@@ -116,7 +122,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const selectModalComponent = () => {
     switch (type) {
-      case 'process':
+      case 'processSpecification':
         return <ProcessModal position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
@@ -126,17 +132,31 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   function handleAddNode() {
+    const store = getDataStore();
 
-    // TODO: we need the path to the original object dropped onto the canvas then we can get a cursor to it.
+    const currentObject = store.getCursor(currentPath);
+    const currentPlanId = store.getRoot()['planID'];
+
+    let newObject = currentObject;
+
+    // TODO: NEed to pipe in data from modal form
+    if (type === 'processSpecification') {
+      newObject = new Process({
+        name: currentNodeName,
+        finished: false,
+        basedOn: currentObject.id,
+        plannedWithin: currentPlanId
+      });
+    }
 
     const node = {
-      vfPath: 'yo',
+      vfPath: currentPath,
       type: type,
       position: currentPosition,
       data: { label: (<>{currentNodeName}</>), name: currentNodeName }
     };
 
-    getDataStore().set(new DisplayNode(node));
+    store.set(new DisplayNode(node));
 
     setNodes((nds) => nds.concat(node as any));
     setCurrentNodeName("");

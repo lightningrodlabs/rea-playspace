@@ -336,8 +336,8 @@ export class Plan implements PlanShape, PathedData {
   note?: string;
   due?: Date;
   process?: Record<string, ProcessShape>;
-  displayedNode?: Record<string, DisplayNode>;
-  displayedEdge?: Record<string, DisplayEdge>;
+  displayNode?: Record<string, DisplayNode>;
+  displayEdge?: Record<string, DisplayEdge>;
 
   constructor(init: PlanShape) {
     this.id = init.id ? init.id : Guid.raw();
@@ -346,6 +346,8 @@ export class Plan implements PlanShape, PathedData {
     this.note = init.note ? init.note: undefined;
     this.due = init.due ? init.due: undefined;
     this.process = init.process ? init.process: undefined;
+    this.displayNode = {};
+    this.displayEdge = {};
   }
 
   static getPrefix(): string {
@@ -495,8 +497,7 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
 /**
  * Map from a parent path slug to a function that transforms the object into the corresponding class
  */
-export const objectTransformations = {
-  'root': function (object: Object) { return new Root(object); },
+export const ObjectTransformations = {
   'agent': function (object: Object) { return new Agent(object as AgentShape); },
   'resourceSpecification': function (object: Object) { return new ResourceSpecification(object as ResourceSpecificationShape); },
   'processSpecification': function (object: Object) { return new ProcessSpecification(object as ProcessSpecificationShape); },
@@ -511,7 +512,7 @@ export const objectTransformations = {
 }
 
 /**
- * Takes an object of Record<string, T> and maps it to Map<Guid, T>
+ * Takes an object of Record<string, T> and maps it to Map<string, T>
  * @param obj
  * @returns
  */
@@ -521,19 +522,19 @@ export function objectEntriesToMap<T> (obj: Record<string, T>): Map<string, T> {
   );
 }
 
-const ObjectTypeMap = [
-  {placeholder: 'agent', type: Agent },
-  {placeholder: 'resourceSpecification', type: ResourceSpecification },
-  {placeholder: 'processSpecification', type: ProcessSpecification },
-  {placeholder: 'plan', type: Plan }
-];
+export const ObjectTypeMap = {
+  'agent': Agent,
+  'resourceSpecification': ResourceSpecification,
+  'processSpecification': ProcessSpecification,
+  'plan': Plan
+};
 
-export function transformEntriesToMap(tempRoot: Object) {
-  const newRoot: Root = new Root();
-  for( let {placeholder, type} of ObjectTypeMap) {
-    if (tempRoot.hasOwnProperty(placeholder)) {
-      newRoot[placeholder] = objectEntriesToMap<typeof type>(tempRoot[placeholder]);
-    }
-  }
-}
+// export function transformEntriesToMap(tempRoot: Object) {
+//   const newRoot: Root = new Root();
+//   for( let {placeholder, type} of ObjectTypeMap) {
+//     if (tempRoot.hasOwnProperty(placeholder)) {
+//       newRoot[placeholder] = objectEntriesToMap<typeof type>(tempRoot[placeholder]);
+//     }
+//   }
+// }
 
