@@ -17,6 +17,7 @@ import ProcessNode from '../nodes/ProcessNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import getDataStore, { DataStore } from "../../data/store";
 import ModalContainer from '../modals/ModalContainer';
+import { DisplayNode, DisplayEdge } from "../../types/valueflows";
 
 let id = 0;
 const getId = () => `node_${id++}`;
@@ -48,13 +49,28 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-    let store = getDataStore();
-    setStore(store);
 
-    store.fetchPlan()
-    
-    // TODO turn elements of plan into nodes and edges to render
-  }
+    let store = getDataStore();
+    // XXX: This is happening before the data is loaded into the data store.
+    const planId = store.getRoot()['planId']
+    const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
+    const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
+
+    const nodes = displayNodes.map((node) => {
+      const type = node.path.split('.').at(-2);
+      const vfObject = store.getCursor(node.vfPath);
+      return {
+        id: node.id,
+        type: type,
+        position: node.position,
+        data: { label: (<>{vfObject.name}</>), name: vfObject.name},
+      };
+    });
+
+    setStore(store); // do we need this?
+    setNodes(nodes);
+    setEdges(displayEdges);
+  };
 
   function openModal() {
     setIsModalOpen(true);
@@ -109,13 +125,19 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   function handleAddNode() {
-    const newNode = {
-      id: getId(),
-      type,
+
+    // TODO: we need the path to the original object dropped onto the canvas then we can get a cursor to it.
+
+    const node = {
+      vfPath: 'yo',
+      type: type,
       position: currentPosition,
-      data: { label: 'Process', name: currentNodeName },
+      data: { label: (<>{currentNodeName}</>), name: currentNodeName }
     };
-    setNodes((nds) => nds.concat(newNode));
+
+    store.set(new DisplayNode(node));
+
+    setNodes((nds) => nds.concat(node as any));
     setCurrentNodeName("");
     setCurrentPosition(undefined);
   }
