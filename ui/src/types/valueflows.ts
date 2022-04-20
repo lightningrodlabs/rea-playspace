@@ -183,17 +183,18 @@ export interface RootShape {
   processSpecification: Record<string, ProcessSpecification>;
   agent: Record<string, Agent>;
   plan: Record<string, Plan>;
-  data: Object;
+  data?: Object;
 
   get path() {
     return 'root';
   }
 
-  constructor() {
+  constructor(data?: Object) {
     this.resourceSpecification = {};
     this.processSpecification = {};
     this.agent = {};
     this.plan = {};
+    this.data = data ? data : {};
   }
 
   public toJSON(){
@@ -401,6 +402,7 @@ export class Process implements ProcessShape, PathedData {
     this.hasEnd = init.hasEnd;
     this.hasPointInTime = init.hasPointInTime;
     this.due = init.due;
+    this.created = new Date();
   }
 
   static getPrefix(planId: string): string {
@@ -494,6 +496,7 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
  * Map from a parent path slug to a function that transforms the object into the corresponding class
  */
 export const objectTransformations = {
+  'root': function (object: Object) { return new Root(object); },
   'agent': function (object: Object) { return new Agent(object as AgentShape); },
   'resourceSpecification': function (object: Object) { return new ResourceSpecification(object as ResourceSpecificationShape); },
   'processSpecification': function (object: Object) { return new ProcessSpecification(object as ProcessSpecificationShape); },

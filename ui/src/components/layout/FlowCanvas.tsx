@@ -33,7 +33,6 @@ const FlowCanvas: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
-  const [store, setStore] = useState<DataStore>();
   const onConnect = (params: Connection) => setEdges((eds) => addEdge(params, eds));
 
   const nodeTypes = useMemo(() => ({
@@ -51,13 +50,16 @@ const FlowCanvas: React.FC<Props> = () => {
     setReactFlowInstance(reactFlowInstance);
 
     let store = getDataStore();
+    await store.fetchOrCreateRoot();
     // XXX: This is happening before the data is loaded into the data store.
-    const planId = store.getRoot()['planId']
+    const planId = (await store.getRoot())['planId']; // undefined
+    console.log('----->', planId);
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
 
     const nodes = displayNodes.map((node) => {
       const type = node.path.split('.').at(-2);
+      console.log('node! ', node);
       const vfObject = store.getCursor(node.vfPath);
       return {
         id: node.id,
@@ -67,7 +69,6 @@ const FlowCanvas: React.FC<Props> = () => {
       };
     });
 
-    setStore(store); // do we need this?
     setNodes(nodes);
     setEdges(displayEdges);
   };
@@ -135,7 +136,7 @@ const FlowCanvas: React.FC<Props> = () => {
       data: { label: (<>{currentNodeName}</>), name: currentNodeName }
     };
 
-    store.set(new DisplayNode(node));
+    getDataStore().set(new DisplayNode(node));
 
     setNodes((nds) => nds.concat(node as any));
     setCurrentNodeName("");

@@ -58,16 +58,6 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
   return (
     <>
       <form onSubmit={handleSubmit}>
-      <br />
-        <SlInput
-          required
-          label="ID"
-          name="id"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={id}
-
-        />
         <br />
         <SlInput
           required
