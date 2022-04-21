@@ -77,7 +77,6 @@ export class DataStore {
         throw new Error(`Could not find element '${slug}' in '${tPath}'.`)
       }
     }
-
     return cursor;
   }
 
@@ -89,9 +88,7 @@ export class DataStore {
    * @returns
    */
   public async fetchSingle(path: string): Promise<PathedData> {
-    const type = path.split('.').at(-2);
     const res = await this.zomeApi.get_thing(path);
-    console.log('res', res);
     this.hydrateFromZome(res);
     return this.getCursor(path);
   }
@@ -102,7 +99,6 @@ export class DataStore {
    * @returns
    */
   public async fetchAll(path: string): Promise<PathedData[]> {
-    const type = path.split('.').at(-1);
     const res = await this.zomeApi.get_thing(path);
     this.hydrateFromZome(res);
     return Object.values(this.getCursor(path));
@@ -211,7 +207,6 @@ export class DataStore {
   }
 
   // Display* helpers
-
   public getDisplayNodes(planId: string): DisplayNode[] {
     return Object.values(this.getCursor(DisplayNode.getPrefix(planId)));
   }
@@ -296,13 +291,13 @@ export class DataStore {
     // Cycle through the result array and construct/deserialize the objects
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
-      const parent = node.parent;
       const {name, data} = node.val;
       const path = this.getRustNodePath(i, res);
       const parentPath = this.getParentPath(path);
 
       // Temporarily assign an empty object
       let deserializedObject: Object = {};
+  
 
       // Deserialize if not an empty string (if this is a link in a path in the DHT)
       if (data != "") {
