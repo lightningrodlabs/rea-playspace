@@ -3,6 +3,7 @@ import React, { CSSProperties } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 
 interface Data {
+  id: string,
   name: string,
   label: string
 }
@@ -58,7 +59,7 @@ const ProcessSpecificationNode: React.FC<Props> = ({data}) => {
   }
 
   return (
-    <div style={{position:'relative', overflow: 'hidden'}}>
+    <div key={data.id} style={{position:'relative', overflow: 'hidden'}}>
 
       <div style={nodeStyles}>
         <div style={nodeHeader}>{data.label}</div>
