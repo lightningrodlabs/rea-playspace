@@ -3,12 +3,8 @@ import { HoloHashB64 } from "@holochain/client"
 
 // container for a set things. Only 1 to begin with
 export interface Project {
-  id: String,
-  name: String
-}
-
-export interface Thing {
-  data: string
+  id: string,
+  name: string
 }
 
 // Maps to AddOutput and NewProjectOutput structs
@@ -32,23 +28,9 @@ export interface ThingInput {
   data: string
 }
 
-export type Tree<T> = {
-  tree: Array<T>
-}
-
 export type RustNode = {
   idx: number;
   val: any;
   parent: null | number;
   children: Array<number>;
 };
-
-export type TreeNode = {
-  val: any;
-  children: Array<TreeNode>;
-};
-
-export interface Content {
-  name: string,
-  data: string,
-}
