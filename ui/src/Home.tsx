@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import FlowCanvas from "./components/layout/FlowCanvas";
 import Pallet from "./components/layout/Pallet";
-import { Agent, Plan, ProcessSpecification, ResourceSpecification } from "./types/valueflows";
-import getDataStore, { DataStore } from "./data/store"
+import { Agent, ProcessSpecification, ResourceSpecification } from "./data/models/Valueflows/Knowledge";
+import getDataStore from "./data/DataStore"
 
 interface Props {}
 
