@@ -80,8 +80,25 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   const onNodesChange = useCallback(
-    (changes) => {
+    async (changes) => {
       setNodes((nds) => applyNodeChanges(changes, nds))
+      const store = getDataStore();
+      if (changes[0].type === 'remove') {
+        console.log(changes);
+        // use its ID to get a handle on it
+        const planId = store.getRoot()['planId'];
+        const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
+        const nodeToDelete = displayNodes.find((obj) => obj.id === changes[0].id);
+        // get the paths
+        const vfPath: string = nodeToDelete.vfPath;
+        const nodePath: string = nodeToDelete.path;
+        await store.delete(vfPath);
+        await store.delete(nodePath);
+  
+        // delete the data at the VF path and the DisplayNodes path
+        // delete links?
+        // delete path terminus link
+      }
       /** 
        * track position change on every event while dragging node
        * hold on to it outside of this callback because this will
@@ -98,7 +115,7 @@ const FlowCanvas: React.FC<Props> = () => {
            * and set that to the DisplayNode.position property.
            * Then persist to DHT.
           */
-          const store = getDataStore();
+
           const planId = store.getRoot()['planId'];
           const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
           const nodeToUpdate = displayNodes.find((obj) => obj.id === changes[0].id);
