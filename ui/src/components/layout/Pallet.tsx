@@ -1,9 +1,9 @@
 import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Agent, ProcessSpecification, ResourceSpecification, PathedData } from '../../types/valueflows';
+import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
+import { PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
-import DataStore from "../../data/store";
 
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,

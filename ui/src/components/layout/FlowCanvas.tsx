@@ -15,11 +15,12 @@ import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
-import getDataStore from "../../data/store";
+import getDataStore from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
-import { DisplayNode, ObjectTransformations, ObjectTypeMap } from "../../types/valueflows";
+import { DisplayNode } from "../../data/models/Application/Display";
+import { ObjectTransformations, ObjectTypeMap } from "../../data/models/ObjectTransformations";
 import ProcessSpecificationNode from '../nodes/ProcessSpecificationNode';
-import { ThingInput } from '../../types/holochain';
+import { PathedData } from '../../data/models/PathedData';
 import { Guid } from 'guid-typescript';
 
 interface Props {};
@@ -50,9 +51,15 @@ const FlowCanvas: React.FC<Props> = () => {
     setReactFlowInstance(reactFlowInstance);
 
     let store = getDataStore();
+
+    /**
+     * TODO: we should have a promise that resolves when the datastore is loaded,
+     * becuase this might cause problems down the road when it's in both Home.tsx
+     * and here.
+     */
     await store.fetchOrCreateRoot();
 
-    const planId = await store.getRoot()['planId'];
+    const planId = await store.getCursor('root.planId');
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     //const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     const nodes = displayNodes.map((node) => {
@@ -82,7 +89,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const onNodesChange = useCallback(
     (changes) => {
       setNodes((nds) => applyNodeChanges(changes, nds))
-      /** 
+      /**
        * track position change on every event while dragging node
        * hold on to it outside of this callback because this will
        * fire dozens of time per second. We need the last position the node
@@ -94,14 +101,13 @@ const FlowCanvas: React.FC<Props> = () => {
           position.y = changes[0].position.y
         } else {
           /**
-           * when dragging == false then we can use the last save position 
+           * when dragging == false then we can use the last save position
            * and set that to the DisplayNode.position property.
            * Then persist to DHT.
           */
           const store = getDataStore();
-          const planId = store.getRoot()['planId'];
-          const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
-          const nodeToUpdate = displayNodes.find((obj) => obj.id === changes[0].id);
+          const planId = store.getCursor('root.planId');
+          const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
           nodeToUpdate.position = position as XYPosition;
           store.set(nodeToUpdate);
           resetPosition();
@@ -129,10 +135,10 @@ const FlowCanvas: React.FC<Props> = () => {
       event.preventDefault();
       if (reactFlowWrapper && reactFlowWrapper.current) {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+
         const {item, type} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
         const T = ObjectTypeMap[type];
         const transformer = ObjectTransformations[type];
-
         const data: typeof T = transformer(item);
 
         // check if the dropped element is valid
@@ -167,7 +173,7 @@ const FlowCanvas: React.FC<Props> = () => {
     }
   }
 
-  function handleAddNode(item: ThingInput) {
+  function handleAddNode(item: PathedData) {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
 
@@ -178,6 +184,7 @@ const FlowCanvas: React.FC<Props> = () => {
       vfPath: item.path,
       type,
       position: currentPosition,
+      // TODO: The is wrong for process, since it ends up saying "ProcessSpecification"
       data: { id: id, label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: currentNodeName }
     };
     // Create an HDK entry version of the node

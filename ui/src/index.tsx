@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { initConnection } from './data/store';
+import { initConnection } from './data/DataStore';
 
 initConnection().then(() => {
   ReactDOM.render(
