@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ResourceSpecification } from "../../../types/valueflows";
+import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge";
 import MainPanelHeader from "../MainPanelHeader";
-import getDataStore from "../../../data/store";
+import getDataStore from "../../../data/DataStore";
 
 export type NewResourceSpecificationProps = {
 }
