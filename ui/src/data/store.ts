@@ -129,6 +129,18 @@ export class DataStore {
     await this.put(item);
   }
 
+    /**
+   * Deletes Thing on Path 
+   * @param path
+   */
+     public async delete(path: string) {
+      try {
+        await this.zomeApi.delete_thing(path);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
   // ProcessSprecification helpers
 
   // Get from store

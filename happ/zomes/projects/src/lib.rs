@@ -109,7 +109,51 @@ pub fn get_thing(path_str: String) -> ExternResult<Tree<Content>> {
     };
     let mut tree = Tree::new(val);
     build_tree(&mut tree, 0, root_path)?;
+    info!("Here is the tree {:?}", tree);
     Ok(tree)
+}
+
+#[hdk_extern]
+pub fn delete_thing(path_str: String) -> ExternResult<()> {
+  info!("delete thing with path {}", path_str.clone());
+  let path = Path::from(path_str.clone());
+  // every update to a Thing will be linked to the Path terminus via 'data' link
+  // tag. Get all Links with tag 'data'.
+
+  let links: Vec<Link> = get_links(path.path_entry_hash()?, Some(LinkTag::new("data")))?;  
+  // loop over the links  
+  for link in links.into_iter() {
+    // get the entry from the link
+    let thing_entry_hash = link.target;
+    let element = try_get_element(thing_entry_hash, GetOptions::default())?;
+
+    // get the header hash from the entry
+    let thing_header = element.header_address().clone();
+
+    // use header hash to delete the entry
+    let delete_input = DeleteInput {
+        deletes_header_hash: thing_header,
+        chain_top_ordering: ChainTopOrdering::Strict,
+    };
+    delete_entry(delete_input)?;
+
+    // use the create header hash of the link to reference and delete
+    // the 'data' link.
+    let delete_header = delete_link(link.create_link_hash)?;
+    info!("Deleter header: {}", delete_header);
+  }
+  Ok(())
+}
+/// Attempts to get an element at the entry_hash and returns it
+/// if the element exists
+pub fn try_get_element(entry_hash: EntryHash, get_options: GetOptions) -> ExternResult<Element> {
+  match get(entry_hash.clone(), get_options)? {
+      Some(element) => Ok(element),
+      None => Err(WasmError::Guest(format!(
+          "There is no element at the hash {}",
+          entry_hash
+      ))),
+  }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]

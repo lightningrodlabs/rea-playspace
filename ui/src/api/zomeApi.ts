@@ -18,6 +18,11 @@ export default class ZomeApi {
     return (await callZome(this.appWs,'projects', 'get_thing', path_str)).tree as Promise<Array<RustNode>>;
   }
 
+  public async delete_thing (path_str: string) : Promise<void> {
+    await callZome(this.appWs,'projects', 'delete_thing', path_str);
+    return;
+  }
+
   public async create_project (project: Project) : Promise<NewProjectOutput> {
     return await callZome(this.appWs, 'projects', 'create_project', project) as Promise<NewProjectOutput>;
   }
