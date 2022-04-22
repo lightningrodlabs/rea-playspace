@@ -114,7 +114,68 @@ export default (orchestrator: Orchestrator<any>) =>  {
     t.ok(get_output)
     jsTree = buildTree(get_output.tree,get_output.tree[0])
     t.equal(JSON.parse(jsTree.children[0].children[0].children[0].children[0].children[0].val.data).effortQuantity.hasNumericalValue, 15 )
-});
+
+
+    // delete thing + links
+    await alice.call(
+      "projects",
+      "delete_thing",
+      "plans.p1.processes.pr1.commitments.cm1"
+    );
+
+    get_output = await alice.call(
+      "projects",
+      "get_thing",
+      "plans"
+    );
+    
+    jsTree = buildTree(get_output.tree,get_output.tree[0]);
+    t.deepEqual(jsTree, {
+      val: {
+        name: "plans",
+        data: "",
+      },
+      children: [
+        {
+          val: {
+            name: "p1",
+            data: "",
+          },
+          children: [
+            {
+              val: {
+                name: "processes",
+                data: "",
+              },
+              children: [
+                {
+                  val: {
+                    name: "pr1",
+                    data: "",
+                  },
+                  children: [
+                    {
+                      val: {
+                        name: "commitments",
+                        data: "",
+                      },
+                      children: [                        {
+                        val: {
+                          name: "cm1",
+                          data: ''
+                        },
+                        children: [],
+                      },],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+  });
 
 }
 

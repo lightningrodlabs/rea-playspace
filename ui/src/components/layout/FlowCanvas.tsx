@@ -54,6 +54,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const planId = await store.getRoot()['planId'];
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
+    console.log('displayNodes: ', displayNodes);
     //const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     const nodes = displayNodes.map((node) => {
       return {

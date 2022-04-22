@@ -142,6 +142,11 @@ pub fn delete_thing(path_str: String) -> ExternResult<()> {
     let delete_header = delete_link(link.create_link_hash)?;
     info!("Deleter header: {}", delete_header);
   }
+  let parent = match path.parent() {
+    Some(parent) => parent.path_entry(),
+    None => "".into(),
+  } ;
+
   Ok(())
 }
 /// Attempts to get an element at the entry_hash and returns it
