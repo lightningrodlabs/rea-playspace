@@ -447,7 +447,7 @@ export class DisplayNode implements DisplayNodeShape, PathedData {
 
   constructor(init: DisplayNodeShape) {
     this.id = init.id ? init.id : Guid.raw();
-    this.position = init.position;
+    this.position = init.position as XYPosition;
     this.vfPath = init.vfPath;
     this.type = init.type;
     this.data = init.data;
