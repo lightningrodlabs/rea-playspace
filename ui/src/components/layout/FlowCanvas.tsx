@@ -188,15 +188,20 @@ const FlowCanvas: React.FC<Props> = () => {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
 
+    // TODO: if we had an interface with a `name` property, we wouldn't need this.
+    const T = ObjectTypeMap[type];
+    const transformer = ObjectTransformations[type];
+    const data: typeof T = transformer(item);
+
     // Create react flow node object
     const id = Guid.raw();
     const node = {
       id: id,
-      vfPath: item.path,
+      vfPath: data.path,
       type,
       position: currentPosition,
       // TODO: The is wrong for process, since it ends up saying "ProcessSpecification"
-      data: { id: id, label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: currentNodeName }
+      data: { id: id, label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: data.name }
     };
     // Create an HDK entry version of the node
     const newNode = new DisplayNode(node);
