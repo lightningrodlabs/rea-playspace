@@ -1,6 +1,7 @@
 import { Guid } from "guid-typescript";
 import { XYPosition } from 'react-flow-renderer';
 import { PathedData } from "../PathedData";
+import { rejectEmptyFields } from '../../../utils';
 
 export interface DisplayNodeShape {
   id?: string;
@@ -25,11 +26,12 @@ export class DisplayNode implements DisplayNodeShape, PathedData {
   data?: any;
 
   constructor(init: DisplayNodeShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.position = init.position as XYPosition;
-    this.vfPath = init.vfPath;
-    this.type = init.type;
-    this.data = init.data;
+    const filtered = rejectEmptyFields<DisplayNodeShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.position = filtered.position as XYPosition;
+    this.vfPath = filtered.vfPath;
+    this.type = filtered.type;
+    this.data = filtered.data;
   }
 
   static getPrefix(planId: string): string {
@@ -53,10 +55,11 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
   vfPath: string;
 
   constructor(init: DisplayEdgeShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.source = init.source;
-    this.target = init.target;
-    this.vfPath = init.vfPath;
+    const filtered = rejectEmptyFields<DisplayEdgeShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.source = filtered.source;
+    this.target = filtered.target;
+    this.vfPath = filtered.vfPath;
   }
 
   static getPrefix(planId: string): string {
