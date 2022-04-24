@@ -1,6 +1,7 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape } from "../../../types/valueflows";
+import { rejectEmptyFields } from '../../../utils';
 
 // Knowledge Classes
 
@@ -14,12 +15,13 @@ export class Agent implements AgentShape, PathedData {
   primaryLocation?: string;
 
   constructor(init: AgentShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.note = init.note ? init.note : undefined;
-    this.image = init.image ? init.image : undefined;
-    this.primaryLocation = init.primaryLocation ? init.primaryLocation : undefined;
+    const filtered = rejectEmptyFields<AgentShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.note = filtered.note ? filtered.note : undefined;
+    this.image = filtered.image ? filtered.image : undefined;
+    this.primaryLocation = filtered.primaryLocation ? filtered.primaryLocation : undefined;
   }
 
   static getPrefix(): string {
@@ -57,14 +59,15 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   defaultUnitOfEffort?: string;
 
   constructor(init: ResourceSpecificationShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.note = init.note ? init.note : undefined;
-    this.image = init.image ? init.image : undefined;
-    this.resourceClassifiedAs = init.resourceClassifiedAs ? init.resourceClassifiedAs : undefined;
-    this.defaultUnitOfResource = init.defaultUnitOfResource ? init.defaultUnitOfResource : undefined;
-    this.defaultUnitOfEffort = init.defaultUnitOfEffort ? init.defaultUnitOfEffort : undefined;
+    const filtered = rejectEmptyFields<ResourceSpecificationShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.note = filtered.note ? filtered.note : undefined;
+    this.image = filtered.image ? filtered.image : undefined;
+    this.resourceClassifiedAs = filtered.resourceClassifiedAs ? filtered.resourceClassifiedAs : undefined;
+    this.defaultUnitOfResource = filtered.defaultUnitOfResource ? filtered.defaultUnitOfResource : undefined;
+    this.defaultUnitOfEffort = filtered.defaultUnitOfEffort ? filtered.defaultUnitOfEffort : undefined;
   }
 
   static getPrefix(): string {
@@ -100,10 +103,11 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
   note?: string;
 
   constructor(init: ProcessSpecificationShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.note = init.note ? init.note : undefined;
+    const filtered = rejectEmptyFields<ProcessSpecificationShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.note = filtered.note ? filtered.note : undefined;
   }
 
   static getPrefix(): string {

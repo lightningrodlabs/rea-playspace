@@ -2,6 +2,7 @@ import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { DisplayNode, DisplayEdge } from "../Application/Display";
 import { PlanShape, ProcessShape, InputCommitmentShape, OutputCommitmentShape } from "../../../types/valueflows";
+import { rejectEmptyFields } from '../../../utils';
 
 // Plan Classes
 
@@ -16,11 +17,12 @@ export class Plan implements PlanShape, PathedData {
   displayEdge?: Record<string, DisplayEdge>;
 
   constructor(init: PlanShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.note = init.note ? init.note : undefined;
-    this.due = init.due ? init.due : undefined;
+    const filtered = rejectEmptyFields<PlanShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.note = filtered.note ? filtered.note : undefined;
+    this.due = filtered.due ? filtered.due : undefined;
     this.process = {};
     this.displayNode = {};
     this.displayEdge = {};
@@ -67,19 +69,20 @@ export class Process implements ProcessShape, PathedData {
   outputCommitments?: Map<string, OutputCommitmentShape>; // add button on right
 
   constructor(init: ProcessShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.finished = init.finished ? init.finished : false;
-    this.note = init.note;
-    this.classifiedAs = init.classifiedAs;
-    this.inScopeOf = init.inScopeOf;
-    this.basedOn = init.basedOn;
-    this.plannedWithin = init.plannedWithin;
-    this.hasBegining = init.hasBegining;
-    this.hasEnd = init.hasEnd;
-    this.hasPointInTime = init.hasPointInTime;
-    this.due = init.due;
+    const filtered = rejectEmptyFields<ProcessShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.finished = filtered.finished ? filtered.finished : false;
+    this.note = filtered.note;
+    this.classifiedAs = filtered.classifiedAs;
+    this.inScopeOf = filtered.inScopeOf;
+    this.basedOn = filtered.basedOn;
+    this.plannedWithin = filtered.plannedWithin;
+    this.hasBegining = filtered.hasBegining;
+    this.hasEnd = filtered.hasEnd;
+    this.hasPointInTime = filtered.hasPointInTime;
+    this.due = filtered.due;
     this.created = new Date();
   }
 
