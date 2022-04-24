@@ -19,32 +19,33 @@ import {
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
 
-let dataStore: DataStore;
+let dataStorePromise: Promise<DataStore>;
 
 /**
- * Initialize our WS connection and set up the Zome API client
+ * Initialize our WS connection, set up the Zome API client
  */
-export async function initConnection(): Promise<void> {
-  const appWs = await getAppWs();
-  const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
-  const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
-  const zomeApi = new ZomeApi(appWs);
-  setAgentPubKey(agentPubKey);
-  setCellId(app_info.cell_data[0].cell_id);
-  setZomeApi(zomeApi);
-  dataStore = new DataStore();
-  await dataStore.fetchOrCreateRoot();
+export async function initConnection(): Promise<DataStore> {
+  dataStorePromise = new Promise(async (res) => {
+    const appWs = await getAppWs();
+    const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
+    const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
+    const zomeApi = new ZomeApi(appWs);
+    setAgentPubKey(agentPubKey);
+    setCellId(app_info.cell_data[0].cell_id);
+    setZomeApi(zomeApi);
+
+    const dataStore = new DataStore();
+    await dataStore.fetchOrCreateRoot();
+    res(dataStore);
+  });
+  return dataStorePromise;
 }
 
 /**
- * Fetches the DataStore or initialtiazes a new one
- * @returns DataStore
+ * Fetches dataStorePromise
  */
-export default function getDataStore(): DataStore {
-  if (dataStore == undefined) {
-    dataStore = new DataStore();
-  }
-  return dataStore;
+export default function getDataStore(): Promise<DataStore> {
+  return dataStorePromise;
 }
 
 export class DataStore extends DataStoreBase {

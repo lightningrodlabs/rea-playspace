@@ -36,8 +36,10 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
+
+    const store = await getDataStore();
     const ag: Agent =  new Agent({name, note});
-    await getDataStore().set(ag);
+    store.set(ag);
     clearState();
     navigate('/');
   }

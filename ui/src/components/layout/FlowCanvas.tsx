@@ -50,15 +50,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const onInit = async (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
 
-    let store = getDataStore();
-
-    /**
-     * TODO: we should have a promise that resolves when the datastore is loaded,
-     * becuase this might cause problems down the road when it's in both Home.tsx
-     * and here.
-     */
-    await store.fetchOrCreateRoot();
-
+    let store = await getDataStore();
     const planId = await store.getCursor('root.planId');
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     console.log(displayNodes);
@@ -122,7 +114,7 @@ const FlowCanvas: React.FC<Props> = () => {
            * and set that to the DisplayNode.position property.
            * Then persist to DHT.
           */
-          const store = getDataStore();
+          const store = await getDataStore();
           const planId = store.getCursor('root.planId');
           const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
           nodeToUpdate.position = position as XYPosition;
@@ -192,7 +184,7 @@ const FlowCanvas: React.FC<Props> = () => {
     }
   }
 
-  function handleAddNode(item: PathedData) {
+  async function handleAddNode(item: PathedData) {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
 
@@ -207,9 +199,10 @@ const FlowCanvas: React.FC<Props> = () => {
       data: { id: id, label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: currentNodeName }
     };
     // Create an HDK entry version of the node
-    const newNode = new DisplayNode(node)
+    const newNode = new DisplayNode(node);
     // Persist to DHT
-    getDataStore().set(newNode);
+    const store = await getDataStore();
+    store.set(newNode);
 
     // Add to local state to render new node on canvas
     setNodes((nds) => nds.concat(node as any));
