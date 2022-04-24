@@ -40,7 +40,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const store = getDataStore();
+    const store = await getDataStore();
     const plannedWithin = store.getCursor('root.planId');
     const process: Process = new Process(
       rejectEmptyFields<ProcessShape>(
