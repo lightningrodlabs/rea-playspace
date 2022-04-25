@@ -1,18 +1,47 @@
+// Building Blocks
+
+interface IdDate {
+  id?: string;
+  created?: Date;
+}
+
+interface TimeBase {
+  hasBegining?: Date;
+  hasEnd?: Date;
+  hasPointInTime?: Date;
+  due?: Date;
+}
+
+interface ReaBase {
+  resourceInventoriedAs?: string; // ResourceSprecification ID
+  resourceConformsTo?: string;    // ResourceSprecification ID
+  resourceQuantity?: number;
+  effortQuantity?: number;
+  provider: string;               // Agent ID
+  receiver: string;               // Agent ID
+  resourceClassifiedAs?: string;  // General classification or grouping
+}
+
+interface ProcessInput {
+  inputOf: string;  // Process ID
+  outputOf?: never; // Should not have an output Process ID
+}
+
+interface ProcessOutput {
+  inputOf?: never;  // Should not have an input Process ID
+  outputOf: string; // Process ID
+}
 
 // Knowledge
 
-export interface AgentShape {
-  id?: string,
-  created?: Date,
+export interface AgentShape extends IdDate {
   name: string,
   note?: string,
   image?: string,
   primaryLocation?: string
 }
 
-export interface ResourceSpecificationShape {
-  id?: string,
-  created?: Date,
+export interface ResourceSpecificationShape extends IdDate {
   name: string,
   note?: string,
   image?: string,
@@ -21,28 +50,22 @@ export interface ResourceSpecificationShape {
   defaultUnitOfEffort?: string
 }
 
-export interface ProcessSpecificationShape {
-  id?: string,
-  created?: Date,
+export interface ProcessSpecificationShape extends IdDate {
   name: string,
   note?: string
 }
 
 // Plan
 
-export interface PlanShape {
-  id?: string,
-  created?: Date,
+export interface PlanShape extends IdDate {
   name: string,
   note?: string,
   due?: Date
   process?: Record<string, ProcessShape>
 }
 
-export interface ProcessShape extends TimeBase {
-  id?:  string,
-  created?: Date,
-  name: string, // get from process spec
+export interface ProcessShape extends IdDate, TimeBase {
+  name: string,
   note?: string, // text-area
   finished: boolean, // defaults to false
   classifiedAs?: string, // don't display
@@ -51,77 +74,7 @@ export interface ProcessShape extends TimeBase {
   plannedWithin: string, // ID of a Plan
 }
 
-export interface InputCommitmentShape extends TimeBase, ReaBase, CommitmentShape {
-  id?: string,
-  created?: Date,
-  inputOf?: ProcessShape,
-  outputOf?: never,
-}
-
-export interface OutputCommitmentShape extends TimeBase, ReaBase, CommitmentShape {
-  id?: string,
-  created?: Date,
-  inputOf?: never,
-  outputOf?: ProcessShape,
-}
-
-// TODO: Commitment Classes and everything else below
-
-// Observation
-export interface EconomicResourceShape {
-  id?: string,
-  created?: Date,
-  name: string,
-  accountingQuantity?: number,
-  currentLocation?: GeoPoint,
-  note?: string,
-  classifiedAs?: string,
-  image?: string,
-  unitOfEffort?: string,
-  state?: string,
-  containedIn?: EconomicResourceShape,
-  stage?: ProcessSpecificationShape
-}
-
-export interface InputEconomicEventShape extends TimeBase, ReaBase, EconomicEventShape {
-  id?: string,
-  created?: Date,
-  inputOf: ProcessShape,
-  outputOf?: never
-}
-
-export interface OutputEconomicEventShape extends TimeBase, ReaBase, EconomicEventShape {
-  id?: string,
-  created?: Date,
-  inputOf?: never,
-  outputOf: ProcessShape
-}
-
-// Generic
-interface ReaBase {
-  provider: AgentShape,
-  receiver: AgentShape,
-  resourceClassifiedAs?: ResourceSpecificationShape,
-  resourceInventoriedAs?: EconomicResourceShape,
-  resourceQuantity?: number,
-  effortQuantity?: number
-}
-
-interface TimeBase {
-  hasBegining?: Date,
-  hasEnd?: Date,
-  hasPointInTime?: Date,
-  due?: Date,
-}
-
-interface GeoPoint {
-  lat: number,
-  lng: number
-}
-
-interface CommitmentShape extends TimeBase, ReaBase {
-  id?: string,
-  created?: Date,
+interface CommitmentShape extends IdDate, TimeBase, ReaBase {
   finished?: boolean,
   inScopeOf?: string,
   note?: string,
@@ -130,13 +83,43 @@ interface CommitmentShape extends TimeBase, ReaBase {
   state?: string
 }
 
-interface EconomicEventShape extends TimeBase, ReaBase {
-  id?: string,
-  created?: Date,
-  note?: string,
-  image?: string,
-  agreedIn?: string,
-  atLocation?: GeoPoint,
-  toLocation?: GeoPoint,
-  state?: string
+export interface InputCommitmentShape extends CommitmentShape, ProcessInput {}
+export interface OutputCommitmentShape extends CommitmentShape, ProcessOutput {}
+
+// Observation
+export interface EconomicResourceShape {
+  name: string;
+  trackingIndentifier: string;
+  accountingQuantity?: number;
+  onhandQuantity: number;
+  currentLocation?: GeoPoint;
+  note?: string;
+  classifiedAs?: string;
+  image?: string;
+  unitOfEffort?: string;
+  state?: string;
+  conformsTo: string;         // ResourceSpecification
+  containedIn?: string;       // EconomicResource ID
+  stage?: string;             // ProcessSpecification ID
+  primaryAccountable: string; // Agent ID of the accountable party
+}
+
+interface EconomicEventShape extends IdDate, TimeBase, ReaBase {
+  note?: string;
+  image?: string;
+  agreedIn?: string;
+  atLocation?: GeoPoint;
+  toLocation?: GeoPoint;
+  state?: string;
+  toResourceInventoriedAs: string; // EconomicResource ID that the transfer will be inventoried as.
+}
+
+export interface InputEconomicEventShape extends EconomicEventShape, ProcessInput {}
+export interface OutputEconomicEventShape extends EconomicEventShape, ProcessOutput {}
+
+// Geo
+
+export interface GeoPoint {
+  lat: number;
+  lng: number;
 }

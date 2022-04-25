@@ -1,12 +1,12 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
+import { NamedData } from "../NamedData";
 import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape } from "../../../types/valueflows";
 import { rejectEmptyFields } from '../../../utils';
 
 // Knowledge Classes
 
-
-export class Agent implements AgentShape, PathedData {
+export class Agent implements AgentShape, PathedData, NamedData {
   id: string;
   created: Date;
   name: string;
@@ -37,18 +37,18 @@ export class Agent implements AgentShape, PathedData {
   }
 
   public toJSON(): AgentShape {
-    return {
+    return rejectEmptyFields<AgentShape>({
       id: this.id.toString(),
       created: this.created,
       name: this.name,
       note: this.note,
       image: this.image,
       primaryLocation: this.primaryLocation,
-    };
+    });
   }
 }
 
-export class ResourceSpecification implements ResourceSpecificationShape, PathedData {
+export class ResourceSpecification implements ResourceSpecificationShape, PathedData, NamedData {
   id: string;
   created: Date;
   name: string;
@@ -83,7 +83,7 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   }
 
   public toJSON(): ResourceSpecificationShape {
-    return {
+    return rejectEmptyFields<ResourceSpecificationShape>({
       id: this.id.toString(),
       created: this.created,
       name: this.name,
@@ -92,11 +92,11 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
       resourceClassifiedAs: this.resourceClassifiedAs,
       defaultUnitOfResource: this.defaultUnitOfResource,
       defaultUnitOfEffort: this.defaultUnitOfEffort
-    };
+    });
   }
 }
 
-export class ProcessSpecification implements ProcessSpecificationShape, PathedData {
+export class ProcessSpecification implements ProcessSpecificationShape, PathedData, NamedData {
   id: string;
   created: Date;
   name: string;
@@ -123,11 +123,11 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
   }
 
   public toJSON(): ProcessSpecificationShape {
-    return {
+    return rejectEmptyFields<ProcessSpecificationShape>({
       id: this.id.toString(),
       created: this.created,
       name: this.name,
       note: this.note,
-    };
+    });
   }
 }
