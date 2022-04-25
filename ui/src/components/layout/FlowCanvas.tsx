@@ -18,10 +18,9 @@ import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import getDataStore from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
 import { DisplayNode } from "../../data/models/Application/Display";
-import { ObjectTransformations, ObjectTypeMap } from "../../data/models/ObjectTransformations";
 import ProcessSpecificationNode from '../nodes/ProcessSpecificationNode';
-import { PathedData } from '../../data/models/PathedData';
-import { Guid } from 'guid-typescript';
+import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
+import { NamedData } from '../../data/models/NamedData';
 
 interface Props {};
 
@@ -47,7 +46,7 @@ const FlowCanvas: React.FC<Props> = () => {
     element.style.position = "relative";
   }, []);
 
-  const onInit = async (reactFlowInstance) => {
+  const onInit = async (reactFlowInstance: ReactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
 
     let store = await getDataStore();
@@ -55,15 +54,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     console.log(displayNodes);
     //const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
-    const nodes = displayNodes.map((node) => {
-      return {
-        id: node.id,
-        type: node.type,
-        position: node.position,
-        data: node.data,
-      };
-    });
-    setNodes(nodes);
+    setNodes(displayNodes);
     //setEdges(displayEdges);
   };
 
@@ -148,12 +139,9 @@ const FlowCanvas: React.FC<Props> = () => {
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
         const {item, type} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-        const T = ObjectTypeMap[type];
-        const transformer = ObjectTransformations[type];
-        const data: typeof T = transformer(item);
 
         // check if the dropped element is valid
-        if (typeof data.name === 'undefined' || !data.name) {
+        if (typeof item.name === 'undefined' || !item.name) {
           return;
         }
 
@@ -163,8 +151,8 @@ const FlowCanvas: React.FC<Props> = () => {
             y: event.clientY - reactFlowBounds.top,
           });
           setCurrentPosition(position);
-          setCurrentNodeName(data.name);
-          //setCurrentPath(data.path);
+          setCurrentNodeName(item.name);
+          //setCurrentPath(item.path);
           setType(type);
           openModal();
         }
@@ -184,33 +172,24 @@ const FlowCanvas: React.FC<Props> = () => {
     }
   }
 
-  async function handleAddNode(item: PathedData) {
+  async function handleAddNode(item: PathedData & NamedData) {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
 
-    // TODO: if we had an interface with a `name` property, we wouldn't need this.
-    const T = ObjectTypeMap[type];
-    const transformer = ObjectTransformations[type];
-    const data: typeof T = transformer(item);
-
-    // Create react flow node object
-    const id = Guid.raw();
-    const node = {
-      id: id,
-      vfPath: data.path,
-      type,
-      position: currentPosition,
-      // TODO: The is wrong for process, since it ends up saying "ProcessSpecification"
-      data: { id: id, label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`, name: data.name }
-    };
     // Create an HDK entry version of the node
-    const newNode = new DisplayNode(node);
+    const newNode = new DisplayNode({
+      name: item.name,
+      vfPath: item.path,
+      type: getAlmostLastPart(item.path),
+      position: currentPosition
+    });
+
     // Persist to DHT
     const store = await getDataStore();
     store.set(newNode);
 
     // Add to local state to render new node on canvas
-    setNodes((nds) => nds.concat(node as any));
+    setNodes((nds) => nds.concat(newNode));
 
     // reset node state
     setCurrentNodeName("");
