@@ -54,7 +54,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const planId = await store.getRoot()['planId'];
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
-    console.log('displayNodes: ', displayNodes);
+    console.log(displayNodes);
     //const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     const nodes = displayNodes.map((node) => {
       return {
@@ -120,8 +120,12 @@ const FlowCanvas: React.FC<Props> = () => {
           const planId = store.getRoot()['planId'];
           const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
           const nodeToUpdate = displayNodes.find((obj) => obj.id === changes[0].id);
+
           nodeToUpdate.position = position as XYPosition;
+
           store.set(nodeToUpdate);
+
+
           resetPosition();
         }
       }

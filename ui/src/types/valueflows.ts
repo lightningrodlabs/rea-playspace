@@ -69,7 +69,7 @@ export interface OutputCommitmentShape extends TimeBase, ReaBase, CommitmentShap
 
 export interface DisplayNodeShape {
   id?: string;
-  position: XYPosition;
+  position?: XYPosition;
   vfPath: string;
   type?: string;
   data?: any;
@@ -176,7 +176,7 @@ export interface RootShape {
  *
  * Elements in the root follow paths that correspond to their paths in the dht:
  *  * root.processSpecification.ps1
- *  * root.plan.p1.process.pr1.committedInputs.c1;
+ *  * root.plan.<GUID>.process.<GUID>.committedInputs.<GUID>;
  */
  export class Root implements RootShape, PathedData {
   resourceSpecification: Record<string, ResourceSpecification>;
