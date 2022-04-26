@@ -44,10 +44,18 @@ export default (orchestrator: Orchestrator<any>) =>  {
     t.ok(put_output.entry_hash);
 
     let get_output = await alice.call(
+      "projects",
+      "get_thing",
+      "doesntexist"
+    );
+    t.equal(get_output, null);
+
+    get_output = await alice.call(
         "projects",
         "get_thing",
         "plans"
     );
+    console.log('plans:', get_output);
     t.ok(get_output)
     let jsTree = buildTree(get_output.tree,get_output.tree[0])
 

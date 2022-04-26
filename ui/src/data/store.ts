@@ -59,6 +59,7 @@ export class DataStore {
     this.root = new Root();
   }
 
+  // Get object/value on path from data tree in memory
   public getCursor(path: string): any {
     const pathSlugs: Array<string> = path.split('.');
     const first: string = pathSlugs.shift();
@@ -235,6 +236,7 @@ export class DataStore {
    public async fetchOrCreateRoot() {
     // check if root object exists
     const res = await this.zomeApi.get_thing('root');
+    console.log("RES: ", res);
     if (res[0].val.data === '') {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
@@ -296,7 +298,6 @@ export class DataStore {
    * @param res response from ZomeAPI
    */
   protected hydrateFromZome(res: RustNode[]) {
-
     // An array of parallel objects and references to deserilzed objects
     const parallelObjects = new Array<Object>();
 
