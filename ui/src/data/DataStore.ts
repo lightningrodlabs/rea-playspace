@@ -20,9 +20,13 @@ import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
 
 let dataStorePromise: Promise<DataStore>;
+let dataStore: DataStore;
 
 /**
- * Initialize our WS connection, set up the Zome API client
+ * Initialize WS connection, set up Zome API client and DataStore singletons
+ *
+ * By the time this promise resolves, any call to `getDataStore` is gauranteed to
+ * have a reference to our singleton
  */
 export async function initConnection(): Promise<DataStore> {
   dataStorePromise = new Promise(async (res) => {
@@ -34,7 +38,7 @@ export async function initConnection(): Promise<DataStore> {
     setCellId(app_info.cell_data[0].cell_id);
     setZomeApi(zomeApi);
 
-    const dataStore = new DataStore();
+    dataStore = new DataStore();
     await dataStore.fetchOrCreateRoot();
     res(dataStore);
   });
@@ -42,10 +46,10 @@ export async function initConnection(): Promise<DataStore> {
 }
 
 /**
- * Fetches dataStorePromise
+ * Fetches DataStore
  */
-export default function getDataStore(): Promise<DataStore> {
-  return dataStorePromise;
+export default function getDataStore(): DataStore {
+  return dataStore;
 }
 
 export class DataStore extends DataStoreBase {

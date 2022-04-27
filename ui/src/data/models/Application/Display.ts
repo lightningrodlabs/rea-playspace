@@ -9,6 +9,7 @@ export interface DisplayNodeShape {
   name: string;
   position: XYPosition;
   vfPath: string;
+  planId: string;
   type?: string;
   data?: any;
 }
@@ -17,7 +18,8 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
-  vfPath: string;
+  vfPath?: string;
+  planId: string;
 }
 
 export class DisplayNode implements Node, PathedData, NamedData {
@@ -25,6 +27,7 @@ export class DisplayNode implements Node, PathedData, NamedData {
   name: string;
   position: XYPosition;
   vfPath: string;
+  planId: string;
   type?: string;
   data: Object;
 
@@ -34,13 +37,13 @@ export class DisplayNode implements Node, PathedData, NamedData {
     this.name = filtered.name;
     this.position = filtered.position as XYPosition;
     this.vfPath = filtered.vfPath;
+    this.planId = filtered.planId;
     this.type = filtered.type;
     this.data = this.makeData();
   }
 
   public makeData(): Object {
     const type = getAlmostLastPart(this.vfPath);
-    console.log(type);
     return {
       id: this.id,
       label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`,
@@ -57,18 +60,18 @@ export class DisplayNode implements Node, PathedData, NamedData {
   }
 
   get path(): string {
-    const planId = this.vfPath.split('.')[2];
-    return DisplayNode.getPath(planId, this.id);
+    return DisplayNode.getPath(this.planId, this.id);
   }
 
   public toJSON() {
-    return {
+    return rejectEmptyFields<DisplayNodeShape>({
       id: this.id,
       name: this.name,
       position: this.position,
       vfPath: this.vfPath,
+      planId: this.planId,
       type: this.type,
-    }
+    });
   }
 }
 
@@ -76,14 +79,16 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
-  vfPath: string;
+  vfPath?: string;
+  planId: string;
 
   constructor(init: DisplayEdgeShape) {
     const filtered = rejectEmptyFields<DisplayEdgeShape>(init);
     this.id = filtered.id ? filtered.id : Guid.raw();
     this.source = filtered.source;
     this.target = filtered.target;
-    this.vfPath = filtered.vfPath;
+    this.vfPath = filtered.vfPath ? filtered.vfPath : undefined;
+    this.planId = filtered.planId;
   }
 
   static getPrefix(planId: string): string {
@@ -95,16 +100,16 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   }
 
   get path(): string {
-    const planId = this.vfPath.split('.')[2];
-    return DisplayEdge.getPath(planId, this.id);
+    return DisplayEdge.getPath(this.planId, this.id);
   }
 
   public toJSON() {
-    return {
+    return rejectEmptyFields<DisplayEdgeShape>({
       id: this.id,
       source: this.source,
       target: this.target,
-      vfPath: this.vfPath
-    };
+      vfPath: this.vfPath,
+      planId: this.planId
+    });
   }
 }

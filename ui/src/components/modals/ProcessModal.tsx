@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
-import { ProcessShape } from '../../types/valueflows';
 import { Process } from "../../data/models/Valueflows/Plan";
 
 
@@ -39,7 +38,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const store = await getDataStore();
+    const store = getDataStore();
     const plannedWithin = store.getCursor('root.planId');
     const process: Process = new Process(
       {name, plannedWithin, finished, note, classifiedAs, inScopeOf, basedOn}

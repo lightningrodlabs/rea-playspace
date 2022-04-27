@@ -12,7 +12,7 @@ interface Props {
   data: Data
 }
 
-const ProcessSpecificationNode: React.FC<Props> = ({data}) => {
+const ProcessNode: React.FC<Props> = ({data}) => {
 
   const nodeStyles = {
     border: '1px solid orange',
@@ -84,4 +84,4 @@ const ProcessSpecificationNode: React.FC<Props> = ({data}) => {
   );
 }
 
-export default ProcessSpecificationNode;
+export default ProcessNode;
