@@ -97,67 +97,61 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
   Ok(())
 }
 
-fn update_parent(tree: &mut Tree<Content>, node: &mut Node<Content>, current_idx: usize) -> ExternResult<()> {
-      // update children Vec of parent
-      info!("Updating Parent...");
-      match node.parent {
-        Some(parent_idx) => {
-          info!("Parent idx: {}", parent_idx);
-          match tree.tree.clone().into_iter().find(|node| node.idx == parent_idx) {
-            Some(mut node) => {
-              info!("updating children: {:?}", node.children);
-              node.children.retain(|&x| x != current_idx);
-              info!("updated children: {:?}", node.children);
-            },
-            None => info!("Nothing at parent_idx.."),
-          }
-        },
-        None => ()
-      }
+// fn _update_parent(tree: &mut Tree<Content>, parent_idx:usize, current_idx: usize) -> ExternResult<()> {
+//   // update children Vec of parent
+//   info!("Updating Parent...");
+//   match tree.tree.clone().into_iter().find(|node| node.idx == parent_idx) {
+//     Some(mut node) => {
+//       info!("updating children: {:?}", node.children);
+//       node.children.retain(|&x| x != current_idx);
+//       info!("updated children: {:?}", node.children);
+//     },
+//     None => info!("Nothing at parent_idx.."),
+//   }
+//   Ok(())
+// }
+
+// Dead node tagger
+fn mark_tree_for_delete(tree: &mut Tree<Content>, to_delete: &mut Vec<bool>) -> ExternResult<()>{
+  for node in tree.tree.clone().into_iter().rev() {
+    if node.children.len() == 0 && node.val.data.eq("") {
+      to_delete[node.idx] = true;
+      info!("Adding node: {}", node.idx);
+    }
+
+    let mut are_children_deleted: bool =  true;
+    for child in node.children.iter() {
+      are_children_deleted = to_delete[*child] && are_children_deleted;
+    }
+
+    if are_children_deleted && node.val.data.eq("") && node.val.name != "root" {
+      to_delete[node.idx] = true;
+      info!("Adding node: {}", node.idx);
+    }
+  };
   Ok(())
 }
 
-// Dead node eliminator
-fn prune_tree(tree: &mut Tree<Content>, current_idx: usize,  visited: &mut Vec<bool>) -> ExternResult<()>{
-  // get a handle on the curent node from inx
-  let option_node: Option<Node<Content>> = tree.tree.clone().into_iter().find(|x| x.idx == current_idx);
-  let mut node: Node<Content>;
-  match option_node {
-    Some(n) => {
-      info!("found match: {:?}", n);
-      node = n;
-    },
-    None => {
-      info!("No match");
-      return Ok(());
-    }
-  }
-  info!("CURRENT TREE: {:?}", tree);
-  visited[current_idx] = true;
+fn prune_tree(tree: &mut Tree<Content>, pruned_tree: &mut Tree<Content>, to_delete: &mut Vec<bool>) -> ExternResult<()> {
 
-  // If children or data exists, descend one level deeper. 
-  // Choose 1 of the children at a time
-  if node.clone().children.len() > 0 || node.val.data.ne("") {
-    let children_idx = node.children.clone();
-    for child_idx in children_idx {
-      if visited[child_idx] {
-        info!("{} already visited", child_idx);
-        continue;
-      }
-      info!("Descending to child with idx {}", child_idx);
-      prune_tree(tree, child_idx, visited)?;
-    }
-  }
-  // end of branch and data is emtpty -> delete
-  if node.clone().children.len() == 0 && node.val.data.eq("") {
-    if node.val.name.eq("root") {
-      info!("Don't delete root (initial).");
-    } else {
-      info!("Deleting node with idx: {}", current_idx);
-      tree.tree.remove(current_idx);
-      update_parent(tree, &mut node, current_idx)?;
-    }
-  }
+   // convert Vec<bool> to Vec<usize>
+   let mut idx_to_delete: Vec<usize> = vec![];
+   for (i, node) in to_delete.iter().enumerate() {
+     if *node {
+       idx_to_delete.push(i);
+     }
+   }
+ 
+   // move non-deleted nodes to new tree
+   // update the children of those nodes 
+   for (idx, node) in to_delete.iter().enumerate() {
+     // if current node to delete is false, move it to new tree
+     if !*node {
+       let mut node: Node<Content> = tree.tree[idx].clone();
+       node.children.retain(|idx| !idx_to_delete.contains(idx));
+       pruned_tree.tree.push(node);
+     }
+   }
   Ok(())
 }
 
@@ -177,15 +171,13 @@ pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
   let mut tree = Tree::new(val);
   build_tree(&mut tree, 0, root_path)?;
  
-
-  // Depth-first search and recurseively remove dead nodes
-  info!("TREE BEFORE PRUNING: {:?}", tree);
-  let mut visited = vec![false; tree.tree.len()];
-  info!("Visited: {:?}", visited);
-  prune_tree(&mut tree, 0, &mut visited)?;
-
-  info!("TREE AFTER PRUNING: {:?}", tree);
-  Ok(Some(tree))
+  let mut to_delete = vec![false; tree.tree.len()];
+  mark_tree_for_delete(&mut tree, &mut to_delete)?;
+  
+  let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
+  prune_tree(&mut tree, &mut pruned_tree, &mut to_delete)?;
+ 
+  Ok(Some(pruned_tree))
 }
 
 #[hdk_extern]
@@ -212,10 +204,12 @@ pub fn delete_thing(path_str: String) -> ExternResult<()> {
     };
     delete_entry(delete_input)?;
 
-    // use the create header hash of the link to reference and delete
-    // the 'data' link.
+    // use the create header hash of the link to reference and delete the 'data' link.
     delete_link(link.create_link_hash)?;
-
+    
+    // This would be preferred as it would remove the need to prune
+    // the tree before returning. Waiting back to hear from core.
+    // delete_link(path.create_path_link_hash)?;
   }
   Ok(())
 }
@@ -292,8 +286,7 @@ where
 
 #[cfg(test)]
 mod tests {
-
-  use crate::{prune_tree, Tree, Node, Content};
+  use crate::{mark_tree_for_delete, Tree, Node, Content};
 
   #[test]
   fn prune_tree_test() {
@@ -392,12 +385,13 @@ mod tests {
       tree: vec![node0, node1, node2, node3, node4, node5, node6, node7, node8],
     };
 
-    let mut visited = vec![false; tree.clone().tree.len()];
+    let mut to_delete = vec![false; tree.tree.len()];
 
     // WHEN - call prune tree
-    prune_tree(tree, 0, &mut visited).ok();
-
+    mark_tree_for_delete(tree, &mut to_delete).ok();
+    print!("########### TO_DELETE ###########");
+    print!("{:?}", to_delete);
     // THEN - assert new tree is xyz
-    assert_eq!(tree.tree.len(), 4);
+    assert!(true);
   }
 }
