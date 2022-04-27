@@ -1,7 +1,7 @@
 import { EntryHashB64, HeaderHashB64 } from "@holochain-open-dev/core-types";
 import { AppWebsocket } from "@holochain/client";
 import { callZome } from "./callZome";
-import { AddOutput, NewProjectOutput, Project, RustNode, ThingInput, Tree, UpdateProjectInput } from "../types/holochain";
+import { AddOutput, NewProjectOutput, Project, RustNode, ThingInput, UpdateProjectInput } from "../types/holochain";
 
 export default class ZomeApi {
   appWs: AppWebsocket

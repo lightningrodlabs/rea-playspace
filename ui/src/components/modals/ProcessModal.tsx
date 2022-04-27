@@ -1,13 +1,14 @@
 import { SlButton, SlCard, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
-import getDataStore from '../../data/store';
-import { getZomeApi } from '../../hcWebsockets';
-import { ThingInput } from '../../types/holochain';
-import { Process, ProcessShape } from '../../types/valueflows';
+import getDataStore from '../../data/DataStore';
+import { PathedData } from '../../data/models/PathedData';
+import { ProcessShape } from '../../types/valueflows';
+import { Process } from "../../data/models/Valueflows/Plan";
+import { rejectEmptyFields } from '../../utils';
+
 
 const initialState = {
-  id: '',
   name: '',
   finished: false,
   note: '',
@@ -19,12 +20,12 @@ const initialState = {
 interface Props {
   position: XYPosition;
   closeModal: () => void;
-  handleAddNode: (item: ThingInput) => void;
+  handleAddNode: (item: PathedData) => void;
 }
 
 const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) => {
   const [
-    {id, name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
+    {name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
 
   const clearState = () => {
@@ -38,15 +39,17 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const process: Process =  new Process({name, finished, note, classifiedAs, inScopeOf, basedOn} as ProcessShape);
-    const planId = getDataStore().getRoot()['planId'];
-    const path: string = `root.plan.${planId}.process.${process.id}`;
-    const input: ThingInput = {
-      path,
-      data: JSON.stringify(process)
-    }
-    await getZomeApi().put_thing(input);
-    handleAddNode(input);
+
+    const store = getDataStore();
+    const plannedWithin = store.getCursor('root.planId');
+    const process: Process = new Process(
+      rejectEmptyFields<ProcessShape>(
+        {name, plannedWithin, finished, note, classifiedAs, inScopeOf, basedOn}
+      )
+    );
+    await store.set(process);
+    handleAddNode(process);
+
     clearState();
     closeModal();
   }

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
-import { Agent } from "../../../types/valueflows";
+import { Agent } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
-import getDataStore from "../../../data/store";
+import getDataStore from "../../../data/DataStore";
 
 export type NewAgentProps = {
 }
