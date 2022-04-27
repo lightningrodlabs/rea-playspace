@@ -327,10 +327,10 @@ where
 
 #[cfg(test)]
 mod tests {
-  use crate::{mark_tree_for_delete, Tree, Node, Content};
+  use crate::{mark_tree_for_delete, Tree, Node, Content, prune_tree, reindex_tree};
 
   #[test]
-  fn prune_tree_test() {
+  fn clean_tree_test() {
     // IF
     // build tree
     let node0: Node<Content> = Node { 
@@ -426,13 +426,19 @@ mod tests {
       tree: vec![node0, node1, node2, node3, node4, node5, node6, node7, node8],
     };
 
+    // WHEN - call mark -> prune -> reindex tree
     let mut to_delete = vec![false; tree.tree.len()];
-
-    // WHEN - call prune tree
     mark_tree_for_delete(tree, &mut to_delete).ok();
-    print!("########### TO_DELETE ###########");
-    print!("{:?}", to_delete);
-    // THEN - assert new tree is xyz
-    assert!(true);
+    
+    let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
+    prune_tree(tree, &mut pruned_tree, &mut to_delete).ok();
+  
+    let mut reindexed_tree: Tree<Content> = Tree { tree: vec![] };
+    reindex_tree(pruned_tree, &mut reindexed_tree).ok();
+
+    // THEN - assert length is correct
+    assert_eq!(reindexed_tree.tree.len(), 5);
+
+    // TODO - deep compare reindexed tree with expected output
   }
 }
