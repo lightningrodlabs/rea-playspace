@@ -16,8 +16,12 @@ const Pallet: React.FC<Props> = ({
   processSpecifications,
   agents}) => {
 
+  /**
+   * When we drag an item from here to the FlowCanvas, create an object with a
+   * path in it. We'll use that to get a cursor to the object.
+   */
   const onDragStart = (event:DragEvent, item: PathedData, type: string) => {
-    const data = {item, type};
+    const data = { path: item.path };
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
   };
@@ -96,6 +100,7 @@ const Pallet: React.FC<Props> = ({
         </h2>
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
+      <br/>
       <div style={categoryStyles}>
         <h2>Agents
         <Link to="/agents/new">
@@ -104,6 +109,7 @@ const Pallet: React.FC<Props> = ({
         </h2>
       </div>
       {renderNodes(agents, 'agent')}
+      <br/>
     </aside>
   )
 }

@@ -37,7 +37,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
     e.preventDefault()
     //getResourceSpecificationListSize();
 
-    const store = await getDataStore();
+    const store = getDataStore();
     const ag: Agent =  new Agent({name, note});
     store.set(ag);
     clearState();

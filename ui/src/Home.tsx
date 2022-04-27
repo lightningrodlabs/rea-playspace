@@ -12,11 +12,10 @@ const Home: React.FC<Props> = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(()=>{
-    getDataStore().then((store)=>{
-      setResourceSpecifications(store.getResourceSpecifications());
-      setProcessSpecifications(store.getProcessSpecifications());
-      setAgents(store.getAgents());
-    });
+    const store = getDataStore();
+    setResourceSpecifications(store.getResourceSpecifications());
+    setProcessSpecifications(store.getProcessSpecifications());
+    setAgents(store.getAgents());
   }, []);
 
   return(
