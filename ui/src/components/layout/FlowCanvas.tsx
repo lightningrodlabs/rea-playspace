@@ -61,6 +61,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const planId = await store.getCursor('root.planId');
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
+    console.log(displayNodes);
     //const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     const nodes = displayNodes.map((node) => {
       return {
@@ -87,9 +88,25 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   const onNodesChange = useCallback(
-    (changes) => {
+    async (changes) => {
       setNodes((nds) => applyNodeChanges(changes, nds))
-      /**
+      const store = getDataStore();
+      if (changes[0].type === 'remove') {
+        // use its ID to get a handle on it
+        const planId = store.getCurrentPlanId();
+        const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
+        const nodeToDelete = displayNodes.find((obj) => obj.id === changes[0].id);
+        // get the paths
+        const vfPath: string = nodeToDelete.vfPath;
+        const nodePath: string = nodeToDelete.path;
+        await store.delete(vfPath);
+        await store.delete(nodePath);
+  
+        // delete the data at the VF path and the DisplayNodes path
+        // delete links?
+        // delete path terminus link
+      }
+      /** 
        * track position change on every event while dragging node
        * hold on to it outside of this callback because this will
        * fire dozens of time per second. We need the last position the node
@@ -109,7 +126,9 @@ const FlowCanvas: React.FC<Props> = () => {
           const planId = store.getCursor('root.planId');
           const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
           nodeToUpdate.position = position as XYPosition;
+
           store.set(nodeToUpdate);
+
           resetPosition();
         }
       }

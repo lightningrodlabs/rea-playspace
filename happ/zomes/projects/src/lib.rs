@@ -1,44 +1,17 @@
+mod test;
+mod data;
+mod tree_clean;
+
 use hdk::prelude::*;
 use holo_hash::{EntryHashB64, HeaderHashB64};
 use tracing::{info};
-mod project;
-
-use project::Project;
+use data::*;
+use tree_clean::{mark_tree, reindex_tree, prune_tree};
 
 entry_defs![
   PathEntry::entry_def(),
-  Thing::entry_def(),
-  Project::entry_def()
+  Thing::entry_def()
 ];
-
-// Actual blob of data stored on the DHT
-#[hdk_entry(id = "thing")]
-#[derive(Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Thing {
-  pub data: String,
-}
-
-// returned after successful write to DHT
-#[derive(Serialize, Deserialize, Debug)]
-pub struct AddOutput {
-  header_hash: HeaderHashB64,
-  entry_hash: EntryHashB64,
-}
-
-// Passed in from UI
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ThingInput {
-  path: String,
-  data: String,
-}
-
-// Sent back to UI
-#[derive(Clone, Serialize, Deserialize, Debug, Default, PartialEq)]
-pub struct Content {
-    name: String,
-    data: String,
-}
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
@@ -58,7 +31,6 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
   };
 
   Ok(output)
-
 }
 
 fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
@@ -72,7 +44,7 @@ fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
           match element.entry().to_app_option() {
             Ok(Some(entry)) => Ok(Some(entry)),
             _ => Ok(None),
-        }
+          }
         }
       }
     }
@@ -80,92 +52,97 @@ fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
 }
 
 fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult<()>{
-
+  // root.plan.p1-guid.process.pr-guid -> for each segment in path
   for path in path.children_paths()? {
-      let v = path.as_ref();
-      let val = Content {
-          name: String::try_from(&v[v.len()-1])?,
-          data: match get_entry(&path, LinkTag::new("data"))? {
-            Some(thing) => thing.data,
-            None => "".into()
-          },
-        };
-      let idx = tree.insert(node, val);
-      build_tree(tree, idx, path)?;
+    let v = path.as_ref();
+
+    let data = match get_entry(&path, LinkTag::new("data"))? {
+      Some(thing) => thing.data,
+      None => "".into()
+    };
+    let val = Content {
+      name: String::try_from(&v[v.len()-1])?,
+      data: data
+    };
+    let idx = tree.insert(node, val);
+    build_tree(tree, idx, path)?;
   }
   Ok(())
 }
 
 #[hdk_extern]
-pub fn get_thing(path_str: String) -> ExternResult<Tree<Content>> {
-  info!("getting thing with path {}", path_str.clone());
+pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
   let root_path = Path::from(path_str.clone());
-    let val = Content {
-        name: String::from(path_str),
-        data: match get_entry(&root_path, LinkTag::new("data"))? {
-          Some(thing) => thing.data,
-          None => "".into()
-        },
+
+  let val = Content {
+      name: String::from(path_str.clone()),
+      data: match get_entry(&root_path, LinkTag::new("data"))? {
+        Some(thing) => thing.data,
+        None => "".into()
+      }
+  };
+
+  let mut tree = Tree::new(val);
+  build_tree(&mut tree, 0, root_path)?;
+ 
+  let mut to_delete = vec![false; tree.tree.len()];
+  mark_tree(&mut tree, &mut to_delete)?;
+  
+  let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
+  prune_tree(&mut tree, &mut pruned_tree, &mut to_delete)?;
+
+  let mut reindexed_tree: Tree<Content> = Tree { tree: vec![] };
+  reindex_tree(pruned_tree, &mut reindexed_tree)?;
+
+  Ok(Some(reindexed_tree))
+}
+
+#[hdk_extern]
+pub fn delete_thing(path_str: String) -> ExternResult<()> {
+  info!("delete thing with path {}", path_str.clone());
+  let path = Path::from(path_str.clone());
+  // every update to a Thing will be linked to the Path terminus via 'data' link
+  // tag. Get all Links with tag 'data'.
+
+  let links: Vec<Link> = get_links(path.path_entry_hash()?, Some(LinkTag::new("data")))?;  
+  // loop over the links  
+  for link in links.into_iter() {
+    // get the entry from the link
+    let thing_entry_hash = link.target;
+    let element = try_get_element(thing_entry_hash, GetOptions::default())?;
+
+    // get the header hash from the entry
+    let thing_header = element.header_address().clone();
+
+    // use header hash to delete the entry
+    let delete_input = DeleteInput {
+        deletes_header_hash: thing_header,
+        chain_top_ordering: ChainTopOrdering::Strict,
     };
-    let mut tree = Tree::new(val);
-    build_tree(&mut tree, 0, root_path)?;
-    Ok(tree)
+    delete_entry(delete_input)?;
+
+    // use the create header hash of the link to reference and delete the 'data' link.
+    delete_link(link.create_link_hash)?;
+    
+    // This would be preferred as it would remove the need to prune
+    // the tree before returning. Waiting back to hear from core.
+    // delete_link(path.create_path_link_hash)?;
+  }
+  Ok(())
+}
+/// Attempts to get an element at the entry_hash and returns it
+/// if the element exists
+pub fn try_get_element(entry_hash: EntryHash, get_options: GetOptions) -> ExternResult<Element> {
+  match get(entry_hash.clone(), get_options)? {
+      Some(element) => Ok(element),
+      None => Err(WasmError::Guest(format!(
+          "There is no element at the hash {}",
+          entry_hash
+      ))),
+  }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, Default)]
-pub struct Tree<T> 
-where
-    T: PartialEq
-{
-    pub tree: Vec<Node<T>>,
-}
 
-impl<T> Tree<T>
-where
-    T: PartialEq
-{
-    // create a new tree with a root node at index 0
-    pub fn new(root: T) -> Self {
-        Self {
-            tree: vec![Node::new(0, None, root)]
-        }
-    }
 
-    // inserts value into parent, return index of new node or 0 if parent doesn't exist
-    pub fn insert(&mut self, parent: usize, val: T) -> usize {
-        let idx = self.tree.len();
-        match self.tree.get_mut(parent) {
-            None => 0,
-            Some(node) => {
-                node.children.push(idx);
-                self.tree.push(Node::new(idx, Some(parent), val));
-                idx
-            }
-        }
-    }
-}
 
-#[derive(Clone, Serialize, Deserialize, Debug, Default)]
-pub struct Node<T>
-where
-    T: PartialEq
-{
-    idx: usize,
-    val: T,
-    parent: Option<usize>,
-    children: Vec<usize>,
-}
 
-impl<T> Node<T>
-where
-    T: PartialEq
-{
-    fn new(idx: usize, parent: Option<usize>, val: T) -> Self {
-        Self {
-            idx,
-            val,
-            parent,
-            children: vec![],
-        }
-    }
-}
