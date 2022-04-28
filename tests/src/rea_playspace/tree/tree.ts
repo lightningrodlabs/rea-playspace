@@ -33,6 +33,17 @@ export default (orchestrator: Orchestrator<any>) =>  {
         }
     }
 
+    let plan = {
+      'id': 'p1',
+      'name': 'Default Plan'
+    }
+
+    // Alice adds a plan
+    await alice.call(
+      "projects",
+      "put_thing",
+      {path: "plans.p1", data: JSON.stringify(plan)}
+    );
 
     // Alice adds a commitment
     let put_output = await alice.call(
@@ -48,17 +59,18 @@ export default (orchestrator: Orchestrator<any>) =>  {
       "get_thing",
       "doesntexist"
     );
-    t.equal(get_output, null);
+    t.equal(get_output.tree[0], undefined);
 
     get_output = await alice.call(
         "projects",
         "get_thing",
         "plans"
     );
-    console.log('plans:', get_output);
+    console.log('######## GET_OUTPUT #######');
     t.ok(get_output)
     let jsTree = buildTree(get_output.tree,get_output.tree[0])
 
+    console.log('######## DEEP EQUAL #######');
     t.deepEqual(jsTree, {
       val: {
         name: "plans",
@@ -68,7 +80,7 @@ export default (orchestrator: Orchestrator<any>) =>  {
         {
           val: {
             name: "p1",
-            data: "",
+            data: '{"id":"p1","name":"Default Plan"}',
           },
           children: [
             {
@@ -119,10 +131,12 @@ export default (orchestrator: Orchestrator<any>) =>  {
         "get_thing",
         "plans"
     );
+    console.log('######## OUTPUT AFTER UPDATE #######');
     t.ok(get_output)
     jsTree = buildTree(get_output.tree,get_output.tree[0])
-    t.equal(JSON.parse(jsTree.children[0].children[0].children[0].children[0].children[0].val.data).effortQuantity.hasNumericalValue, 15 )
+    console.log('######## EQUAL AFTER UPDATE#######');
 
+    t.equal(JSON.parse(jsTree.children[0].children[0].children[0].children[0].children[0].val.data).effortQuantity.hasNumericalValue, 15 )
 
     // delete thing + links
     await alice.call(
@@ -136,7 +150,8 @@ export default (orchestrator: Orchestrator<any>) =>  {
       "get_thing",
       "plans"
     );
-    
+    console.log('######## DEEP EQUAL AFTER DELETE #######');
+
     jsTree = buildTree(get_output.tree,get_output.tree[0]);
     t.deepEqual(jsTree, {
       val: {
@@ -147,39 +162,9 @@ export default (orchestrator: Orchestrator<any>) =>  {
         {
           val: {
             name: "p1",
-            data: "",
+            data: '{"id":"p1","name":"Default Plan"}',
           },
-          children: [
-            {
-              val: {
-                name: "processes",
-                data: "",
-              },
-              children: [
-                {
-                  val: {
-                    name: "pr1",
-                    data: "",
-                  },
-                  children: [
-                    {
-                      val: {
-                        name: "commitments",
-                        data: "",
-                      },
-                      children: [                        {
-                        val: {
-                          name: "cm1",
-                          data: ''
-                        },
-                        children: [],
-                      },],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
+          children: [],
         },
       ],
     });
