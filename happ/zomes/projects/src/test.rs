@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-  use crate::{mark_tree_for_delete, Tree, Node, Content, prune_tree, reindex_tree};
+  use crate::{ Tree, Node, Content, tree_clean::{mark_tree, prune_tree, reindex_tree}};
 
   /**
    * Tests the output of mark_tree, prune_tree and reindex_tree when get_thing is called.
@@ -108,7 +108,7 @@ mod tests {
 
     // WHEN - mark -> prune -> reindex tree
     let mut to_delete = vec![false; tree.tree.len()];
-    mark_tree_for_delete(tree, &mut to_delete).ok();
+    mark_tree(tree, &mut to_delete).ok();
     
     let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
     prune_tree(tree, &mut pruned_tree, &mut to_delete).ok();
