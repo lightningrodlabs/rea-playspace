@@ -92,10 +92,17 @@ export class DataStoreBase {
     await this.put(item);
   }
 
+  /**
+  * Deletes Thing on Path 
+  * @param path
+  */
   public async delete(path: string) {
-    // TODO: actually call the delete zome function
+    try {
+      await this.zomeApi.delete_thing(path);
+    } catch (e) {
+      console.log(e);
+    }
   }
-
 
   // Root helpers
 
@@ -137,6 +144,7 @@ export class DataStoreBase {
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const { name, data } = node.val;
+      console.log("name: ", name, " Data: ", data);
       const path = getRustNodePath(i, res);
       const parentPath = getParentPath(path);
 

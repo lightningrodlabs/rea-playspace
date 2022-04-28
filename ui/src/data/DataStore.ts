@@ -61,7 +61,7 @@ export class DataStore extends DataStoreBase {
   public override async fetchOrCreateRoot() {
     // check if root object exists
     const res = await this.zomeApi.get_thing('root');
-    if (res[0].val.data === '') {
+    if (res.length === 0) {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
       const plan = new Plan({
@@ -135,6 +135,9 @@ export class DataStore extends DataStoreBase {
     return await this.fetchAll(Agent.getPrefix());
   }
 
+  public getCurrentPlanId(): string {
+    return this.root['planId'];
+  }
 
   // Plan helpers
   public getPlan(id: string): Plan {
