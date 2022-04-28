@@ -150,9 +150,10 @@ export default (orchestrator: Orchestrator<any>) =>  {
       "get_thing",
       "plans"
     );
-    console.log('######## DEEP EQUAL AFTER DELETE #######');
+    console.log('########   DEEP EQUAL AFTER DELETE #######');
 
     jsTree = buildTree(get_output.tree,get_output.tree[0]);
+    console.log(JSON.stringify(jsTree, null, 2));
     t.deepEqual(jsTree, {
       val: {
         name: "plans",
