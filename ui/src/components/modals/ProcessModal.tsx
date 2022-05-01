@@ -3,9 +3,7 @@ import React, { useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
-import { ProcessShape } from '../../types/valueflows';
 import { Process } from "../../data/models/Valueflows/Plan";
-import { rejectEmptyFields } from '../../utils';
 
 
 const initialState = {
@@ -43,9 +41,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
     const store = getDataStore();
     const plannedWithin = store.getCursor('root.planId');
     const process: Process = new Process(
-      rejectEmptyFields<ProcessShape>(
-        {name, plannedWithin, finished, note, classifiedAs, inScopeOf, basedOn}
-      )
+      {name, plannedWithin, finished, note, classifiedAs, inScopeOf, basedOn}
     );
     await store.set(process);
     handleAddNode(process);
