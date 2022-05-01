@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -8,6 +8,14 @@ import Home from "./Home";
 import NewAgent from "./components/layout/create/NewAgent";
 import NewResourceSpecification from "./components/layout/create/NewResourceSpecification";
 import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
+import {
+  profilesStoreContext,
+  ProfilesStore
+} from "@holochain-open-dev/profiles";
+import {
+  ContextProvider,
+  CreateProfile
+} from "./elements";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
@@ -16,6 +24,23 @@ setBasePath(
 interface Props {}
 
 const App: React.FC<Props> = () => {
+
+  // const [store, setStore] = useState(undefined);
+
+  // async function connect() {
+  //   const cellClient = await createMockZome();
+  //   // how do I make a cellClient?
+  //   // I need a BaseClient
+  //   return new ProfilesStore(cellClient);
+  // }
+
+  // useEffect(() => {
+  //   connect().then((store) => {
+  //     setStore(store);
+  //   });
+  // });
+
+
   const Main = () => {
     return (
       <BrowserRouter>
@@ -49,8 +74,13 @@ const App: React.FC<Props> = () => {
     );
   }
 
+
   return (
-      <Main />
+    // <ContextProvider context={profilesStoreContext} value={store}>
+    //   <CreateProfile>
+        <Main />
+      /* </CreateProfile>
+    </ContextProvider> */
   );
 };
 
