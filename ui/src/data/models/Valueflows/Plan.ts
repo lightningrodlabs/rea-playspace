@@ -1,11 +1,13 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
+import { NamedData } from "../NamedData";
 import { DisplayNode, DisplayEdge } from "../Application/Display";
-import { PlanShape, ProcessShape, InputCommitmentShape, OutputCommitmentShape } from "../../../types/valueflows";
+import { GeoPoint, PlanShape, ProcessShape, InputCommitmentShape, OutputCommitmentShape, ResourceSpecificationShape, EconomicResourceShape, AgentShape } from "../../../types/valueflows";
+import { rejectEmptyFields } from '../../../utils';
 
 // Plan Classes
 
-export class Plan implements PlanShape, PathedData {
+export class Plan implements PlanShape, PathedData, NamedData {
   id: string;
   created: Date;
   name: string;
@@ -16,11 +18,12 @@ export class Plan implements PlanShape, PathedData {
   displayEdge?: Record<string, DisplayEdge>;
 
   constructor(init: PlanShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.note = init.note ? init.note : undefined;
-    this.due = init.due ? init.due : undefined;
+    const filtered = rejectEmptyFields<PlanShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.note = filtered.note ? filtered.note : undefined;
+    this.due = filtered.due ? filtered.due : undefined;
     this.process = {};
     this.displayNode = {};
     this.displayEdge = {};
@@ -39,17 +42,17 @@ export class Plan implements PlanShape, PathedData {
   }
 
   public toJSON(): PlanShape {
-    return {
+    return rejectEmptyFields<PlanShape>({
       id: this.id.toString(),
       created: this.created,
       name: this.name,
       note: this.note,
       due: this.due
-    };
+    });
   }
 }
 
-export class Process implements ProcessShape, PathedData {
+export class Process implements ProcessShape, PathedData, NamedData {
   id: string;
   created: Date;
   basedOn: string; // required: ID of a process specification
@@ -67,19 +70,20 @@ export class Process implements ProcessShape, PathedData {
   outputCommitments?: Map<string, OutputCommitmentShape>; // add button on right
 
   constructor(init: ProcessShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.created = init.created ? init.created : new Date();
-    this.name = init.name;
-    this.finished = init.finished ? init.finished : false;
-    this.note = init.note;
-    this.classifiedAs = init.classifiedAs;
-    this.inScopeOf = init.inScopeOf;
-    this.basedOn = init.basedOn;
-    this.plannedWithin = init.plannedWithin;
-    this.hasBegining = init.hasBegining;
-    this.hasEnd = init.hasEnd;
-    this.hasPointInTime = init.hasPointInTime;
-    this.due = init.due;
+    const filtered = rejectEmptyFields<ProcessShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.created = filtered.created ? filtered.created : new Date();
+    this.name = filtered.name;
+    this.finished = filtered.finished ? filtered.finished : false;
+    this.note = filtered.note;
+    this.classifiedAs = filtered.classifiedAs;
+    this.inScopeOf = filtered.inScopeOf;
+    this.basedOn = filtered.basedOn;
+    this.plannedWithin = filtered.plannedWithin;
+    this.hasBegining = filtered.hasBegining;
+    this.hasEnd = filtered.hasEnd;
+    this.hasPointInTime = filtered.hasPointInTime;
+    this.due = filtered.due;
     this.created = new Date();
   }
 
@@ -96,7 +100,7 @@ export class Process implements ProcessShape, PathedData {
   }
 
   public toJSON(): ProcessShape {
-    return {
+    return rejectEmptyFields<ProcessShape>({
       id: this.id.toString(),
       created: this.created,
       name: this.name,
@@ -110,6 +114,67 @@ export class Process implements ProcessShape, PathedData {
       hasEnd: this.hasEnd,
       hasPointInTime: this.hasPointInTime,
       due: this.due
-    };
+    });
+  }
+}
+
+export class InputCommitment implements InputCommitmentShape, PathedData {
+  id?: string;
+  created?: Date;
+  resourceInventoriedAs?: string; // ResourceSprecification ID
+  resourceConformsTo?: string;    // ResourceSprecification ID
+  resourceQuantity?: number;
+  effortQuantity?: number;
+  provider: string;               // Agent ID
+  receiver: string;               // Agent ID
+  resourceClassifiedAs?: string;  // General classification or grouping
+  hasBegining?: Date;
+  hasEnd?: Date;
+  hasPointInTime?: Date;
+  due?: Date;
+  finished?: boolean;
+  inScopeOf?: string;
+  note?: string;
+  agreedIn?: string;
+  atLocation?: GeoPoint;
+  state?: string;
+  inputOf: string;                // Process ID this commitment flows into
+
+  static getPrefix(planId: string, processId: string): string {
+    return `root.plan.${planId}.process.${processId}.inputCommitment`;
+  }
+
+  static getPath(planId: string, processId: string, id: string): string {
+    return `${InputCommitment.getPrefix(planId, processId)}.${id}`;
+  }
+
+  get path(): string {
+    // TODO: We'll need to get a cursor to the process in order to get the planId!
+    return InputCommitment.getPath('whoops', this.inputOf, this.id);
+  }
+
+  public toJSON(): InputCommitmentShape {
+    return rejectEmptyFields<InputCommitmentShape>({
+      id: this.id,
+      created: this.created,
+      resourceInventoriedAs: this.resourceInventoriedAs,
+      resourceConformsTo: this.resourceConformsTo,
+      resourceQuantity: this.resourceQuantity,
+      effortQuantity: this.effortQuantity,
+      provider: this.provider,
+      receiver: this.receiver,
+      resourceClassifiedAs: this.resourceClassifiedAs,
+      hasBegining: this.hasBegining,
+      hasEnd: this.hasEnd,
+      hasPointInTime: this.hasPointInTime,
+      due: this.due,
+      finished: this.finished,
+      inScopeOf: this.inScopeOf,
+      note: this.note,
+      agreedIn: this.agreedIn,
+      atLocation: this.atLocation,
+      state: this.state,
+      inputOf: this.inputOf
+    });
   }
 }

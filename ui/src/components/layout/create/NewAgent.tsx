@@ -36,8 +36,10 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
+
+    const store = getDataStore();
     const ag: Agent =  new Agent({name, note});
-    await getDataStore().set(ag);
+    store.set(ag);
     clearState();
     navigate('/');
   }
@@ -45,7 +47,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   return (
     <>
       <MainPanelHeader>
-        <h2>New Resource Specification</h2>
+        <h2>New Agent</h2>
         <Link to="/">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
