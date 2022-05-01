@@ -31,7 +31,6 @@ const FlowCanvas: React.FC<Props> = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   const [type, setType] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
-  const [currentNodeName, setCurrentNodeName] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
 
   const nodeTypes = useMemo(() => ({
@@ -59,7 +58,6 @@ const FlowCanvas: React.FC<Props> = () => {
     setEdges(displayEdges);
   };
 
-
   // need a variable outside of the onNodesChange callback below. useState too async-y
   const position: XYPosition = {
     x: 0,
@@ -73,6 +71,11 @@ const FlowCanvas: React.FC<Props> = () => {
 
   /**
    * This is what tracks the DisplayNodes and updates them if they change.
+   *
+   * TODO: We're assuming that changes is always of length 1, we should probably
+   * check that or batch through all the changes.
+   * TODO: Sometimes, the ability to delete an item will depend on a whole Vf
+   * graph, so we'll need to add a business logic library.
    */
   const onNodesChange = useCallback(
     async (changes) => {
@@ -81,17 +84,43 @@ const FlowCanvas: React.FC<Props> = () => {
       if (changes[0].type === 'remove') {
         // use its ID to get a handle on it
         const planId = store.getCurrentPlanId();
-        const displayNodes: Array<DisplayNode> = store.getDisplayNodes(planId);
-        const nodeToDelete = displayNodes.find((obj) => obj.id === changes[0].id);
+        const nodeId = changes[0].id;
+        const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
+
+        // Compute edges to delete
+        const edgesToDelete: Array<DisplayEdge> = [];
+        for (let edge of store.getDisplayEdges(planId)) {
+          if (edge.source == nodeId || edge.target == nodeId) {
+            edgesToDelete.push(edge);
+          }
+        }
+        // Create an array of promise returning functions to serialize execution of deletions
+        const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
+
         // get the paths
-        const vfPath: string = nodeToDelete.vfPath;
         const nodePath: string = nodeToDelete.path;
-        await store.delete(vfPath);
-        await store.delete(nodePath);
-  
-        // delete the data at the VF path and the DisplayNodes path
-        // delete links?
-        // delete path terminus link
+        const vfPath: string = nodeToDelete.vfPath;
+
+        /**
+         * We don't want to delete the `Agents` or `ResourceSpecifications`, so
+         * let's add in some logic to handle special cases.
+         *
+         * TODO: Map out the various kinds of behaviours we need.
+         */
+        const type = getAlmostLastPart(vfPath);
+        switch (type) {
+          case 'process':
+            await store.delete(nodePath);
+            await store.delete(vfPath);
+            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+            break;
+          default:
+            await store.delete(nodePath);
+            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+            break;
+        }
       }
       /** 
        * track position change on every event while dragging node
@@ -109,11 +138,9 @@ const FlowCanvas: React.FC<Props> = () => {
            * and set that to the DisplayNode.position property.
            * Then persist to DHT.
           */
-          const store = getDataStore();
-          const planId = store.getCursor('root.planId');
+          const planId = store.getCurrentPlanId();
           const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
           nodeToUpdate.position = position as XYPosition;
-
           store.set(nodeToUpdate);
 
           resetPosition();
@@ -188,8 +215,6 @@ const FlowCanvas: React.FC<Props> = () => {
             case 'processSpecification':
               // Set the state, then open the dialog
               setCurrentPosition(position);
-              setCurrentNodeName(item.name);
-              //setCurrentPath(item.path);
               setType(type);
               openModal();
               break;
@@ -234,7 +259,7 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
-   * Adds a display node corresponding to a Valuflows object.
+   * Adds a display node corresponding to a Valueflows object.
    *
    * vfPath refers to the Valueflows object.
    */
@@ -247,20 +272,18 @@ const FlowCanvas: React.FC<Props> = () => {
     const newNode = new DisplayNode({
       name: item.name,
       vfPath: item.path,
-      planId: store.getCursor('root.planId'),
+      planId: store.getCurrentPlanId(),
       type: getAlmostLastPart(item.path),
       position: position ? position : currentPosition
     });
 
     // Persist to DHT
-
     store.set(newNode);
 
     // Add to local state to render new node on canvas
     setNodes((nds) => nds.concat(newNode));
 
     // reset node state
-    setCurrentNodeName("");
     setCurrentPosition(undefined);
   }
 
@@ -273,11 +296,15 @@ const FlowCanvas: React.FC<Props> = () => {
 
     // Validate objects can be connected
     const validSourceTargets = {
-      agent: [
+      'agent': [
         'process'
       ],
-      resourceSpecification: [
+      'resourceSpecification': [
         'process'
+      ],
+      'process': [
+        'agent',
+        'resourceSpecification'
       ]
     };
 
@@ -291,7 +318,7 @@ const FlowCanvas: React.FC<Props> = () => {
       // If we need user input for this connection, we should get it.
 
       // If our our conditions are met, add the edge
-      const edge = new DisplayEdge({source, target, planId: store.getCursor('root.planId')} as DisplayEdgeShape);
+      const edge = new DisplayEdge({source, target, planId: store.getCurrentPlanId()} as DisplayEdgeShape);
       await store.set(edge);
       setEdges((eds) => eds.concat(edge));
     }
