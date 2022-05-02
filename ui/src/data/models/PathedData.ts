@@ -13,6 +13,10 @@ export function getLastPart(path: string): string {
   return path.split('.').at(-1);
 }
 
+export function getAlmostLastPart(path: string): string {
+  return path.split('.').at(-2);
+}
+
 export function getRustNodePath(idx: number, nodes: RustNode[]): string {
   const parts: string[] = [];
 

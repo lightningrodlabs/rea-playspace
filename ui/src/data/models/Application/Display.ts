@@ -1,11 +1,15 @@
 import { Guid } from "guid-typescript";
-import { XYPosition } from 'react-flow-renderer';
-import { PathedData } from "../PathedData";
+import { XYPosition, Node, Edge } from 'react-flow-renderer';
+import { PathedData, getAlmostLastPart } from "../PathedData";
+import { NamedData } from "../NamedData";
+import { rejectEmptyFields } from '../../../utils';
 
 export interface DisplayNodeShape {
   id?: string;
+  name: string;
   position: XYPosition;
   vfPath: string;
+  planId: string;
   type?: string;
   data?: any;
 }
@@ -14,22 +18,37 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
-  vfPath: string;
+  vfPath?: string;
+  planId: string;
 }
 
-export class DisplayNode implements DisplayNodeShape, PathedData {
+export class DisplayNode implements Node, PathedData, NamedData {
   id: string;
+  name: string;
   position: XYPosition;
   vfPath: string;
+  planId: string;
   type?: string;
-  data?: any;
+  data: Object;
 
   constructor(init: DisplayNodeShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.position = init.position as XYPosition;
-    this.vfPath = init.vfPath;
-    this.type = init.type;
-    this.data = init.data;
+    const filtered = rejectEmptyFields<DisplayNodeShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.name = filtered.name;
+    this.position = filtered.position as XYPosition;
+    this.vfPath = filtered.vfPath;
+    this.planId = filtered.planId;
+    this.type = filtered.type;
+    this.data = this.makeData();
+  }
+
+  public makeData(): Object {
+    const type = getAlmostLastPart(this.vfPath);
+    return {
+      id: this.id,
+      label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`,
+      name: this.name
+    }
   }
 
   static getPrefix(planId: string): string {
@@ -41,22 +60,35 @@ export class DisplayNode implements DisplayNodeShape, PathedData {
   }
 
   get path(): string {
-    const planId = this.vfPath.split('.')[2];
-    return DisplayNode.getPath(planId, this.id);
+    return DisplayNode.getPath(this.planId, this.id);
+  }
+
+  public toJSON() {
+    return rejectEmptyFields<DisplayNodeShape>({
+      id: this.id,
+      name: this.name,
+      position: this.position,
+      vfPath: this.vfPath,
+      planId: this.planId,
+      type: this.type,
+    });
   }
 }
 
-export class DisplayEdge implements DisplayEdgeShape, PathedData {
+export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
-  vfPath: string;
+  vfPath?: string;
+  planId: string;
 
   constructor(init: DisplayEdgeShape) {
-    this.id = init.id ? init.id : Guid.raw();
-    this.source = init.source;
-    this.target = init.target;
-    this.vfPath = init.vfPath;
+    const filtered = rejectEmptyFields<DisplayEdgeShape>(init);
+    this.id = filtered.id ? filtered.id : Guid.raw();
+    this.source = filtered.source;
+    this.target = filtered.target;
+    this.vfPath = filtered.vfPath ? filtered.vfPath : undefined;
+    this.planId = filtered.planId;
   }
 
   static getPrefix(planId: string): string {
@@ -68,7 +100,16 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
   }
 
   get path(): string {
-    const planId = this.vfPath.split('.')[2];
-    return DisplayEdge.getPath(planId, this.id);
+    return DisplayEdge.getPath(this.planId, this.id);
+  }
+
+  public toJSON() {
+    return rejectEmptyFields<DisplayEdgeShape>({
+      id: this.id,
+      source: this.source,
+      target: this.target,
+      vfPath: this.vfPath,
+      planId: this.planId
+    });
   }
 }

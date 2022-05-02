@@ -13,11 +13,9 @@ const Home: React.FC<Props> = () => {
 
   useEffect(()=>{
     const store = getDataStore();
-    store.fetchOrCreateRoot().then(()=>{
-      setResourceSpecifications(store.getResourceSpecifications());
-      setProcessSpecifications(store.getProcessSpecifications());
-      setAgents(store.getAgents());
-    });
+    setResourceSpecifications(store.getResourceSpecifications());
+    setProcessSpecifications(store.getProcessSpecifications());
+    setAgents(store.getAgents());
   }, []);
 
   return(

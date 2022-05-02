@@ -13,10 +13,12 @@ export class DataStoreBase {
 
   protected zomeApi: ZomeApi;
   protected root: Root;
+  protected pathIndex: Map<string, string>;
 
   constructor() {
     this.zomeApi = getZomeApi();
     this.root = new Root();
+    this.pathIndex = new Map<string, string>();
   }
 
   /**
@@ -43,6 +45,20 @@ export class DataStoreBase {
       }
     }
     return cursor;
+  }
+
+  /**
+   * Look up path by id.
+   */
+  public lookUpPath(id: string): string {
+    return this.pathIndex.get(id);
+  }
+
+  /**
+   * Looks up an object by id.
+   */
+  public getById(id: string): any {
+    return this.getCursor(this.lookUpPath(id));
   }
 
   /**
@@ -89,6 +105,7 @@ export class DataStoreBase {
    */
   public async set(item: PathedData) {
     this.getCursor(getParentPath(item.path))[item.id] = item;
+    this.pathIndex.set(item.id, item.path);
     await this.put(item);
   }
 
@@ -128,8 +145,8 @@ export class DataStoreBase {
   /**
    * Takes the data we receive from the Zome API and hydrates the root structure.
    *
-   * NOTE: if a completely new datached object is created and we receive a signal
-   * for it, this will throw an error when the cursor can reach the path. Either
+   * NOTE: if a completely new detached object is created and we receive a signal
+   * for it, this will throw an error when the cursor can't reach the path. Either
    * we'll need to reorder messages to create the shortest paths first, or we'll
    * need to just fetch the whole tree from the root.
    *
@@ -151,7 +168,6 @@ export class DataStoreBase {
       // Temporarily assign an empty object
       let deserializedObject: Object = {};
 
-
       // Deserialize if not an empty string (if this is a link in a path in the DHT)
       if (data != "") {
         deserializedObject = JSON.parse(data);
@@ -163,12 +179,18 @@ export class DataStoreBase {
         const parentCursor = this.getCursor(parentPath);
         const parentName = getLastPart(parentPath);
         if (parentName in ObjectTransformations) {
+          // Transform object into a class instance
           const instance = ObjectTransformations[parentName](deserializedObject);
+          // Place the class instance on the parent indexed by id
           parentCursor[name] = instance;
+          // Place the path of the object in the index (by id)
+          this.pathIndex.set(instance.id, instance.path);
         } else {
+          // We have a plan container object with no class
           parentCursor[name] = deserializedObject;
         }
       } else {
+        // It's the Root!
         this.root = new Root(deserializedObject as RootShape);
       }
     });
