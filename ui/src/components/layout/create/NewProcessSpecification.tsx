@@ -33,8 +33,10 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     //getResourceSpecificationListSize();
+
+    const store = getDataStore();
     const ps: ProcessSpecification =  new ProcessSpecification({name, note});
-    await getDataStore().set(ps);
+    store.set(ps);
     clearState();
     navigate('/');
   }
