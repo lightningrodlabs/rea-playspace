@@ -1,6 +1,7 @@
-import { AppWebsocket, AdminWebsocket, CellId, AgentPubKey  } from '@holochain/client'
+import { HolochainClient } from '@holochain-open-dev/cell-client'
+import { AppWebsocket, AdminWebsocket, CellId, AgentPubKey, RoleId  } from '@holochain/client'
 import ZomeApi from './api/zomeApi'
-import { APP_PORT, ADMIN_PORT } from './holochainConf'
+import { APP_PORT, ADMIN_PORT, APP_ID } from './holochainConf'
 import { sleep100 } from './utils'
 
 // @ts-ignore
@@ -10,13 +11,27 @@ const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`
 
 let appWs: AppWebsocket
 let adminWs: AdminWebsocket
+let holochainClient: HolochainClient
 let agentPubKey: AgentPubKey
 let cellId: CellId
 let zomeApi: ZomeApi
 
+export async function getHolochainClient() {
+  const installed_app_id = APP_ID;
+  if (holochainClient) {
+    return holochainClient;
+  }
+  const client: HolochainClient = await HolochainClient.connect(
+    APP_WS_URL,
+    installed_app_id
+  );
+  holochainClient = client;
+  return client;
+}
+
 export async function getAdminWs(): Promise<AdminWebsocket> {
   if (adminWs) {
-    return adminWs
+    return adminWs;
   } else {
     adminWs = await AdminWebsocket.connect(ADMIN_WS_URL)
     while (!(adminWs.client.socket.readyState === adminWs.client.socket.OPEN)) {
@@ -25,13 +40,13 @@ export async function getAdminWs(): Promise<AdminWebsocket> {
     adminWs.client.socket.addEventListener('close', () => {
       console.log('admin websocket closed')
     })
-    return adminWs
+    return adminWs;
   }
 }
 
 export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
   if (appWs) {
-    return appWs
+    return appWs;
   } else {
     appWs = await AppWebsocket.connect(APP_WS_URL, undefined, signalsHandler)
     while (!(appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
@@ -40,7 +55,7 @@ export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
     appWs.client.socket.addEventListener('close', () => {
       console.log('app websocket closed')
     })
-    return appWs
+    return appWs;
   }
 }
 
