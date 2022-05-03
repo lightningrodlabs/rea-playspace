@@ -14,8 +14,9 @@ import {
 } from "@holochain-open-dev/profiles";
 import {
   ContextProvider,
-  CreateProfile
 } from "./elements";
+import { getProfilesStore } from "./data/ProfilesStore";
+import ProfilePrompt from "./components/ProfilePrompt";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
@@ -25,20 +26,13 @@ interface Props {}
 
 const App: React.FC<Props> = () => {
 
-  // const [store, setStore] = useState(undefined);
+  const [store, setStore] = useState<ProfilesStore>();
 
-  // async function connect() {
-  //   const cellClient = await createMockZome();
-  //   // how do I make a cellClient?
-  //   // I need a BaseClient
-  //   return new ProfilesStore(cellClient);
-  // }
-
-  // useEffect(() => {
-  //   connect().then((store) => {
-  //     setStore(store);
-  //   });
-  // });
+  useEffect(() => {
+    getProfilesStore().then((store) => {
+      setStore(store);
+    });
+  }, []);
 
 
   const Main = () => {
@@ -73,14 +67,19 @@ const App: React.FC<Props> = () => {
       </BrowserRouter>
     );
   }
-
-
+  if (!store) {
+    return <span>Loading.......</span>;
+  }
   return (
-    // <ContextProvider context={profilesStoreContext} value={store}>
-    //   <CreateProfile>
+    <ContextProvider context={profilesStoreContext} value={store}>
+      <ProfilePrompt>
         <Main />
-      /* </CreateProfile>
-    </ContextProvider> */
+      </ProfilePrompt>
+
+      {/* <ListProfiles
+          onagentselected={(e) => alert("agent")}
+        ></ListProfiles> */}
+    </ContextProvider> 
   );
 };
 

@@ -42,7 +42,9 @@
     "react-modal": "^3.14.4",
     "react-redux": "7.2.8",
     "react-router-dom": "^6.3.0",
+    "react-svelte-stores": "0.2.0",
     "redux": "^4.1.2",
+    "@scoped-elements/material-web": "0.0.19",
     "ws": "^8.5.0"
   },
   "peerDependencies": {
