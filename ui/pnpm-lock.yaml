@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@holochain-open-dev/cell-client': 0.3.2
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': ^0.2.0
   '@holochain-open-dev/profiles': 0.0.8
@@ -36,6 +37,7 @@ specifiers:
   ws: ^8.5.0
 
 dependencies:
+  '@holochain-open-dev/cell-client': 0.3.2_ws@8.5.0
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
   '@holochain-open-dev/profiles': 0.0.8_ws@8.5.0
