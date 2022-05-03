@@ -5,6 +5,8 @@ import MainPanelHeader from "../MainPanelHeader";
 import { Agent } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
 import getDataStore from "../../../data/DataStore";
+import { ListProfiles } from "../../../elements";
+import { getProfilesService } from "../../../data/ProfilesStore";
 
 export type NewAgentProps = {
 }
@@ -33,9 +35,29 @@ const NewAgent: React.FC<NewAgentProps> = () => {
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
+  const handleAddAgentFromProfile = async (e: CustomEvent) => {
+    console.log('event: ', e);
+    const agentPubKey = e.detail.agentPubKey;
+    const agent = await getProfilesService().getAgentProfile(agentPubKey);
+    const store = getDataStore();
+    const agent2 = store.getById(agentPubKey);
+    if (agent2) {
+      console.log('Already exists.');
+      return;
+    }
+    const ag: Agent = new Agent({
+      id: e.detail.agentPubKey, 
+      name: agent.profile.nickname, 
+      note
+    });
+    store.set(ag);
+    store.fetchAgents();
+    clearState();
+    navigate('/');
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    //getResourceSpecificationListSize();
 
     const store = getDataStore();
     const ag: Agent =  new Agent({name, note});
@@ -54,7 +76,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
       </MainPanelHeader>
       <SlCard className="create-resource">
       <form onSubmit={handleSubmit}>
-      <br />
+        <br />
         <br />
         <SlInput
           required
@@ -96,6 +118,15 @@ const NewAgent: React.FC<NewAgentProps> = () => {
         <SlButton type="submit" variant="primary">
           Create
         </SlButton>
+      </form>
+    </SlCard>
+    
+    <SlCard className="create-resource" style={{"marginLeft":"40px"}}>
+      
+      <ListProfiles
+          onagentselected={(e:Event) => handleAddAgentFromProfile(e)}
+        ></ListProfiles>
+      <form onSubmit={handleSubmit}>
       </form>
     </SlCard>
     </>
