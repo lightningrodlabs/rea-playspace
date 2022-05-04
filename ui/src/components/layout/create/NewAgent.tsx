@@ -40,9 +40,10 @@ const NewAgent: React.FC<NewAgentProps> = () => {
     const agentPubKey = e.detail.agentPubKey;
     const agent = await getProfilesService().getAgentProfile(agentPubKey);
     const store = getDataStore();
-    const agent2 = store.getById(agentPubKey);
+    await store.fetchAgents();
+    const agent2 = store.getAgent(agentPubKey);
     if (agent2) {
-      console.log('Already exists.');
+      alert('Agent already exists.');
       return;
     }
     const ag: Agent = new Agent({
