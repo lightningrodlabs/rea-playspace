@@ -10,7 +10,6 @@ electron/web
 ui/dist/*
 ui/ui.zip
 
-workdir/rea-playspace.webhapp
 happ/workdir/application.dna
 happ/workdir/application.happ
 
