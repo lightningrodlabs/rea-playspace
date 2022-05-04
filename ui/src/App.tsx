@@ -75,10 +75,6 @@ const App: React.FC<Props> = () => {
       <ProfilePrompt>
         <Main />
       </ProfilePrompt>
-
-      {/* <ListProfiles
-          onagentselected={(e) => alert("agent")}
-        ></ListProfiles> */}
     </ContextProvider> 
   );
 };
