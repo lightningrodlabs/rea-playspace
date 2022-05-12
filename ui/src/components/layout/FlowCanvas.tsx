@@ -326,7 +326,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const layoutStyle = {
     border: "black 1px solid",
-    height: "800px",
+    height: "87vh",
     width: "auto"
   };
 
