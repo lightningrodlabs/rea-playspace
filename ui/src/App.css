@@ -30,6 +30,7 @@
   flex: 1;
   display: flex;
   flex-direction: row;
+  margin: 1em 1em 0em 1em;;
 }
 
 .left-screen-nav-menu {
@@ -38,9 +39,11 @@
 }
 
 .main-panel {
-  padding: 30px;
+  padding: 0px;
+  margin: 0px;
+  width: 100vw;
+  height: 100%;
   box-sizing: border-box;
-  width: 100%;
 }
 
 .main-panel-header {
@@ -143,4 +146,33 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+
+/* pi-hacker-button */
+
+.pi-hacker-row {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100vw;
+  text-align: right;
+}
+
+.pi-hacker-spacer {
+  display: flex;
+  flex-direction: column;
+  width: 98vw;
+  text-align: right;
+}
+
+.pi-hacker-button {
+  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  vertical-align: bottom;
+  align-content: flex-end;
+  width: 2vw;
+  text-align: right;
+  margin: 0.3em;
 }

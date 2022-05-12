@@ -109,6 +109,29 @@ export class DataStoreBase {
     await this.put(item);
   }
 
+  public async saveTree(): Promise<void | {}> {
+    const self = this;
+    const saveFuncs = new Array<() => {}>();
+
+    // Store everything in the order it was added to the path index (which should be from shortest to longest path)
+    this.pathIndex.forEach((path) => {
+      console.log(path);
+      saveFuncs.push(async () => {
+        try {
+          const cursor = self.getCursor(path);
+          return self.put(cursor);
+        } catch {
+          console.log(`Could not save: ${path}`);
+        }
+      });
+    });
+    // Need to store the root, too.
+    saveFuncs.push(async() => {
+      return self.put(self.root);
+    });
+    return saveFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+  }
+
   /**
   * Deletes Thing on Path 
   * @param path
@@ -136,6 +159,27 @@ export class DataStoreBase {
       await this.put(this.root);
     } else {
       // We have the data, lets hydrate it
+      this.hydrateFromZome(res);
+    }
+  }
+
+  public async saveLocalRoot() {
+    const res = await this.zomeApi.get_thing('root');
+    if ((res as []).length > 3) {
+      window.localStorage.setItem('root', JSON.stringify(res));
+    } else {
+      throw new Error('Cowardly refusing to save.');
+    }
+  }
+
+  public deleteLocalRoot() {
+    window.localStorage.removeItem('root');
+  }
+
+  public fetchLocalRoot() {
+    const local_json = window.localStorage.getItem('root');
+    if (local_json != null) {
+      const res = JSON.parse(window.localStorage.getItem('root'));
       this.hydrateFromZome(res);
     }
   }
