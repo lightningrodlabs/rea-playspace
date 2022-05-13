@@ -39,10 +39,7 @@ specifiers:
   ws: ^8.5.0
 
 dependencies:
-<<<<<<< HEAD
-=======
   '@holochain-open-dev/cell-client': 0.3.2_ws@8.5.0
->>>>>>> feature/integrate-profiles-module
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
   '@holochain-open-dev/profiles': 0.0.8_ws@8.5.0
@@ -1332,8 +1329,6 @@ packages:
       lit: 2.2.1
     dev: false
 
-<<<<<<< HEAD
-=======
   /@scoped-elements/material-web/0.0.19:
     resolution: {integrity: sha512-QMH5RKqHRLOlxnp+8jRro/Y6iJdNfzENKE9QieIuSylm+DOtHZOw9iny1iWqcdq+ipRhgyciC5NoEDT+QBPbRQ==}
     dependencies:
@@ -1371,7 +1366,6 @@ packages:
       lit: 2.2.1
     dev: false
 
->>>>>>> feature/integrate-profiles-module
   /@scoped-elements/shoelace/0.0.8:
     resolution: {integrity: sha512-ccSggWBhyZWdtftDtE8ps+4SKSO7618TzfWt1fCPGYs/FihfW3bEWxfWscdvuZN8wg4eDSKVGrpO+QuuqZ3fPg==}
     dependencies:
@@ -2609,14 +2603,11 @@ packages:
       lit-html: 2.2.1
     dev: false
 
-<<<<<<< HEAD
-=======
   /localStorage/1.0.4:
     resolution: {integrity: sha512-r35zrihcDiX+dqWlJSeIwS9nrF95OQTgqMFm3FB2D/+XgdmZtcutZOb7t0xXkhOEM8a9kpuu7cc28g1g36I5DQ==}
     engines: {node: '>= v0.2.0'}
     dev: false
 
->>>>>>> feature/integrate-profiles-module
   /lodash-es/4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
     dev: false
