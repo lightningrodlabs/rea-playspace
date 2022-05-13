@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,6 +13,16 @@ import getDataStore from "./data/DataStore";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
+import {
+  profilesStoreContext,
+  ProfilesStore
+} from "@holochain-open-dev/profiles";
+import {
+  ContextProvider,
+  CreateProfile
+} from "./elements";
+import { getProfilesStore } from "./data/ProfilesStore";
+import ProfilePrompt from "./components/ProfilePrompt";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
@@ -48,6 +58,15 @@ const App: React.FC<Props> = () => {
       console.log('oh, so close...');
     }
   }
+
+  const [store, setStore] = useState<ProfilesStore>();
+
+  useEffect(() => {
+    getProfilesStore().then((store) => {
+      setStore(store);
+    });
+  }, []);
+
 
   const Main = () => {
     return (
@@ -100,9 +119,15 @@ const App: React.FC<Props> = () => {
       </BrowserRouter>
     );
   }
-
+  if (!store) {
+    return <span>Loading.......</span>;
+  }
   return (
-      <Main />
+    <ContextProvider context={profilesStoreContext} value={store}>
+      <ProfilePrompt>
+        <Main />
+      </ProfilePrompt>
+    </ContextProvider> 
   );
 };
 
