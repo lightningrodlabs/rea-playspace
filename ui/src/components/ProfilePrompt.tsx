@@ -25,7 +25,9 @@ const ProfilePrompt: React.FC<Props> = ({children}) => {
       }
     });
   }
+
   window.addEventListener('profile-created', handleCreateProfile);
+
   useEffect(() => {
     service.getMyProfile().then((profile) => {
       setMyProfile(profile);
@@ -38,16 +40,11 @@ const ProfilePrompt: React.FC<Props> = ({children}) => {
   const RenderPrompt = () => {
     if (getMyProfile() == null) {
       return (
-        <div
-        style={{"display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "flex": "1"}}>
-          <div style={{"display": "flex", "flexDirection": "column", "alignItems": "center"}}>
+        <div className="profile-prompt">
             <CreateProfile></CreateProfile>
-          </div>
         </div>
       );
     } else {
-      // children is the rest of the app,  <Main />. Can this 
-      // be improved?
       return(
         <slot>{children}</slot>
       )

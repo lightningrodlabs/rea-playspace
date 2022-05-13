@@ -184,3 +184,11 @@
   text-align: right;
   margin: 0.3em;
 }
+
+/* profile-prompt */
+
+.profile-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
