@@ -74,7 +74,7 @@ const Pallet: React.FC<Props> = ({
     flexGrow: 1,
     marginRight: "10px",
     overflowY: "scroll",
-    maxHeight: "100vh"
+    maxHeight: "85vh"
   }
 
   const categoryStyles: CSSProperties = {
