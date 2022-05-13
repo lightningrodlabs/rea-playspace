@@ -152,8 +152,14 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const onEdgesChange = useCallback(
     async (changes) => {
+      const store = getDataStore();
+      for (let edge of store.getDisplayEdges(store.getCurrentPlanId())) {
+        if (edge.id == changes[0].id ) {
+          store.delete(edge.path)
+        }
+      }
       setEdges((edges) => applyEdgeChanges(changes, edges));
-      console.log(changes)
+      console.log(changes);
     },
     [setEdges]
   );
