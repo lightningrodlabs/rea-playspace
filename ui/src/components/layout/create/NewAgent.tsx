@@ -75,61 +75,62 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
-      <SlCard className="create-resource">
-      <form onSubmit={handleSubmit}>
-        <br />
-        <br />
-        <SlInput
-          required
-          label="Name"
-          name="name"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={name}
+      <section style={{"display": "flex"}}>
+        <SlCard className="new-agent-card">
+        <form onSubmit={handleSubmit}>
+          <br />
+          <br />
+          <SlInput
+            required
+            label="Name"
+            name="name"
+            // @ts-ignore
+            onSlInput={onChange}
+            value={name}
 
-        />
-        <br />
-        <SlInput
-          required
-          label="Image"
-          name="image"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={image}
+          />
+          <br />
+          <SlInput
+            required
+            label="Image"
+            name="image"
+            // @ts-ignore
+            onSlInput={onChange}
+            value={image}
 
-        />
-        <br />
-        <SlTextarea
-          label='Note'
-          name='note'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={note}
-        />
-        <br />
-        <SlInput
-          required
-          label="Primary Location"
-          name="primaryLocation"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={primaryLocation}
-        />
-        <br />
-        <SlButton type="submit" variant="primary">
-          Create
-        </SlButton>
-      </form>
-    </SlCard>
-    
-    <SlCard className="create-resource" style={{"marginLeft":"40px"}}>
+          />
+          <br />
+          <SlTextarea
+            label='Note'
+            name='note'
+            // @ts-ignore
+            onSlInput={onChange}
+            value={note}
+          />
+          <br />
+          <SlInput
+            required
+            label="Primary Location"
+            name="primaryLocation"
+            // @ts-ignore
+            onSlInput={onChange}
+            value={primaryLocation}
+          />
+          <br />
+          <SlButton type="submit" variant="primary">
+            Create
+          </SlButton>
+        </form>
+        </SlCard>
       
-      <ListProfiles
-          onagentselected={(e:Event) => handleAddAgentFromProfile(e)}
-        ></ListProfiles>
-      <form onSubmit={handleSubmit}>
-      </form>
-    </SlCard>
+        <SlCard className="new-agent-card">
+          <ListProfiles
+              onagentselected={(e:Event) => handleAddAgentFromProfile(e)}
+            ></ListProfiles>
+          <form onSubmit={handleSubmit}>
+          </form>
+        </SlCard>
+      </section>
     </>
   );
 };
