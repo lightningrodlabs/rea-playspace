@@ -18,8 +18,7 @@ const ResourceSpecificationNode: React.FC<Props> = ({data}) => {
     border: '1px solid green',
     width: '125px',
     height: '50px',
-    background: "lightgreen",
-    borderRadius: "10px"
+    background: "lightgreen"
   }
 
   const nodeHeader: CSSProperties = {
