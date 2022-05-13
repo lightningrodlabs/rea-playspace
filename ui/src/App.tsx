@@ -13,6 +13,14 @@ import getDataStore from "./data/DataStore";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
+import {
+  profilesStoreContext,
+  ProfilesStore
+} from "@holochain-open-dev/profiles";
+import {
+  ContextProvider,
+  CreateProfile
+} from "./elements";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
@@ -101,8 +109,13 @@ const App: React.FC<Props> = () => {
     );
   }
 
+
   return (
-      <Main />
+    // <ContextProvider context={profilesStoreContext} value={store}>
+    //   <CreateProfile>
+        <Main />
+      /* </CreateProfile>
+    </ContextProvider> */
   );
 };
 
