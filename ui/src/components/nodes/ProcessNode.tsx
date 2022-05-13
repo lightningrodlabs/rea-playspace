@@ -36,7 +36,7 @@ const ProcessNode: React.FC<Props> = ({data}) => {
     width: "8px", 
     height: '8px', 
     backgroundColor: 'rgb(189, 196, 204)', 
-    border: 'orange solid 1px', 
+    border: 'white solid 1px', 
     position:'absolute', 
     right: '-4px',
     top: '35px'
@@ -59,7 +59,7 @@ const ProcessNode: React.FC<Props> = ({data}) => {
   }
 
   return (
-    <div key={data.id} style={{position:'relative', overflow: 'hidden'}}>
+    <div key={data.id} style={{position:'relative'}}>
 
       <div style={nodeStyles}>
         <div style={nodeHeader}>{data.label}</div>

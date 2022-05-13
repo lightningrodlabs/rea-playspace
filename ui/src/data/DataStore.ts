@@ -1,6 +1,5 @@
 import ZomeApi from "../api/zomeApi";
-import { APP_ID } from '../holochainConf';
-import { getAppWs, setAgentPubKey, setCellId, setZomeApi } from '../hcWebsockets';
+import {  getHolochainClient, setAgentPubKey, setCellId, setZomeApi } from '../hcWebsockets';
 
 import {
   Agent,
@@ -22,18 +21,20 @@ import { Root } from "./models/Application/Root";
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
 
+
 /**
- * Initialize WS connection, set up Zome API client and DataStore singletons
+ * Initialize Holochain WS connection, set up Zome API client and DataStore singletons.
  *
  * By the time this promise resolves, any call to `getDataStore` is gauranteed to
  * have a reference to our singleton
  */
-export async function initConnection(): Promise<DataStore> {
+ export async function initConnection(): Promise<DataStore> {
   dataStorePromise = new Promise(async (res) => {
-    const appWs = await getAppWs();
-    const app_info = await appWs.appInfo({ installed_app_id: APP_ID });
+    const client = await getHolochainClient();
+    const app_info = client.appInfo;
     const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
-    const zomeApi = new ZomeApi(appWs);
+
+    const zomeApi = new ZomeApi(client);
     setAgentPubKey(agentPubKey);
     setCellId(app_info.cell_data[0].cell_id);
     setZomeApi(zomeApi);

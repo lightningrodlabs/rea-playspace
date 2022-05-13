@@ -4,6 +4,8 @@ import {
   SlAvatar,
   SlIcon,
 } from "@shoelace-style/shoelace/dist/react";
+import { getMyProfile, getProfilesService } from "../../data/ProfilesStore";
+
 import { getAgentPubKey } from "../../hcWebsockets";
 
 export type HeaderProps = {};
@@ -25,7 +27,7 @@ const Header: React.FC<HeaderProps> = () => {
       <div>
         <SlAvatar shape="circle" label="Circle avatar" />
         {" "}
-        {getAgentPubKey().slice(0, 8)}...
+        {getMyProfile().profile.nickname.slice(0, 8)}...
       </div>
     </div>
   );
