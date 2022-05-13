@@ -148,6 +148,14 @@
   justify-content: space-between;
 }
 
+.new-agent-card {
+  display: block;
+  flex-basis: 100%;
+}
+
+.new-agent-card:last-child {
+  margin-left: 40px;
+}
 
 /* pi-hacker-button */
 
@@ -175,4 +183,12 @@
   width: 2vw;
   text-align: right;
   margin: 0.3em;
+}
+
+/* profile-prompt */
+
+.profile-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
