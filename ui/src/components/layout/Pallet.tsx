@@ -1,5 +1,5 @@
 import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { PathedData } from "../../data/models/PathedData";
@@ -70,15 +70,18 @@ const Pallet: React.FC<Props> = ({
     return (<p style={{textAlign: "center"}}>No items</p>);
   }
 
-  const palletStyles = {
-    flexGrow:1,
-    border: "1px solid black"
+  const palletStyles: CSSProperties = {
+    flexGrow: 1,
+    marginRight: "10px",
+    overflowY: "scroll",
+    maxHeight: "100vh"
   }
 
-  const categoryStyles = {
+  const categoryStyles: CSSProperties = {
     border: "1px solid black",
     background: "lightgray",
-    padding: "5px"
+    padding: "5px",
+    margin: "10px"
   }
 
   return (
