@@ -1,11 +1,14 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape } from "../../../types/valueflows";
-import { rejectEmptyFields } from '../../../utils';
+import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape, ActionShape, InputOutput, ResourceEffect} from "../../../types/valueflows";
+import { assignFields, toJSON } from '../../../utils';
 
 // Knowledge Classes
 
+/**
+ * Agent can be an individual, organization, etc.
+ */
 export class Agent implements AgentShape, PathedData, NamedData {
   id: string;
   created: Date;
@@ -15,13 +18,9 @@ export class Agent implements AgentShape, PathedData, NamedData {
   primaryLocation?: string;
 
   constructor(init: AgentShape) {
-    const filtered = rejectEmptyFields<AgentShape>(init);
-    this.id = filtered.id ? filtered.id : Guid.raw();
-    this.created = filtered.created ? filtered.created : new Date();
-    this.name = filtered.name;
-    this.note = filtered.note ? filtered.note : undefined;
-    this.image = filtered.image ? filtered.image : undefined;
-    this.primaryLocation = filtered.primaryLocation ? filtered.primaryLocation : undefined;
+    assignFields<AgentShape, Agent>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
   }
 
   static getPrefix(): string {
@@ -37,17 +36,13 @@ export class Agent implements AgentShape, PathedData, NamedData {
   }
 
   public toJSON(): AgentShape {
-    return rejectEmptyFields<AgentShape>({
-      id: this.id.toString(),
-      created: this.created,
-      name: this.name,
-      note: this.note,
-      image: this.image,
-      primaryLocation: this.primaryLocation,
-    });
+    return toJSON<AgentShape, Agent>(this);
   }
 }
 
+/**
+ * The archetype of a resource. The accounting happens on the `EconomicResource`.
+ */
 export class ResourceSpecification implements ResourceSpecificationShape, PathedData, NamedData {
   id: string;
   created: Date;
@@ -59,15 +54,9 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   defaultUnitOfEffort?: string;
 
   constructor(init: ResourceSpecificationShape) {
-    const filtered = rejectEmptyFields<ResourceSpecificationShape>(init);
-    this.id = filtered.id ? filtered.id : Guid.raw();
-    this.created = filtered.created ? filtered.created : new Date();
-    this.name = filtered.name;
-    this.note = filtered.note ? filtered.note : undefined;
-    this.image = filtered.image ? filtered.image : undefined;
-    this.resourceClassifiedAs = filtered.resourceClassifiedAs ? filtered.resourceClassifiedAs : undefined;
-    this.defaultUnitOfResource = filtered.defaultUnitOfResource ? filtered.defaultUnitOfResource : undefined;
-    this.defaultUnitOfEffort = filtered.defaultUnitOfEffort ? filtered.defaultUnitOfEffort : undefined;
+    assignFields<ResourceSpecificationShape, ResourceSpecification>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
   }
 
   static getPrefix(): string {
@@ -83,19 +72,13 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   }
 
   public toJSON(): ResourceSpecificationShape {
-    return rejectEmptyFields<ResourceSpecificationShape>({
-      id: this.id.toString(),
-      created: this.created,
-      name: this.name,
-      note: this.note,
-      image: this.image,
-      resourceClassifiedAs: this.resourceClassifiedAs,
-      defaultUnitOfResource: this.defaultUnitOfResource,
-      defaultUnitOfEffort: this.defaultUnitOfEffort
-    });
+    return toJSON<ResourceSpecificationShape, ResourceSpecification>(this);
   }
 }
 
+/**
+ * The archetype of a Process. Each `Process` is an instance of a `ProcessSpecification`.
+ */
 export class ProcessSpecification implements ProcessSpecificationShape, PathedData, NamedData {
   id: string;
   created: Date;
@@ -103,11 +86,9 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
   note?: string;
 
   constructor(init: ProcessSpecificationShape) {
-    const filtered = rejectEmptyFields<ProcessSpecificationShape>(init);
-    this.id = filtered.id ? filtered.id : Guid.raw();
-    this.created = filtered.created ? filtered.created : new Date();
-    this.name = filtered.name;
-    this.note = filtered.note ? filtered.note : undefined;
+    assignFields<ProcessSpecificationShape, ProcessSpecification>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
   }
 
   static getPrefix(): string {
@@ -123,11 +104,6 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
   }
 
   public toJSON(): ProcessSpecificationShape {
-    return rejectEmptyFields<ProcessSpecificationShape>({
-      id: this.id.toString(),
-      created: this.created,
-      name: this.name,
-      note: this.note,
-    });
+    return toJSON<ProcessSpecificationShape, ProcessSpecification>(this);
   }
 }
