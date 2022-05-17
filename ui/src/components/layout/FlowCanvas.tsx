@@ -11,6 +11,7 @@ import ReactFlow, {
   applyEdgeChanges
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
+import CommitmentModal from '../modals/CommitmentModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import AgentNode from '../nodes/AgentNode';
@@ -26,18 +27,56 @@ interface Props {};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  // STATE MANAGEMENT
+
   const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
+  /**
+   * we should probably add a more sophisticated state machine for this since we have:
+   * + add or edit node
+   *   + position
+   *   + type
+   * + add or edit edge
+   *   + source
+   *   + target
+   *   + type (Commitment, InputCommittment, and OutputCommitment)
+   * + dragging
+   *   + position
+   */
   const [type, setType] = useState<string>();
-  const [isModelOpen, setIsModalOpen] = useState(false);
+  const [source, setSource] = useState<string>();
+  const [target, setTarget] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
+  const [isModelOpen, setIsModalOpen] = useState(false);
+
+  // need a variable outside of the onNodesChange callback below. useState too async-y
+  const position: XYPosition = {
+    x: 0,
+    y: 0
+  };
+
+  function resetPosition() {
+    position.x = 0;
+    position.y = 0;
+  }
+
+  function openModal() {
+    setIsModalOpen(true);
+  }
+
+  function closeModal() {
+    setIsModalOpen(false);
+  }
 
   const nodeTypes = useMemo(() => ({
     process: ProcessNode,
     resourceSpecification: ResourceSpecificationNode,
     agent: AgentNode
   }), []);
+
+  // INITIALIZATION
 
   useEffect(() => {
     let element: HTMLElement = document.getElementsByClassName('react-flow__container')[0] as HTMLElement;
@@ -58,113 +97,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setEdges(displayEdges);
   };
 
-  // need a variable outside of the onNodesChange callback below. useState too async-y
-  const position: XYPosition = {
-    x: 0,
-    y: 0
-  };
-
-  function resetPosition() {
-    position.x = 0;
-    position.y = 0;
-  }
-
-  /**
-   * This is what tracks the DisplayNodes and updates them if they change.
-   *
-   * TODO: We're assuming that changes is always of length 1, we should probably
-   * check that or batch through all the changes.
-   * TODO: Sometimes, the ability to delete an item will depend on a whole Vf
-   * graph, so we'll need to add a business logic library.
-   */
-  const onNodesChange = useCallback(
-    async (changes) => {
-      setNodes((nds) => applyNodeChanges(changes, nds))
-      const store = getDataStore();
-      if (changes[0].type === 'remove') {
-        // use its ID to get a handle on it
-        const planId = store.getCurrentPlanId();
-        const nodeId = changes[0].id;
-        const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
-
-        // Compute edges to delete
-        const edgesToDelete: Array<DisplayEdge> = [];
-        for (let edge of store.getDisplayEdges(planId)) {
-          if (edge.source == nodeId || edge.target == nodeId) {
-            edgesToDelete.push(edge);
-          }
-        }
-        // Create an array of promise returning functions to serialize execution of deletions
-        const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
-
-        // get the paths
-        const nodePath: string = nodeToDelete.path;
-        const vfPath: string = nodeToDelete.vfPath;
-
-        /**
-         * We don't want to delete the `Agents` or `ResourceSpecifications`, so
-         * let's add in some logic to handle special cases.
-         *
-         * TODO: Map out the various kinds of behaviours we need.
-         */
-        const type = getAlmostLastPart(vfPath);
-        switch (type) {
-          case 'process':
-            await store.delete(nodePath);
-            await store.delete(vfPath);
-            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
-            break;
-          default:
-            await store.delete(nodePath);
-            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
-            break;
-        }
-      }
-      /** 
-       * track position change on every event while dragging node
-       * hold on to it outside of this callback because this will
-       * fire dozens of time per second. We need the last position the node
-       * had before its state changes from dragging=true to dragging=false
-      */
-      if (changes[0].type ==='position') {
-        if (changes[0].dragging) {
-          position.x = changes[0].position.x,
-          position.y = changes[0].position.y
-        } else {
-          /**
-           * when dragging == false then we can use the last save position
-           * and set that to the DisplayNode.position property.
-           * Then persist to DHT.
-          */
-          const planId = store.getCurrentPlanId();
-          const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
-          nodeToUpdate.position = position as XYPosition;
-          store.set(nodeToUpdate);
-
-          resetPosition();
-        }
-      }
-    },
-    [setNodes]
-  );
-
-  const onEdgesChange = useCallback(
-    async (changes) => {
-      setEdges((edges) => applyEdgeChanges(changes, edges));
-      console.log(changes)
-    },
-    [setEdges]
-  );
-
-  function openModal() {
-    setIsModalOpen(true);
-  }
-
-  function closeModal() {
-    setIsModalOpen(false);
-  }
+  // UX EVENT HANDLING
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -230,6 +163,149 @@ const FlowCanvas: React.FC<Props> = () => {
   );
 
   /**
+   * This is called each time a connection is made between two nodes.
+   */
+   const onConnect = async (params: Connection) => {
+    const {source, sourceHandle, target, targetHandle} = params;
+    const store = getDataStore();
+
+    // Validate objects can be connected
+    const validSourceTargets = {
+      'resourceSpecification': [
+        'process'
+      ],
+      'process': [
+        'resourceSpecification'
+      ]
+    };
+
+    // Grab the paths to the objects by their ID and grab the type of their vfPath
+    const sourceNode: DisplayNode = store.getCursor(store.lookUpPath(source));
+    const sourceType = getAlmostLastPart(sourceNode.vfPath);
+    const targetNode: DisplayNode = store.getCursor(store.lookUpPath(target));
+    const targetType = getAlmostLastPart(targetNode.vfPath);
+
+    // If the connection is valid, open the commitment modal
+    if (validSourceTargets[sourceType].indexOf(targetType) >= 0) {
+      setType('commitment');
+      setSource(source);
+      setTarget(target);
+      openModal();
+    }
+  };
+
+  /**
+   * Track position change on every event while dragging node.
+   *
+   * Hold on to position outside of this callback because this will
+   * fire dozens of time per second. We need the last position the node
+   * had before its state changes from dragging=true to dragging=false
+   */
+  const onDragNode = async (change) => {
+    if (change.dragging) {
+      position.x = change.position.x,
+      position.y = change.position.y
+    } else {
+      /**
+       * when dragging == false then we can use the last save position
+       * and set that to the DisplayNode.position property.
+       * Then persist to DHT.
+       */
+      const store = getDataStore();
+      const planId = store.getCurrentPlanId();
+      const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, change.id));
+      nodeToUpdate.position = position as XYPosition;
+      store.set(nodeToUpdate);
+
+      resetPosition();
+    }
+  }
+
+  /**
+   * Removes a Node
+   */
+   const onRemoveNode = async (change) => {
+    const store = getDataStore();
+    // use its ID to get a handle on it
+    const planId = store.getCurrentPlanId();
+    const nodeId = change.id;
+    const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
+
+    // Compute edges to delete
+    const edgesToDelete: Array<DisplayEdge> = [];
+    for (let edge of store.getDisplayEdges(planId)) {
+      if (edge.source == nodeId || edge.target == nodeId) {
+        edgesToDelete.push(edge);
+      }
+    }
+    // Create an array of promise returning functions to serialize execution of deletions
+    const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
+
+    // get the paths
+    const nodePath: string = nodeToDelete.path;
+    const vfPath: string = nodeToDelete.vfPath;
+
+    /**
+     * We don't want to delete the `Agents` or `ResourceSpecifications`, so
+     * let's add in some logic to handle special cases.
+     *
+     * TODO: Map out the various kinds of behaviours we need.
+     */
+    const type = getAlmostLastPart(vfPath);
+    switch (type) {
+      case 'process':
+        await store.delete(nodePath);
+        await store.delete(vfPath);
+        // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+        deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+        break;
+      default:
+        await store.delete(nodePath);
+        // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+        deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+        break;
+    }
+  }
+
+  /**
+   * Dispatches changes related to nodes
+   */
+  const onNodesChange = useCallback(
+    async (changes) => {
+      // TODO: remove this call when we add custom logic to determine if a node can be removed
+      setNodes((nds) => applyNodeChanges(changes, nds))
+      changes.forEach(change => {
+        switch (change.type) {
+          case 'remove':
+            onRemoveNode(change);
+            break;
+          case 'position':
+            onDragNode(change)
+            break;
+        }
+      });
+    },
+    [setNodes]
+  );
+
+  /**
+   * Dispatches changes related to edges
+   */
+  const onEdgesChange = useCallback(
+    async (changes) => {
+      setEdges((edges) => applyEdgeChanges(changes, edges));
+      console.log(changes);
+      changes.forEach(change => {
+        switch (change.type) {
+          default:
+            break;
+        }
+      });
+    },
+    [setEdges]
+  );
+
+  /**
    * This returns the forms that go in the modal that open on the page when
    * something is dropped on the screen.
    *
@@ -244,8 +320,8 @@ const FlowCanvas: React.FC<Props> = () => {
    * ProcessSpecification?) Or should only specific instances of objects in the
    * flow diagram be editable?
    *
-   * At any rate, we'll need to be able to specify an exiting object to pass into
-   * the modal to be edited.
+   * At any rate, we'll need to be able to specify an existing object to pass
+   * into the modal to be edited.
    */
   const selectModalComponent = () => {
     switch (type) {
@@ -255,6 +331,8 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ResourceModal />;
       case 'agent':
         return <AgentModal />;
+      case 'commitment':
+        return <CommitmentModal closeModal={closeModal} handleAddEdge={handleAddEdge} />;
     }
   }
 
@@ -288,41 +366,22 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
-   * This is called each time a connection is made between two nodes.
+   * Adds an edge corresponding to a commitment
    */
-  const onConnect = async (params: Connection) => {
-    const {source, sourceHandle, target, targetHandle} = params;
+  async function handleAddEdge(item: PathedData & NamedData) {
     const store = getDataStore();
+    // Add the edge
+    const edge = new DisplayEdge({
+      source,
+      target,
+      vfPath: item.path,
+      planId: store.getCurrentPlanId()
+    } as DisplayEdgeShape);
+    await store.set(edge);
+    setEdges((eds) => eds.concat(edge));
+  }
 
-    // Validate objects can be connected
-    const validSourceTargets = {
-      'agent': [
-        'process'
-      ],
-      'resourceSpecification': [
-        'process'
-      ],
-      'process': [
-        'agent',
-        'resourceSpecification'
-      ]
-    };
-
-    // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getCursor(store.lookUpPath(source));
-    const sourceType = getAlmostLastPart(sourceNode.vfPath);
-    const targetNode: DisplayNode = store.getCursor(store.lookUpPath(target));
-    const targetType = getAlmostLastPart(targetNode.vfPath);
-
-    if (validSourceTargets[sourceType].indexOf(targetType) >= 0) {
-      // If we need user input for this connection, we should get it.
-
-      // If our our conditions are met, add the edge
-      const edge = new DisplayEdge({source, target, planId: store.getCurrentPlanId()} as DisplayEdgeShape);
-      await store.set(edge);
-      setEdges((eds) => eds.concat(edge));
-    }
-  };
+  // UI ELEMENTS
 
   const layoutStyle = {
     border: "black 1px solid",
