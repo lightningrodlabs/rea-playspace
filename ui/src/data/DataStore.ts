@@ -2,6 +2,7 @@ import ZomeApi from "../api/zomeApi";
 import {  getHolochainClient, setAgentPubKey, setCellId, setZomeApi } from '../hcWebsockets';
 
 import {
+  Action,
   Agent,
   ProcessSpecification,
   ResourceSpecification
@@ -169,6 +170,11 @@ export class DataStore extends DataStoreBase {
 
   public getDisplayEdges(planId: string): DisplayEdge[] {
     return Object.values(this.getCursor(DisplayEdge.getPrefix(planId)));
+  }
+
+  // Commitment helpers
+  public getActions(): Action[] {
+    return Object.values(this.root.action);
   }
 }
 
