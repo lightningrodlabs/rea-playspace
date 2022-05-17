@@ -2,11 +2,22 @@ import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { DisplayNode, DisplayEdge } from "../Application/Display";
-import { GeoPoint, PlanShape, ProcessShape, InputCommitmentShape, OutputCommitmentShape, ResourceSpecificationShape, EconomicResourceShape, AgentShape } from "../../../types/valueflows";
-import { rejectEmptyFields } from '../../../utils';
+import {
+  GeoPoint,
+  PlanShape,
+  ProcessShape,
+  CommitmentShape
+} from "../../../types/valueflows";
+import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
 
 // Plan Classes
 
+/**
+ * Plans are a container of sorts in Valueflows. They provide a very granular
+ * level of planning below the agent (organization, individual, etc.) In the
+ * spec, Plans are a refinement of a Scenario, which is based on a
+ * Scenario Definition.
+ */
 export class Plan implements PlanShape, PathedData, NamedData {
   id: string;
   created: Date;
@@ -18,12 +29,9 @@ export class Plan implements PlanShape, PathedData, NamedData {
   displayEdge?: Record<string, DisplayEdge>;
 
   constructor(init: PlanShape) {
-    const filtered = rejectEmptyFields<PlanShape>(init);
-    this.id = filtered.id ? filtered.id : Guid.raw();
-    this.created = filtered.created ? filtered.created : new Date();
-    this.name = filtered.name;
-    this.note = filtered.note ? filtered.note : undefined;
-    this.due = filtered.due ? filtered.due : undefined;
+    assignFields<PlanShape, Plan>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
     this.process = {};
     this.displayNode = {};
     this.displayEdge = {};
@@ -42,16 +50,23 @@ export class Plan implements PlanShape, PathedData, NamedData {
   }
 
   public toJSON(): PlanShape {
-    return rejectEmptyFields<PlanShape>({
-      id: this.id.toString(),
-      created: this.created,
-      name: this.name,
-      note: this.note,
-      due: this.due
-    });
+    return fieldsToJSON<PlanShape, Plan>(
+      this,
+      [
+        'id',
+        'created',
+        'name',
+        'note',
+        'due'
+      ]
+    );
   }
 }
 
+/**
+ * Processes are mappings between multiple resources. They can describe how one
+ * ResourceSpecification/EconomicResource is transformed.
+ */
 export class Process implements ProcessShape, PathedData, NamedData {
   id: string;
   created: Date;
@@ -66,25 +81,15 @@ export class Process implements ProcessShape, PathedData, NamedData {
   hasEnd?: Date;
   hasPointInTime?: Date;
   due?: Date;
-  inputCommitments?: Map<string, InputCommitmentShape>; // Add button on left
-  outputCommitments?: Map<string, OutputCommitmentShape>; // add button on right
+  inputCommitments?: Record<string, CommitmentShape>; // Add button on left
+  outputCommitments?: Record<string, CommitmentShape>; // add button on right
 
   constructor(init: ProcessShape) {
-    const filtered = rejectEmptyFields<ProcessShape>(init);
-    this.id = filtered.id ? filtered.id : Guid.raw();
-    this.created = filtered.created ? filtered.created : new Date();
-    this.name = filtered.name;
-    this.finished = filtered.finished ? filtered.finished : false;
-    this.note = filtered.note;
-    this.classifiedAs = filtered.classifiedAs;
-    this.inScopeOf = filtered.inScopeOf;
-    this.basedOn = filtered.basedOn;
-    this.plannedWithin = filtered.plannedWithin;
-    this.hasBegining = filtered.hasBegining;
-    this.hasEnd = filtered.hasEnd;
-    this.hasPointInTime = filtered.hasPointInTime;
-    this.due = filtered.due;
-    this.created = new Date();
+    assignFields<ProcessShape, Process>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
+    this.inputCommitments = {};
+    this.outputCommitments = {};
   }
 
   static getPrefix(planId: string): string {
@@ -100,81 +105,81 @@ export class Process implements ProcessShape, PathedData, NamedData {
   }
 
   public toJSON(): ProcessShape {
-    return rejectEmptyFields<ProcessShape>({
-      id: this.id.toString(),
-      created: this.created,
-      name: this.name,
-      note: this.note,
-      finished: this.finished,
-      classifiedAs: this.classifiedAs,
-      inScopeOf: this.inScopeOf,
-      basedOn: this.basedOn,
-      plannedWithin: this.plannedWithin,
-      hasBegining: this.hasBegining,
-      hasEnd: this.hasEnd,
-      hasPointInTime: this.hasPointInTime,
-      due: this.due
-    });
+    return fieldsToJSON<ProcessShape, Process>(
+      this,
+      [
+        'id',
+        'created',
+        'name',
+        'note',
+        'finished',
+        'classifiedAs',
+        'inScopeOf',
+        'basedOn',
+        'plannedWithin',
+        'hasBegining',
+        'hasEnd',
+        'hasPointInTime',
+        'due'
+      ]
+    );
   }
 }
 
-export class InputCommitment implements InputCommitmentShape, PathedData {
-  id?: string;
-  created?: Date;
+/**
+ * Commitments are really where the flows happen. They can describe the flow of
+ * resources between agents and between processes. It is important to note that
+ * the flows go from `provider` to `reciever` and from `EconomicResource`/
+ * `ResourceSpecification` to `Process` via `inputOf` and from `Process` to
+ * `EconomicResource`/`ResourceSpecification` via `outputOf`. Also note the
+ * `receiver` on the `Process` side of `inputOf` is the `Agent` in charge of
+ * completing the `Process`.
+ */
+export class Commitment implements CommitmentShape, PathedData {
+  id: string;
+  created: Date;
+  action: string;
+  provider: string;               // Agent ID
+  receiver: string;               // Agent ID
+  inputOf?: string;
+  outputOf?: string;
   resourceInventoriedAs?: string; // ResourceSprecification ID
   resourceConformsTo?: string;    // ResourceSprecification ID
   resourceQuantity?: number;
   effortQuantity?: number;
-  provider: string;               // Agent ID
-  receiver: string;               // Agent ID
   resourceClassifiedAs?: string;  // General classification or grouping
   hasBegining?: Date;
   hasEnd?: Date;
   hasPointInTime?: Date;
   due?: Date;
+  plannedWithin: string;
+  independentDemandOf?: string;
   finished?: boolean;
   inScopeOf?: string;
   note?: string;
   agreedIn?: string;
   atLocation?: GeoPoint;
   state?: string;
-  inputOf: string;                // Process ID this commitment flows into
 
-  static getPrefix(planId: string, processId: string): string {
-    return `root.plan.${planId}.process.${processId}.inputCommitment`;
+  constructor(init: CommitmentShape) {
+    assignFields<CommitmentShape, Commitment>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = this.created ? this.created : new Date();
   }
 
-  static getPath(planId: string, processId: string, id: string): string {
-    return `${InputCommitment.getPrefix(planId, processId)}.${id}`;
+  static getPrefix(planId: string): string {
+    return `root.plan.${planId}.Commitment`;
+  }
+
+  static getPath(planId: string, id: string): string {
+    return `${Commitment.getPrefix(planId)}.${id}`;
   }
 
   get path(): string {
-    // TODO: We'll need to get a cursor to the process in order to get the planId!
-    return InputCommitment.getPath('whoops', this.inputOf, this.id);
+    return Commitment.getPath(this.plannedWithin, this.id);
   }
 
-  public toJSON(): InputCommitmentShape {
-    return rejectEmptyFields<InputCommitmentShape>({
-      id: this.id,
-      created: this.created,
-      resourceInventoriedAs: this.resourceInventoriedAs,
-      resourceConformsTo: this.resourceConformsTo,
-      resourceQuantity: this.resourceQuantity,
-      effortQuantity: this.effortQuantity,
-      provider: this.provider,
-      receiver: this.receiver,
-      resourceClassifiedAs: this.resourceClassifiedAs,
-      hasBegining: this.hasBegining,
-      hasEnd: this.hasEnd,
-      hasPointInTime: this.hasPointInTime,
-      due: this.due,
-      finished: this.finished,
-      inScopeOf: this.inScopeOf,
-      note: this.note,
-      agreedIn: this.agreedIn,
-      atLocation: this.atLocation,
-      state: this.state,
-      inputOf: this.inputOf
-    });
+  public toJSON(): CommitmentShape {
+    return toJSON<CommitmentShape, Commitment>(this);
   }
 }

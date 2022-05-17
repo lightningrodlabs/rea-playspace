@@ -1,11 +1,11 @@
 // Building Blocks
 
-interface IdDate {
+interface HasIdDate {
   id?: string;
   created?: Date;
 }
 
-interface TimeBase {
+interface HasTime {
   hasBegining?: Date;
   hasEnd?: Date;
   hasPointInTime?: Date;
@@ -13,35 +13,29 @@ interface TimeBase {
 }
 
 interface ReaBase {
+  provider: string;               // Agent ID
+  receiver: string;               // Agent ID
   resourceInventoriedAs?: string; // ResourceSprecification ID
   resourceConformsTo?: string;    // ResourceSprecification ID
   resourceQuantity?: number;
   effortQuantity?: number;
-  provider: string;               // Agent ID
-  receiver: string;               // Agent ID
   resourceClassifiedAs?: string;  // General classification or grouping
 }
 
-interface ProcessInput {
-  inputOf: string;  // Process ID
-  outputOf?: never; // Should not have an output Process ID
-}
-
-interface ProcessOutput {
-  inputOf?: never;  // Should not have an input Process ID
-  outputOf: string; // Process ID
+interface HasAction {
+  action: string;
 }
 
 // Knowledge
 
-export interface AgentShape extends IdDate {
+export interface AgentShape extends HasIdDate {
   name: string,
   note?: string,
   image?: string,
   primaryLocation?: string
 }
 
-export interface ResourceSpecificationShape extends IdDate {
+export interface ResourceSpecificationShape extends HasIdDate {
   name: string,
   note?: string,
   image?: string,
@@ -50,21 +44,37 @@ export interface ResourceSpecificationShape extends IdDate {
   defaultUnitOfEffort?: string
 }
 
-export interface ProcessSpecificationShape extends IdDate {
+export interface ProcessSpecificationShape extends HasIdDate {
   name: string,
   note?: string
 }
 
+export type InputOutput = 'input' | 'output';
+
+export type ResourceEffect = 'decrement' | 'decrementIncrement' | 'increment' | 'update' | 'remove' | 'noEffect';
+
+export interface ActionShape {
+  id: string;
+  label: string;
+  inputOutput?: InputOutput;
+  resourceEffect?: ResourceEffect;
+  onhandEffect?: ResourceEffect;
+  pairsWith?: string;
+  locationEffect?: string;
+  containedEffect?: string;
+  comment?: string;
+}
+
 // Plan
 
-export interface PlanShape extends IdDate {
+export interface PlanShape extends HasIdDate {
   name: string,
   note?: string,
   due?: Date
   process?: Record<string, ProcessShape>
 }
 
-export interface ProcessShape extends IdDate, TimeBase {
+export interface ProcessShape extends HasIdDate, HasTime {
   name: string,
   note?: string, // text-area
   finished: boolean, // defaults to false
@@ -74,17 +84,18 @@ export interface ProcessShape extends IdDate, TimeBase {
   plannedWithin: string, // ID of a Plan
 }
 
-interface CommitmentShape extends IdDate, TimeBase, ReaBase {
-  finished?: boolean,
-  inScopeOf?: string,
-  note?: string,
-  agreedIn?: string,
-  atLocation?: GeoPoint,
-  state?: string
+export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase {
+  plannedWithin: string;
+  independentDemandOf?: string;
+  finished?: boolean;
+  inScopeOf?: string;
+  note?: string;
+  agreedIn?: string;
+  atLocation?: GeoPoint;
+  state?: string;
+  inputOf?: string;
+  outputOf?: string;
 }
-
-export interface InputCommitmentShape extends CommitmentShape, ProcessInput {}
-export interface OutputCommitmentShape extends CommitmentShape, ProcessOutput {}
 
 // Observation
 export interface EconomicResourceShape {
@@ -104,7 +115,7 @@ export interface EconomicResourceShape {
   primaryAccountable: string; // Agent ID of the accountable party
 }
 
-interface EconomicEventShape extends IdDate, TimeBase, ReaBase {
+export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBase {
   note?: string;
   image?: string;
   agreedIn?: string;
@@ -112,10 +123,9 @@ interface EconomicEventShape extends IdDate, TimeBase, ReaBase {
   toLocation?: GeoPoint;
   state?: string;
   toResourceInventoriedAs: string; // EconomicResource ID that the transfer will be inventoried as.
+  inputOf?: string;
+  outputOf?: string;
 }
-
-export interface InputEconomicEventShape extends EconomicEventShape, ProcessInput {}
-export interface OutputEconomicEventShape extends EconomicEventShape, ProcessOutput {}
 
 // Geo
 
