@@ -32,6 +32,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [type, setType] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
+  const [currentPath, setCurrentPath] = useState<String>();
 
   const nodeTypes = useMemo(() => ({
     process: ProcessNode,
@@ -222,6 +223,7 @@ const FlowCanvas: React.FC<Props> = () => {
               // Set the state, then open the dialog
               setCurrentPosition(position);
               setType(type);
+              setCurrentPath(path);
               openModal();
               break;
             default:
@@ -256,7 +258,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const selectModalComponent = () => {
     switch (type) {
       case 'processSpecification':
-        return <ProcessModal position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
+        return <ProcessModal processSpecificationPath={currentPath} position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':

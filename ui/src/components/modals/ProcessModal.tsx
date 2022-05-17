@@ -1,8 +1,9 @@
 import { SlButton, SlCard, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
+import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Process } from "../../data/models/Valueflows/Plan";
 
 
@@ -16,15 +17,21 @@ const initialState = {
 }
 
 interface Props {
+  processSpecificaitonPath: string;
   position: XYPosition;
   closeModal: () => void;
   handleAddNode: (item: PathedData) => void;
 }
 
-const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) => {
+const ProcessModal: React.FC<Props> = ({processSpecificaitonPath, position, closeModal, handleAddNode}) => {
   const [
     {name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
+
+  useEffect(()=>{
+    let processSpec: ProcessSpecification = getDataStore().getCursor(processSpecificaitonPath);
+    setState(prevState => ({ ...prevState, name: processSpec.name, note:processSpec.note }));
+  },[]);
 
   const clearState = () => {
     setState({ ...initialState });
@@ -56,7 +63,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
         <br />
         <SlInput
           required
-          label="Name"
+          label="Name - prefil from process spec"
           name="name"
           // @ts-ignore
           onSlInput={onChange}
@@ -65,19 +72,11 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
         />
         <br />
         <SlInput
-          label="Finished"
+          label="Finished - turn into checkbox and bool"
           name="finished"
           // @ts-ignore
           onSlInput={onChange}
           value={`finished`}
-        />
-        <br />
-        <SlInput
-          label="Classified As"
-          name="classifiedAs"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={classifiedAs}
         />
         <br />
         <SlInput
@@ -86,6 +85,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
           // @ts-ignore
           onSlInput={onChange}
           value={inScopeOf}
+          placeholder="list of agents"
         />
         <br />
         <SlInput
@@ -97,7 +97,7 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
         />
         <br />
         <SlTextarea
-          label='Note'
+          label='Note - prefill from process spec'
           name='note'
           // @ts-ignore
           onSlInput={onChange}
