@@ -106,92 +106,78 @@ const FlowCanvas: React.FC<Props> = () => {
    * TODO: Sometimes, the ability to delete an item will depend on a whole Vf
    * graph, so we'll need to add a business logic library.
    */
-  const onNodesChange = useCallback(
-    async (changes) => {
-      setNodes((nds) => applyNodeChanges(changes, nds))
-      const store = getDataStore();
-      if (changes[0].type === 'remove') {
-        // use its ID to get a handle on it
-        const planId = store.getCurrentPlanId();
-        const nodeId = changes[0].id;
-        const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
+  // const onNodesChange = useCallback(
+  //   async (changes) => {
+  //     setNodes((nds) => applyNodeChanges(changes, nds))
+  //     const store = getDataStore();
+  //     if (changes[0].type === 'remove') {
+  //       // use its ID to get a handle on it
+  //       const planId = store.getCurrentPlanId();
+  //       const nodeId = changes[0].id;
+  //       const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
 
-        // Compute edges to delete
-        const edgesToDelete: Array<DisplayEdge> = [];
-        for (let edge of store.getDisplayEdges(planId)) {
-          if (edge.source == nodeId || edge.target == nodeId) {
-            edgesToDelete.push(edge);
-          }
-        }
-        // Create an array of promise returning functions to serialize execution of deletions
-        const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
+  //       // Compute edges to delete
+  //       const edgesToDelete: Array<DisplayEdge> = [];
+  //       for (let edge of store.getDisplayEdges(planId)) {
+  //         if (edge.source == nodeId || edge.target == nodeId) {
+  //           edgesToDelete.push(edge);
+  //         }
+  //       }
+  //       // Create an array of promise returning functions to serialize execution of deletions
+  //       const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
 
-        // get the paths
-        const nodePath: string = nodeToDelete.path;
-        const vfPath: string = nodeToDelete.vfPath;
+  //       // get the paths
+  //       const nodePath: string = nodeToDelete.path;
+  //       const vfPath: string = nodeToDelete.vfPath;
 
-        /**
-         * We don't want to delete the `Agents` or `ResourceSpecifications`, so
-         * let's add in some logic to handle special cases.
-         *
-         * TODO: Map out the various kinds of behaviours we need.
-         */
-        const type = getAlmostLastPart(vfPath);
-        switch (type) {
-          case 'process':
-            await store.delete(nodePath);
-            await store.delete(vfPath);
-            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
-            break;
-          default:
-            await store.delete(nodePath);
-            // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-            deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
-            break;
-        }
-      }
-      /** 
-       * track position change on every event while dragging node
-       * hold on to it outside of this callback because this will
-       * fire dozens of time per second. We need the last position the node
-       * had before its state changes from dragging=true to dragging=false
-      */
-      if (changes[0].type ==='position') {
-        if (changes[0].dragging) {
-          position.x = changes[0].position.x,
-          position.y = changes[0].position.y
-        } else {
-          /**
-           * when dragging == false then we can use the last save position
-           * and set that to the DisplayNode.position property.
-           * Then persist to DHT.
-          */
-          const planId = store.getCurrentPlanId();
-          const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
-          nodeToUpdate.position = position as XYPosition;
-          store.set(nodeToUpdate);
+  //       /**
+  //        * We don't want to delete the `Agents` or `ResourceSpecifications`, so
+  //        * let's add in some logic to handle special cases.
+  //        *
+  //        * TODO: Map out the various kinds of behaviours we need.
+  //        */
+  //       const type = getAlmostLastPart(vfPath);
+  //       switch (type) {
+  //         case 'process':
+  //           await store.delete(nodePath);
+  //           await store.delete(vfPath);
+  //           // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+  //           deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+  //           break;
+  //         default:
+  //           await store.delete(nodePath);
+  //           // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+  //           deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+  //           break;
+  //       }
+  //     }
+  //     /** 
+  //      * track position change on every event while dragging node
+  //      * hold on to it outside of this callback because this will
+  //      * fire dozens of time per second. We need the last position the node
+  //      * had before its state changes from dragging=true to dragging=false
+  //     */
+  //     if (changes[0].type ==='position') {
+  //       if (changes[0].dragging) {
+  //         position.x = changes[0].position.x,
+  //         position.y = changes[0].position.y
+  //       } else {
+  //         /**
+  //          * when dragging == false then we can use the last save position
+  //          * and set that to the DisplayNode.position property.
+  //          * Then persist to DHT.
+  //         */
+  //         const planId = store.getCurrentPlanId();
+  //         const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, changes[0].id));
+  //         nodeToUpdate.position = position as XYPosition;
+  //         store.set(nodeToUpdate);
 
-          resetPosition();
-        }
-      }
-    },
-    [setNodes]
-  );
-
-  const onEdgesChange = useCallback(
-    async (changes) => {
-      const store = getDataStore();
-      for (let edge of store.getDisplayEdges(store.getCurrentPlanId())) {
-        if (edge.id == changes[0].id ) {
-          store.delete(edge.path)
-        }
-      }
-      setEdges((edges) => applyEdgeChanges(changes, edges));
-      console.log(changes);
-    },
-    [setEdges]
-  );
+  //         resetPosition();
+  //       }
+  //     }
+  //   },
+  //   [setNodes]
+  // );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -271,6 +257,9 @@ const FlowCanvas: React.FC<Props> = () => {
       ],
       'process': [
         'resourceSpecification'
+      ],
+      'agent': [
+        'agent'
       ]
     };
 
@@ -317,7 +306,7 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
-   * Removes a Node
+   * Removes a Node and its corresponding VF data.
    */
    const onRemoveNode = async (change) => {
     const store = getDataStore();
@@ -363,6 +352,69 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
+   * Removes an edge and its commitment.
+   */
+  const onRemoveEdge = async (change) => {
+    const store = getDataStore();
+    // use its ID to get a handle on it
+    const planId = store.getCurrentPlanId();
+    const edgeId = change.id;
+    const edgeToDelete = store.getCursor(DisplayEdge.getPath(planId, edgeId));
+
+    // delete the edge
+    const edgePath: string = edgeToDelete.path;
+    await store.delete(edgePath);
+
+    // Guard this for now while data isn't consistent
+    // Delete the commitment
+    if(edgeToDelete.vfPath && (edgeToDelete.vfPath != undefined || edgeToDelete.vfPath != '')) {
+      const vfPath: string = edgeToDelete.vfPath;
+      await store.delete(vfPath);
+    }
+  }
+
+  /**
+   * Dispatches changes related to nodes
+   */
+  const onNodesChange = useCallback(
+    async (changes) => {
+      // TODO: move this call into the functions below when we add custom logic to determine if a node can be removed
+      setNodes((nds) => applyNodeChanges(changes, nds))
+      changes.forEach(change => {
+        switch (change.type) {
+          case 'remove':
+            onRemoveNode(change);
+            break;
+          case 'position':
+            onDragNode(change)
+            break;
+        }
+      });
+    },
+    [setNodes]
+  );
+
+  /**
+   * Dispatches changes related to edges
+   */
+  const onEdgesChange = useCallback(
+    async (changes) => {
+      // TODO: move this call into the functions below when we add custom logic to determine if a edge can be removed
+      setEdges((edges) => applyEdgeChanges(changes, edges));
+      console.log(changes);
+      changes.forEach(change => {
+        switch (change.type) {
+          case 'remove':
+            onRemoveEdge(change);
+          default:
+            break;
+        }
+      });
+    },
+    [setEdges]
+  );
+
+  /**
    * This returns the forms that go in the modal that open on the page when
    * something is dropped on the screen.
    *
@@ -383,13 +435,13 @@ const FlowCanvas: React.FC<Props> = () => {
   const selectModalComponent = () => {
     switch (type) {
       case 'processSpecification':
-        return <ProcessModal processSpecificationPath={currentPath} position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
+        return <ProcessModal processSpecificationPath={currentPath} closeModal={closeModal} handleAddNode={handleAddNode}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal closeModal={closeModal} handleAddEdge={handleAddEdge} />;
+        return <CommitmentModal sourcePath={source} targetPath={target} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
     }
   }
 
@@ -466,6 +518,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             zoomOnDoubleClick={false}
+            deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right"
             style={layoutStyle}>
