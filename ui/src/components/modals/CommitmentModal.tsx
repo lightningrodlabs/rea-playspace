@@ -161,9 +161,9 @@ const CommitmentModal: React.FC<Props> = ({sourcePath, targetPath, closeModal, h
         <br/>
         <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={resourceConformsTo}></SlInput>
         <br />
-        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} value={resourceQuantity.toString()}></SlInput>
+        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} valueAsNumber={resourceQuantity}></SlInput>
         <br />
-        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} value={effortQuantity.toString()}></SlInput>
+        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} valueAsNumber={effortQuantity}></SlInput>
         <br />
         <SlTextarea
           label='Note'
