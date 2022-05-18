@@ -10,9 +10,7 @@ import NewResourceSpecification from "./components/layout/create/NewResourceSpec
 import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
 import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
-import Modal from "react-modal";
-
-Modal.setAppElement("#root");
+import Modal from "react-modal"
 import {
   profilesStoreContext,
   ProfilesStore
@@ -23,6 +21,8 @@ import {
 } from "./elements";
 import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
+
+Modal.setAppElement("#root");
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
