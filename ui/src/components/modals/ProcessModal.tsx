@@ -41,7 +41,7 @@ const ProcessModal: React.FC<Props> = ({
 
   useEffect(()=>{
     let processSpec: ProcessSpecification = getDataStore().getCursor(processSpecificationPath);
-    setState(prevState => ({ ...prevState, name: processSpec.name}));
+    setState(prevState => ({ ...prevState, name: processSpec.name, basedOn: processSpec.id}));
     if (processSpec.note != null) {
       setState(prevState => ({ ...prevState, note:processSpec.note}));
     }
@@ -87,15 +87,6 @@ const ProcessModal: React.FC<Props> = ({
 
         />
         <br />
-        <SlCheckbox
-          name="finished"
-          // @ts-ignore
-          onSlInput={onChange}
-          checked={finished}
-        >Finished</SlCheckbox> 
-        <br />
-        <br />
-
         <SlSelect 
           label="In Scope Of" 
           name='inScopeOf' 
@@ -106,14 +97,14 @@ const ProcessModal: React.FC<Props> = ({
         </SlSelect>
 
         <br />
-        <SlInput
+        {/* <SlInput
           label="Based On"
           name="basedOn"
           // @ts-ignore
           onSlInput={onChange}
           value={basedOn}
         />
-        <br />
+        <br /> */}
         <SlTextarea
           label='Note'
           name='note'
