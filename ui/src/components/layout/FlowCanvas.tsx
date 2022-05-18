@@ -10,6 +10,8 @@ import ReactFlow, {
   applyNodeChanges,
   applyEdgeChanges,
   MarkerType,
+  MiniMap,
+  Controls,
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
 import CommitmentModal from '../modals/CommitmentModal';
@@ -487,6 +489,7 @@ const FlowCanvas: React.FC<Props> = () => {
       source,
       target,
       label: thing.action,
+      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
       vfPath: item.path,
       planId: store.getCurrentPlanId(),
       markerEnd: {
@@ -529,6 +532,8 @@ const FlowCanvas: React.FC<Props> = () => {
             fitView
             attributionPosition="top-right"
             style={layoutStyle}>
+            <MiniMap />
+            <Controls />
             <Background color="#aaa" gap={16} />
           </ReactFlow>
         </div>
