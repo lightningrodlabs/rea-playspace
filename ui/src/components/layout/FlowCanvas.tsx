@@ -8,7 +8,8 @@ import ReactFlow, {
   ReactFlowInstance,
   XYPosition,
   applyNodeChanges,
-  applyEdgeChanges
+  applyEdgeChanges,
+  MarkerType,
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
 import CommitmentModal from '../modals/CommitmentModal';
@@ -22,6 +23,7 @@ import { DisplayEdge, DisplayEdgeShape, DisplayNode } from "../../data/models/Ap
 import ProcessNode from '../nodes/ProcessNode';
 import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
 import { NamedData } from '../../data/models/NamedData';
+import { Commitment } from '../../data/models/Valueflows/Plan';
 
 interface Props {};
 
@@ -479,12 +481,17 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   async function handleAddEdge(item: PathedData & NamedData) {
     const store = getDataStore();
+    const thing = store.getCursor(item.path) as Commitment;
     // Add the edge
     const edge = new DisplayEdge({
       source,
       target,
+      label: thing.action,
       vfPath: item.path,
-      planId: store.getCurrentPlanId()
+      planId: store.getCurrentPlanId(),
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
     } as DisplayEdgeShape);
     await store.set(edge);
     setEdges((eds) => eds.concat(edge));
