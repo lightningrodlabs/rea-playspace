@@ -1,11 +1,16 @@
 import { SlButton, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { FormEvent, useEffect, useState } from 'react';
-import { PathedData } from '../../data/models/PathedData';
+import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
 import { ActionShape, AgentShape, CommitmentShape } from '../../types/valueflows';
-import { Commitment } from '../../data/models/Valueflows/Plan';
+import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import getDataStore from '../../data/DataStore';
+import { DisplayNode } from '../../data/models/Application/Display';
+import { Agent, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
+import { ObjectTransformations, ObjectTypeMap } from '../../data/models/ObjectTransformations';
 
 interface Props {
+  sourcePath: string,
+  targetPath: string,
   closeModal: () => void;
   handleAddEdge: (item: PathedData) => void;
 }
@@ -35,18 +40,70 @@ const initialState = {
   state: null
 } as CommitmentShape;
 
-const CommitmentModal: React.FC<Props> = ({closeModal, handleAddEdge}) => {
+const CommitmentModal: React.FC<Props> = ({sourcePath, targetPath, closeModal, handleAddEdge}) => {
 
   const [
-    {action, provider, receiver, note}, setState
+    {action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}, setState
   ] = useState(initialState);
 
   const [actions, setActions] = useState<ActionShape[]>([]);
   const [agents, setAgents] = useState<AgentShape[]>([]);
 
 
+  const setUpInputCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
+    const transformer1 = ObjectTransformations[sourceType];
+    const resource: ResourceSpecification = transformer1(sourceVfNode);
+    setState(prevState => ({ ...prevState, ['resourceConformsTo']: resource.id }));
+    const transformer2 = ObjectTransformations[targetType];
+    const process: Process = transformer2(targetVfNode);
+    setState(prevState => ({ ...prevState, ['inputOf']: process.id }));
+  }
+
+  const setUpOuputCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
+    const transformer1 = ObjectTransformations[sourceType];
+    const process: Process = transformer1(sourceVfNode);
+    setState(prevState => ({ ...prevState, ['outputOf']: process.id }));
+    const transformer2 = ObjectTransformations[targetType];
+    const resource: ResourceSpecification = transformer2(targetVfNode);
+    setState(prevState => ({ ...prevState, ['resourceConformsTo']: resource.id }));
+  }
+
+  const setUpTransferCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
+    const transformer1 = ObjectTransformations[sourceType];
+    const provider: Agent = transformer1(sourceVfNode);
+    setState(prevState => ({ ...prevState, ['provider']: provider.id }));
+    const transformer2 = ObjectTransformations[targetType];
+    const receiver: Agent = transformer2(targetVfNode);
+    setState(prevState => ({ ...prevState, ['receiver']: receiver.id }));
+  }
+
   useEffect(() => {
     const store = getDataStore();
+
+    // Grab the paths to the objects by their ID and grab the type of their vfPath
+    const sourceNode: DisplayNode = store.getCursor(store.lookUpPath(sourcePath));
+    const sourceVfNode: PathedData = store.getCursor(sourceNode.vfPath);
+    const sourceType = getAlmostLastPart(sourceVfNode.path);
+    const targetNode: DisplayNode = store.getCursor(store.lookUpPath(targetPath));
+    const targetVfNode: PathedData = store.getCursor(targetNode.vfPath)
+    const targetType = getAlmostLastPart(targetVfNode.path);
+
+    // based on the flows in the commitment, let's set up some sensible defaults
+    switch (`${sourceType}-${targetType}`) {
+      // This is an inputOf
+      case 'resourceSpecification-process':
+        setUpInputCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
+        break;
+      // this is an output 
+      case 'process-resourceSpecification':
+        setUpOuputCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
+        break;
+      // This is a transfer, set up the flow between the agents. User must select a resource.
+      case 'agent-agent':
+        setUpTransferCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
+        break;
+    }
+
     setActions(store.getActions());
     setAgents(store.getAgents());
   }, []);
@@ -66,13 +123,23 @@ const CommitmentModal: React.FC<Props> = ({closeModal, handleAddEdge}) => {
     const store = getDataStore();
     const plannedWithin = store.getCursor('root.planId');
     const commitment: Commitment = new Commitment(
-      {plannedWithin, action, provider, receiver, note}
+      {plannedWithin, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}
     );
     await store.set(commitment);
     handleAddEdge(commitment);
 
     clearState();
     closeModal();
+  }
+
+  const inputOrOutputOf = () => {
+    if (inputOf) {
+      return (<SlInput disabled label="Input of" name="inputOf" value={inputOf}></SlInput>)
+    } else if (outputOf) {
+      return (<SlInput disabled label="Output of" name="outputOf" value={outputOf}></SlInput>)
+    } else {
+      return (<p>This is a transfer.</p>)
+    }
   }
 
   return (
@@ -90,6 +157,14 @@ const CommitmentModal: React.FC<Props> = ({closeModal, handleAddEdge}) => {
           {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
         </SlSelect>
         <br/>
+        {inputOrOutputOf()}
+        <br/>
+        <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={resourceConformsTo}></SlInput>
+        <br />
+        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} value={resourceQuantity.toString()}></SlInput>
+        <br />
+        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} value={effortQuantity.toString()}></SlInput>
+        <br />
         <SlTextarea
           label='Note'
           name='note'

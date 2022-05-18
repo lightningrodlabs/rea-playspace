@@ -176,6 +176,9 @@ const FlowCanvas: React.FC<Props> = () => {
       ],
       'process': [
         'resourceSpecification'
+      ],
+      'agent': [
+        'agent'
       ]
     };
 
@@ -357,7 +360,7 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal closeModal={closeModal} handleAddEdge={handleAddEdge} />;
+        return <CommitmentModal sourcePath={source} targetPath={target} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
     }
   }
 
