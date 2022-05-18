@@ -125,7 +125,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
       
         <SlCard className="new-agent-card">
           <ListProfiles
-              onagentselected={(e:Event) => handleAddAgentFromProfile(e)}
+              onagentselected={(e:CustomEvent) => handleAddAgentFromProfile(e)}
             ></ListProfiles>
           <form onSubmit={handleSubmit}>
           </form>
