@@ -434,6 +434,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             zoomOnDoubleClick={false}
+            deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right"
             style={layoutStyle}>
