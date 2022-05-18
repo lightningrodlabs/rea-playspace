@@ -19,6 +19,7 @@ export interface DisplayEdgeShape {
   source: string;
   target: string;
   label: string;
+  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
   markerEnd: Object;
@@ -73,6 +74,7 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   source: string;
   target: string;
   label: string;
+  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
   markerEnd: MarkerType;
@@ -81,7 +83,6 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
     this.id = this.id ? this.id : Guid.raw();
   }
-
 
   static getPrefix(planId: string): string {
     return `root.plan.${planId}.displayEdge`;
