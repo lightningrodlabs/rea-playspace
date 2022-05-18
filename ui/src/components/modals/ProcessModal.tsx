@@ -97,14 +97,6 @@ const ProcessModal: React.FC<Props> = ({
         </SlSelect>
 
         <br />
-        {/* <SlInput
-          label="Based On"
-          name="basedOn"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={basedOn}
-        />
-        <br /> */}
         <SlTextarea
           label='Note'
           name='note'
