@@ -49,7 +49,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [source, setSource] = useState<string>();
   const [target, setTarget] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
-  const [currentPath, setCurrentPath] = useState<String>();
+  const [currentPath, setCurrentPath] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
 
   // need a variable outside of the onNodesChange callback below. useState too async-y
@@ -383,7 +383,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const selectModalComponent = () => {
     switch (type) {
       case 'processSpecification':
-        return <ProcessModal position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
+        return <ProcessModal processSpecificationPath={currentPath} position={currentPosition} closeModal={closeModal} handleAddNode={handleAddNode}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':
@@ -447,7 +447,7 @@ const FlowCanvas: React.FC<Props> = () => {
   };
 
   const style = {
-    flexGrow:23
+    flexGrow:10
   }
 
   return (
