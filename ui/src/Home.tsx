@@ -9,13 +9,13 @@ interface Props {}
 const Home: React.FC<Props> = () => {
   const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
   const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
-  // const [agents, setAgents] = useState<Agent[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(()=>{
     const store = getDataStore();
     setResourceSpecifications(store.getResourceSpecifications());
     setProcessSpecifications(store.getProcessSpecifications());
-    // setAgents(store.getAgents());
+    setAgents(store.getAgents());
   }, []);
 
   return(
@@ -23,6 +23,7 @@ const Home: React.FC<Props> = () => {
       <Pallet
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
+        agents={agents}
       />
       <FlowCanvas />
     </div>

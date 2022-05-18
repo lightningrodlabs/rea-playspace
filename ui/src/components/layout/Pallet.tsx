@@ -8,12 +8,13 @@ import PalletNode from '../PalletNode';
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
-  // agents: Array<Agent>
+  agents: Array<Agent>
 }
 
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
-  processSpecifications
+  processSpecifications,
+  agents
 }) => {
 
   /**
@@ -70,6 +71,21 @@ const Pallet: React.FC<Props> = ({
     return (<p style={{textAlign: "center"}}>No items</p>);
   }
 
+  function renderAgents(list, type) {
+    if (list.length > 0) {
+      return (list.map((item: any) => (
+        <div
+        key={item.id}
+        style={pickStyle(type)}>
+          <PalletNode
+            thing={item}
+          />
+        </div>
+      )));
+    }
+    return (<p style={{textAlign: "center"}}>No items</p>);
+  }
+
   const palletStyles: CSSProperties = {
     flexGrow: 1,
     marginRight: "10px",
@@ -104,14 +120,14 @@ const Pallet: React.FC<Props> = ({
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
       <br/>
-      {/* <div style={categoryStyles}>
+      <div style={categoryStyles}>
         <h2>Agents
         <Link to="/agents/new">
           <SlIconButton name="plus-square-fill" label="Settings" />
         </Link>
         </h2>
       </div>
-      {renderNodes(agents, 'agent')} */}
+      {renderAgents(agents, 'agent')}
       <br/>
     </aside>
   )
