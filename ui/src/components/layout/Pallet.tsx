@@ -8,13 +8,13 @@ import PalletNode from '../PalletNode';
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
-  agents: Array<Agent>
+  // agents: Array<Agent>
 }
 
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
-  processSpecifications,
-  agents}) => {
+  processSpecifications
+}) => {
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
@@ -104,14 +104,14 @@ const Pallet: React.FC<Props> = ({
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
       <br/>
-      <div style={categoryStyles}>
+      {/* <div style={categoryStyles}>
         <h2>Agents
         <Link to="/agents/new">
           <SlIconButton name="plus-square-fill" label="Settings" />
         </Link>
         </h2>
       </div>
-      {renderNodes(agents, 'agent')}
+      {renderNodes(agents, 'agent')} */}
       <br/>
     </aside>
   )
