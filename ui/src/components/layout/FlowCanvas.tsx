@@ -176,6 +176,9 @@ const FlowCanvas: React.FC<Props> = () => {
       ],
       'process': [
         'resourceSpecification'
+      ],
+      'agent': [
+        'agent'
       ]
     };
 
@@ -222,7 +225,7 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
-   * Removes a Node
+   * Removes a Node and its corresponding VF data.
    */
    const onRemoveNode = async (change) => {
     const store = getDataStore();
@@ -268,11 +271,33 @@ const FlowCanvas: React.FC<Props> = () => {
   }
 
   /**
+   * Removes an edge and its commitment.
+   */
+  const onRemoveEdge = async (change) => {
+    const store = getDataStore();
+    // use its ID to get a handle on it
+    const planId = store.getCurrentPlanId();
+    const edgeId = change.id;
+    const edgeToDelete = store.getCursor(DisplayEdge.getPath(planId, edgeId));
+
+    // delete the edge
+    const edgePath: string = edgeToDelete.path;
+    await store.delete(edgePath);
+
+    // Guard this for now while data isn't consistent
+    // Delete the commitment
+    if(edgeToDelete.vfPath && (edgeToDelete.vfPath != undefined || edgeToDelete.vfPath != '')) {
+      const vfPath: string = edgeToDelete.vfPath;
+      await store.delete(vfPath);
+    }
+  }
+
+  /**
    * Dispatches changes related to nodes
    */
   const onNodesChange = useCallback(
     async (changes) => {
-      // TODO: remove this call when we add custom logic to determine if a node can be removed
+      // TODO: move this call into the functions below when we add custom logic to determine if a node can be removed
       setNodes((nds) => applyNodeChanges(changes, nds))
       changes.forEach(change => {
         switch (change.type) {
@@ -293,10 +318,13 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onEdgesChange = useCallback(
     async (changes) => {
+      // TODO: move this call into the functions below when we add custom logic to determine if a edge can be removed
       setEdges((edges) => applyEdgeChanges(changes, edges));
       console.log(changes);
       changes.forEach(change => {
         switch (change.type) {
+          case 'remove':
+            onRemoveEdge(change);
           default:
             break;
         }
@@ -332,7 +360,7 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal closeModal={closeModal} handleAddEdge={handleAddEdge} />;
+        return <CommitmentModal sourcePath={source} targetPath={target} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
     }
   }
 
@@ -409,6 +437,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             zoomOnDoubleClick={false}
+            deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right"
             style={layoutStyle}>
