@@ -1,4 +1,4 @@
-import { SlButton, SlCard, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
+import { SlButton, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
 import { XYPosition } from 'react-flow-renderer';
 import getDataStore from '../../data/DataStore';
