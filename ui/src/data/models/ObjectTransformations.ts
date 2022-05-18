@@ -12,7 +12,8 @@ import {
   ResourceSpecificationShape,
   ProcessSpecificationShape,
   PlanShape,
-  ProcessShape} from "../../types/valueflows";
+  ProcessShape,
+  CommitmentShape} from "../../types/valueflows";
 import {
   Root
 } from "./Application/Root";
@@ -22,6 +23,7 @@ import {
   ProcessSpecification
 } from "./Valueflows/Knowledge";
 import {
+  Commitment,
   Plan,
   Process
 } from "./Valueflows/Plan";
@@ -36,17 +38,15 @@ import {
  * Map from a parent path slug to a function that transforms the object into the corresponding class
  */
 export const ObjectTransformations = {
-  'agent': function (object: Object) { return new Agent(object as AgentShape); },
-  'resourceSpecification': function (object: Object) { return new ResourceSpecification(object as ResourceSpecificationShape); },
-  'processSpecification': function (object: Object) { return new ProcessSpecification(object as ProcessSpecificationShape); },
-  'plan': function (object: Object) { return new Plan(object as PlanShape); },
-  'process': function (object: Object) { return new Process(object as ProcessShape); },
-  'displayNode': function (object: Object) { return new DisplayNode(object as DisplayNodeShape); },
-  'displayEdge': function (object: Object) { return new DisplayEdge(object as DisplayEdgeShape); },
-  'inputCommitment': function () { throw new Error('Not yet implemented'); },
-  'outputCommitment': function () { throw new Error('Not yet implemented'); },
-  'inputEconomicEvent': function () { throw new Error('Not yet implemented'); },
-  'outputEconomicEvent': function () { throw new Error('Not yet implemented'); }
+  'agent': (object: Object) => new Agent(object as AgentShape),
+  'resourceSpecification': (object: Object) => new ResourceSpecification(object as ResourceSpecificationShape),
+  'processSpecification': (object: Object) => new ProcessSpecification(object as ProcessSpecificationShape),
+  'plan': (object: Object) => new Plan(object as PlanShape),
+  'process': (object: Object) => new Process(object as ProcessShape),
+  'displayNode': (object: Object) => new DisplayNode(object as DisplayNodeShape),
+  'displayEdge': (object: Object) => new DisplayEdge(object as DisplayEdgeShape),
+  'commitment': (object: Object) => new Commitment(object as CommitmentShape),
+  'economicEvent': function () { throw new Error('Not yet implemented'); }
 };
 
 /**
