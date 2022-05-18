@@ -40,7 +40,6 @@ const ProcessModal: React.FC<Props> = ({
     {name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
   ] = useState(initialState);
   const [agentMap, setAgentMap] = useState<Map<string, JSX.Element>>(new Map());
-  const [selectedAgent, setSelectedAgent] = useState<string, JSX.Element>();
   const [loading, setLoading] = useState<boolean>(true);
 
   useConstructor(() => {
@@ -71,7 +70,6 @@ const ProcessModal: React.FC<Props> = ({
   const handleSelect = e => {
     const agentName = e.detail.item.innerHTML;
     setState(prevState => ({ ...prevState, inScopeOf: agentName }));
-    setSelectedAgent
   };
 
   const handleSubmit = async (e) => {

@@ -25,6 +25,7 @@ export class Plan implements PlanShape, PathedData, NamedData {
   note?: string;
   due?: Date;
   process?: Record<string, ProcessShape>;
+  commitment: Record<string, CommitmentShape>;
   displayNode?: Record<string, DisplayNode>;
   displayEdge?: Record<string, DisplayEdge>;
 
@@ -33,6 +34,7 @@ export class Plan implements PlanShape, PathedData, NamedData {
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? this.created : new Date();
     this.process = {};
+    this.commitment = {};
     this.displayNode = {};
     this.displayEdge = {};
   }
@@ -168,7 +170,7 @@ export class Commitment implements CommitmentShape, PathedData {
   }
 
   static getPrefix(planId: string): string {
-    return `root.plan.${planId}.Commitment`;
+    return `root.plan.${planId}.commitment`;
   }
 
   static getPath(planId: string, id: string): string {
