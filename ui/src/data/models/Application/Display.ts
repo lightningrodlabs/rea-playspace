@@ -1,5 +1,5 @@
 import { Guid } from "guid-typescript";
-import { XYPosition, Node, Edge } from 'react-flow-renderer';
+import { XYPosition, Node, Edge, MarkerType } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, toJSON, fieldsToJSON } from '../../../utils';
@@ -18,8 +18,11 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
+  label: string;
+  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
+  markerEnd: Object;
 }
 
 export class DisplayNode implements Node, PathedData, NamedData {
@@ -70,8 +73,11 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
+  label: string;
+  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
+  markerEnd: MarkerType;
 
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);

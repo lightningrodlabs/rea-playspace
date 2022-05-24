@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo } from 'react';
+import React from 'react';
 
 import { Handle, Position } from 'react-flow-renderer';
 
@@ -14,68 +14,22 @@ interface Props {
 
 const ResourceSpecificationNode: React.FC<Props> = ({data}) => {
 
-  const nodeStyles = {
-    border: '1px solid green',
-    width: '125px',
-    height: '50px',
-    background: "lightgreen",
-    borderRadius: "10px"
-  }
-
-  const nodeHeader: CSSProperties = {
-    borderBottomWidth: '1px', 
-    borderBottomStyle: 'solid',
-    fontSize: '10px',
-    paddingLeft: '8px',
-    paddingTop: '4px',
-    paddingBottom: '4px', 
-    borderColor: 'green'
-  }
-
-  const handleRight: CSSProperties = {
-    width: "8px", 
-    height: '8px', 
-    backgroundColor: 'rgb(189, 196, 204)', 
-    border: 'white solid 1px', 
-    position:'absolute', 
-    right: '-4px',
-    top: '35px'
-  }
-
-  const handleLeft: CSSProperties = { 
-    width: "8px", 
-    height: '8px', 
-    backgroundColor: 'rgb(189, 196, 204)', 
-    border: 'white solid 1px', 
-    position:'absolute', 
-    left: '-4px',
-    top: '35px'
-  }
-
-  const nodeBody: CSSProperties = {
-    fontSize: '10px',
-    paddingLeft: "12px", 
-    paddingRight: "12px"
-  }
-
   return (
     <>
       <div key={data.id} style={{position:'relative'}}>
-      <div style={nodeStyles}>
-          <div style={nodeHeader}>{data.label}</div>
-          <div style={nodeBody}>
+      <div className='canvas-node-base canvas-node-resource-specification'>
+          <div className='canvas-node-header-base canvas-node-resource-specification'>{data.label}</div>
+          <div className='canvas-node-body'>
             <Handle
               type="target"
               position={Position.Left}
-              style={handleLeft}
-              onConnect={(params) => console.log('handle onConnect', params)}
+              className='canvas-node-handle-base canvas-node-handle-left'
             />
             <p>{data.name}</p>
             <Handle
               type="source"
               position={Position.Right}
-              id="a"
-              style={handleRight}
+              className='canvas-node-handle-base canvas-node-handle-right'
             />
           </div>
         </div>
