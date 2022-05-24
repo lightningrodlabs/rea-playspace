@@ -23,6 +23,7 @@ export interface DisplayEdgeShape {
   vfPath?: string;
   planId: string;
   markerEnd: Object;
+  data?: any;
 }
 
 export class DisplayNode implements Node, PathedData, NamedData {
@@ -73,6 +74,8 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
+  sourceHandle?: string | null;
+  targetHandle?: string | null;
   label: string;
   labelBgStyle: Object;
   vfPath?: string;
@@ -82,6 +85,19 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
     this.id = this.id ? this.id : Guid.raw();
+  }
+
+  public toEdge(): Edge {
+    return {
+      id: `reactflow__edge-${this.source}${this.sourceHandle || ''}-${this.target}${this.targetHandle || ''}`,
+      source: this.source,
+      target: this.target,
+      sourceHandle: this.sourceHandle,
+      targetHandle: this.targetHandle,
+      data: {
+        id: this.id
+      }
+    }
   }
 
   static getPrefix(planId: string): string {
@@ -97,6 +113,9 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   }
 
   public toJSON() {
-    return toJSON<DisplayEdgeShape, DisplayEdge>(this);
+    return fieldsToJSON<DisplayEdgeShape, DisplayEdge>(
+      this,
+      ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'vfPath', 'planId']
+    );
   }
 }

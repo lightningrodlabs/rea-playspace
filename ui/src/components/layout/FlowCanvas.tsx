@@ -12,6 +12,8 @@ import ReactFlow, {
   MarkerType,
   MiniMap,
   Controls,
+  Edge,
+  updateEdge
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
 import CommitmentModal from '../modals/CommitmentModal';
@@ -24,12 +26,22 @@ import { DisplayEdge, DisplayEdgeShape, DisplayNode } from "../../data/models/Ap
 import ProcessNode from '../nodes/ProcessNode';
 import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
 import { NamedData } from '../../data/models/NamedData';
-import { Commitment } from '../../data/models/Valueflows/Plan';
+import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
+import { ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
+import { Commitment, Process } from '../../data/models/Valueflows/Plan';
+import { CommitmentShape } from '../../types/valueflows';
 
 interface Props {};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  let actionFiber = Promise.resolve();
+  // Execute each deletion in serial fashion, so each one is based on the right Holochain head
+  const scheduleActions = (actions: Array<()=>Promise<void>>): Promise<void> => {
+    actions.unshift(async () => console.log('called scheduleActions'));
+    return actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
+  }
 
   // STATE MANAGEMENT
 
@@ -49,6 +61,7 @@ const FlowCanvas: React.FC<Props> = () => {
    *   + position
    */
   const [type, setType] = useState<string>();
+  const [commitmentState, setCommitmentState] = useState<CommitmentShape>();
   const [source, setSource] = useState<string>();
   const [target, setTarget] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
@@ -97,7 +110,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     setNodes(displayNodes);
-    setEdges(displayEdges);
+    setEdges(displayEdges.map((node: DisplayEdge) => node.toEdge()));
   };
 
   const onDragOver = useCallback((event) => {
@@ -110,7 +123,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * pallet, this deserializes it and gets user input if needed.
    */
   const onDrop = useCallback(
-    async (event) => {
+    (event) => {
       event.preventDefault();
       // Grab the path and coords asap
       // If an async function depends on the data from the event, we need to make a closure
@@ -139,7 +152,6 @@ const FlowCanvas: React.FC<Props> = () => {
           // Get the type and the item
           const type = getAlmostLastPart(path);
           const item = store.getCursor(path);
-          console.log(type, path, item, position)
 
           /**
            * Choose the action that will happen based on the object type.
@@ -155,7 +167,7 @@ const FlowCanvas: React.FC<Props> = () => {
               break;
             default:
               // Nothing special just put the node where we need it, no user input
-              await handleAddNode(item, position);
+              handleAddNode(item, position);
               break;
           }
         }
@@ -165,39 +177,156 @@ const FlowCanvas: React.FC<Props> = () => {
   );
 
   /**
-   * This is called each time a connection is made between two nodes.
+   * Adds a display node corresponding to a Valueflows object.
+   *
+   * vfPath refers to the Valueflows object.
    */
-   const onConnect = async (params: Connection) => {
-    const {source, sourceHandle, target, targetHandle} = params;
+   const handleAddNode = (item: PathedData & NamedData, position?: XYPosition) => {
+    // Item is from the form entered in the modal
+    // and has already been stored on the DHT by this point
     const store = getDataStore();
 
-    // Validate objects can be connected
+    // Create an HDK entry version of the node
+    const newNode = new DisplayNode({
+      name: item.name,
+      vfPath: item.path,
+      planId: store.getCurrentPlanId(),
+      type: getAlmostLastPart(item.path),
+      position: position ? position : currentPosition
+    });
+
+    // Persist to DHT
+    scheduleActions([
+      async () => store.set(newNode),
+      async () => {
+        // Add to local state to render new node on canvas
+        setNodes((nds) => nds.concat(newNode));
+        // reset state
+        setType(null);
+        setCurrentPosition(undefined);
+      }
+    ]);
+  }
+
+  const setUpInputCommitment = (resource: ResourceSpecification, process: Process): CommitmentShape => {
+    const store = getDataStore();
+    return {
+      plannedWithin: store.getCurrentPlanId(),
+      resourceConformsTo: resource.id,
+      provider: null,
+      receiver: process.inScopeOf,
+      action: 'use',
+      inputOf: process.id
+    };
+  }
+
+  const setUpOuputCommitment = (process: Process, resource: ResourceSpecification): CommitmentShape => {
+    const store = getDataStore();
+    return {
+      plannedWithin: store.getCurrentPlanId(),
+      resourceConformsTo: resource.id,
+      provider: process.inScopeOf,
+      receiver: null,
+      action: 'use',
+      outputOf: process.id
+    };
+  }
+
+  const setUpTransferCommitment = (source: ResourceSpecification, target: ResourceSpecification): CommitmentShape => {
+    const store = getDataStore();
+    return {
+      plannedWithin: store.getCurrentPlanId(),
+      resourceConformsTo: source.id,
+      provider: null,
+      receiver: null,
+      action: 'transfer'
+    };
+  }
+
+  /**
+   * Validate if a connection can happen
+   */
+  const validateConnection = (sourceType: string, targetType: string): boolean => {
     const validSourceTargets = {
       'resourceSpecification': [
-        'process'
+        'process',
+        'resourceSpecification'
       ],
       'process': [
         'resourceSpecification'
-      ],
-      'agent': [
-        'agent'
       ]
     };
+    return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
+  }
+
+  /**
+   * This is called each time a connection is made between two nodes.
+   */
+   const onConnect = (params: Connection) => {
+    const {source, sourceHandle, target, targetHandle} = params;
+    const store = getDataStore();
 
     // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getCursor(store.lookUpPath(source));
+    const sourceNode: DisplayNode = store.getById(source);
     const sourceType = getAlmostLastPart(sourceNode.vfPath);
-    const targetNode: DisplayNode = store.getCursor(store.lookUpPath(target));
+    const T = ObjectTypeMap[sourceType];
+    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
+    const targetNode: DisplayNode = store.getById(target);
     const targetType = getAlmostLastPart(targetNode.vfPath);
+    const U = ObjectTypeMap[sourceType];
+    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
+
+    let initial: CommitmentShape;
+
+    // based on the flows in the commitment, let's set up some sensible defaults
+    switch (`${sourceType}-${targetType}`) {
+      // This is an inputOf
+      case 'resourceSpecification-process':
+        initial = setUpInputCommitment(sourceVfNode, targetVfNode);
+        break;
+      // this is an output
+      case 'process-resourceSpecification':
+        initial = setUpOuputCommitment(sourceVfNode, targetVfNode);
+        break;
+      // This is a transfer, set up the flow between the agents. User must select a resource.
+      case 'resourceSpecification-resourceSpecification':
+        initial = setUpTransferCommitment(sourceVfNode, targetVfNode);
+        break;
+    }
 
     // If the connection is valid, open the commitment modal
-    if (validSourceTargets[sourceType].indexOf(targetType) >= 0) {
+    if (validateConnection(sourceType, targetType)) {
       setType('commitment');
+      setCommitmentState(initial);
       setSource(source);
       setTarget(target);
       openModal();
     }
   };
+
+ /**
+   * Adds an edge corresponding to a commitment
+   */
+  const handleAddEdge = (item: PathedData & NamedData) => {
+    const store = getDataStore();
+    // Add the edge
+    const edge = new DisplayEdge({
+      source,
+      target,
+      vfPath: item.path,
+      planId: store.getCurrentPlanId()
+    } as DisplayEdgeShape);
+    scheduleActions([
+      async () => store.set(edge),
+      async () => {
+        setEdges((eds) => eds.concat(edge.toEdge()));
+        setType(null);
+        setCommitmentState(null);
+        setSource(null);
+        setTarget(null);
+      }
+    ]);
+  }
 
   /**
    * Track position change on every event while dragging node.
@@ -206,7 +335,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * fire dozens of time per second. We need the last position the node
    * had before its state changes from dragging=true to dragging=false
    */
-  const onDragNode = async (change) => {
+  const onDragNode = (change) => {
     if (change.dragging) {
       position.x = change.position.x,
       position.y = change.position.y
@@ -219,22 +348,50 @@ const FlowCanvas: React.FC<Props> = () => {
       const store = getDataStore();
       const planId = store.getCurrentPlanId();
       const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, change.id));
-      nodeToUpdate.position = position as XYPosition;
-      store.set(nodeToUpdate);
+      nodeToUpdate.position = {...position as XYPosition};
+      scheduleActions([
+        async () => store.set(nodeToUpdate),
+        async () => resetPosition()
+      ]);
+    }
+  }
 
-      resetPosition();
+  /**
+   * Update an edge when it's dragged to a new node.
+   *
+   * TIL: In React Flows an edge is uniquely defined by:
+   *   `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`
+   * I do not like this. -JB
+   */
+  const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
+    // Check if it's allowed
+    if (validateConnection(newConnection.source, newConnection.target)) {
+      const store = getDataStore();
+      const dEdge: DisplayEdge = store.getById(edge.data.id);
+      dEdge.source = newConnection.source;
+      dEdge.target = newConnection.target;
+      dEdge.sourceHandle = newConnection.sourceHandle;
+      dEdge.targetHandle = newConnection.targetHandle;
+      // TODO: We should probably update the commitment and display the edit dialog
+      scheduleActions([
+        async () => store.set(dEdge),
+        async () => setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
+      ]);
     }
   }
 
   /**
    * Removes a Node and its corresponding VF data.
    */
-   const onRemoveNode = async (change) => {
+   const onRemoveNode = (change) => {
     const store = getDataStore();
     // use its ID to get a handle on it
     const planId = store.getCurrentPlanId();
     const nodeId = change.id;
     const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
+    // get the paths
+    const nodePath: string = nodeToDelete.path;
+    const vfPath: string = nodeToDelete.vfPath;
 
     // Compute edges to delete
     const edgesToDelete: Array<DisplayEdge> = [];
@@ -244,11 +401,10 @@ const FlowCanvas: React.FC<Props> = () => {
       }
     }
     // Create an array of promise returning functions to serialize execution of deletions
-    const deleteFuncs = edgesToDelete.map((edge) => (async () => store.delete(edge.path)));
-
-    // get the paths
-    const nodePath: string = nodeToDelete.path;
-    const vfPath: string = nodeToDelete.vfPath;
+    const deleteFuncs = [
+      async () => store.delete(nodePath),
+      ...edgesToDelete.map((edge) => (async () => store.delete(edge.path)))
+    ];
 
     /**
      * We don't want to delete the `Agents` or `ResourceSpecifications`, so
@@ -259,38 +415,38 @@ const FlowCanvas: React.FC<Props> = () => {
     const type = getAlmostLastPart(vfPath);
     switch (type) {
       case 'process':
-        await store.delete(nodePath);
-        await store.delete(vfPath);
-        // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-        deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
-        break;
-      default:
-        await store.delete(nodePath);
-        // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-        deleteFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+        deleteFuncs.push(async () => store.delete(vfPath));
         break;
     }
+    deleteFuncs.push(async() => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge())));
+    scheduleActions(deleteFuncs);
   }
 
   /**
    * Removes an edge and its commitment.
    */
-  const onRemoveEdge = async (change) => {
-    const store = getDataStore();
-    // use its ID to get a handle on it
-    const planId = store.getCurrentPlanId();
-    const edgeId = change.id;
-    const edgeToDelete = store.getCursor(DisplayEdge.getPath(planId, edgeId));
-
-    // delete the edge
-    const edgePath: string = edgeToDelete.path;
-    await store.delete(edgePath);
-
-    // Guard this for now while data isn't consistent
-    // Delete the commitment
-    if(edgeToDelete.vfPath && (edgeToDelete.vfPath != undefined || edgeToDelete.vfPath != '')) {
+  const onRemoveEdge = (change) => {
+    console.log('on remove edge', {change}, {edges})
+    const edgeArray = edges.filter((e: Edge) => {
+      console.log(e.id, change.id)
+      return e.id == change.id
+    });
+    // If we don't have an edge, don't do it. It probably got deleted by onRemoveNode or this function.
+    if (edgeArray.length == 1) {
+      const edgeId = edgeArray[0].data.id;
+      // use its ID to get a handle on it
+      const store = getDataStore();
+      const planId = store.getCurrentPlanId();
+      const edgeToDelete = store.getCursor(DisplayEdge.getPath(planId, edgeId));
+      const edgePath: string = edgeToDelete.path;
       const vfPath: string = edgeToDelete.vfPath;
-      await store.delete(vfPath);
+      console.log(edgePath, vfPath);
+      // Delete the edge and commitment
+      scheduleActions([
+        async () => store.delete(edgePath),
+        async () => vfPath? store.delete(vfPath) : null,
+        async () => setEdges((es) => applyEdgeChanges([change], es))
+      ]);
     }
   }
 
@@ -312,7 +468,7 @@ const FlowCanvas: React.FC<Props> = () => {
         }
       });
     },
-    [setNodes]
+    [setNodes, setEdges]
   );
 
   /**
@@ -320,14 +476,13 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onEdgesChange = useCallback(
     async (changes) => {
-      // TODO: move this call into the functions below when we add custom logic to determine if a edge can be removed
-      setEdges((edges) => applyEdgeChanges(changes, edges));
-      console.log(changes);
       changes.forEach(change => {
         switch (change.type) {
           case 'remove':
             onRemoveEdge(change);
+            break;
           default:
+            setEdges((es) => applyEdgeChanges(changes, es));
             break;
         }
       });
@@ -362,59 +517,8 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal sourcePath={source} targetPath={target} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
+        return <CommitmentModal commitmentState={commitmentState} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
     }
-  }
-
-  /**
-   * Adds a display node corresponding to a Valueflows object.
-   *
-   * vfPath refers to the Valueflows object.
-   */
-  async function handleAddNode(item: PathedData & NamedData, position?: XYPosition) {
-    // Item is from the form entered in the modal
-    // and has already been stored on the DHT by this point
-    const store = getDataStore();
-
-    // Create an HDK entry version of the node
-    const newNode = new DisplayNode({
-      name: item.name,
-      vfPath: item.path,
-      planId: store.getCurrentPlanId(),
-      type: getAlmostLastPart(item.path),
-      position: position ? position : currentPosition
-    });
-
-    // Persist to DHT
-    store.set(newNode);
-
-    // Add to local state to render new node on canvas
-    setNodes((nds) => nds.concat(newNode));
-
-    // reset node state
-    setCurrentPosition(undefined);
-  }
-
-  /**
-   * Adds an edge corresponding to a commitment
-   */
-  async function handleAddEdge(item: PathedData & NamedData) {
-    const store = getDataStore();
-    const thing = store.getCursor(item.path) as Commitment;
-    // Add the edge
-    const edge = new DisplayEdge({
-      source,
-      target,
-      label: thing.action,
-      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
-      vfPath: item.path,
-      planId: store.getCurrentPlanId(),
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-      },
-    } as DisplayEdgeShape);
-    await store.set(edge);
-    setEdges((eds) => eds.concat(edge));
   }
 
   return (
@@ -429,6 +533,7 @@ const FlowCanvas: React.FC<Props> = () => {
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onEdgeUpdate={onEdgeUpdate}
             onConnect={onConnect}
             onInit={onInit}
             onDrop={onDrop}
@@ -452,4 +557,3 @@ const FlowCanvas: React.FC<Props> = () => {
 }
 
 export default FlowCanvas;
-
