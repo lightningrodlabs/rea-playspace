@@ -308,12 +308,18 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const handleAddEdge = (item: PathedData & NamedData) => {
     const store = getDataStore();
+    const thing = store.getCursor(item.path) as Commitment;
     // Add the edge
     const edge = new DisplayEdge({
       source,
       target,
+      label: thing.action,
+      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
       vfPath: item.path,
-      planId: store.getCurrentPlanId()
+      planId: store.getCurrentPlanId(),
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
     } as DisplayEdgeShape);
     scheduleActions([
       async () => store.set(edge),
