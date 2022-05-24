@@ -38,9 +38,8 @@ const FlowCanvas: React.FC<Props> = () => {
 
   let actionFiber = Promise.resolve();
   // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-  const scheduleActions = (actions: Array<()=>Promise<void>>): Promise<void> => {
-    actions.unshift(async () => console.log('called scheduleActions'));
-    return actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
+  const scheduleActions = (actions: Array<()=>Promise<void>>) => {
+    actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
   }
 
   // STATE MANAGEMENT
@@ -263,7 +262,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * This is called each time a connection is made between two nodes.
    */
    const onConnect = (params: Connection) => {
-    const {source, sourceHandle, target, targetHandle} = params;
+    const {source, target} = params;
     const store = getDataStore();
 
     // Grab the paths to the objects by their ID and grab the type of their vfPath
@@ -400,26 +399,16 @@ const FlowCanvas: React.FC<Props> = () => {
         edgesToDelete.push(edge);
       }
     }
-    // Create an array of promise returning functions to serialize execution of deletions
-    const deleteFuncs = [
-      async () => store.delete(nodePath),
-      ...edgesToDelete.map((edge) => (async () => store.delete(edge.path)))
-    ];
-
-    /**
-     * We don't want to delete the `Agents` or `ResourceSpecifications`, so
-     * let's add in some logic to handle special cases.
-     *
-     * TODO: Map out the various kinds of behaviours we need.
-     */
     const type = getAlmostLastPart(vfPath);
-    switch (type) {
-      case 'process':
-        deleteFuncs.push(async () => store.delete(vfPath));
-        break;
-    }
-    deleteFuncs.push(async() => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge())));
-    scheduleActions(deleteFuncs);
+
+    // Create an array of promise returning functions to serialize execution of deletions
+    scheduleActions([
+      async () => store.delete(nodePath),
+      ...edgesToDelete.map((edge) => (async () => store.delete(edge.path))),
+      // We don't want to delete the `Agents` or `ResourceSpecifications`
+      async () => { if (type == 'process') store.delete(vfPath)},
+      async() => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge()))
+    ]);
   }
 
   /**
