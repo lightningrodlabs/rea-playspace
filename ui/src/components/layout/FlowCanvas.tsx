@@ -17,7 +17,6 @@ import AgentModal from '../modals/AgentModal';
 import CommitmentModal from '../modals/CommitmentModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
-import AgentNode from '../nodes/AgentNode';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import getDataStore from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
@@ -77,8 +76,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
   const nodeTypes = useMemo(() => ({
     process: ProcessNode,
-    resourceSpecification: ResourceSpecificationNode,
-    agent: AgentNode
+    resourceSpecification: ResourceSpecificationNode
   }), []);
 
   // INITIALIZATION
@@ -500,24 +498,13 @@ const FlowCanvas: React.FC<Props> = () => {
     setEdges((eds) => eds.concat(edge));
   }
 
-  // UI ELEMENTS
-
-  const layoutStyle = {
-    border: "black 1px solid",
-    height: "87vh",
-    width: "auto"
-  };
-
-  const style = {
-    flexGrow:10
-  }
-
   return (
-    <div style={style}>
+    <div className='rf-provider-container'>
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
           <ReactFlow
             id="flow-canvas"
+            className='rea-flow-canvas'
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
@@ -530,8 +517,7 @@ const FlowCanvas: React.FC<Props> = () => {
             zoomOnDoubleClick={false}
             deleteKeyCode='AltLeft+Backspace'
             fitView
-            attributionPosition="top-right"
-            style={layoutStyle}>
+            attributionPosition="top-right">
             <MiniMap />
             <Controls />
             <Background color="#aaa" gap={16} />

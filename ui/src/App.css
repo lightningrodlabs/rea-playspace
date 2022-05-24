@@ -136,9 +136,6 @@
   margin-right: var(--sl-spacing-small);
 }
 
-
-/* Transfer */
-
 .resource-select-menu-item {
   width: 100%;
 }
@@ -148,6 +145,105 @@
   justify-content: space-between;
 }
 
+/* Pallet */
+
+.pallet-node {
+  border: 1px solid;
+  margin: 5px;
+  border-radius: 10px;
+  padding: 4px;
+  text-align: center;
+}
+
+.resource-specification-pallet-node {
+  border-color:green;
+  background: lightgreen;
+}
+
+.process-specification-pallet-node {
+  border-color: orange;
+  background: rgb(255, 213, 128);
+}
+
+.agent-pallet-node {
+  border-color: blue;
+  background: lightblue;
+}
+
+.pallet-styles {
+  flex-basis: 15%;
+  margin-right: 15px;
+  overflow-y: scroll;
+  max-height: 85vh;
+}
+
+.category-styles {
+  border: 1px solid black;
+  background: lightgray;
+  padding: 5px;
+  margin: 10px;
+}
+
+/* Nodes */
+
+.canvas-node-base {
+  border: 1px solid;
+  width: 125px;
+  height: 50px;
+}
+
+.canvas-node-body {
+  font-size: 10px;
+  padding-left: 12px; 
+  padding-right: 12px;
+}
+
+.canvas-node-header-base {
+  border-bottom-width: 1px; 
+  border-bottom-style: solid;
+  font-size: 10px;
+  padding-left: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.canvas-node-handle-base {
+  width: 8px !important;
+  height: 8px !important; 
+  background-color: rgb(189, 196, 204) !important;
+  border: white solid 1px !important;
+  position:absolute !important; 
+  top: 35px !important;
+}
+
+.canvas-node-handle-right {
+  right: -4px !important;
+}
+
+.canvas-node-handle-left {
+  left: -4px !important;
+}
+
+.canvas-node-resource-specification {
+  border-color: green;
+  background: lightgreen;
+}
+
+.process-colors {
+  border-color: orange;
+  background: rgb(255, 213, 128);
+}
+
+.canvas-node-process {
+  border-radius: 10px;
+}
+
+.canvas-node-header-process {
+  border-color: orange;
+}
+
+
+/* New Agent */
 .new-agent-card {
   display: block;
   flex-basis: 100%;
@@ -155,6 +251,16 @@
 
 .new-agent-card:last-child {
   margin-left: 40px;
+}
+
+.rf-provider-container {
+  flex-basis: 85%;
+}
+
+.rea-flow-canvas {
+  border: black 1px solid;
+  height: 90vh !important;
+  width: auto !important;
 }
 
 /* pi-hacker-button */
