@@ -1,16 +1,12 @@
 import { SlButton, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { FormEvent, useEffect, useState } from 'react';
-import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
+import { PathedData } from '../../data/models/PathedData';
 import { ActionShape, AgentShape, CommitmentShape } from '../../types/valueflows';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import getDataStore from '../../data/DataStore';
-import { DisplayNode } from '../../data/models/Application/Display';
-import { Agent, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
-import { ObjectTransformations, ObjectTypeMap } from '../../data/models/ObjectTransformations';
 
 interface Props {
-  sourcePath: string,
-  targetPath: string,
+  commitmentState: CommitmentShape;
   closeModal: () => void;
   handleAddEdge: (item: PathedData) => void;
 }
@@ -40,70 +36,17 @@ const initialState = {
   state: null
 } as CommitmentShape;
 
-const CommitmentModal: React.FC<Props> = ({sourcePath, targetPath, closeModal, handleAddEdge}) => {
+const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAddEdge}) => {
 
   const [
     {action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}, setState
-  ] = useState(initialState);
+  ] = useState({...initialState, ...commitmentState});
 
   const [actions, setActions] = useState<ActionShape[]>([]);
   const [agents, setAgents] = useState<AgentShape[]>([]);
 
-
-  const setUpInputCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
-    const transformer1 = ObjectTransformations[sourceType];
-    const resource: ResourceSpecification = transformer1(sourceVfNode);
-    setState(prevState => ({ ...prevState, ['resourceConformsTo']: resource.id }));
-    const transformer2 = ObjectTransformations[targetType];
-    const process: Process = transformer2(targetVfNode);
-    setState(prevState => ({ ...prevState, ['inputOf']: process.id }));
-  }
-
-  const setUpOuputCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
-    const transformer1 = ObjectTransformations[sourceType];
-    const process: Process = transformer1(sourceVfNode);
-    setState(prevState => ({ ...prevState, ['outputOf']: process.id }));
-    const transformer2 = ObjectTransformations[targetType];
-    const resource: ResourceSpecification = transformer2(targetVfNode);
-    setState(prevState => ({ ...prevState, ['resourceConformsTo']: resource.id }));
-  }
-
-  const setUpTransferCommitment = (sourceType: string, sourceVfNode: PathedData, targetType: string, targetVfNode: PathedData) => {
-    const transformer1 = ObjectTransformations[sourceType];
-    const provider: Agent = transformer1(sourceVfNode);
-    setState(prevState => ({ ...prevState, ['provider']: provider.id }));
-    const transformer2 = ObjectTransformations[targetType];
-    const receiver: Agent = transformer2(targetVfNode);
-    setState(prevState => ({ ...prevState, ['receiver']: receiver.id }));
-  }
-
   useEffect(() => {
     const store = getDataStore();
-
-    // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getCursor(store.lookUpPath(sourcePath));
-    const sourceVfNode: PathedData = store.getCursor(sourceNode.vfPath);
-    const sourceType = getAlmostLastPart(sourceVfNode.path);
-    const targetNode: DisplayNode = store.getCursor(store.lookUpPath(targetPath));
-    const targetVfNode: PathedData = store.getCursor(targetNode.vfPath)
-    const targetType = getAlmostLastPart(targetVfNode.path);
-
-    // based on the flows in the commitment, let's set up some sensible defaults
-    switch (`${sourceType}-${targetType}`) {
-      // This is an inputOf
-      case 'resourceSpecification-process':
-        setUpInputCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
-        break;
-      // this is an output 
-      case 'process-resourceSpecification':
-        setUpOuputCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
-        break;
-      // This is a transfer, set up the flow between the agents. User must select a resource.
-      case 'agent-agent':
-        setUpTransferCommitment(sourceType, sourceVfNode, targetType, targetVfNode);
-        break;
-    }
-
     setActions(store.getActions());
     setAgents(store.getAgents());
   }, []);
