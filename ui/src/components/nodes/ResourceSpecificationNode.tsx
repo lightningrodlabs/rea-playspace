@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo } from 'react';
+import React from 'react';
 
 import { Handle, Position } from 'react-flow-renderer';
 
