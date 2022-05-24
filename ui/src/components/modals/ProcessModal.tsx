@@ -88,7 +88,7 @@ const ProcessModal: React.FC<Props> = ({
         />
         <br />
         <SlSelect 
-          label="In Scope Of" 
+          label="Accountable" 
           name='inScopeOf' 
           value={inScopeOf} 
           onSlChange={onChange} 
