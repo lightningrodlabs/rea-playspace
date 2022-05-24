@@ -1,10 +1,10 @@
-import { SlButton, SlInput, SlTextarea } from '@shoelace-style/shoelace/dist/react';
-import React, { useState } from 'react';
-import { XYPosition } from 'react-flow-renderer';
+import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import React, { useEffect, useState } from 'react';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
+import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Process } from "../../data/models/Valueflows/Plan";
-
+import { AgentShape } from '../../types/valueflows';
 
 const initialState = {
   name: '',
@@ -16,15 +16,35 @@ const initialState = {
 }
 
 interface Props {
-  position: XYPosition;
+  processSpecificationPath: string;
   closeModal: () => void;
   handleAddNode: (item: PathedData) => void;
 }
 
-const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) => {
+const ProcessModal: React.FC<Props> = ({
+  processSpecificationPath,
+  closeModal, 
+  handleAddNode
+}) => {
   const [
-    {name, finished, note, classifiedAs, inScopeOf, basedOn}, setState
+    {name, 
+    finished, 
+    note, 
+    classifiedAs, 
+    inScopeOf, 
+    basedOn}, setState
   ] = useState(initialState);
+  const [agents, setAgents] = useState<AgentShape[]>([]);
+
+  useEffect(()=>{
+    let processSpec: ProcessSpecification = getDataStore().getCursor(processSpecificationPath);
+    setState(prevState => ({ ...prevState, name: processSpec.name, basedOn: processSpec.id}));
+    if (processSpec.note != null) {
+      setState(prevState => ({ ...prevState, note:processSpec.note}));
+    }
+    const store = getDataStore();
+    setAgents(store.getAgents());
+  },[]);
 
   const clearState = () => {
     setState({ ...initialState });
@@ -64,37 +84,15 @@ const ProcessModal: React.FC<Props> = ({position, closeModal, handleAddNode}) =>
 
         />
         <br />
-        <SlInput
-          label="Finished"
-          name="finished"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={`finished`}
-        />
-        <br />
-        <SlInput
-          label="Classified As"
-          name="classifiedAs"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={classifiedAs}
-        />
-        <br />
-        <SlInput
-          label="In Scope Of"
-          name="inScopeOf"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={inScopeOf}
-        />
-        <br />
-        <SlInput
-          label="Based On"
-          name="basedOn"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={basedOn}
-        />
+        <SlSelect 
+          label="Accountable" 
+          name='inScopeOf' 
+          value={inScopeOf} 
+          onSlChange={onChange} 
+          required>
+          {agents.map((agent) => (<SlMenuItem key={`agent_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        </SlSelect>
+
         <br />
         <SlTextarea
           label='Note'

@@ -23,7 +23,8 @@ const Home: React.FC<Props> = () => {
       <Pallet
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
-        agents={agents}/>
+        agents={agents}
+      />
       <FlowCanvas />
     </div>
   )
