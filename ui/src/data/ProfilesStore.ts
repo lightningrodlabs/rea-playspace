@@ -13,12 +13,17 @@ const config: Partial<ProfilesConfig> = {
 };
 
 export async function getProfilesStore() {
+  console.log('getting profile store...');
   if (profilesStore) {
+    console.log('exists returning...', profilesStore);
     return profilesStore;
   }
   const client = await getHolochainClient();
-  const cellData: InstalledCell = client.cellDataByRoleId('reaplayspace');
+  console.log('got holochainClient: ', client);
+  const cellData: InstalledCell = client.cellDataByRoleId('reaplayspace'); // maybe this is screwing up?
+  console.log('got cellData: ', cellData);
   const cellClient: CellClient = client.forCell(cellData);
+  console.log('got cellClient: ', cellClient);
   profilesStore = new ProfilesStore(cellClient, config);
   profilesService = new ProfilesService(cellClient);
   myProfile = await profilesService.getMyProfile();
