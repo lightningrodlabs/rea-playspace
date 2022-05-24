@@ -8,6 +8,7 @@ use tracing::{info};
 use data::*;
 use tree_clean::{mark_tree, reindex_tree, prune_tree};
 
+// entry defs
 entry_defs![
   PathEntry::entry_def(),
   Thing::entry_def()
