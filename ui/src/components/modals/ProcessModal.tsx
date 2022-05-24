@@ -1,11 +1,8 @@
-import { AgentProfile } from '@holochain-open-dev/profiles';
-import { SlButton, SlDropdown, SlCheckbox, SlDivider, SlIcon, SlInput, SlMenu, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
-import { Guid } from 'guid-typescript';
-import React, { useEffect, useRef, useState } from 'react';
-import { XYPosition } from 'react-flow-renderer';
+import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import React, { useEffect, useState } from 'react';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
-import { Agent, ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
+import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Process } from "../../data/models/Valueflows/Plan";
 import { AgentShape } from '../../types/valueflows';
 
