@@ -14,43 +14,23 @@ interface Props {
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
   processSpecifications,
-  agents}) => {
+  agents
+}) => {
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
    * path in it. We'll use that to get a cursor to the object.
    */
-  const onDragStart = (event:DragEvent, item: PathedData, type: string) => {
+  const onDragStart = (event:DragEvent, item: PathedData) => {
     const data = { path: item.path };
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
   };
 
-  const resourceSpecificationPalletNodeStyles = {
-      border: "1px solid green",
-      background: "lightgreen",
-      margin: "5px",
-      borderRadius: "10px"
-  }
-
-  const processSpecificationPalletNodeStyles = {
-    border: "1px solid orange",
-    background: "rgb(255, 213, 128)",
-    margin: "5px",
-    borderRadius: "10px"
-  }
-
-  const agentPalletNodeStyles = {
-    border: "1px solid blue",
-    background: "lightblue",
-    margin: "5px",
-    borderRadius: "10px"
-  }
-
   function pickStyle(type: string) {
-    if (type === 'resourceSpecification') return resourceSpecificationPalletNodeStyles;
-    if (type === 'processSpecification') return processSpecificationPalletNodeStyles;
-    if (type === 'agent') return agentPalletNodeStyles;
+    if (type === 'resourceSpecification') return 'resource-specification-pallet-node';
+    if (type === 'processSpecification') return 'process-specification-pallet-node';
+    if (type === 'agent') return 'agent-pallet-node';
   }
 
   function renderNodes(list, type) {
@@ -58,9 +38,9 @@ const Pallet: React.FC<Props> = ({
       return (list.map((item: any) => (
         <div
         key={item.id}
-        onDragStart={(event: any) => onDragStart(event, item, type)}
+        onDragStart={(event: any) => onDragStart(event, item)}
         draggable
-        style={pickStyle(type)}>
+        className={'pallet-node ' + pickStyle(type)}>
           <PalletNode
             thing={item}
           />
@@ -70,48 +50,52 @@ const Pallet: React.FC<Props> = ({
     return (<p style={{textAlign: "center"}}>No items</p>);
   }
 
-  const palletStyles: CSSProperties = {
-    flexGrow: 1,
-    marginRight: "10px",
-    overflowY: "scroll",
-    maxHeight: "85vh"
-  }
-
-  const categoryStyles: CSSProperties = {
-    border: "1px solid black",
-    background: "lightgray",
-    padding: "5px",
-    margin: "10px"
+  function renderAgents(list: Array<any>, type: string) {
+    if (list.length > 0) {
+      return (list.map((item: any) => (
+        <div
+        key={item.id}
+        className={'pallet-node ' + pickStyle(type)}>
+          <PalletNode
+            thing={item}
+          />
+        </div>
+      )));
+    }
+    return (<p style={{textAlign: "center"}}>No items</p>);
   }
 
   return (
-    <aside style={palletStyles}>
-      <div style={categoryStyles}>
-      <h2>Resource Specifications
+    <aside className='pallet-styles'>
+      <div className='category-styles'>
+      <h2>
         <Link to="/resources/new">
           <SlIconButton name="plus-square-fill" label="Settings" />
         </Link>
+        Resource Specifications
       </h2>
       </div>
       {renderNodes(resourceSpecifications, 'resourceSpecification')}
       <br/>
-      <div style={categoryStyles}>
-        <h2>Processes
-        <Link to="/processes/new">
+      <div className='category-styles'>
+        <h2>
+          <Link to="/processes/new">
           <SlIconButton name="plus-square-fill" label="Settings"/>
-        </Link>
+          </Link>
+          Processes
         </h2>
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
       <br/>
-      <div style={categoryStyles}>
-        <h2>Agents
-        <Link to="/agents/new">
-          <SlIconButton name="plus-square-fill" label="Settings" />
-        </Link>
+      <div className='category-styles'>
+        <h2>
+          <Link to="/agents/new">
+            <SlIconButton name="plus-square-fill"   label="Settings" />
+          </Link>
+          Agents
         </h2>
       </div>
-      {renderNodes(agents, 'agent')}
+      {renderAgents(agents, 'agent')}
       <br/>
     </aside>
   )
