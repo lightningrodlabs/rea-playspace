@@ -4,14 +4,16 @@ import { PathedData } from '../../data/models/PathedData';
 import { ActionShape, AgentShape, CommitmentShape } from '../../types/valueflows';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import getDataStore from '../../data/DataStore';
+import { assignFields } from '../../utils';
 
 interface Props {
   commitmentState: CommitmentShape;
   closeModal: () => void;
-  handleAddEdge: (item: PathedData) => void;
+  afterward?: (item: PathedData) => void;
 }
 
 const initialState = {
+  id: '',
   plannedWithin: '',          // Needed: Plan ID
   action: 'use',              // Needed: Action ID
   provider: '',               // Needed: Agent ID
@@ -36,10 +38,9 @@ const initialState = {
   state: null
 } as CommitmentShape;
 
-const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAddEdge}) => {
-
+const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterward}) => {
   const [
-    {action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}, setState
+    {id, plannedWithin, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}, setState
   ] = useState({...initialState, ...commitmentState});
 
   const [actions, setActions] = useState<ActionShape[]>([]);
@@ -57,19 +58,34 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAd
 
   const onChange = (e: any) => {
     const { name, value } = e.target;
-    setState(prevState => ({ ...prevState, [name]: value }));
+
+    // It seems the shoelace only provides numeric values when calling serialize
+    if (name in ['resourceQuantity', 'effortQuantity']) {
+      setState(prevState => ({ ...prevState, [name]: parseFloat(value) }));
+    } else {
+      setState(prevState => ({ ...prevState, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const store = getDataStore();
-    const plannedWithin = store.getCursor('root.planId');
-    const commitment: Commitment = new Commitment(
-      {plannedWithin, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}
-    );
-    await store.set(commitment);
-    handleAddEdge(commitment);
+    if (id) {
+      const commitment = store.getById(id);
+      assignFields(
+        {id, plannedWithin, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note},
+        commitment
+      );
+      await store.set(commitment);
+      if (afterward) afterward(commitment);
+    } else {
+      const commitment: Commitment = new Commitment(
+        {plannedWithin: store.getCurrentPlanId(), action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}
+      );
+      await store.set(commitment);
+      if (afterward) afterward(commitment);
+    }
 
     clearState();
     closeModal();
@@ -85,6 +101,10 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAd
     }
   }
 
+  /**
+   * TIL: valueAsNumber does not cause the the value to display.
+   * This might be because of how we're using shoelace. /me shrugs
+   */
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -104,9 +124,9 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAd
         <br/>
         <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={resourceConformsTo}></SlInput>
         <br />
-        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} valueAsNumber={resourceQuantity}></SlInput>
+        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} value={resourceQuantity.toString()}></SlInput>
         <br />
-        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} valueAsNumber={effortQuantity}></SlInput>
+        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} value={effortQuantity.toString()}></SlInput>
         <br />
         <SlTextarea
           label='Note'
@@ -115,7 +135,7 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAd
           onSlInput={onChange}
           value={note}
         />
-        <SlButton type="submit" variant="primary">Create</SlButton>
+        <SlButton type="submit" variant="primary">{id? 'Update' : 'Create'}</SlButton>
       </form>
     </>
   );
