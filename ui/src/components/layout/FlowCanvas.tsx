@@ -308,10 +308,12 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const handleAddEdge = (item: PathedData & NamedData) => {
     const store = getDataStore();
+    const thing = store.getCursor(item.path) as Commitment;
     // Add the edge
     const edge = new DisplayEdge({
       source,
       target,
+      label: thing.action,
       vfPath: item.path,
       planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
@@ -476,7 +478,7 @@ const FlowCanvas: React.FC<Props> = () => {
         }
       });
     },
-    [setEdges]
+    [setEdges, edges]
   );
 
   /**

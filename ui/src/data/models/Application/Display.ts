@@ -19,10 +19,8 @@ export interface DisplayEdgeShape {
   source: string;
   target: string;
   label: string;
-  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
-  markerEnd: Object;
   data?: any;
 }
 
@@ -77,10 +75,8 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   sourceHandle?: string | null;
   targetHandle?: string | null;
   label: string;
-  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
-  markerEnd: MarkerType;
 
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
@@ -94,6 +90,11 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
       target: this.target,
       sourceHandle: this.sourceHandle,
       targetHandle: this.targetHandle,
+      label: this.label,
+      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
       data: {
         id: this.id
       }
@@ -115,7 +116,7 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   public toJSON() {
     return fieldsToJSON<DisplayEdgeShape, DisplayEdge>(
       this,
-      ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'vfPath', 'planId']
+      ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'label', 'vfPath', 'planId']
     );
   }
 }
