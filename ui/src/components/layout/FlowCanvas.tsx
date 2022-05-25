@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef, useEffect, useMemo} from 'react';
+import React, {useState, useCallback, useRef, useEffect, useMemo, SyntheticEvent} from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   Background,
@@ -9,10 +9,10 @@ import ReactFlow, {
   XYPosition,
   applyNodeChanges,
   applyEdgeChanges,
-  MarkerType,
   MiniMap,
   Controls,
   Edge,
+  Node,
   updateEdge
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
@@ -63,6 +63,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const [commitmentState, setCommitmentState] = useState<CommitmentShape>();
   const [source, setSource] = useState<string>();
   const [target, setTarget] = useState<string>();
+  const [selectedDisplayEdge, setSelectedDisplayEdge] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
   const [currentPath, setCurrentPath] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
@@ -111,6 +112,8 @@ const FlowCanvas: React.FC<Props> = () => {
     setNodes(displayNodes);
     setEdges(displayEdges.map((node: DisplayEdge) => node.toEdge()));
   };
+
+  // NODE HANDLERS
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -207,127 +210,7 @@ const FlowCanvas: React.FC<Props> = () => {
     ]);
   }
 
-  const setUpInputCommitment = (resource: ResourceSpecification, process: Process): CommitmentShape => {
-    const store = getDataStore();
-    return {
-      plannedWithin: store.getCurrentPlanId(),
-      resourceConformsTo: resource.id,
-      provider: null,
-      receiver: process.inScopeOf,
-      action: 'use',
-      inputOf: process.id
-    };
-  }
-
-  const setUpOuputCommitment = (process: Process, resource: ResourceSpecification): CommitmentShape => {
-    const store = getDataStore();
-    return {
-      plannedWithin: store.getCurrentPlanId(),
-      resourceConformsTo: resource.id,
-      provider: process.inScopeOf,
-      receiver: null,
-      action: 'use',
-      outputOf: process.id
-    };
-  }
-
-  const setUpTransferCommitment = (source: ResourceSpecification, target: ResourceSpecification): CommitmentShape => {
-    const store = getDataStore();
-    return {
-      plannedWithin: store.getCurrentPlanId(),
-      resourceConformsTo: source.id,
-      provider: null,
-      receiver: null,
-      action: 'transfer'
-    };
-  }
-
-  /**
-   * Validate if a connection can happen
-   */
-  const validateConnection = (sourceType: string, targetType: string): boolean => {
-    const validSourceTargets = {
-      'resourceSpecification': [
-        'process',
-        'resourceSpecification'
-      ],
-      'process': [
-        'resourceSpecification'
-      ]
-    };
-    return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
-  }
-
-  /**
-   * This is called each time a connection is made between two nodes.
-   */
-   const onConnect = (params: Connection) => {
-    const {source, target} = params;
-    const store = getDataStore();
-
-    // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getById(source);
-    const sourceType = getAlmostLastPart(sourceNode.vfPath);
-    const T = ObjectTypeMap[sourceType];
-    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
-    const targetNode: DisplayNode = store.getById(target);
-    const targetType = getAlmostLastPart(targetNode.vfPath);
-    const U = ObjectTypeMap[sourceType];
-    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
-
-    let initial: CommitmentShape;
-
-    // based on the flows in the commitment, let's set up some sensible defaults
-    switch (`${sourceType}-${targetType}`) {
-      // This is an inputOf
-      case 'resourceSpecification-process':
-        initial = setUpInputCommitment(sourceVfNode, targetVfNode);
-        break;
-      // this is an output
-      case 'process-resourceSpecification':
-        initial = setUpOuputCommitment(sourceVfNode, targetVfNode);
-        break;
-      // This is a transfer, set up the flow between the agents. User must select a resource.
-      case 'resourceSpecification-resourceSpecification':
-        initial = setUpTransferCommitment(sourceVfNode, targetVfNode);
-        break;
-    }
-
-    // If the connection is valid, open the commitment modal
-    if (validateConnection(sourceType, targetType)) {
-      setType('commitment');
-      setCommitmentState(initial);
-      setSource(source);
-      setTarget(target);
-      openModal();
-    }
-  };
-
- /**
-   * Adds an edge corresponding to a commitment
-   */
-  const handleAddEdge = (item: PathedData & NamedData) => {
-    const store = getDataStore();
-    const thing = store.getCursor(item.path) as Commitment;
-    // Add the edge
-    const edge = new DisplayEdge({
-      source,
-      target,
-      label: thing.action,
-      vfPath: item.path,
-      planId: store.getCurrentPlanId()
-    } as DisplayEdgeShape);
-    scheduleActions([
-      async () => store.set(edge),
-      async () => {
-        setEdges((eds) => eds.concat(edge.toEdge()));
-        setType(null);
-        setCommitmentState(null);
-        setSource(null);
-        setTarget(null);
-      }
-    ]);
-  }
+  const onNodeEdit = (event: SyntheticEvent, node: Node) => { console.log(event, node, "Hiyii!")}
 
   /**
    * Track position change on every event while dragging node.
@@ -336,7 +219,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * fire dozens of time per second. We need the last position the node
    * had before its state changes from dragging=true to dragging=false
    */
-  const onDragNode = (change) => {
+   const onDragNode = (change) => {
     if (change.dragging) {
       position.x = change.position.x,
       position.y = change.position.y
@@ -353,30 +236,6 @@ const FlowCanvas: React.FC<Props> = () => {
       scheduleActions([
         async () => store.set(nodeToUpdate),
         async () => resetPosition()
-      ]);
-    }
-  }
-
-  /**
-   * Update an edge when it's dragged to a new node.
-   *
-   * TIL: In React Flows an edge is uniquely defined by:
-   *   `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`
-   * I do not like this. -JB
-   */
-  const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
-    // Check if it's allowed
-    if (validateConnection(newConnection.source, newConnection.target)) {
-      const store = getDataStore();
-      const dEdge: DisplayEdge = store.getById(edge.data.id);
-      dEdge.source = newConnection.source;
-      dEdge.target = newConnection.target;
-      dEdge.sourceHandle = newConnection.sourceHandle;
-      dEdge.targetHandle = newConnection.targetHandle;
-      // TODO: We should probably update the commitment and display the edit dialog
-      scheduleActions([
-        async () => store.set(dEdge),
-        async () => setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
       ]);
     }
   }
@@ -413,6 +272,182 @@ const FlowCanvas: React.FC<Props> = () => {
     ]);
   }
 
+  // EDGE BUSINESS LOGIC
+  const commitmentDefaults = {
+    // This is an input
+    'resourceSpecification-process': (resource: ResourceSpecification, process: Process): CommitmentShape => {
+      const store = getDataStore();
+      return {
+        plannedWithin: store.getCurrentPlanId(),
+        resourceConformsTo: resource.id,
+        provider: null,
+        receiver: process.inScopeOf,
+        action: 'use',
+        inputOf: process.id
+      };
+    },
+    // this is an output
+    'process-resourceSpecification': (process: Process, resource: ResourceSpecification): CommitmentShape => {
+      const store = getDataStore();
+      return {
+        plannedWithin: store.getCurrentPlanId(),
+        resourceConformsTo: resource.id,
+        provider: process.inScopeOf,
+        receiver: null,
+        action: 'use',
+        outputOf: process.id
+      };
+    },
+    // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
+    'resourceSpecification-resourceSpecification': (source: ResourceSpecification, target: ResourceSpecification): CommitmentShape => {
+      const store = getDataStore();
+      return {
+        plannedWithin: store.getCurrentPlanId(),
+        resourceConformsTo: source.id,
+        provider: null,
+        receiver: null,
+        action: 'transfer'
+      };
+    }
+  }
+
+  /**
+   * Validate if a connection can happen
+   */
+  const validateConnection = (sourceType: string, targetType: string): boolean => {
+    const validSourceTargets = {
+      'resourceSpecification': [
+        'process',
+        'resourceSpecification'
+      ],
+      'process': [
+        'resourceSpecification'
+      ]
+    };
+    return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
+  }
+
+  // EDGE HANDLERS
+
+  /**
+   * This is called each time a connection is made between two nodes.
+   */
+   const onConnect = (params: Connection) => {
+    const {source, target} = params;
+    const store = getDataStore();
+
+    // Grab the paths to the objects by their ID and grab the type of their vfPath
+    const sourceNode: DisplayNode = store.getById(source);
+    const sourceType = getAlmostLastPart(sourceNode.vfPath);
+    const T = ObjectTypeMap[sourceType];
+    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
+
+    const targetNode: DisplayNode = store.getById(target);
+    const targetType = getAlmostLastPart(targetNode.vfPath);
+    const U = ObjectTypeMap[sourceType];
+    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
+
+    // based on the flows in the commitment, let's set up some sensible defaults
+    const initial: CommitmentShape = commitmentDefaults[`${sourceType}-${targetType}`](sourceVfNode, targetVfNode);
+
+    // If the connection is valid, open the commitment modal
+    if (validateConnection(sourceType, targetType)) {
+      setType('commitment');
+      setCommitmentState(initial);
+      setSource(source);
+      setTarget(target);
+      openModal();
+    }
+  };
+
+ /**
+   * Adds a DisplayEdge and React Flow Edge corresponding to a commitment
+   */
+  const afterAddCommitment = (commitment: Commitment) => {
+    const store = getDataStore();
+    // Add the edge
+    const edge = new DisplayEdge({
+      source,
+      target,
+      label: commitment.action,
+      vfPath: commitment.path,
+      planId: store.getCurrentPlanId()
+    } as DisplayEdgeShape);
+    scheduleActions([
+      async () => store.set(edge),
+      async () => {
+        setEdges((eds) => eds.concat(edge.toEdge()));
+        setType(null);
+        setCommitmentState(null);
+        setSource(null);
+        setTarget(null);
+      }
+    ]);
+  }
+
+  /**
+   * Update an edge when it's dragged to a new node.
+   *
+   * TIL: In React Flows an edge is uniquely defined by:
+   *   `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`
+   * I do not like this. -JB
+   */
+  const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
+    // Check if it's allowed
+    if (validateConnection(newConnection.source, newConnection.target)) {
+      const store = getDataStore();
+      const dEdge: DisplayEdge = store.getById(edge.data.id);
+      dEdge.source = newConnection.source;
+      dEdge.target = newConnection.target;
+      dEdge.sourceHandle = newConnection.sourceHandle;
+      dEdge.targetHandle = newConnection.targetHandle;
+      // TODO: We should probably update the commitment and display the edit dialog
+      scheduleActions([
+        async () => store.set(dEdge),
+        async () => setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
+      ]);
+    }
+  }
+
+  /**
+   * Edit an edge when it's double clicked
+   */
+  const onEdgeEdit = (event: SyntheticEvent, edge: Edge) => {
+    const store = getDataStore();
+    const vfEdge = store.getById(edge.data.id) as DisplayEdge;
+    const vfCommitment = store.getCursor(vfEdge.vfPath);
+    setCommitmentState(vfCommitment);
+    setSelectedDisplayEdge(vfEdge.id);
+    setType('updateCommitment');
+    openModal();
+  }
+
+  /**
+   * Updates the DisplayEdge and Edge (React Flow) object after an edit
+   */
+  const afterEdgeEdit = (commitment: Commitment) => {
+    const store = getDataStore();
+    const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
+    displayEdge.label = commitment.action;
+    scheduleActions([
+      async () => store.set(commitment),
+      async () => store.set(displayEdge),
+      async () => {
+        const newEdge = displayEdge.toEdge();
+        setEdges((es) => {
+          const i = es.findIndex((edge) => edge.id === newEdge.id);
+          es[i] = newEdge;
+          return es;
+        });
+      },
+      async () => {
+        setCommitmentState(null);
+        setSelectedDisplayEdge(null);
+        setType(null);
+      }
+    ]);
+  }
+
   /**
    * Removes an edge and its commitment.
    */
@@ -440,6 +475,8 @@ const FlowCanvas: React.FC<Props> = () => {
       ]);
     }
   }
+
+  // DISPATCHING EVENTS
 
   /**
    * Dispatches changes related to nodes
@@ -508,7 +545,9 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal commitmentState={commitmentState} closeModal={closeModal} handleAddEdge={handleAddEdge} />;
+        return <CommitmentModal commitmentState={{...commitmentState}} closeModal={closeModal} afterward={afterAddCommitment} />;
+      case 'updateCommitment':
+        return <CommitmentModal commitmentState={{...commitmentState}} closeModal={closeModal} afterward={afterEdgeEdit}/>;
     }
   }
 
@@ -530,6 +569,8 @@ const FlowCanvas: React.FC<Props> = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             zoomOnDoubleClick={false}
+            onEdgeDoubleClick={onEdgeEdit}
+            onNodeDoubleClick={onNodeEdit}
             deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right">
