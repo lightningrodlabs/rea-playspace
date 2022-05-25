@@ -263,13 +263,18 @@ const FlowCanvas: React.FC<Props> = () => {
     const type = getAlmostLastPart(vfPath);
 
     // Create an array of promise returning functions to serialize execution of deletions
-    scheduleActions([
-      async () => store.delete(nodePath),
-      ...edgesToDelete.map((edge) => (async () => store.delete(edge.path))),
-      // We don't want to delete the `Agents` or `ResourceSpecifications`
-      async () => { if (type == 'process') store.delete(vfPath)},
-      async() => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge()))
-    ]);
+    const actions = [
+      async () => store.delete(nodePath)
+    ];
+    actions.concat(...edgesToDelete.map((edge) => (async () => store.delete(edge.path))));
+    actions.concat(
+      [
+        // We don't want to delete the `Agents` or `ResourceSpecifications`
+        async () => { if (type == 'process') store.delete(vfPath)},
+        async () => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge()))
+      ]
+    )
+    scheduleActions(actions);
   }
 
   // EDGE BUSINESS LOGIC
