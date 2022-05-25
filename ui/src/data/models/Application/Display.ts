@@ -24,6 +24,10 @@ export interface DisplayEdgeShape {
   data?: any;
 }
 
+/**
+ * This represents a node in React Flows. It corresponds to a few different
+ * Valueflows objects.
+ */
 export class DisplayNode implements Node, PathedData, NamedData {
   id: string;
   name: string;
@@ -39,6 +43,9 @@ export class DisplayNode implements Node, PathedData, NamedData {
     this.data = this.makeData();
   }
 
+  /**
+   * Creates the data field that React Flows uses to render the node.
+   */
   public makeData(): Object {
     const type = getAlmostLastPart(this.vfPath);
     return {
@@ -68,6 +75,16 @@ export class DisplayNode implements Node, PathedData, NamedData {
   }
 }
 
+/**
+ * Representation of an edge in the graph, represents a Valueflows Comittment.
+ * 
+ * Our representation of edges is slightly different from the representation in
+ * React Flow. We need to be able to store what we care about, but also give
+ * React Flow what it needs. Unfortunately, it adds a layer of complexity where
+ * there is a React state that holds the data for the view and our data store.
+ * This means we need to transform back and forth between the objects to maintain
+ * consistency in both layers.
+ */
 export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
   id: string;
   source: string;
@@ -83,6 +100,13 @@ export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
     this.id = this.id ? this.id : Guid.raw();
   }
 
+  /**
+   * This returns the data in the format React Flow requires. The data.id is used
+   * to map back to the DisplayEdge object in the store.
+   *
+   * TODO: maybe submit a PR to React Flows to either export the function that
+   * builds these IDs, or make it more amenable to unique external IDs.
+   */
   public toEdge(): Edge {
     return {
       id: `reactflow__edge-${this.source}${this.sourceHandle || ''}-${this.target}${this.targetHandle || ''}`,
