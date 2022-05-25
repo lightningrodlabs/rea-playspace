@@ -13,11 +13,11 @@ interface Props {
 
 const initialState = {
   plannedWithin: '',          // Needed: Plan ID
-  action: null,               // Needed: Action ID
-  provider: null,             // Needed: Agent ID
-  receiver: null,             // Needed: Agent ID
-  inputOf: null,              // Process ID
-  outputOf: null,             // Process ID
+  action: 'use',              // Needed: Action ID
+  provider: '',               // Needed: Agent ID
+  receiver: '',               // Needed: Agent ID
+  inputOf: '',                // Process ID
+  outputOf: '',               // Process ID
   resourceInventoriedAs: '',  // EconomicResource ID,  not yet implemented, but will be soon
   resourceConformsTo: '',     // ResourceSpecification ID
   resourceQuantity: 0,        // Need to have one of these that match the ResourceSpecification.
@@ -92,11 +92,11 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, handleAd
           {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
         </SlSelect>
         <br/>
-        <SlSelect label="Provider" name='provider' value={provider} onSlChange={onChange} required>
+        <SlSelect label="Provider" name='provider' value={provider ? provider : agents[0]?.id} onSlChange={onChange} required>
           {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
         </SlSelect>
         <br/>
-        <SlSelect label="Receiver" name='receiver' value={receiver} onSlChange={onChange} required>
+        <SlSelect label="Receiver" name='receiver' value={receiver ? receiver : agents[0]?.id} onSlChange={onChange} required>
           {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
         </SlSelect>
         <br/>
