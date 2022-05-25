@@ -49,7 +49,7 @@ export interface ProcessSpecificationShape extends HasIdDate {
   note?: string
 }
 
-export type InputOutput = 'input' | 'output';
+export type InputOutput = 'input' | 'output' | 'both' | 'na';
 
 export type ResourceEffect = 'decrement' | 'decrementIncrement' | 'increment' | 'update' | 'remove' | 'noEffect';
 
