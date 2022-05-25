@@ -235,7 +235,7 @@ export const Actions = {
   'deliver-service': new Action({
     id: 'deliver-service',
     label: 'Deliver Service',
-    inputOutput: 'output',
+    inputOutput: 'both',
     comment: "New service produced and delivered (a service implies that an agent actively receives the service)."
   }),
   'dropoff': new Action({
@@ -254,18 +254,21 @@ export const Actions = {
   'move': new Action({
     id: 'move',
     label: 'Move',
+    inputOutput: 'na',
     locationEffect: 'update',
     comment: "Change location and possibly identifier, if location is part of the identification, of a resource with no change of agent rights or possession."
   }),
   'transfer-all-rights': new Action({
     id: 'transfer-all-rights',
     label: 'Transfer all rights',
+    inputOutput: 'na',
     resourceEffect: 'decrementIncrement',
     comment: "Give full (in the human realm) rights and responsibilities to another agent, without transferring physical custody."
   }),
   'transfer': new Action({
     id: 'transfer',
     label: 'Transfer',
+    inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
     resourceEffect: 'decrementIncrement',
     locationEffect: 'update',
@@ -274,6 +277,7 @@ export const Actions = {
   'transfer-custody': new Action({
     id: 'transfer-custody',
     label: 'Transfer custody',
+    inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
     locationEffect: 'update',
     comment: "Give physical custody and control of a resource, without full accounting or ownership rights."
