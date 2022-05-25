@@ -314,12 +314,8 @@ const FlowCanvas: React.FC<Props> = () => {
       source,
       target,
       label: thing.action,
-      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
       vfPath: item.path,
-      planId: store.getCurrentPlanId(),
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-      },
+      planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
     scheduleActions([
       async () => store.set(edge),
@@ -482,7 +478,7 @@ const FlowCanvas: React.FC<Props> = () => {
         }
       });
     },
-    [setEdges]
+    [setEdges, edges]
   );
 
   /**
