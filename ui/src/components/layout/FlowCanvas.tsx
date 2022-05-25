@@ -393,9 +393,17 @@ const FlowCanvas: React.FC<Props> = () => {
    * I do not like this. -JB
    */
   const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
+    const store = getDataStore();
+
+    // Get types
+    const sourceNode: DisplayNode = store.getById(newConnection.source);
+    const sourceType = getAlmostLastPart(sourceNode.vfPath);
+
+    const targetNode: DisplayNode = store.getById(newConnection.target);
+    const targetType = getAlmostLastPart(targetNode.vfPath);
+
     // Check if it's allowed
-    if (validateConnection(newConnection.source, newConnection.target)) {
-      const store = getDataStore();
+    if (validateConnection(sourceType, targetType)) {
       const dEdge: DisplayEdge = store.getById(edge.data.id);
       dEdge.source = newConnection.source;
       dEdge.target = newConnection.target;
