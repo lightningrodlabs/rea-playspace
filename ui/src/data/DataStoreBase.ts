@@ -205,7 +205,7 @@ export class DataStoreBase {
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const { name, data } = node.val;
-      console.log("name: ", name, " Data: ", data);
+      console.log(data);
       const path = getRustNodePath(i, res);
       const parentPath = getParentPath(path);
 
