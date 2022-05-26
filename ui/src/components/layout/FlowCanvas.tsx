@@ -532,22 +532,7 @@ const FlowCanvas: React.FC<Props> = () => {
   );
 
   /**
-   * This returns the forms that go in the modal that open on the page when
-   * something is dropped on the screen.
-   *
-   * Currently, only processSpecification needs a dialog that lets a user create
-   * a new process. The other components just use things already created by the
-   * user through other means.
-   *
-   * At some point, we'll need to be able to open an existing node and edit it.
-   * However, we need to decide how things are edited. Are the objects in the
-   * side panel only editable through the side panel? Can we edit them by
-   * clicking on any instance of them (with the exception of the
-   * ProcessSpecification?) Or should only specific instances of objects in the
-   * flow diagram be editable?
-   *
-   * At any rate, we'll need to be able to specify an existing object to pass
-   * into the modal to be edited.
+   * This returns the forms that go in the modal when an action is taken on the screen.
    */
   const selectModalComponent = () => {
     switch (type) {
