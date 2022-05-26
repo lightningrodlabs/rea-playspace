@@ -53,7 +53,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * executed in sequential fashion over the lifetime of this fiber.
    *
    * **Note:** Do not enclose any React state variables or function parameters
-   * without first making clone of the structures.
+   * without first making a clone of the structures.
    */
   const scheduleActions = (actions: Array<Action>) => {
     actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
