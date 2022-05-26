@@ -13,7 +13,11 @@ import ReactFlow, {
   Controls,
   Edge,
   Node,
-  updateEdge
+  updateEdge,
+  NodeRemoveChange,
+  EdgeRemoveChange,
+  NodeChange,
+  EdgeChange
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
 import CommitmentModal from '../modals/CommitmentModal';
@@ -36,9 +40,22 @@ interface Props {};
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
+  // EXECUTION FIBER
+
+  // Define the type signature of an Action: async function or Promise
+  type Action = () => Promise<void>
+
+  // Define the "fiber" that we'll use. For a reminder: Process > Thread > Fiber
   let actionFiber = Promise.resolve();
-  // Execute each deletion in serial fashion, so each one is based on the right Holochain head
-  const scheduleActions = (actions: Array<()=>Promise<void>>) => {
+
+  /**
+   * This takes an array of Promises (or async functions) and ensures they are
+   * executed in sequential fashion over the lifetime of this fiber.
+   *
+   * **Note:** Do not enclose any React state variables or function parameters
+   * without first making clone of the structures.
+   */
+  const scheduleActions = (actions: Array<Action>) => {
     actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
   }
 
@@ -197,15 +214,16 @@ const FlowCanvas: React.FC<Props> = () => {
       position: position ? position : currentPosition
     });
 
+    // reset state
+    setType(null);
+    setCurrentPosition(undefined);
+
     // Persist to DHT
     scheduleActions([
-      async () => store.set(newNode),
+      () => store.set(newNode),
       async () => {
         // Add to local state to render new node on canvas
         setNodes((nds) => nds.concat(newNode));
-        // reset state
-        setType(null);
-        setCurrentPosition(undefined);
       }
     ]);
   }
@@ -233,51 +251,50 @@ const FlowCanvas: React.FC<Props> = () => {
       const planId = store.getCurrentPlanId();
       const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, change.id));
       nodeToUpdate.position = {...position as XYPosition};
+
+      resetPosition();
+
       scheduleActions([
-        async () => store.set(nodeToUpdate),
-        async () => resetPosition()
+        () => store.set(nodeToUpdate)
       ]);
     }
   }
 
   /**
-   * Removes a Node and its corresponding VF data.
+   * Removes one or more Nodes and corresponding VF data.
+   *
+   * TIL (the hard way): we will have to validate if nodes can be deleted in both
+   * this function and the the onRemoveNode method. Both methods are called when
+   * any number of nodes are deleted. In fact, onRemoveNode can be called multiple
+   * times with the same data for some weird bug deep inside React Flow. This
+   * handler is always called with a unique set of nodes.
    */
-   const onRemoveNode = (change) => {
+   const onRemoveNodes = (nodes: Node[]) => {
+    console.log('onRemoveNodes', nodes);
     const store = getDataStore();
-    // use its ID to get a handle on it
-    const planId = store.getCurrentPlanId();
-    const nodeId = change.id;
-    const nodeToDelete = store.getCursor(DisplayNode.getPath(planId, nodeId));
-    // get the paths
-    const nodePath: string = nodeToDelete.path;
-    const vfPath: string = nodeToDelete.vfPath;
-
-    // Compute edges to delete
-    const edgesToDelete: Array<DisplayEdge> = [];
-    for (let edge of store.getDisplayEdges(planId)) {
-      if (edge.source == nodeId || edge.target == nodeId) {
-        edgesToDelete.push(edge);
-      }
-    }
-    const type = getAlmostLastPart(vfPath);
-
-    // Create an array of promise returning functions to serialize execution of deletions
-    const actions = [
-      async () => store.delete(nodePath)
-    ];
-    actions.concat(...edgesToDelete.map((edge) => (async () => store.delete(edge.path))));
-    actions.concat(
-      [
+    nodes.forEach((node) => {
+      const nodeToDelete = store.getById(node.id);
+      const nodePath: string = nodeToDelete.path;
+      const vfPath: string = nodeToDelete.vfPath;
+      const vfType = getAlmostLastPart(vfPath);
+      scheduleActions([
+        () => store.delete(nodePath),
         // We don't want to delete the `Agents` or `ResourceSpecifications`
-        async () => { if (type == 'process') store.delete(vfPath)},
-        async () => setEdges((store.getDisplayEdges(store.getCurrentPlanId())).map((node: DisplayEdge) => node.toEdge()))
-      ]
-    )
-    scheduleActions(actions);
+        () => (vfType == 'process') ? store.delete(vfPath) : Promise.resolve()
+      ]);
+    });
+  }
+
+  /**
+   * Removes a node from the FlowCanvas.
+   */
+  const onRemoveNode = (change: NodeRemoveChange) => {
+    // Run the same validation check as above before running this
+    setNodes((nds) => applyNodeChanges([change], nds))
   }
 
   // EDGE BUSINESS LOGIC
+
   const commitmentDefaults = {
     // This is an input
     'resourceSpecification-process': (resource: ResourceSpecification, process: Process): CommitmentShape => {
@@ -369,6 +386,11 @@ const FlowCanvas: React.FC<Props> = () => {
    * Adds a DisplayEdge and React Flow Edge corresponding to a commitment
    */
   const afterAddCommitment = (commitment: Commitment) => {
+    setType(null);
+    setCommitmentState(null);
+    setSource(null);
+    setTarget(null);
+
     const store = getDataStore();
     // Add the edge
     const edge = new DisplayEdge({
@@ -379,13 +401,9 @@ const FlowCanvas: React.FC<Props> = () => {
       planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
     scheduleActions([
-      async () => store.set(edge),
+      () => store.set(edge),
       async () => {
         setEdges((eds) => eds.concat(edge.toEdge()));
-        setType(null);
-        setCommitmentState(null);
-        setSource(null);
-        setTarget(null);
       }
     ]);
   }
@@ -409,15 +427,17 @@ const FlowCanvas: React.FC<Props> = () => {
 
     // Check if it's allowed
     if (validateConnection(sourceType, targetType)) {
+      setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
+
       const dEdge: DisplayEdge = store.getById(edge.data.id);
       dEdge.source = newConnection.source;
       dEdge.target = newConnection.target;
       dEdge.sourceHandle = newConnection.sourceHandle;
       dEdge.targetHandle = newConnection.targetHandle;
       // TODO: We should probably update the commitment and display the edit dialog
+
       scheduleActions([
-        async () => store.set(dEdge),
-        async () => setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
+        () => store.set(dEdge)
       ]);
     }
   }
@@ -442,51 +462,57 @@ const FlowCanvas: React.FC<Props> = () => {
     const store = getDataStore();
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
     displayEdge.label = commitment.action;
+
+    const newEdge = displayEdge.toEdge();
+    setEdges((es) => {
+      const i = es.findIndex((edge) => edge.id === newEdge.id);
+      es[i] = newEdge;
+      return es;
+    });
+
+    setCommitmentState(null);
+    setSelectedDisplayEdge(null);
+    setType(null);
+
     scheduleActions([
-      async () => store.set(commitment),
-      async () => store.set(displayEdge),
-      async () => {
-        const newEdge = displayEdge.toEdge();
-        setEdges((es) => {
-          const i = es.findIndex((edge) => edge.id === newEdge.id);
-          es[i] = newEdge;
-          return es;
-        });
-      },
-      async () => {
-        setCommitmentState(null);
-        setSelectedDisplayEdge(null);
-        setType(null);
-      }
+      () => store.set(commitment),
+      () => store.set(displayEdge)
     ]);
   }
 
   /**
-   * Removes an edge and its commitment.
+   * Removes one or more Edges and corresponding VF data.
+   *
+   * TIL (the hard way): we will have to validate if edges can be deleted in both
+   * this function and the the onRemoveEdge method. Both methods are called when
+   * any number of edges are deleted. In fact, onRemoveEdge can be called multiple
+   * times with the same data for some weird bug deep inside React Flow. This
+   * handler is always called with a unique set of edges.
    */
-  const onRemoveEdge = (change) => {
-    console.log('on remove edge', {change}, {edges})
-    const edgeArray = edges.filter((e: Edge) => {
-      console.log(e.id, change.id)
-      return e.id == change.id
-    });
-    // If we don't have an edge, don't do it. It probably got deleted by onRemoveNode or this function.
-    if (edgeArray.length == 1) {
-      const edgeId = edgeArray[0].data.id;
-      // use its ID to get a handle on it
-      const store = getDataStore();
-      const planId = store.getCurrentPlanId();
-      const edgeToDelete = store.getCursor(DisplayEdge.getPath(planId, edgeId));
+  const onRemoveEdges = (edges: Edge[]) => {
+    console.log('onRemoveEdges', {edges})
+    const store = getDataStore();
+
+    edges.forEach((edge) => {
+      const edgeId = edge.data.id;
+      console.log('deleting edge', edge)
+      const edgeToDelete = store.getById(edgeId);
       const edgePath: string = edgeToDelete.path;
       const vfPath: string = edgeToDelete.vfPath;
-      console.log(edgePath, vfPath);
-      // Delete the edge and commitment
+
       scheduleActions([
-        async () => store.delete(edgePath),
-        async () => vfPath? store.delete(vfPath) : null,
-        async () => setEdges((es) => applyEdgeChanges([change], es))
+        () => store.delete(edgePath),
+        () => store.delete(vfPath)
       ]);
-    }
+    });
+  }
+
+  /**
+   * Removes the edge from the Flow Canvas
+   */
+  const onRemoveEdge = (change: EdgeRemoveChange) => {
+    // Run the same validation check as above before running this
+    setEdges((es) => applyEdgeChanges([change], es));
   }
 
   // DISPATCHING EVENTS
@@ -496,20 +522,23 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onNodesChange = useCallback(
     async (changes) => {
-      // TODO: move this call into the functions below when we add custom logic to determine if a node can be removed
-      setNodes((nds) => applyNodeChanges(changes, nds))
-      changes.forEach(change => {
+    console.debug('onNodesChange');
+      changes.forEach((change: NodeChange) => {
         switch (change.type) {
           case 'remove':
             onRemoveNode(change);
             break;
           case 'position':
-            onDragNode(change)
+            onDragNode(change);
+            setNodes((nds) => applyNodeChanges([change], nds));
+            break;
+          default:
+            setNodes((nds) => applyNodeChanges([change], nds));
             break;
         }
       });
     },
-    [setNodes, setEdges]
+    [setNodes]
   );
 
   /**
@@ -517,13 +546,14 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onEdgesChange = useCallback(
     async (changes) => {
-      changes.forEach(change => {
+    console.debug('onEdgesChange');
+      changes.forEach((change: EdgeChange) => {
         switch (change.type) {
           case 'remove':
             onRemoveEdge(change);
             break;
           default:
-            setEdges((es) => applyEdgeChanges(changes, es));
+            setEdges((es) => applyEdgeChanges([change], es));
             break;
         }
       });
@@ -561,6 +591,8 @@ const FlowCanvas: React.FC<Props> = () => {
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onEdgesDelete={onRemoveEdges}
+            onNodesDelete={onRemoveNodes}
             onEdgeUpdate={onEdgeUpdate}
             onConnect={onConnect}
             onInit={onInit}
