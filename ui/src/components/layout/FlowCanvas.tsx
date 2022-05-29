@@ -521,7 +521,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * Dispatches changes related to nodes
    */
   const onNodesChange = useCallback(
-    async (changes) => {
+    async (changes: NodeChange[]) => {
     console.debug('onNodesChange');
       changes.forEach((change: NodeChange) => {
         switch (change.type) {
@@ -545,7 +545,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * Dispatches changes related to edges
    */
   const onEdgesChange = useCallback(
-    async (changes) => {
+    async (changes: EdgeChange[]) => {
     console.debug('onEdgesChange');
       changes.forEach((change: EdgeChange) => {
         switch (change.type) {
