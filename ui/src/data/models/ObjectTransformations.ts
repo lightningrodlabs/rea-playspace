@@ -72,11 +72,9 @@ export const ObjectTypeMap = {
   'process': Process,
   'displayNode': DisplayNode,
   'displayEdge': DisplayEdge,
+  'commitment': Commitment,
   // TODO:
-  'inputCommitment': undefined,
-  'outputCommitment': undefined,
-  'inputEconomicEvent': undefined,
-  'outputEconomicEvent': undefined
+  'economicEvent': undefined
 };
 
 /**
