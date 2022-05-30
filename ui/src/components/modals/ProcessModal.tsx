@@ -26,7 +26,7 @@ const initialState: ProcessShape = {
 interface Props {
   processState: ProcessShape;
   closeModal: () => void;
-  afterward?: (item: PathedData) => void;
+  afterward: (item: PathedData) => void;
 }
 
 const ProcessModal: React.FC<Props> = ({
