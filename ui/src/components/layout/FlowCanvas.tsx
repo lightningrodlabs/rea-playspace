@@ -254,8 +254,6 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const afterProcessEdit = (process: Process) => {
     const store = getDataStore();
-
-    console.log(process, store.getById(processState.id));
     const displayNode: DisplayNode = store.getById(selectedDisplayNode);
     displayNode.name = process.name;
     const newNode = new DisplayNode(displayNode);
