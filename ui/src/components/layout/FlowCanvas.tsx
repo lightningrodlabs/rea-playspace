@@ -380,6 +380,34 @@ const FlowCanvas: React.FC<Props> = () => {
     }
   }
 
+  const commitmentUpdates = {
+    // This is an input
+    'resourceSpecification-process': (commitment: Commitment, resource: ResourceSpecification, process: Process): Commitment => {
+      const clone = new Commitment(commitment);
+      clone.resourceConformsTo = resource.id;
+      clone.receiver = process.inScopeOf;
+      clone.inputOf = process.id;
+      return clone;
+    },
+    // this is an output
+    'process-resourceSpecification': (commitment: Commitment, process: Process, resource: ResourceSpecification): Commitment => {
+      const clone = new Commitment(commitment);
+      clone.resourceConformsTo = resource.id;
+      clone.provider = process.inScopeOf;
+      clone.outputOf = process.id;
+      return clone
+    },
+    // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
+    'resourceSpecification-resourceSpecification': (commitment: Commitment, source: ResourceSpecification, target: ResourceSpecification): Commitment => {
+      const clone = new Commitment(commitment);
+      clone.resourceConformsTo = source.id;
+      clone.action = commitment.action in ['transfer', 'transfer-all-rights', 'transfer-custody'] ? commitment.action : 'transfer';
+      clone.inputOf = '';
+      clone.outputOf = '';
+      return clone
+    }
+  }
+
   /**
    * Validate if a connection can happen
    */
@@ -465,26 +493,38 @@ const FlowCanvas: React.FC<Props> = () => {
   const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
     const store = getDataStore();
 
-    // Get types
+    // Grab the paths to the objects by their ID and grab the type of their vfPath
     const sourceNode: DisplayNode = store.getById(newConnection.source);
     const sourceType = getAlmostLastPart(sourceNode.vfPath);
+    const T = ObjectTypeMap[sourceType];
+    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
 
     const targetNode: DisplayNode = store.getById(newConnection.target);
     const targetType = getAlmostLastPart(targetNode.vfPath);
+    const U = ObjectTypeMap[sourceType];
+    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
 
     // Check if it's allowed
     if (validateConnection(sourceType, targetType)) {
       setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
 
-      const dEdge: DisplayEdge = store.getById(edge.data.id);
-      dEdge.source = newConnection.source;
-      dEdge.target = newConnection.target;
-      dEdge.sourceHandle = newConnection.sourceHandle;
-      dEdge.targetHandle = newConnection.targetHandle;
-      // TODO: We should probably update the commitment and display the edit dialog
+      const vfEdge: DisplayEdge = store.getById(edge.data.id);
+      vfEdge.source = newConnection.source;
+      vfEdge.target = newConnection.target;
+      vfEdge.sourceHandle = newConnection.sourceHandle;
+      vfEdge.targetHandle = newConnection.targetHandle;
+
+      const vfCommitment = store.getCursor(vfEdge.vfPath);
+      const updatedCommitment: Commitment = commitmentUpdates[`${sourceType}-${targetType}`](vfCommitment, sourceVfNode, targetVfNode);
+
+      setCommitmentState(updatedCommitment);
+      setSelectedDisplayEdge(vfEdge.id);
+      setType('updateCommitment');
+      openModal();
 
       scheduleActions([
-        () => store.set(dEdge)
+        () => store.set(vfEdge),
+        () => store.set(updatedCommitment)
       ]);
     }
   }
