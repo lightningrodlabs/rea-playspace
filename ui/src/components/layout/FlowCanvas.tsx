@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef, useEffect, useMemo, SyntheticEvent} from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo, SyntheticEvent } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   Background,
@@ -31,33 +31,17 @@ import ProcessNode from '../nodes/ProcessNode';
 import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/PathedData';
 import { NamedData } from '../../data/models/NamedData';
 import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
-import { ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import { CommitmentShape, ProcessShape } from '../../types/valueflows';
+import { Fiber} from '../../lib/fiber';
+import { commitmentDefaults, commitmentUpdates, validateConnection } from '../../logic/commitment';
 
 interface Props {};
 
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-
-  // EXECUTION FIBER
-
-  // Define the type signature of an Action: async function or Promise
-  type Action = () => Promise<void>
-
-  // Define the "fiber" that we'll use. For a reminder: Process > Thread > Fiber
-  let actionFiber = Promise.resolve();
-
-  /**
-   * This takes an array of Promises (or async functions) and ensures they are
-   * executed in sequential fashion over the lifetime of this fiber.
-   *
-   * **Note:** Do not enclose any React state variables or function parameters
-   * without first making a clone of the structures.
-   */
-  const scheduleActions = (actions: Array<Action>) => {
-    actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), actionFiber);
-  }
+  const store = getDataStore();
+  const fiber = new Fiber();
 
   // STATE MANAGEMENT
 
@@ -208,7 +192,6 @@ const FlowCanvas: React.FC<Props> = () => {
    const handleAddNode = (item: PathedData & NamedData, position?: XYPosition) => {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
-    const store = getDataStore();
 
     // Create an HDK entry version of the node
     const newNode = new DisplayNode({
@@ -224,7 +207,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setCurrentPosition(undefined);
 
     // Persist to DHT
-    scheduleActions([
+    fiber.schedule([
       () => store.set(newNode),
       async () => {
         // Add to local state to render new node on canvas
@@ -237,7 +220,6 @@ const FlowCanvas: React.FC<Props> = () => {
    * Edit a Node when it's double clicked
    */
    const onNodeEdit = (event: SyntheticEvent, node: Node) => {
-    const store = getDataStore();
     const vfNode: DisplayNode = store.getById(node.id);
     const vfType = getAlmostLastPart(vfNode.vfPath);
     if(vfType == 'process') {
@@ -253,7 +235,6 @@ const FlowCanvas: React.FC<Props> = () => {
    * Updates the DisplayNode object after an edit
    */
   const afterProcessEdit = (process: Process) => {
-    const store = getDataStore();
     const displayNode: DisplayNode = store.getById(selectedDisplayNode);
     displayNode.name = process.name;
     const newNode = new DisplayNode(displayNode);
@@ -269,7 +250,7 @@ const FlowCanvas: React.FC<Props> = () => {
       return nsClone;
     });
 
-    scheduleActions([
+    fiber.schedule([
       () => store.set(newNode)
     ]);
   }
@@ -292,14 +273,13 @@ const FlowCanvas: React.FC<Props> = () => {
        * and set that to the DisplayNode.position property.
        * Then persist to DHT.
        */
-      const store = getDataStore();
       const planId = store.getCurrentPlanId();
       const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, change.id));
       nodeToUpdate.position = {...position as XYPosition};
 
       resetPosition();
 
-      scheduleActions([
+      fiber.schedule([
         () => store.set(nodeToUpdate)
       ]);
     }
@@ -315,14 +295,12 @@ const FlowCanvas: React.FC<Props> = () => {
    * handler is always called with a unique set of nodes.
    */
    const onRemoveNodes = (nodes: Node[]) => {
-    console.log('onRemoveNodes', nodes);
-    const store = getDataStore();
     nodes.forEach((node) => {
       const nodeToDelete = store.getById(node.id);
       const nodePath: string = nodeToDelete.path;
       const vfPath: string = nodeToDelete.vfPath;
       const vfType = getAlmostLastPart(vfPath);
-      scheduleActions([
+      fiber.schedule([
         () => store.delete(nodePath),
         // We don't want to delete the `Agents` or `ResourceSpecifications`
         () => (vfType == 'process') ? store.delete(vfPath) : Promise.resolve()
@@ -338,90 +316,6 @@ const FlowCanvas: React.FC<Props> = () => {
     setNodes((nds) => applyNodeChanges([change], nds))
   }
 
-  // EDGE BUSINESS LOGIC
-
-  const commitmentDefaults = {
-    // This is an input
-    'resourceSpecification-process': (resource: ResourceSpecification, process: Process): CommitmentShape => {
-      const store = getDataStore();
-      return {
-        plannedWithin: store.getCurrentPlanId(),
-        resourceConformsTo: resource.id,
-        provider: null,
-        receiver: process.inScopeOf,
-        action: 'use',
-        inputOf: process.id
-      };
-    },
-    // this is an output
-    'process-resourceSpecification': (process: Process, resource: ResourceSpecification): CommitmentShape => {
-      const store = getDataStore();
-      return {
-        plannedWithin: store.getCurrentPlanId(),
-        resourceConformsTo: resource.id,
-        provider: process.inScopeOf,
-        receiver: null,
-        action: 'use',
-        outputOf: process.id
-      };
-    },
-    // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
-    'resourceSpecification-resourceSpecification': (source: ResourceSpecification, target: ResourceSpecification): CommitmentShape => {
-      const store = getDataStore();
-      return {
-        plannedWithin: store.getCurrentPlanId(),
-        resourceConformsTo: source.id,
-        provider: null,
-        receiver: null,
-        action: 'transfer'
-      };
-    }
-  }
-
-  const commitmentUpdates = {
-    // This is an input
-    'resourceSpecification-process': (commitment: Commitment, resource: ResourceSpecification, process: Process): Commitment => {
-      const clone = new Commitment(commitment);
-      clone.resourceConformsTo = resource.id;
-      clone.receiver = process.inScopeOf;
-      clone.inputOf = process.id;
-      return clone;
-    },
-    // this is an output
-    'process-resourceSpecification': (commitment: Commitment, process: Process, resource: ResourceSpecification): Commitment => {
-      const clone = new Commitment(commitment);
-      clone.resourceConformsTo = resource.id;
-      clone.provider = process.inScopeOf;
-      clone.outputOf = process.id;
-      return clone
-    },
-    // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
-    'resourceSpecification-resourceSpecification': (commitment: Commitment, source: ResourceSpecification, target: ResourceSpecification): Commitment => {
-      const clone = new Commitment(commitment);
-      clone.resourceConformsTo = source.id;
-      clone.action = commitment.action in ['transfer', 'transfer-all-rights', 'transfer-custody'] ? commitment.action : 'transfer';
-      clone.inputOf = '';
-      clone.outputOf = '';
-      return clone
-    }
-  }
-
-  /**
-   * Validate if a connection can happen
-   */
-  const validateConnection = (sourceType: string, targetType: string): boolean => {
-    const validSourceTargets = {
-      'resourceSpecification': [
-        'process',
-        'resourceSpecification'
-      ],
-      'process': [
-        'resourceSpecification'
-      ]
-    };
-    return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
-  }
-
   // EDGE HANDLERS
 
   /**
@@ -429,7 +323,6 @@ const FlowCanvas: React.FC<Props> = () => {
    */
    const onConnect = (params: Connection) => {
     const {source, target} = params;
-    const store = getDataStore();
 
     // Grab the paths to the objects by their ID and grab the type of their vfPath
     const sourceNode: DisplayNode = store.getById(source);
@@ -442,11 +335,10 @@ const FlowCanvas: React.FC<Props> = () => {
     const U = ObjectTypeMap[sourceType];
     const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
 
-    // based on the flows in the commitment, let's set up some sensible defaults
-    const initial: CommitmentShape = commitmentDefaults[`${sourceType}-${targetType}`](sourceVfNode, targetVfNode);
-
     // If the connection is valid, open the commitment modal
     if (validateConnection(sourceType, targetType)) {
+      // based on the flows in the commitment, let's set up some sensible defaults
+      const initial: CommitmentShape = commitmentDefaults[`${sourceType}-${targetType}`](store.getCurrentPlanId(), sourceVfNode, targetVfNode);
       setType('commitment');
       setCommitmentState(initial);
       setSource(source);
@@ -464,7 +356,6 @@ const FlowCanvas: React.FC<Props> = () => {
     setSource(null);
     setTarget(null);
 
-    const store = getDataStore();
     // Add the edge
     const edge = new DisplayEdge({
       source,
@@ -473,7 +364,7 @@ const FlowCanvas: React.FC<Props> = () => {
       vfPath: commitment.path,
       planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
-    scheduleActions([
+    fiber.schedule([
       () => store.set(edge),
       async () => {
         setEdges((eds) => eds.concat(edge.toEdge()));
@@ -489,15 +380,15 @@ const FlowCanvas: React.FC<Props> = () => {
    * I do not like this. -JB
    */
   const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
-    const store = getDataStore();
+    const {source, target} = newConnection;
 
     // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getById(newConnection.source);
+    const sourceNode: DisplayNode = store.getById(source);
     const sourceType = getAlmostLastPart(sourceNode.vfPath);
     const T = ObjectTypeMap[sourceType];
     const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
 
-    const targetNode: DisplayNode = store.getById(newConnection.target);
+    const targetNode: DisplayNode = store.getById(target);
     const targetType = getAlmostLastPart(targetNode.vfPath);
     const U = ObjectTypeMap[sourceType];
     const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
@@ -520,7 +411,7 @@ const FlowCanvas: React.FC<Props> = () => {
       setType('updateCommitment');
       openModal();
 
-      scheduleActions([
+      fiber.schedule([
         () => store.set(vfEdge),
         () => store.set(updatedCommitment)
       ]);
@@ -531,7 +422,6 @@ const FlowCanvas: React.FC<Props> = () => {
    * Edit an edge when it's double clicked
    */
   const onEdgeEdit = (event: SyntheticEvent, edge: Edge) => {
-    const store = getDataStore();
     const vfEdge = store.getById(edge.data.id) as DisplayEdge;
     const vfCommitment = store.getCursor(vfEdge.vfPath);
     setCommitmentState(vfCommitment);
@@ -544,7 +434,6 @@ const FlowCanvas: React.FC<Props> = () => {
    * Updates the DisplayEdge and Edge (React Flow) object after an edit
    */
   const afterEdgeEdit = (commitment: Commitment) => {
-    const store = getDataStore();
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
     displayEdge.label = commitment.action;
 
@@ -559,7 +448,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setSelectedDisplayEdge(null);
     setType(null);
 
-    scheduleActions([
+    fiber.schedule([
       () => store.set(commitment),
       () => store.set(displayEdge)
     ]);
@@ -575,17 +464,13 @@ const FlowCanvas: React.FC<Props> = () => {
    * handler is always called with a unique set of edges.
    */
   const onRemoveEdges = (edges: Edge[]) => {
-    console.log('onRemoveEdges', {edges})
-    const store = getDataStore();
-
     edges.forEach((edge) => {
       const edgeId = edge.data.id;
-      console.log('deleting edge', edge)
       const edgeToDelete = store.getById(edgeId);
       const edgePath: string = edgeToDelete.path;
       const vfPath: string = edgeToDelete.vfPath;
 
-      scheduleActions([
+      fiber.schedule([
         () => store.delete(edgePath),
         () => store.delete(vfPath)
       ]);
@@ -607,7 +492,6 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onNodesChange = useCallback(
     async (changes: NodeChange[]) => {
-    console.debug('onNodesChange');
       changes.forEach((change: NodeChange) => {
         switch (change.type) {
           case 'remove':
@@ -631,7 +515,6 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onEdgesChange = useCallback(
     async (changes: EdgeChange[]) => {
-    console.debug('onEdgesChange');
       changes.forEach((change: EdgeChange) => {
         switch (change.type) {
           case 'remove':
