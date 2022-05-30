@@ -12,7 +12,7 @@ interface Props {
   afterward?: (item: PathedData) => void;
 }
 
-const initialState = {
+const initialState: CommitmentShape = {
   id: '',
   plannedWithin: '',          // Needed: Plan ID
   action: 'use',              // Needed: Action ID
@@ -36,7 +36,7 @@ const initialState = {
   agreedIn: '',
   atLocation: null,
   state: null
-} as CommitmentShape;
+};
 
 const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterward}) => {
   const [
