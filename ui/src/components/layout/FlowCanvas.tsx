@@ -28,12 +28,12 @@ import getDataStore from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
 import { DisplayEdge, DisplayEdgeShape, DisplayNode } from "../../data/models/Application/Display";
 import ProcessNode from '../nodes/ProcessNode';
-import { getAlmostLastPart, PathedData } from '../../data/models/PathedData';
+import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/PathedData';
 import { NamedData } from '../../data/models/NamedData';
 import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
 import { ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
-import { CommitmentShape } from '../../types/valueflows';
+import { CommitmentShape, ProcessShape } from '../../types/valueflows';
 
 interface Props {};
 
@@ -78,11 +78,12 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const [type, setType] = useState<string>();
   const [commitmentState, setCommitmentState] = useState<CommitmentShape>();
+  const [processState, setProcessState] = useState<ProcessShape>();
   const [source, setSource] = useState<string>();
   const [target, setTarget] = useState<string>();
   const [selectedDisplayEdge, setSelectedDisplayEdge] = useState<string>();
+  const [selectedDisplayNode, setSelectedDisplayNode] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
-  const [currentPath, setCurrentPath] = useState<string>();
   const [isModelOpen, setIsModalOpen] = useState(false);
 
   // need a variable outside of the onNodesChange callback below. useState too async-y
@@ -174,14 +175,18 @@ const FlowCanvas: React.FC<Props> = () => {
 
           /**
            * Choose the action that will happen based on the object type.
-           * Currently, ProcessSpecification is tha most unique situation.
+           * Currently, ProcessSpecification is the most unique situation.
            */
           switch (type) {
             case 'processSpecification':
               // Set the state, then open the dialog
               setCurrentPosition(position);
               setType(type);
-              setCurrentPath(path);
+              setProcessState({
+                name: item.name,
+                basedOn: getLastPart(path),
+                plannedWithin: store.getCurrentPlanId()
+              } as ProcessShape);
               openModal();
               break;
             default:
@@ -228,7 +233,49 @@ const FlowCanvas: React.FC<Props> = () => {
     ]);
   }
 
-  const onNodeEdit = (event: SyntheticEvent, node: Node) => { console.log(event, node, "Hiyii!")}
+  /**
+   * Edit a Node when it's double clicked
+   */
+   const onNodeEdit = (event: SyntheticEvent, node: Node) => {
+    const store = getDataStore();
+    const vfNode: DisplayNode = store.getById(node.id);
+    const vfType = getAlmostLastPart(vfNode.vfPath);
+    if(vfType == 'process') {
+      const vfProcess = store.getCursor(vfNode.vfPath) as Process;
+      setProcessState(vfProcess);
+      setSelectedDisplayNode(vfNode.id);
+      setType('updateProcess');
+      openModal();
+    }
+  }
+
+  /**
+   * Updates the DisplayNode object after an edit
+   */
+  const afterProcessEdit = (process: Process) => {
+    const store = getDataStore();
+
+    console.log(process, store.getById(processState.id));
+    const displayNode: DisplayNode = store.getById(selectedDisplayNode);
+    displayNode.name = process.name;
+    const newNode = new DisplayNode(displayNode);
+
+    setProcessState(null);
+    setSelectedDisplayNode(null);
+    setType(null);
+
+    setNodes((ns) => {
+      const i = ns.findIndex((node) => node.id === displayNode.id);
+      const nsClone = ns.slice();
+      nsClone[i] = newNode;
+      return nsClone;
+    });
+
+    scheduleActions([
+      () => store.set(newNode)
+    ]);
+  }
+
 
   /**
    * Track position change on every event while dragging node.
@@ -567,7 +614,9 @@ const FlowCanvas: React.FC<Props> = () => {
   const selectModalComponent = () => {
     switch (type) {
       case 'processSpecification':
-        return <ProcessModal processSpecificationPath={currentPath} closeModal={closeModal} handleAddNode={handleAddNode}/>;
+        return <ProcessModal processState={{...processState}} closeModal={closeModal} afterward={handleAddNode}/>;
+      case 'updateProcess':
+        return <ProcessModal processState={{...processState}} closeModal={closeModal} afterward={afterProcessEdit}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'agent':
