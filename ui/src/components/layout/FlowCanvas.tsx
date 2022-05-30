@@ -243,11 +243,23 @@ const FlowCanvas: React.FC<Props> = () => {
     setSelectedDisplayNode(null);
     setType(null);
 
+    /**
+     * When we use the `applyNodeChanges` function, it filters the array and adds
+     * back the changes. We can't use applyNodeChanges here, because this is our
+     * own event to update the name (and maybe other properties in the future).
+     *
+     * https://github.com/wbkd/react-flow/blob/ea6247f4a14bc24f4f21d4272de51c20aa73e083/src/utils/changes.ts#L52
+     *
+     * React internally uses object identity to verify if any changes have taken
+     * place, so we need to make sure we pass in a new object so that it actually
+     * re-renders our nodes.
+     *
+     * See: https://blog.bitsrc.io/understanding-referential-equality-in-react-a8fb3769be0
+     */
     setNodes((ns) => {
-      const i = ns.findIndex((node) => node.id === displayNode.id);
-      const nsClone = ns.slice();
-      nsClone[i] = newNode;
-      return nsClone;
+      const nsNew = ns.filter((node) => node.id === displayNode.id);
+      nsNew.push(newNode);
+      return nsNew;
     });
 
     fiber.schedule([
@@ -432,6 +444,8 @@ const FlowCanvas: React.FC<Props> = () => {
 
   /**
    * Updates the DisplayEdge and Edge (React Flow) object after an edit
+   *
+   * TIL: The comment in `afterProcessEdit` should apply here, too.
    */
   const afterEdgeEdit = (commitment: Commitment) => {
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
@@ -439,9 +453,9 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const newEdge = displayEdge.toEdge();
     setEdges((es) => {
-      const i = es.findIndex((edge) => edge.id === newEdge.id);
-      es[i] = newEdge;
-      return es;
+      const newNodes = es.filter((edge) => edge.id === newEdge.id);
+      newNodes.push(newEdge);
+      return newNodes;
     });
 
     setCommitmentState(null);
