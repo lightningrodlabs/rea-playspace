@@ -83,15 +83,11 @@ export class Process implements ProcessShape, PathedData, NamedData {
   hasEnd?: Date;
   hasPointInTime?: Date;
   due?: Date;
-  inputCommitments?: Record<string, CommitmentShape>; // Add button on left
-  outputCommitments?: Record<string, CommitmentShape>; // add button on right
 
   constructor(init: ProcessShape) {
     assignFields<ProcessShape, Process>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? this.created : new Date();
-    this.inputCommitments = {};
-    this.outputCommitments = {};
   }
 
   static getPrefix(planId: string): string {
