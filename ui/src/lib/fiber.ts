@@ -36,7 +36,9 @@ export class Fiber {
    * Most likely it will have undefined parameters. This is because in certain
    * events the specific object is reused and it's properties are cleared after
    * the event handler is done executing. That leaves you with a reference to an
-   * empty object.
+   * empty object. You will also see a warning:
+   *
+   * `This synthetic event is reused for performance reasons. If you're seeing...`
    *
    * See [https://reactjs.org/docs/legacy-event-pooling.html] for the official
    * take on this. This doesn't happen in React v17 and above.
