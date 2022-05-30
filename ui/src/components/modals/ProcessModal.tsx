@@ -63,12 +63,10 @@ const ProcessModal: React.FC<Props> = ({
     const store = getDataStore();
     if (id) {
       const process = store.getById(id);
-      console.log({...process})
       assignFields(
         { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf },
         process
       );
-      console.log({...process})
       await store.set(process);
       if (afterward) afterward(process);
     } else {
