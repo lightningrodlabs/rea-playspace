@@ -65,6 +65,3 @@ export class Fiber {
     this.schedule(this.actionQueue);
   }
 }
-
-
-
