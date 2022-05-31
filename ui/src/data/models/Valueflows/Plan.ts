@@ -6,7 +6,8 @@ import {
   GeoPoint,
   PlanShape,
   ProcessShape,
-  CommitmentShape
+  CommitmentShape,
+  MeasurementShape
 } from "../../../types/valueflows";
 import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
 
@@ -143,8 +144,8 @@ export class Commitment implements CommitmentShape, PathedData {
   outputOf?: string;
   resourceInventoriedAs?: string; // ResourceSprecification ID
   resourceConformsTo?: string;    // ResourceSprecification ID
-  resourceQuantity?: number;
-  effortQuantity?: number;
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
   resourceClassifiedAs?: string;  // General classification or grouping
   hasBegining?: Date;
   hasEnd?: Date;
@@ -163,6 +164,7 @@ export class Commitment implements CommitmentShape, PathedData {
     assignFields<CommitmentShape, Commitment>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? this.created : new Date();
+
   }
 
   static getPrefix(planId: string): string {
