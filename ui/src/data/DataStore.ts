@@ -102,7 +102,6 @@ export class DataStore extends DataStoreBase {
     return this.fetchAll(ProcessSpecification.getPrefix());
   }
 
-
   // ResourceSpecification helpers
 
   public getResourceSpecification(id: string): ResourceSpecification {
@@ -120,7 +119,6 @@ export class DataStore extends DataStoreBase {
   public async fetchResourceSpecifications() {
     return await this.fetchAll(ResourceSpecification.getPrefix());
   }
-
 
   // Agent helpers
 
@@ -140,11 +138,11 @@ export class DataStore extends DataStoreBase {
     return await this.fetchAll(Agent.getPrefix());
   }
 
+  // Plan helpers
   public getCurrentPlanId(): string {
     return this.root['planId'];
   }
 
-  // Plan helpers
   public getPlan(id: string): Plan {
     return this.root.plan[id];
   }
