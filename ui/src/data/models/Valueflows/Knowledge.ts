@@ -150,15 +150,15 @@ export class Action implements PathedData, ActionShape {
   }
 
   static getPrefix(): string {
-    return 'root.processSpecification';
+    return 'root.action';
   }
 
   static getPath(id: string): string {
-    return `${ProcessSpecification.getPrefix()}.${id}`;
+    return `${Action.getPrefix()}.${id}`;
   }
 
   get path(): string {
-    return ProcessSpecification.getPath(this.id);
+    return Action.getPath(this.id);
   }
 
   public toJSON(): ActionShape {
