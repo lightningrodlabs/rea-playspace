@@ -13,14 +13,18 @@ import {
   ProcessSpecificationShape,
   PlanShape,
   ProcessShape,
-  CommitmentShape} from "../../types/valueflows";
+  CommitmentShape,
+  UnitShape
+} from "../../types/valueflows";
 import {
   Root
 } from "./Application/Root";
 import {
   Agent,
   ResourceSpecification,
-  ProcessSpecification
+  ProcessSpecification,
+  Unit,
+  Measurement
 } from "./Valueflows/Knowledge";
 import {
   Commitment,
@@ -46,6 +50,7 @@ export const ObjectTransformations = {
   'displayNode': (object: Object) => new DisplayNode(object as DisplayNodeShape),
   'displayEdge': (object: Object) => new DisplayEdge(object as DisplayEdgeShape),
   'commitment': (object: Object) => new Commitment(object as CommitmentShape),
+  'unit': (object: Object) => new Unit(object as UnitShape),
   'economicEvent': function () { throw new Error('Not yet implemented'); }
 };
 
@@ -73,6 +78,7 @@ export const ObjectTypeMap = {
   'displayNode': DisplayNode,
   'displayEdge': DisplayEdge,
   'commitment': Commitment,
+  'unit': Unit,
   // TODO:
   'economicEvent': undefined
 };

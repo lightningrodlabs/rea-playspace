@@ -1,5 +1,5 @@
 import { PathedData } from "../PathedData";
-import { ResourceSpecification, ProcessSpecification, Agent, Action, Actions } from "../Valueflows/Knowledge";
+import { ResourceSpecification, ProcessSpecification, Agent, Action, Actions, Unit, Units } from "../Valueflows/Knowledge";
 import { Plan } from "../Valueflows/Plan";
 
 /**
@@ -30,6 +30,7 @@ export class Root implements RootShape, PathedData {
   agent: Record<string, Agent>;
   plan: Record<string, Plan>;
   action: Record<string, Action>;
+  unit: Record<string, Unit>;
 
   get path() {
     return 'root';
@@ -43,6 +44,7 @@ export class Root implements RootShape, PathedData {
     this.agent = {};
     this.plan = {};
     this.action = Actions;
+    this.unit = Units;
 
     // If data has been passed in, set it otherwise, make it empty.
 
