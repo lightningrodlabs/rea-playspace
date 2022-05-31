@@ -91,7 +91,7 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
   inScopeOf?: string;
   note?: string;
   agreedIn?: string;
-  atLocation?: GeoPoint;
+  atLocation?: GeoDataShape;
   state?: string;
   inputOf?: string;
   outputOf?: string;
@@ -100,36 +100,50 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
 // Observation
 export interface EconomicResourceShape {
   name: string;
+  conformsTo: string;         // ResourceSpecification
+  primaryAccountable: string; // Agent ID of the accountable party
   trackingIndentifier: string;
-  accountingQuantity?: number;
   onhandQuantity: number;
-  currentLocation?: GeoPoint;
+  accountingQuantity?: number;
+  currentLocation?: GeoDataShape;
   note?: string;
   classifiedAs?: string;
   image?: string;
   unitOfEffort?: string;      // Unit ID
   state?: string;
-  conformsTo: string;         // ResourceSpecification
-  containedIn?: string;       // EconomicResource ID
   stage?: string;             // ProcessSpecification ID
-  primaryAccountable: string; // Agent ID of the accountable party
+  containedIn?: string;       // EconomicResource ID
+  lot?: string;
 }
 
 export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBase {
   note?: string;
   image?: string;
   agreedIn?: string;
-  atLocation?: GeoPoint;
-  toLocation?: GeoPoint;
+  atLocation?: GeoDataShape;
+  toLocation?: GeoDataShape;
   state?: string;
-  toResourceInventoriedAs: string; // EconomicResource ID that the transfer will be inventoried as.
+  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as.
   inputOf?: string;
   outputOf?: string;
 }
 
+export interface FulfillmentShape extends HasIdDate {
+  resourceQuantity?: number;
+  effortQuantity?: number;
+  fulfills: string;
+  fulfilledBy: string;
+}
+
 // Geo
 
-export interface GeoPoint {
+export interface GeoDataShape extends HasIdDate {
+  type: string;
+  address: string;
+  point: GeoPointShape;
+}
+
+export interface GeoPointShape extends HasIdDate {
   lat: number;
   lng: number;
 }
