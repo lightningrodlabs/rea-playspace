@@ -257,7 +257,7 @@ const FlowCanvas: React.FC<Props> = () => {
      * See: https://blog.bitsrc.io/understanding-referential-equality-in-react-a8fb3769be0
      */
     setNodes((ns) => {
-      const nsNew = ns.filter((node) => node.id === displayNode.id);
+      const nsNew = ns.filter((node) => node.id !== displayNode.id);
       nsNew.push(newNode);
       return nsNew;
     });
@@ -453,7 +453,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const newEdge = displayEdge.toEdge();
     setEdges((es) => {
-      const newNodes = es.filter((edge) => edge.id === newEdge.id);
+      const newNodes = es.filter((edge) => edge.id !== newEdge.id);
       newNodes.push(newEdge);
       return newNodes;
     });
