@@ -1,6 +1,6 @@
 import { PathedData } from "../PathedData";
 import { ResourceSpecification, ProcessSpecification, Agent, Action, Actions, Unit, Units } from "../Valueflows/Knowledge";
-import { EconomicEvent, EconomicResource, GeoData, GeoPoint } from "../Valueflows/Observation";
+import { EconomicEvent, EconomicResource, Fulfillment, GeoData, GeoPoint } from "../Valueflows/Observation";
 import { Plan } from "../Valueflows/Plan";
 
 /**
@@ -34,6 +34,7 @@ export class Root implements RootShape, PathedData {
   unit: Record<string, Unit>;
   economicResource: Record<string, EconomicResource>;
   economicEvent: Record<string, EconomicEvent>;
+  fulfillment: Record<string, Fulfillment>;
   geoData: Record<string, GeoData>;
   geoPoint: Record<string, GeoPoint>;
 
@@ -50,6 +51,7 @@ export class Root implements RootShape, PathedData {
     this.plan = {};
     this.economicResource = {};
     this.economicEvent = {};
+    this.fulfillment = {};
     this.geoData = {};
     this.geoPoint = {};
 
