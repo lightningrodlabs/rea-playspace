@@ -63,35 +63,42 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const getMeasumentValue = (old: MeasurementShape | number): string => {
+  /**
+   * Make sure we can load a value from either a number (old data) or a Measurement.
+   */
+  const getMeasumentValue = (quantity: MeasurementShape | number): string => {
     let retval = '';
 
-    switch (typeof old) {
+    switch (typeof quantity) {
       case 'number':
-        console.log('number')
-        retval = old.toString();
+        retval = quantity.toString();
         break;
       case 'object':
-        console.log('object, old')
-        if (old != null) {
-          retval = old.hasNumericalValue ? old.hasNumericalValue.toString() : '';
+        if (quantity != null) {
+          retval = quantity.hasNumericalValue ? quantity.hasNumericalValue.toString() : '';
         }
+        break;
     }
 
     return retval;
   }
 
-  const getMeasurementUnit = (old: MeasurementShape | number): string => {
-
+  /**
+   * Return an empty string if its a number or the unit if it's a measurement.
+   */
+  const getMeasurementUnit = (quantity: MeasurementShape | number): string => {
     let retval = '';
 
-    if (typeof old == 'object' && old != null) {
-      retval = old.hasUnit ? old.hasUnit.toString() : '';
+    if (typeof quantity == 'object' && quantity != null) {
+      retval = quantity.hasUnit ? quantity.hasUnit.toString() : '';
     }
 
     return retval;
   }
 
+  /**
+   * Constructs a default object that conforms to MeasurementShape.
+   */
   const newMeasurement = (): MeasurementShape => {
     return {
       hasNumericalValue: 0,
@@ -99,6 +106,13 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
     };
   };
 
+  /**
+   * We need to set the right value inside of the right part of the Measurement
+   * object.
+   *
+   * This is a candidate for making a component that returns Measurements. This
+   * is just to get it done.
+   */
   const onMeasurementChange = (e: any) => {
     const { name, value } = e.target;
 
