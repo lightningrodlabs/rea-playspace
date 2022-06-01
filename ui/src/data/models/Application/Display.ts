@@ -3,6 +3,7 @@ import { XYPosition, Node, Edge, MarkerType } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, toJSON, fieldsToJSON } from '../../../utils';
+import { getLabel } from "../../../logic/commitment";
 
 export interface DisplayNodeShape {
   id?: string;
@@ -18,7 +19,6 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
-  label: string;
   vfPath?: string;
   planId: string;
   data?: any;
@@ -85,44 +85,18 @@ export class DisplayNode implements Node, PathedData, NamedData {
  * This means we need to transform back and forth between the objects to maintain
  * consistency in both layers.
  */
-export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
+export class DisplayEdge implements DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
   sourceHandle?: string | null;
   targetHandle?: string | null;
-  label: string;
   vfPath?: string;
   planId: string;
 
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-  }
-
-  /**
-   * This returns the data in the format React Flow requires. The data.id is used
-   * to map back to the DisplayEdge object in the store.
-   *
-   * TODO: maybe submit a PR to React Flows to either export the function that
-   * builds these IDs, or make it more amenable to unique external IDs.
-   */
-  public toEdge(): Edge {
-    return {
-      id: `reactflow__edge-${this.source}${this.sourceHandle || ''}-${this.target}${this.targetHandle || ''}`,
-      source: this.source,
-      target: this.target,
-      sourceHandle: this.sourceHandle,
-      targetHandle: this.targetHandle,
-      label: this.label,
-      labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-      },
-      data: {
-        id: this.id
-      }
-    }
   }
 
   static getPrefix(planId: string): string {
