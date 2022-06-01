@@ -5,6 +5,7 @@ import { ActionShape, AgentShape, CommitmentShape, MeasurementShape, UnitShape }
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import getDataStore from '../../data/DataStore';
 import { assignFields } from '../../utils';
+import { ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
 
 interface Props {
   commitmentState: CommitmentShape;
@@ -46,12 +47,34 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
   const [actions, setActions] = useState<ActionShape[]>([]);
   const [agents, setAgents] = useState<AgentShape[]>([]);
   const [units, setUnits] = useState<UnitShape[]>([]);
+  const [conformingResource, setConformingResource] = useState<ResourceSpecification>();
 
   useEffect(() => {
     const store = getDataStore();
+    const resource: ResourceSpecification = store.getById(resourceConformsTo);
     setActions(store.getActions());
     setAgents(store.getAgents());
     setUnits(store.getUnits());
+    setConformingResource(resource);
+
+    // Set the default units when the resource specification has them and the current *Quantities are null
+    if (resourceConformsTo) {
+      const unitState = {} as CommitmentShape;
+      const hasDefaultUnitOfResource = resource.defaultUnitOfResource && resource.defaultUnitOfResource != null;
+      const hasDefaultUnitOfEffort = resource.defaultUnitOfEffort && resource.defaultUnitOfEffort != null
+
+      if (resourceQuantity == null && hasDefaultUnitOfResource) {
+        const measurement = newMeasurement();
+        measurement.hasUnit = resource.defaultUnitOfResource;
+        unitState.resourceQuantity = measurement;
+      }
+      if (effortQuantity == null && hasDefaultUnitOfEffort) {
+        const measurement = newMeasurement();
+        measurement.hasUnit = resource.defaultUnitOfEffort;
+        unitState.effortQuantity = measurement;
+      }
+      setState((prevState) => ({...prevState, ...unitState}))
+    }
   }, []);
 
   const clearState = () => {
@@ -224,7 +247,7 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
         <br/>
         {inputOrOutputOf()}
         <br/>
-        <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={resourceConformsTo}></SlInput>
+        <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
         <br />
         <SlInput label="Resource quantity" type="number" name="resourceValue" onSlInput={onMeasurementChange} value={getMeasumentValue(resourceQuantity)}></SlInput>
         <br />
