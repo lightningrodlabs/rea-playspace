@@ -33,7 +33,11 @@ export const commitmentDefaults = {
       outputOf: process.id
     };
   },
-  // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
+  // This is a transfer, set up the flow between the agents. User must select a
+  // resourceSpecification.
+  // TODO: The data model doesn't actualy have all the data needed to reconstruct
+  // the graph. We don't actually know what the resource this is being transfered
+  // to is without logging an event with resourceInventoriedAs and toResourceInventoriedAs
   'resourceSpecification-resourceSpecification': (planId: string, source: ResourceSpecification, target: ResourceSpecification): CommitmentShape => {
     return {
       plannedWithin: planId,
