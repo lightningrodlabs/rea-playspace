@@ -1,7 +1,7 @@
 import { SlButton, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { PathedData } from '../../data/models/PathedData';
-import { ActionShape, AgentShape, CommitmentShape } from '../../types/valueflows';
+import { ActionShape, AgentShape, CommitmentShape, MeasurementShape, UnitShape } from '../../types/valueflows';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import getDataStore from '../../data/DataStore';
 import { assignFields } from '../../utils';
@@ -22,8 +22,8 @@ const initialState: CommitmentShape = {
   outputOf: '',               // Process ID
   resourceInventoriedAs: '',  // EconomicResource ID,  not yet implemented, but will be soon
   resourceConformsTo: '',     // ResourceSpecification ID
-  resourceQuantity: 0,        // Need to have one of these that match the ResourceSpecification.
-  effortQuantity: 0,          // ''
+  resourceQuantity: null,     // Need to have one of these (either resourceQuantity or effortQuantity) that match the ResourceSpecification.
+  effortQuantity: null,
   resourceClassifiedAs: '',   // General classification or grouping
   hasBegining: null,          // Datetime
   hasEnd: null,               // Datetime
@@ -45,11 +45,13 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
 
   const [actions, setActions] = useState<ActionShape[]>([]);
   const [agents, setAgents] = useState<AgentShape[]>([]);
+  const [units, setUnits] = useState<UnitShape[]>([]);
 
   useEffect(() => {
     const store = getDataStore();
     setActions(store.getActions());
     setAgents(store.getAgents());
+    setUnits(store.getUnits());
   }, []);
 
   const clearState = () => {
@@ -58,14 +60,100 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
 
   const onChange = (e: any) => {
     const { name, value } = e.target;
-
-    // It seems the shoelace only provides numeric values when calling serialize
-    if (name in ['resourceQuantity', 'effortQuantity']) {
-      setState(prevState => ({ ...prevState, [name]: parseFloat(value) }));
-    } else {
-      setState(prevState => ({ ...prevState, [name]: value }));
-    }
+    setState(prevState => ({ ...prevState, [name]: value }));
   };
+
+  const getMeasumentValue = (old: MeasurementShape | number): string => {
+    let retval = '';
+
+    switch (typeof old) {
+      case 'number':
+        console.log('number')
+        retval = old.toString();
+        break;
+      case 'object':
+        console.log('object, old')
+        if (old != null) {
+          retval = old.hasNumericalValue ? old.hasNumericalValue.toString() : '';
+        }
+    }
+
+    return retval;
+  }
+
+  const getMeasurementUnit = (old: MeasurementShape | number): string => {
+
+    let retval = '';
+
+    if (typeof old == 'object' && old != null) {
+      retval = old.hasUnit ? old.hasUnit.toString() : '';
+    }
+
+    return retval;
+  }
+
+  const newMeasurement = (): MeasurementShape => {
+    return {
+      hasNumericalValue: 0,
+      hasUnit: ''
+    };
+  };
+
+  const onMeasurementChange = (e: any) => {
+    const { name, value } = e.target;
+
+    switch (name) {
+      case 'resourceValue':
+        setState((prevState) => {
+          const res = prevState.resourceQuantity ? prevState.resourceQuantity : newMeasurement();
+          return {
+            ...prevState,
+            resourceQuantity: {
+              hasNumericalValue: parseFloat(value),
+              hasUnit: res.hasUnit
+            }
+          }
+        })
+        break;
+      case 'effortValue':
+        setState((prevState) => {
+          const res = prevState.effortQuantity ? prevState.effortQuantity : newMeasurement();
+          return {
+            ...prevState,
+            effortQuantity: {
+              hasNumericalValue: parseFloat(value),
+              hasUnit: res.hasUnit
+            }
+          }
+        })
+        break;
+      case 'resourceUnit':
+        setState((prevState) => {
+          const res = prevState.resourceQuantity ? prevState.resourceQuantity : newMeasurement();
+          return {
+            ...prevState,
+            resourceQuantity: {
+              hasNumericalValue: res.hasNumericalValue,
+              hasUnit: value
+            }
+          }
+        })
+        break;
+      case 'effortUnit':
+        setState((prevState) => {
+          const res = prevState.effortQuantity ? prevState.effortQuantity : newMeasurement();
+          console.log(res)
+          return {
+            ...prevState,
+            effortQuantity: {
+              hasNumericalValue: res.hasNumericalValue,
+              hasUnit: value
+            }
+          }
+        })
+        break;
+    }
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -124,9 +212,17 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
         <br/>
         <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={resourceConformsTo}></SlInput>
         <br />
-        <SlInput label="Resource quantity" type="number" name="resourceQuantity" onSlInput={onChange} value={resourceQuantity.toString()}></SlInput>
+        <SlInput label="Resource quantity" type="number" name="resourceValue" onSlInput={onMeasurementChange} value={getMeasumentValue(resourceQuantity)}></SlInput>
         <br />
-        <SlInput label="Effort quantity" type="number" name="effortQuantity" onSlInput={onChange} value={effortQuantity.toString()}></SlInput>
+        <SlSelect label="Resource unit" name="resourceUnit" onSlChange={onMeasurementChange} value={getMeasurementUnit(resourceQuantity)}>
+          {units.map((unit) => (<SlMenuItem key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+        </SlSelect>
+        <br />
+        <SlInput label="Effort quantity" type="number" name="effortValue" onSlInput={onMeasurementChange} value={getMeasumentValue(effortQuantity)}></SlInput>
+        <br />
+        <SlSelect label="Effort unit" name="effortUnit" onSlChange={onMeasurementChange} value={getMeasurementUnit(effortQuantity)}>
+          {units.map((unit) => (<SlMenuItem key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+        </SlSelect>
         <br />
         <SlTextarea
           label='Note'
