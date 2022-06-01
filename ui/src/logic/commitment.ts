@@ -1,9 +1,14 @@
 
 // EDGE BUSINESS LOGIC
 
-import { ResourceSpecification } from "../data/models/Valueflows/Knowledge";
+import { Edge, MarkerType } from "react-flow-renderer";
+import getDataStore from "../data/DataStore";
+import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
+import { ObjectTypeMap } from "../data/models/ObjectTransformations";
+import { getAlmostLastPart } from "../data/models/PathedData";
+import { Action, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
 import { Commitment, Process } from "../data/models/Valueflows/Plan";
-import { CommitmentShape } from "../types/valueflows";
+import { CommitmentShape, MeasurementShape } from "../types/valueflows";
 
 export const commitmentDefaults = {
   // This is an input
@@ -82,4 +87,63 @@ export const validateConnection = (sourceType: string, targetType: string): bool
     ]
   };
   return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
+}
+
+export const getLabel = (displayEdge: DisplayEdge): string => {
+  const store = getDataStore();
+  // Grab the paths to the objects by their ID and grab the type of their vfPath
+  const sourceNode: DisplayNode = store.getById(displayEdge.source);
+  const sourceType = getAlmostLastPart(sourceNode.vfPath);
+  const T = ObjectTypeMap[sourceType];
+  const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
+
+  const targetNode: DisplayNode = store.getById(displayEdge.target);
+  const targetType = getAlmostLastPart(targetNode.vfPath);
+  const U = ObjectTypeMap[targetType];
+  const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
+
+  const commitment: Commitment = store.getCursor(displayEdge.vfPath);
+  const action: Action = store.getActions().find((action) => action.id == commitment.action);
+  const measurement: MeasurementShape = {
+    hasNumericalValue: 0,
+    hasUnit: ''
+  };
+
+  if (commitment.resourceQuantity != null && commitment.effortQuantity == null) {
+    measurement.hasNumericalValue = commitment.resourceQuantity.hasNumericalValue;
+    measurement.hasUnit = commitment.resourceQuantity.hasUnit;
+  }
+  if (commitment.resourceQuantity == null && commitment.effortQuantity != null) {
+    measurement.hasNumericalValue = commitment.effortQuantity.hasNumericalValue;
+    measurement.hasUnit = commitment.effortQuantity.hasUnit;
+  }
+
+  const unit: Unit = store.getUnits().find((unit) => unit.id == measurement.hasUnit)
+
+  return `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`;
+}
+
+/**
+ * This returns the data in the format React Flow requires. The data.id is used
+ * to map back to the DisplayEdge object in the store.
+ *
+ * TODO: maybe submit a PR to React Flows to either export the function that
+ * builds these IDs, or make it more amenable to unique external IDs.
+ */
+export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge  => {
+  return {
+    id: `reactflow__edge-${displayEdge.source}${displayEdge.sourceHandle || ''}-${displayEdge.target}${displayEdge.targetHandle || ''}`,
+    source: displayEdge.source,
+    target: displayEdge.target,
+    sourceHandle: displayEdge.sourceHandle,
+    targetHandle: displayEdge.targetHandle,
+    label: getLabel(displayEdge),
+    labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+    },
+    data: {
+      id: displayEdge.id
+    }
+  }
 }
