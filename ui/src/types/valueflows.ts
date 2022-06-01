@@ -139,8 +139,8 @@ export interface FulfillmentShape extends HasIdDate {
 
 export interface GeoDataShape extends HasIdDate {
   type: string;
-  address: string;
-  point: GeoPointShape;
+  address?: string;
+  point?: GeoPointShape;
 }
 
 export interface GeoPointShape extends HasIdDate {

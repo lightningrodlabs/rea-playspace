@@ -8,8 +8,8 @@ export class GeoData implements GeoDataShape {
   id: string;
   created: Date;
   type: string;
-  address: string;
-  point: GeoPoint;
+  address?: string;
+  point?: GeoPoint;
 
   constructor(init: GeoDataShape) {
     assignFields<GeoDataShape, GeoData>(init, this);
