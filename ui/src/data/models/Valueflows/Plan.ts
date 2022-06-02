@@ -6,11 +6,9 @@ import {
   PlanShape,
   ProcessShape,
   CommitmentShape,
-  MeasurementShape
+  MeasurementShape,
+  GeoDataShape
 } from "../../../types/valueflows";
-import {
-  GeoData
-} from './Observation';
 import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
 
 // Plan Classes
@@ -159,7 +157,7 @@ export class Commitment implements CommitmentShape, PathedData {
   inScopeOf?: string;
   note?: string;
   agreedIn?: string;
-  atLocation?: GeoData;
+  atLocation?: GeoDataShape;
   state?: string;
 
   constructor(init: CommitmentShape) {
