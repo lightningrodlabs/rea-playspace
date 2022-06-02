@@ -1,67 +1,8 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { GeoDataShape, GeoPointShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape } from "../../../types/valueflows";
+import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
-
-export class GeoData implements GeoDataShape {
-  id: string;
-  created: Date;
-  type: string;
-  address?: string;
-  point?: GeoPoint;
-
-  constructor(init: GeoDataShape) {
-    assignFields<GeoDataShape, GeoData>(init, this);
-    this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
-  }
-
-  static getPrefix(): string {
-    return 'root.geoData';
-  }
-
-  static getPath(id: string): string {
-    return `${GeoData.getPrefix()}.${id}`;
-  }
-
-  get path(): string {
-    return GeoData.getPath(this.id);
-  }
-
-  public toJSON(): GeoDataShape {
-    return toJSON<GeoDataShape, GeoData>(this);
-  }
-}
-
-export class GeoPoint implements GeoPointShape {
-  id: string;
-  created: Date;
-  lat: number;
-  lng: number;
-
-  constructor(init: GeoPointShape) {
-    assignFields<GeoPointShape, GeoPoint>(init, this);
-    this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
-  }
-
-  static getPrefix(): string {
-    return 'root.geoPoint';
-  }
-
-  static getPath(id: string): string {
-    return `${GeoPoint.getPrefix()}.${id}`;
-  }
-
-  get path(): string {
-    return GeoPoint.getPath(this.id);
-  }
-
-  public toJSON(): GeoPointShape {
-    return toJSON<GeoPointShape, GeoPoint>(this);
-  }
-}
 
 export class EconomicResource implements EconomicResourceShape, PathedData, NamedData {
   id: string;
@@ -72,7 +13,7 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
   trackingIndentifier: string;
   onhandQuantity: number;
   accountingQuantity?: number;
-  currentLocation?: GeoData;
+  currentLocation?: GeoDataShape;
   note?: string;
   classifiedAs?: string;
   image?: string;
@@ -113,11 +54,11 @@ export class EconomicEvent implements EconomicEventShape {
   receiver: string;                 // Agent ID
   resourceInventoriedAs?: string;   // EconomicResource ID
   toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
-  resourceConformsTo?: string;      // ResourceSprecification ID
   inputOf?: string;                 // Process ID
   outputOf?: string;                // Process ID
   atLocation?: GeoDataShape;        // Source Location
   toLocation?: GeoDataShape;        // Destination Location
+  resourceConformsTo?: string;      // ResourceSprecification ID
   resourceQuantity?: number;
   effortQuantity?: number;
   resourceClassifiedAs?: string;    // General classification or grouping
