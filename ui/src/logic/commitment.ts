@@ -98,13 +98,9 @@ export const getLabel = (displayEdge: DisplayEdge): string => {
   // Grab the paths to the objects by their ID and grab the type of their vfPath
   const sourceNode: DisplayNode = store.getById(displayEdge.source);
   const sourceType = getAlmostLastPart(sourceNode.vfPath);
-  const T = ObjectTypeMap[sourceType];
-  const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
 
   const targetNode: DisplayNode = store.getById(displayEdge.target);
   const targetType = getAlmostLastPart(targetNode.vfPath);
-  const U = ObjectTypeMap[targetType];
-  const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
 
   const commitment: Commitment = store.getCursor(displayEdge.vfPath);
   const action: Action = store.getActions().find((action) => action.id == commitment.action);
@@ -122,9 +118,31 @@ export const getLabel = (displayEdge: DisplayEdge): string => {
     measurement.hasUnit = commitment.effortQuantity.hasUnit;
   }
 
-  const unit: Unit = store.getUnits().find((unit) => unit.id == measurement.hasUnit)
+  const unit: Unit = store.getUnits().find((unit) => unit.id == measurement.hasUnit);
+  const baseLabel = `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`
 
-  return `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`;
+
+  const type = `${sourceType}-${targetType}`;
+  switch (type) {
+    case 'resourceSpecification-process':
+      if (commitment.provider){
+        const provider = store.getById(commitment.provider);
+        return `${provider.name}: ${baseLabel}`;
+      }
+      break;
+    case 'process-resourceSpecification':
+      return baseLabel;
+      break;
+    case 'resourceSpecification-resourceSpecification':
+      if (commitment.provider && commitment.receiver){
+        const provider = store.getById(commitment.provider);
+        const receiver = store.getById(commitment.receiver);
+        return `${baseLabel} from ${provider.name} to ${receiver.name}`;
+      }
+      break;
+  }
+
+  return baseLabel;
 }
 
 /**
