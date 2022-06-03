@@ -4,7 +4,6 @@
 import { Edge, MarkerType } from "react-flow-renderer";
 import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
-import { ObjectTypeMap } from "../data/models/ObjectTransformations";
 import { getAlmostLastPart } from "../data/models/PathedData";
 import { Action, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
 import { Commitment, Process } from "../data/models/Valueflows/Plan";
@@ -93,17 +92,33 @@ export const validateConnection = (sourceType: string, targetType: string): bool
   return validSourceTargets[sourceType]?.indexOf(targetType) >= 0
 }
 
+/**
+ * Function to generate the label for a commitment edge.
+ *
+ * TODO: This should eventually agonotic about our DisplayEdge and DisplayNode
+ * objects. The data from those should be passed into this. This should only deal
+ * with Valueflows objects that will likely be present across all
+ * implementations. It would be good to separate out the datastore access, so
+ * this is completely agnostic, but that can come later (and passing in functions
+ * so this can stay lazy or even memoize certain things would be even better).
+ *
+ * TODO: There's a certain repetition to the logic around sourceType and
+ * targetType, can this be simplified so the conditions don't have to be executed
+ * numerous conitions but rather just have separate code paths from the outset?
+ *
+ * Future signature:
+ * (sourceType: string, targetType: string, commitment: Commitment, action: Action, Provider: Agent, Receiver: Agent, units: Unit[]): string
+ */
 export const getLabel = (displayEdge: DisplayEdge): string => {
   const store = getDataStore();
   // Grab the paths to the objects by their ID and grab the type of their vfPath
   const sourceNode: DisplayNode = store.getById(displayEdge.source);
-  const sourceType = getAlmostLastPart(sourceNode.vfPath);
-
   const targetNode: DisplayNode = store.getById(displayEdge.target);
+  const sourceType = getAlmostLastPart(sourceNode.vfPath);
   const targetType = getAlmostLastPart(targetNode.vfPath);
-
   const commitment: Commitment = store.getCursor(displayEdge.vfPath);
   const action: Action = store.getActions().find((action) => action.id == commitment.action);
+
   const measurement: MeasurementShape = {
     hasNumericalValue: 0,
     hasUnit: ''
@@ -119,29 +134,31 @@ export const getLabel = (displayEdge: DisplayEdge): string => {
   }
 
   const unit: Unit = store.getUnits().find((unit) => unit.id == measurement.hasUnit);
+
   const baseLabel = `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`
-
-
   const type = `${sourceType}-${targetType}`;
+
   switch (type) {
     case 'resourceSpecification-process':
-      if (commitment.provider){
+      if (commitment.provider) {
         const provider = store.getById(commitment.provider);
         return `${provider.name}: ${baseLabel}`;
       }
       break;
     case 'process-resourceSpecification':
-      return baseLabel;
+      if (commitment.provider && commitment.receiver) {
+        const receiver = store.getById(commitment.receiver);
+        return `${baseLabel} for ${receiver.name}`;
+      }
       break;
     case 'resourceSpecification-resourceSpecification':
-      if (commitment.provider && commitment.receiver){
+      if (commitment.provider && commitment.receiver) {
         const provider = store.getById(commitment.provider);
         const receiver = store.getById(commitment.receiver);
         return `${baseLabel} from ${provider.name} to ${receiver.name}`;
       }
       break;
   }
-
   return baseLabel;
 }
 
