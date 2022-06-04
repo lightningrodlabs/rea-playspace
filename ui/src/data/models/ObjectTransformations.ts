@@ -17,9 +17,7 @@ import {
   UnitShape,
   EconomicResourceShape,
   EconomicEventShape,
-  FulfillmentShape,
-  GeoDataShape,
-  GeoPointShape
+  FulfillmentShape
 } from "../../types/valueflows";
 import {
   Root
