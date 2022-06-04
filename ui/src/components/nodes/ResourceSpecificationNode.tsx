@@ -18,7 +18,6 @@ const ResourceSpecificationNode: React.FC<Props> = ({data}) => {
     <>
       <div key={data.id} style={{position:'relative'}}>
       <div className='canvas-node-base canvas-node-resource-specification'>
-          <div className='canvas-node-header-base canvas-node-resource-specification'>{data.label}</div>
           <div className='canvas-node-body'>
             <Handle
               type="target"

@@ -82,7 +82,7 @@ const Pallet: React.FC<Props> = ({
           <Link to="/processes/new">
           <SlIconButton name="plus-square-fill" label="Settings"/>
           </Link>
-          Processes
+          Process Specifications
         </h2>
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
