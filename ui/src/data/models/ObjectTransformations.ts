@@ -39,9 +39,7 @@ import {
 import {
   EconomicResource,
   EconomicEvent,
-  Fulfillment,
-  GeoData,
-  GeoPoint
+  Fulfillment
 } from './Valueflows/Observation';
 import {
   DisplayNode,
@@ -65,9 +63,7 @@ export const ObjectTransformations = {
   'unit': (object: Object) => new Unit(object as UnitShape),
   'economicResource': (object: Object) => new EconomicResource(object as EconomicResourceShape),
   'economicEvent': (object: Object) => new EconomicEvent(object as EconomicEventShape),
-  'fulfillment': (object: Object) => new Fulfillment(object as FulfillmentShape),
-  'geoData': (object: Object) => new GeoData(object as GeoDataShape),
-  'geoPoint': (object: Object) => new GeoPoint(object as GeoPointShape)
+  'fulfillment': (object: Object) => new Fulfillment(object as FulfillmentShape)
 };
 
 /**
@@ -97,9 +93,7 @@ export const ObjectTypeMap = {
   'unit': Unit,
   'economicResource': EconomicResource,
   'economicEvent': EconomicEvent,
-  'fulfillment': Fulfillment,
-  'geoData': GeoData,
-  'geoPoint': GeoPoint
+  'fulfillment': Fulfillment
 };
 
 /**
