@@ -153,35 +153,43 @@
   border-radius: 10px;
   padding: 4px;
   text-align: center;
+  box-shadow: 0.13em 0.13em 0.25em #ccc !important;
 }
 
 .resource-specification-pallet-node {
-  border-color:green;
+  border-color:#79c879;
   background: lightgreen;
+  border-radius: 0;;
 }
 
 .process-specification-pallet-node {
-  border-color: orange;
+  border-color: #deb96f;
   background: rgb(255, 213, 128);
 }
 
 .agent-pallet-node {
-  border-color: blue;
-  background: lightblue;
+  border-color: #6eb5cc;
+  background: #98d3e6;
+  border-radius: 80px;
 }
 
 .pallet-styles {
   flex-basis: 15%;
   margin-right: 15px;
   overflow-y: scroll;
-  max-height: 85vh;
+  max-height: 89vh;
 }
 
 .category-styles {
   border: 1px solid black;
-  background: lightgray;
+  background: #eaeaea;
   padding: 5px;
   margin: 10px;
+}
+
+.category-styles h2 {
+  padding: 0em;
+  margin: 0em;
 }
 
 /* Nodes */
@@ -189,13 +197,15 @@
 .canvas-node-base {
   border: 1px solid;
   width: 125px;
-  height: 50px;
+  height: 2em;
+  box-shadow: 0.13em 0.13em 0.25em #ccc !important;
 }
 
 .canvas-node-body {
   font-size: 10px;
   padding-left: 12px; 
   padding-right: 12px;
+  text-align: center;
 }
 
 .canvas-node-header-base {
@@ -210,10 +220,9 @@
 .canvas-node-handle-base {
   width: 8px !important;
   height: 8px !important; 
-  background-color: rgb(189, 196, 204) !important;
-  border: white solid 1px !important;
-  position:absolute !important; 
-  top: 35px !important;
+  background-color: #d1e0ea !important;
+  border: #a7a7a7 solid 1px !important;
+  position: absolute !important;
 }
 
 .canvas-node-handle-right {
@@ -225,12 +234,12 @@
 }
 
 .canvas-node-resource-specification {
-  border-color: green;
+  border-color: #79c879;
   background: lightgreen;
 }
 
 .process-colors {
-  border-color: orange;
+  border-color: #deb96f;
   background: rgb(255, 213, 128);
 }
 
@@ -259,13 +268,14 @@
 
 .rea-flow-canvas {
   border: black 1px solid;
-  height: 90vh !important;
+  height: 89vh !important;
   width: auto !important;
 }
 
 /* pi-hacker-button */
 
 .pi-hacker-row {
+  margin-top: 1vh;
   display: flex;
   flex-direction: row;
   height: 100%;
