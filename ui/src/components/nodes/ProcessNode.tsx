@@ -19,7 +19,6 @@ const ProcessNode: React.FC<Props> = ({data}) => {
     <div key={data.id} style={{position:'relative'}}>
 
     <div className='canvas-node-base process-colors canvas-node-process'>
-      <div className='canvas-node-header-base canvas-node-header-process'>{data.label}</div>
           <div className='canvas-node-body'>
             <Handle
               type="target"
