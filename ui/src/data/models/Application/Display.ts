@@ -1,9 +1,8 @@
 import { Guid } from "guid-typescript";
-import { XYPosition, Node, Edge, MarkerType } from 'react-flow-renderer';
+import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { assignFields, toJSON, fieldsToJSON } from '../../../utils';
-import { getLabel } from "../../../logic/commitment";
+import { assignFields, fieldsToJSON } from '../../../utils';
 
 export interface DisplayNodeShape {
   id?: string;
@@ -114,7 +113,7 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
   public toJSON() {
     return fieldsToJSON<DisplayEdgeShape, DisplayEdge>(
       this,
-      ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'label', 'vfPath', 'planId']
+      ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'vfPath', 'planId']
     );
   }
 }
