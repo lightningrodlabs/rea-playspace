@@ -1,7 +1,7 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape } from "../../../types/valueflows";
+import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape, MeasurementShape } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
 
 export class EconomicResource implements EconomicResourceShape, PathedData, NamedData {
@@ -59,8 +59,8 @@ export class EconomicEvent implements EconomicEventShape {
   atLocation?: GeoDataShape;        // Source Location
   toLocation?: GeoDataShape;        // Destination Location
   resourceConformsTo?: string;      // ResourceSprecification ID
-  resourceQuantity?: number;
-  effortQuantity?: number;
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
   resourceClassifiedAs?: string;    // General classification or grouping
   note?: string;
   image?: string;

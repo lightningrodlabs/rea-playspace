@@ -26,8 +26,7 @@ import {
   Agent,
   ResourceSpecification,
   ProcessSpecification,
-  Unit,
-  Measurement
+  Unit
 } from "./Valueflows/Knowledge";
 import {
   Commitment,
