@@ -5,7 +5,8 @@ import {
   Action,
   Agent,
   ProcessSpecification,
-  ResourceSpecification
+  ResourceSpecification,
+  Unit
 } from "./models/Valueflows/Knowledge";
 import {
   Plan,
@@ -175,6 +176,10 @@ export class DataStore extends DataStoreBase {
   // Commitment helpers
   public getActions(): Action[] {
     return Object.values(this.root.action);
+  }
+
+  public getUnits(): Unit[] {
+    return Object.values(this.root.unit);
   }
 }
 

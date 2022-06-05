@@ -13,13 +13,13 @@ interface HasTime {
 }
 
 interface ReaBase {
-  provider: string;               // Agent ID
-  receiver: string;               // Agent ID
-  resourceInventoriedAs?: string; // ResourceSprecification ID
-  resourceConformsTo?: string;    // ResourceSprecification ID
-  resourceQuantity?: number;
-  effortQuantity?: number;
-  resourceClassifiedAs?: string;  // General classification or grouping
+  provider: string;                   // Agent ID
+  receiver: string;                   // Agent ID
+  resourceInventoriedAs?: string;     // ResourceSprecification ID
+  resourceConformsTo?: string;        // ResourceSprecification ID
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
+  resourceClassifiedAs?: string;      // General classification or grouping
 }
 
 interface HasAction {
@@ -107,7 +107,7 @@ export interface EconomicResourceShape {
   note?: string;
   classifiedAs?: string;
   image?: string;
-  unitOfEffort?: string;
+  unitOfEffort?: string;      // Unit ID
   state?: string;
   conformsTo: string;         // ResourceSpecification
   containedIn?: string;       // EconomicResource ID
@@ -132,4 +132,15 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
 export interface GeoPoint {
   lat: number;
   lng: number;
+}
+
+export interface UnitShape {
+  id: string;
+  name: string;
+  symbol: string;
+}
+
+export interface MeasurementShape {
+  hasNumericalValue: number;  // actual quantity
+  hasUnit: string;            // ID of unit
 }
