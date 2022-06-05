@@ -113,9 +113,7 @@ const ProcessModal: React.FC<Props> = ({
           value={note}
         />
         <br />
-        <SlButton type="submit" variant="primary">
-          Create
-        </SlButton>
+        <SlButton type="submit" variant="primary">{id? 'Update' : 'Create'}</SlButton>
       </form>
     </>
   );

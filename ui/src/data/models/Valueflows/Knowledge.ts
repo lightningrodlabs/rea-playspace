@@ -1,7 +1,7 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape, ActionShape, InputOutput, ResourceEffect} from "../../../types/valueflows";
+import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape, ActionShape, InputOutput, ResourceEffect, UnitShape, MeasurementShape} from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
 
 // Knowledge Classes
@@ -41,6 +41,83 @@ export class Agent implements AgentShape, PathedData, NamedData {
 }
 
 /**
+ * Basic model of Units
+ */
+export class Unit {
+  id: string;
+  name: string;
+  symbol: string;
+
+  constructor(init: UnitShape) {
+    assignFields<UnitShape, Unit>(init, this);
+    this.id = this.id ? this.id : Guid.raw();
+  }
+
+  static getPrefix(): string {
+    return 'root.unit';
+  }
+
+  static getPath(id: string): string {
+    return `${Unit.getPrefix()}.${id}`;
+  }
+
+  get path(): string {
+    return Unit.getPath(this.id);
+  }
+
+  public toJSON(): UnitShape {
+    return toJSON<UnitShape, Unit>(this);
+  }
+}
+
+/**
+ * Basic model of a measurement from the OM Schema
+ */
+export class Measurement implements MeasurementShape {
+  hasNumericalValue: number;  // actual quantity
+  hasUnit: string;            // ID of unit
+
+  constructor(init: MeasurementShape) {
+    assignFields<MeasurementShape, Measurement>(init, this);
+  }
+
+  public toJSON(): MeasurementShape {
+    return toJSON<MeasurementShape, Measurement>(this);
+  }
+}
+
+/**
+ * Small selection of units for demo purpose
+ */
+export const Units = {
+  'cup-USCustomary': new Unit({
+    id: 'cup-USCustomary',
+    name: 'cup (US customary)',
+    symbol: 'cup'
+  }),
+  'tablespoon-US': new Unit({
+    id: 'tablespoon-US',
+    name: 'tablespoon (US)',
+    symbol: 'tbsp.'
+  }),
+  'teaspoon-US': new Unit({
+    id: 'teaspoon-US',
+    name: 'teaspoon (US)',
+    symbol: 'tsp.'
+  }),
+  'hour': new Unit({
+    id: 'hour',
+    name: 'hour',
+    symbol: 'h'
+  }),
+  'minute': new Unit({
+    id: 'minute',
+    name: 'minute',
+    symbol: 'min'
+  })
+}
+
+/**
  * The archetype of a resource. The accounting happens on the `EconomicResource`.
  */
 export class ResourceSpecification implements ResourceSpecificationShape, PathedData, NamedData {
@@ -50,8 +127,8 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   note?: string;
   image?: string;
   resourceClassifiedAs?: string;
-  defaultUnitOfResource?: string;
-  defaultUnitOfEffort?: string;
+  defaultUnitOfResource?: string; // Unit ID
+  defaultUnitOfEffort?: string;   // Unit ID
 
   constructor(init: ResourceSpecificationShape) {
     assignFields<ResourceSpecificationShape, ResourceSpecification>(init, this);
@@ -150,15 +227,15 @@ export class Action implements PathedData, ActionShape {
   }
 
   static getPrefix(): string {
-    return 'root.processSpecification';
+    return 'root.action';
   }
 
   static getPath(id: string): string {
-    return `${ProcessSpecification.getPrefix()}.${id}`;
+    return `${Action.getPrefix()}.${id}`;
   }
 
   get path(): string {
-    return ProcessSpecification.getPath(this.id);
+    return Action.getPath(this.id);
   }
 
   public toJSON(): ActionShape {

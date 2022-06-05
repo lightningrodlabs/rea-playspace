@@ -34,7 +34,7 @@ import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import { CommitmentShape, ProcessShape } from '../../types/valueflows';
 import { Fiber} from '../../lib/fiber';
-import { commitmentDefaults, commitmentUpdates, validateConnection } from '../../logic/commitment';
+import { commitmentDefaults, commitmentUpdates, displayEdgeToEdge, validateConnection } from '../../logic/commitment';
 
 interface Props {};
 
@@ -112,7 +112,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
     setNodes(displayNodes);
-    setEdges(displayEdges.map((node: DisplayEdge) => node.toEdge()));
+    setEdges(displayEdges.map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
   };
 
   // NODE HANDLERS
@@ -379,7 +379,7 @@ const FlowCanvas: React.FC<Props> = () => {
     fiber.schedule([
       () => store.set(edge),
       async () => {
-        setEdges((eds) => eds.concat(edge.toEdge()));
+        setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
       }
     ]);
   }
@@ -402,7 +402,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     const targetNode: DisplayNode = store.getById(target);
     const targetType = getAlmostLastPart(targetNode.vfPath);
-    const U = ObjectTypeMap[sourceType];
+    const U = ObjectTypeMap[targetType];
     const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
 
     // Check if it's allowed
@@ -449,9 +449,7 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const afterEdgeEdit = (commitment: Commitment) => {
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
-    displayEdge.label = commitment.action;
-
-    const newEdge = displayEdge.toEdge();
+    const newEdge = displayEdgeToEdge(displayEdge);
     setEdges((es) => {
       const newNodes = es.filter((edge) => edge.id !== newEdge.id);
       newNodes.push(newEdge);
