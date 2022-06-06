@@ -30,7 +30,7 @@
   flex: 1;
   display: flex;
   flex-direction: row;
-  margin: 1em 1em 0em 1em;;
+  margin: 0.66em 0.66em 0em 0.66em;;
 }
 
 .left-screen-nav-menu {
@@ -149,7 +149,7 @@
 
 .pallet-node {
   border: 1px solid;
-  margin: 5px;
+  margin: 9px 7px 9px 7px;
   border-radius: 10px;
   padding: 4px;
   text-align: center;
@@ -175,21 +175,19 @@
 
 .pallet-styles {
   flex-basis: 15%;
-  margin-right: 15px;
   overflow-y: scroll;
   max-height: 89vh;
 }
 
 .category-styles {
-  border: 1px solid black;
   background: #eaeaea;
   padding: 5px;
-  margin: 10px;
 }
 
 .category-styles h2 {
   padding: 0em;
   margin: 0em;
+  font-size: 18px;
 }
 
 /* Nodes */
@@ -267,7 +265,7 @@
 }
 
 .rea-flow-canvas {
-  border: black 1px solid;
+  border: #eaeaea 2px solid;
   height: 89vh !important;
   width: auto !important;
 }
