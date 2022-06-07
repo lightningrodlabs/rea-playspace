@@ -83,6 +83,7 @@ const ProcessModal: React.FC<Props> = ({
 
   return (
     <>
+      <div className='modal-title'>Process</div>
       <form onSubmit={handleSubmit}>
         <br />
         <SlInput
