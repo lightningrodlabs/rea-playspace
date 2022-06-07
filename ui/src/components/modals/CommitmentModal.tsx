@@ -94,9 +94,15 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
 
   const inputOrOutputOf = () => {
     if (inputOf) {
-      return (<SlInput disabled label="Input of" name="inputOf" value={inputOf}></SlInput>)
+      return (<>
+        <SlInput disabled label="Input of" name="inputOf" value={inputOf}></SlInput>
+        <br />
+      </>)
     } else if (outputOf) {
-      return (<SlInput disabled label="Output of" name="outputOf" value={outputOf}></SlInput>)
+      return (<>
+        <SlInput disabled label="Output of" name="outputOf" value={outputOf}></SlInput>
+        <br />
+      </>)
     } else {
       return (<></>)
     }
@@ -119,7 +125,6 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
         </SlSelect>
         <br/>
         {inputOrOutputOf()}
-        <br/>
         <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
         <br />
         <MeasurementInput label="Resource" value={resourceQuantity} name='resourceQuantity' onChange={onChange} units={units} />
