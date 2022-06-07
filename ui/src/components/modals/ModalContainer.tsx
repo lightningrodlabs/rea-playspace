@@ -17,7 +17,7 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
         overlay: {zIndex: 2000},
         content: {
           width: '50%',
-          height: '80%',
+          maxHeight: '80%',
           top: '50%',
           left: '50%',
           right: 'auto',
