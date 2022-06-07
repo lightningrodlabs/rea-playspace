@@ -77,8 +77,13 @@ export class Measurement implements MeasurementShape {
   hasNumericalValue: number;  // actual quantity
   hasUnit: string;            // ID of unit
 
-  constructor(init: MeasurementShape) {
-    assignFields<MeasurementShape, Measurement>(init, this);
+  constructor(init?: MeasurementShape) {
+    if (init) {
+      assignFields<MeasurementShape, Measurement>(init, this);
+    } else {
+      this.hasNumericalValue = 0;
+      this.hasUnit = '';
+    }
   }
 
   public toJSON(): MeasurementShape {

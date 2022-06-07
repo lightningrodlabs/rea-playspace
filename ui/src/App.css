@@ -306,3 +306,29 @@
   align-items: center;
   justify-content: center;
 }
+
+/* form controls */
+
+.measurementInput {
+  display: flex;
+  flex-direction: row;
+}
+
+.measurementInput .measurementValue {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+}
+
+.measurementInput .measurementSpacer {
+  display: flex;
+  flex-direction: column;
+  width: 5%;
+}
+
+.measurementInput .measurementUnit {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  align-content: flex-end;
+}
