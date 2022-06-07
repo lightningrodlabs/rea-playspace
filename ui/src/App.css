@@ -307,6 +307,22 @@
   justify-content: center;
 }
 
+/* modal styling */
+
+.modal-close {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: auto;
+}
+
+.modal-title {
+  font-size: 1.33em;
+  font-weight: bolder;
+  margin-top: 0em;
+  margin-bottom: 0.66em;
+}
+
 /* form controls */
 
 .measurementInput {
@@ -317,18 +333,18 @@
 .measurementInput .measurementValue {
   display: flex;
   flex-direction: column;
-  width: 45%;
+  width: 48%;
 }
 
 .measurementInput .measurementSpacer {
   display: flex;
   flex-direction: column;
-  width: 5%;
+  width: 4%;
 }
 
 .measurementInput .measurementUnit {
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 48%;
   align-content: flex-end;
 }

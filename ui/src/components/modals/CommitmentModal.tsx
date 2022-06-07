@@ -104,6 +104,7 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
 
   return (
     <>
+      <div className="modal-title">Commitment</div>
       <form onSubmit={handleSubmit}>
         <SlSelect label="Action" name='action' value={action} onSlChange={onChange} required>
           {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}

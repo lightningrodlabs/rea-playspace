@@ -7,9 +7,10 @@ Modal.setAppElement("#root");
 interface Props {
   isOpen: boolean;
   closeModal: () => void;
+  title?: string
 }
 
-const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
+const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, title, children}) => {
 
   return (
     <Modal
@@ -32,7 +33,7 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
       onRequestClose={closeModal}
       shouldCloseOnOverlayClick={true}
     >
-      <SlIconButton name="x-square-fill" onClick={closeModal}/>
+      <SlIconButton className="modal-close" name="x-square-fill" onClick={closeModal}/>
       <>{children}</>
     </Modal>
   );
