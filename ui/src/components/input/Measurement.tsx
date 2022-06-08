@@ -17,22 +17,22 @@ const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}
   const [{hasNumericalValue, hasUnit}, setState] = useState({...initialState, ...value});
   const componentName = name;
 
+  const deferOnChange = (measurement: MeasurementShape) => {
+    setTimeout(() => {
+      onChange({target: {name: componentName, value: measurement}})
+    }, 1);
+  }
+
   const onSlChange = (e: any) => {
     const { name, value } = e.target;
     setState(prevMeasurement => {
+      let parsedValue = value;
       if (name == 'hasNumericalValue') {
-        const measurement = { ...prevMeasurement, [name]: parseFloat(value) };
-        setTimeout(() => {
-          onChange({target: {name: componentName, value: measurement}})
-        }, 1);
-        return measurement;
-      } else {
-        const measurement = { ...prevMeasurement, [name]: value };
-        setTimeout(() => {
-          onChange({target: {name: componentName, value: measurement}})
-        }, 1);
-        return measurement;
+        parsedValue = parseFloat(value);
       }
+      const measurement = { ...prevMeasurement, [name]: parsedValue };
+      deferOnChange(measurement);
+      return measurement;
     });
   };
 
