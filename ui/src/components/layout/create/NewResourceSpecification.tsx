@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
+import React, { useEffect, useState } from "react";
+import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge";
 import MainPanelHeader from "../MainPanelHeader";
 import getDataStore from "../../../data/DataStore";
+import { UnitShape } from "../../../types/valueflows";
 
 export type NewResourceSpecificationProps = {
 }
@@ -23,14 +24,25 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
     {name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
 
+  const [units, setUnits] = useState<UnitShape[]>([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const store = getDataStore();
+    setUnits(store.getUnits());
+  }, []);
 
   const clearState = () => {
     console.log('clearing')
     setState({ ...initialState });
   };
 
+  /**
+   * Handle changes.
+   *
+   * TODO: Only one of defaultUnitOfResource or defaultUnitOfEffort should be set
+   */
   const onChange = e => {
     const { name, value } = e.target;
     setState(prevState => ({ ...prevState, [name]: value }));
@@ -84,22 +96,25 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
 
         />
         <br />
-        <SlInput
+        <SlSelect
           label='Default Unit Of Resource'
           name='defaultUnitOfResource'
           // @ts-ignore
-          onSlInput={onChange}
+          onSlChange={onChange}
           value={defaultUnitOfResource}
-
-        />
+        >
+          {units.map((unit) => (<SlMenuItem key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+        </SlSelect>
         <br />
-        <SlInput
+        <SlSelect
           label='Default Unit Of Effort'
           name='defaultUnitOfEffort'
           // @ts-ignore
-          onSlInput={onChange}
+          onSlChange={onChange}
           value={defaultUnitOfEffort}
-        />
+        >
+          {units.map((unit) => (<SlMenuItem key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+        </SlSelect>
         <br />
         <SlTextarea
           label='Note'
@@ -119,5 +134,3 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
 };
 
 export default NewResourceSpecification;
-
-

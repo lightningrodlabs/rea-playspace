@@ -7,25 +7,33 @@ Modal.setAppElement("#root");
 interface Props {
   isOpen: boolean;
   closeModal: () => void;
+  title?: string
 }
 
-const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, children}) => {
+const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, title, children}) => {
 
   return (
     <Modal
       style={{
         overlay: {zIndex: 2000},
         content: {
-          top: '30%',
-          left: '30%',
-          right: '30%',
+          width: '50%',
+          maxHeight: '80%',
+          top: '50%',
+          left: '50%',
+          right: 'auto',
           bottom: 'auto',
-          transform: 'translate(-20%, -20%)',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+          overflow: 'auto',
+          WebkitOverflowScrolling: 'touch'
         }
       }}
       isOpen={isOpen}
+      onRequestClose={closeModal}
+      shouldCloseOnOverlayClick={true}
     >
-      <SlIconButton name="x-square-fill" onClick={closeModal}/>
+      <SlIconButton className="modal-close" name="x-square-fill" onClick={closeModal}/>
       <>{children}</>
     </Modal>
   );

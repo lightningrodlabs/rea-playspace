@@ -4,41 +4,43 @@ import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
 import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Process } from "../../data/models/Valueflows/Plan";
-import { AgentShape } from '../../types/valueflows';
+import { AgentShape, ProcessShape } from '../../types/valueflows';
+import { assignFields } from '../../utils';
 
-const initialState = {
+const initialState: ProcessShape = {
+  id: '',
+  created: null,
+  basedOn: '',
+  plannedWithin: '',
   name: '',
   finished: false,
   note: '',
   classifiedAs: '',
   inScopeOf: '',
-  basedOn: ''
+  hasBegining: null,
+  hasEnd: null,
+  hasPointInTime: null,
+  due: null
 }
 
 interface Props {
-  processSpecificationPath: string;
+  processState: ProcessShape;
   closeModal: () => void;
-  handleAddNode: (item: PathedData) => void;
+  afterward: (item: PathedData) => void;
 }
 
 const ProcessModal: React.FC<Props> = ({
-  processSpecificationPath,
+  processState,
   closeModal, 
-  handleAddNode
+  afterward
 }) => {
   const [
-    {name, 
-    finished, 
-    note, 
-    classifiedAs, 
-    inScopeOf, 
-    basedOn}, setState
-  ] = useState(initialState);
+    { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf }, setState
+  ] = useState({...initialState, ...processState});
   const [agents, setAgents] = useState<AgentShape[]>([]);
 
   useEffect(()=>{
-    let processSpec: ProcessSpecification = getDataStore().getCursor(processSpecificationPath);
-    setState(prevState => ({ ...prevState, name: processSpec.name, basedOn: processSpec.id}));
+    let processSpec: ProcessSpecification = getDataStore().getById(basedOn);
     if (processSpec.note != null) {
       setState(prevState => ({ ...prevState, note:processSpec.note}));
     }
@@ -50,7 +52,7 @@ const ProcessModal: React.FC<Props> = ({
     setState({ ...initialState });
   };
 
-  const onChange = e => {
+  const onChange = (e: any) => {
     const { name, value } = e.target;
     setState(prevState => ({ ...prevState, [name]: value }));
   };
@@ -59,12 +61,21 @@ const ProcessModal: React.FC<Props> = ({
     e.preventDefault()
 
     const store = getDataStore();
-    const plannedWithin = store.getCursor('root.planId');
-    const process: Process = new Process(
-      {name, plannedWithin, finished, note, classifiedAs, inScopeOf, basedOn}
-    );
-    await store.set(process);
-    handleAddNode(process);
+    if (id) {
+      const process = store.getById(id);
+      assignFields(
+        { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf },
+        process
+      );
+      store.set(process);
+      if (afterward) afterward(process);
+    } else {
+      const process: Process = new Process(
+        { basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf }
+      );
+      store.set(process);
+      if (afterward) afterward(process);
+    }
 
     clearState();
     closeModal();
@@ -72,6 +83,7 @@ const ProcessModal: React.FC<Props> = ({
 
   return (
     <>
+      <div className='modal-title'>Process</div>
       <form onSubmit={handleSubmit}>
         <br />
         <SlInput
@@ -102,9 +114,7 @@ const ProcessModal: React.FC<Props> = ({
           value={note}
         />
         <br />
-        <SlButton type="submit" variant="primary">
-          Create
-        </SlButton>
+        <SlButton type="submit" variant="primary">{id? 'Update' : 'Create'}</SlButton>
       </form>
     </>
   );

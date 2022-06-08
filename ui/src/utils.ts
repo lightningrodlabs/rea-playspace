@@ -45,7 +45,6 @@ export function toJSON<T extends Object, U extends Object> (context: U): T {
       filtered[key] = context[key];
     }
   });
-  console.log(filtered);
   return filtered;
 }
 
@@ -60,6 +59,5 @@ export function fieldsToJSON<T extends Object, U extends Object> (context: U, fi
       filtered[key] = context[key];
     }
   });
-  console.log(filtered);
   return filtered;
 }

@@ -1,8 +1,8 @@
 import { Guid } from "guid-typescript";
-import { XYPosition, Node, Edge, MarkerType } from 'react-flow-renderer';
+import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { assignFields, toJSON, fieldsToJSON } from '../../../utils';
+import { assignFields, fieldsToJSON } from '../../../utils';
 
 export interface DisplayNodeShape {
   id?: string;
@@ -18,14 +18,15 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
-  label: string;
-  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
-  markerEnd: Object;
   data?: any;
 }
 
+/**
+ * This represents a node in React Flows. It corresponds to a few different
+ * Valueflows objects.
+ */
 export class DisplayNode implements Node, PathedData, NamedData {
   id: string;
   name: string;
@@ -41,6 +42,9 @@ export class DisplayNode implements Node, PathedData, NamedData {
     this.data = this.makeData();
   }
 
+  /**
+   * Creates the data field that React Flows uses to render the node.
+   */
   public makeData(): Object {
     const type = getAlmostLastPart(this.vfPath);
     return {
@@ -70,34 +74,28 @@ export class DisplayNode implements Node, PathedData, NamedData {
   }
 }
 
-export class DisplayEdge implements Edge, DisplayEdgeShape, PathedData {
+/**
+ * Representation of an edge in the graph, represents a Valueflows Comittment.
+ * 
+ * Our representation of edges is slightly different from the representation in
+ * React Flow. We need to be able to store what we care about, but also give
+ * React Flow what it needs. Unfortunately, it adds a layer of complexity where
+ * there is a React state that holds the data for the view and our data store.
+ * This means we need to transform back and forth between the objects to maintain
+ * consistency in both layers.
+ */
+export class DisplayEdge implements DisplayEdgeShape, PathedData {
   id: string;
   source: string;
   target: string;
   sourceHandle?: string | null;
   targetHandle?: string | null;
-  label: string;
-  labelBgStyle: Object;
   vfPath?: string;
   planId: string;
-  markerEnd: MarkerType;
 
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-  }
-
-  public toEdge(): Edge {
-    return {
-      id: `reactflow__edge-${this.source}${this.sourceHandle || ''}-${this.target}${this.targetHandle || ''}`,
-      source: this.source,
-      target: this.target,
-      sourceHandle: this.sourceHandle,
-      targetHandle: this.targetHandle,
-      data: {
-        id: this.id
-      }
-    }
   }
 
   static getPrefix(planId: string): string {
