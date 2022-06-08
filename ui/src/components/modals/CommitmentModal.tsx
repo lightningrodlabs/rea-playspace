@@ -78,13 +78,13 @@ const CommitmentModal: React.FC<Props> = ({commitmentState, closeModal, afterwar
         {id, plannedWithin, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note},
         commitment
       );
-      await store.set(commitment);
+      store.set(commitment);
       if (afterward) afterward(commitment);
     } else {
       const commitment: Commitment = new Commitment(
         {plannedWithin: store.getCurrentPlanId(), action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}
       );
-      await store.set(commitment);
+      store.set(commitment);
       if (afterward) afterward(commitment);
     }
 
