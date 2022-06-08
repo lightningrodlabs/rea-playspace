@@ -67,13 +67,13 @@ const ProcessModal: React.FC<Props> = ({
         { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf },
         process
       );
-      await store.set(process);
+      store.set(process);
       if (afterward) afterward(process);
     } else {
       const process: Process = new Process(
         { basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf }
       );
-      await store.set(process);
+      store.set(process);
       if (afterward) afterward(process);
     }
 
