@@ -1,24 +1,26 @@
+export type ActionResult<T> = Promise<T>
+
 // Define the type signature of an Action: async function or Promise
-export type Action = () => Promise<void>
+export type Action<T> = () => Promise<T>
 
 /**
  * This is a simple mechanism to ensure that we execute async or promise
  * returning code in the order it was added to the queue.
  */
-export class Fiber {
+export class Fiber<T> {
 
   /**
    * Define the "fiber" that we'll use. For a reminder: Process > Thread > Fiber
    */
-  private actionFiber: Promise<void>;
+  private actionFiber: Promise<T>;
 
-  private actionQueue: Action[];
+  private actionQueue: Action<T>[];
 
   /**
    * Create the first resolved promise from which we build
    */
   constructor() {
-    this.actionFiber = Promise.resolve();
+    this.actionFiber = Promise.resolve({} as T);
   }
 
   /**
@@ -47,8 +49,8 @@ export class Fiber {
    * more in-depth examples and exmplantion of the SyntheticEvent pool object
    * reuse.
    */
-  public schedule(actions: Array<Action>) {
-    this.actionFiber = actions.reduce((chain: Promise<void>, curr) => chain.then(curr), this.actionFiber);
+  public schedule(actions: Array<Action<T>>) {
+    this.actionFiber = actions.reduce((chain: ActionResult<T>, curr) => chain.then(curr), this.actionFiber);
   }
 
   /**
@@ -56,7 +58,7 @@ export class Fiber {
    * 
    * Same warning as above.
    */
-  public scheduleDefered(actions: Array<Action>) {
+  public scheduleDefered(actions: Action<T>[]) {
     this.actionQueue.concat(actions);
   }
 

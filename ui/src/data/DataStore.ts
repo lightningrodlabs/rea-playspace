@@ -1,6 +1,5 @@
 import ZomeApi from "../api/zomeApi";
 import {  getHolochainClient, setAgentPubKey, setCellId, setZomeApi } from '../hcWebsockets';
-
 import {
   Action,
   Agent,
@@ -9,10 +8,8 @@ import {
   Unit
 } from "./models/Valueflows/Knowledge";
 import {
-  Plan,
-  Process
+  Plan
 } from "./models/Valueflows/Plan";
-
 import {
   DisplayNode,
   DisplayEdge
@@ -76,8 +73,8 @@ export class DataStore extends DataStoreBase {
         name: 'Default Plan Name'
       });
       this.root = new Root({planId: plan.id})
-      await this.put(this.root);
-      await this.set(plan);
+      this.put(this.root);
+      this.set(plan);
     } else  {
       // We have the data, lets hydrate it
       this.hydrateFromZome(res);
@@ -94,7 +91,7 @@ export class DataStore extends DataStoreBase {
 
   // For fetching updates when we get signals
   public async fetchProcessSpecification(id: string) {
-    return await this.fetchSingle(ProcessSpecification.getPath(id));
+    return await this.fetch(ProcessSpecification.getPath(id));
   }
 
   public getProcessSpecifications(): Array<ProcessSpecification> {
@@ -113,7 +110,7 @@ export class DataStore extends DataStoreBase {
   }
 
   public async fetchResourceSpecification(id: string) {
-    return await this.fetchSingle(ResourceSpecification.getPath(id));
+    return await this.fetch(ResourceSpecification.getPath(id));
   }
 
   public getResourceSpecifications(): Array<ResourceSpecification> {
@@ -132,7 +129,7 @@ export class DataStore extends DataStoreBase {
   }
 
   public async fetchAgent(id: string): Promise<Agent> {
-    return await this.fetchSingle(Agent.getPath(id)) as Agent;
+    return await this.fetch(Agent.getPath(id)) as Agent;
   }
 
   public getAgents(): Array<Agent> {
@@ -153,7 +150,7 @@ export class DataStore extends DataStoreBase {
   }
 
   public async fetchPlan(id: string) {
-    return await this.fetchSingle(Plan.getPath(id));
+    return await this.fetch(Plan.getPath(id));
   }
 
   public getPlans(): Array<Plan> {
