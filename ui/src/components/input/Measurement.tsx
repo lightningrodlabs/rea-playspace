@@ -15,20 +15,20 @@ const initialState: MeasurementShape = new Measurement();
 
 const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}) => {
   const [{hasNumericalValue, hasUnit}, setState] = useState({...initialState, ...value});
-
-  useEffect(() => {
-    // Set the default units when the resource specification has them and the current *Quantities are null
-    if (value === null) {
-      console.log(`${label} is null`)
-    }
-  });
+  const componentName = name;
 
   const onSlChange = (e: any) => {
-    const { field_name, field_value } = e.target;
+    const { name, value } = e.target;
     setState(prevMeasurement => {
-      const measurement = { ...prevMeasurement, [field_name]: field_value };
-      onChange({target: {name, value: measurement}});
-      return measurement;
+      if (name == 'hasNumericalValue') {
+        const measurement = { ...prevMeasurement, [name]: parseFloat(value) };
+        onChange({target: {name: componentName, value: measurement}});
+        return measurement;
+      } else {
+        const measurement = { ...prevMeasurement, [name]: value };
+        onChange({target: {name: componentName, value: measurement}});
+        return measurement;
+      }
     });
   };
 
@@ -39,9 +39,9 @@ const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}
   return (
       <>
         <div className='measurementInput'>
-          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="resourceValue" onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
+          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
           <span className='measurementSpacer'></span>
-          <SlSelect className="measurementUnit" label={`${label} unit`} name="resourceUnit" onSlChange={onSlChange} value={hasUnit}>
+          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} value={hasUnit}>
             {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
           </SlSelect>
         </div>
