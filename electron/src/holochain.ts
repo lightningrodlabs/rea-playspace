@@ -7,10 +7,10 @@ const COMMUNITY_PROXY_URL =
   'kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--'
 // increment this version when an update to the application
 // requires to have a new DHT/DNA
-const DATABASES_VERSION_ID = '0-0-1'
+const DATABASES_VERSION_ID = '0-0-2'
 // increment this version when you want the application
 // to use a new keystore
-const KEYSTORE_VERSION_ID = '0-0-1'
+const KEYSTORE_VERSION_ID = '0-0-2'
 
 // these messages get seen on the splash page
 export enum StateSignalText {
