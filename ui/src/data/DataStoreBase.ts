@@ -4,6 +4,7 @@ import { RustNode, ThingInput } from "../types/holochain";
 import { getLastPart, getParentPath, getRustNodePath, PathedData } from "./models/PathedData";
 import { ObjectTransformations } from "./models/ObjectTransformations";
 import { Root, RootShape } from "./models/Application/Root";
+import { Action, Fiber } from "../lib/fiber";
 
 /**
  * Data store object
@@ -12,11 +13,13 @@ import { Root, RootShape } from "./models/Application/Root";
 export class DataStoreBase {
 
   protected zomeApi: ZomeApi;
+  protected fiber: Fiber<void>;
   protected root: Root;
   protected pathIndex: Map<string, string>;
 
   constructor() {
     this.zomeApi = getZomeApi();
+    this.fiber = new Fiber<void>();
     this.root = new Root();
     this.pathIndex = new Map<string, string>();
   }
@@ -63,10 +66,13 @@ export class DataStoreBase {
 
   /**
    * Fetches a single terminal object given its full path and id.
+   *
+   * TODO: Should we schedule these for execution after all updates have been made?
+   *
    * @param path
    * @returns
    */
-  public async fetchSingle(path: string): Promise<PathedData> {
+  public async fetch(path: string): Promise<PathedData> {
     const res = await this.zomeApi.get_thing(path);
     this.hydrateFromZome(res);
     return this.getCursor(path);
@@ -74,6 +80,9 @@ export class DataStoreBase {
 
   /**
    * Fetches all of the entries under a particular path
+   *
+   * TODO: Should we schedule these for execution after all updates have been made?
+   *
    * @param path
    * @returns
    */
@@ -84,64 +93,82 @@ export class DataStoreBase {
   }
 
   /**
-   * Puts any object that knows it's path and how to properly serialize itself
-   * @param item
+   * Higher-order function returning an async function which stores the item passed in
    */
-  public async put(item: PathedData) {
+  private putAction = (item: PathedData): Action<void> => {
     const itemThing: ThingInput = {
       path: item.path,
       data: JSON.stringify(item)
     };
-    try {
+    return async () => {
       await this.zomeApi.put_thing(itemThing);
-    } catch (e) {
-      console.log(e);
+      return;
     }
   }
 
   /**
-   * Stores and saves any PathedItem
+   * Persist a PathedData object
    * @param item
    */
-  public async set(item: PathedData) {
-    this.getCursor(getParentPath(item.path))[item.id] = item;
-    this.pathIndex.set(item.id, item.path);
-    await this.put(item);
-  }
-
-  public async saveTree(): Promise<void | {}> {
-    const self = this;
-    const saveFuncs = new Array<() => {}>();
-
-    // Store everything in the order it was added to the path index (which should be from shortest to longest path)
-    this.pathIndex.forEach((path) => {
-      console.log(path);
-      saveFuncs.push(async () => {
-        try {
-          const cursor = self.getCursor(path);
-          return self.put(cursor);
-        } catch {
-          console.log(`Could not save: ${path}`);
-        }
-      });
-    });
-    // Need to store the root, too.
-    saveFuncs.push(async() => {
-      return self.put(self.root);
-    });
-    return saveFuncs.reduce((chain, curr) => chain.then(curr), Promise.resolve());
+  public put(item: PathedData) {
+    this.fiber.schedule([
+      this.putAction(item)
+    ]);
   }
 
   /**
-  * Deletes Thing on Path 
+   * Persist an array of PathedData objects
+   */
+  public putAll(items: PathedData[]) {
+    this.fiber.schedule(
+      items.map((item) => this.putAction(item))
+    );
+  }
+
+  /**
+   * Sets or updates a PathedData item in the tree and persists it
+   * @param item
+   */
+  public set(item: PathedData) {
+    // This is necessary to make sure we are manipulating the correct reference
+    this.getCursor(getParentPath(item.path))[item.id] = item;
+    // Update the path index
+    this.pathIndex.set(item.id, item.path);
+    // Persist to DHT
+    this.put(item);
+  }
+
+  /**
+   * Persists the entire tree, using the pathIndex as the reference
+   */
+  public saveTree() {
+    const self = this;
+    // Store everything in the order it was added to the path index (which should be from shortest to longest path)
+    this.fiber.schedule(
+      Array.from(this.pathIndex.values()).map(
+        (path) => {
+          console.log(path);
+          try {
+            const item = self.getCursor(path);
+            return self.putAction(item);
+          } catch (e) {
+            console.log('Path not found in tree store');
+            return (async () => {});
+          }
+        }
+      )
+    );
+    this.put(self.root);
+  }
+
+  /**
+  * Deletes thing corresponding to the path 
   * @param path
   */
-  public async delete(path: string) {
-    try {
-      await this.zomeApi.delete_thing(path);
-    } catch (e) {
-      console.log(e);
-    }
+  public delete(path: string) {
+    this.fiber.schedule([
+      () => this.zomeApi.delete_thing(path)
+    ]);
   }
 
   // Root helpers
@@ -156,7 +183,7 @@ export class DataStoreBase {
     if (res[0].val.data === '') {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
-      await this.put(this.root);
+      this.put(this.root);
     } else {
       // We have the data, lets hydrate it
       this.hydrateFromZome(res);

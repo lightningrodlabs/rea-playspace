@@ -33,7 +33,6 @@ import { NamedData } from '../../data/models/NamedData';
 import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
 import { Commitment, Process } from '../../data/models/Valueflows/Plan';
 import { CommitmentShape, ProcessShape } from '../../types/valueflows';
-import { Fiber} from '../../lib/fiber';
 import { commitmentDefaults, commitmentUpdates, displayEdgeToEdge, validateConnection } from '../../logic/commitment';
 
 interface Props {};
@@ -41,7 +40,6 @@ interface Props {};
 const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const store = getDataStore();
-  const fiber = new Fiber();
 
   // STATE MANAGEMENT
 
@@ -206,14 +204,11 @@ const FlowCanvas: React.FC<Props> = () => {
     setType(null);
     setCurrentPosition(undefined);
 
+    // Add to local state to render new node on canvas
+    setNodes((nds) => nds.concat(newNode));
+
     // Persist to DHT
-    fiber.schedule([
-      () => store.set(newNode),
-      async () => {
-        // Add to local state to render new node on canvas
-        setNodes((nds) => nds.concat(newNode));
-      }
-    ]);
+    store.set(newNode);
   }
 
   /**
@@ -262,9 +257,7 @@ const FlowCanvas: React.FC<Props> = () => {
       return nsNew;
     });
 
-    fiber.schedule([
-      () => store.set(newNode)
-    ]);
+    store.set(newNode);
   }
 
 
@@ -291,9 +284,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
       resetPosition();
 
-      fiber.schedule([
-        () => store.set(nodeToUpdate)
-      ]);
+      store.set(nodeToUpdate);
     }
   }
 
@@ -312,11 +303,10 @@ const FlowCanvas: React.FC<Props> = () => {
       const nodePath: string = nodeToDelete.path;
       const vfPath: string = nodeToDelete.vfPath;
       const vfType = getAlmostLastPart(vfPath);
-      fiber.schedule([
-        () => store.delete(nodePath),
-        // We don't want to delete the `Agents` or `ResourceSpecifications`
-        () => (vfType == 'process') ? store.delete(vfPath) : Promise.resolve()
-      ]);
+
+      store.delete(nodePath);
+      // We don't want to delete the `Agents` or `ResourceSpecifications`
+      (vfType == 'process') ? store.delete(vfPath) : Promise.resolve();
     });
   }
 
@@ -376,12 +366,8 @@ const FlowCanvas: React.FC<Props> = () => {
       vfPath: commitment.path,
       planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
-    fiber.schedule([
-      () => store.set(edge),
-      async () => {
-        setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
-      }
-    ]);
+    setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
+    store.set(edge);
   }
 
   /**
@@ -423,10 +409,8 @@ const FlowCanvas: React.FC<Props> = () => {
       setType('updateCommitment');
       openModal();
 
-      fiber.schedule([
-        () => store.set(vfEdge),
-        () => store.set(updatedCommitment)
-      ]);
+      store.set(vfEdge);
+      store.set(updatedCommitment);
     }
   }
 
@@ -460,10 +444,8 @@ const FlowCanvas: React.FC<Props> = () => {
     setSelectedDisplayEdge(null);
     setType(null);
 
-    fiber.schedule([
-      () => store.set(commitment),
-      () => store.set(displayEdge)
-    ]);
+    store.set(commitment);
+    store.set(displayEdge);
   }
 
   /**
@@ -482,10 +464,8 @@ const FlowCanvas: React.FC<Props> = () => {
       const edgePath: string = edgeToDelete.path;
       const vfPath: string = edgeToDelete.vfPath;
 
-      fiber.schedule([
-        () => store.delete(edgePath),
-        () => store.delete(vfPath)
-      ]);
+      store.delete(edgePath);
+      store.delete(vfPath);
     });
   }
 
