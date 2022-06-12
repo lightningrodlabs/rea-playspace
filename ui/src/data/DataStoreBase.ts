@@ -147,12 +147,11 @@ export class DataStoreBase {
     this.fiber.schedule(
       Array.from(this.pathIndex.values()).map(
         (path) => {
-          console.log(path);
           try {
             const item = self.getCursor(path);
             return self.putAction(item);
           } catch (e) {
-            console.log('Path not found in tree store');
+            console.log(`Path not found in tree store: ${path}`);
             return (async () => {});
           }
         }
