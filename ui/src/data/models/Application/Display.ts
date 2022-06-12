@@ -18,7 +18,7 @@ export interface DisplayEdgeShape {
   id?: string;
   source: string;
   target: string;
-  vfPath?: string;
+  vfPath?: string[];
   planId: string;
   data?: any;
 }
@@ -90,7 +90,7 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
   target: string;
   sourceHandle?: string | null;
   targetHandle?: string | null;
-  vfPath?: string;
+  vfPath?: string[];
   planId: string;
 
   constructor(init: DisplayEdgeShape) {
