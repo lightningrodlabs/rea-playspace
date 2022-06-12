@@ -1,18 +1,18 @@
 // Building Blocks
 
-interface HasIdDate {
+export interface HasIdDate {
   id?: string;
   created?: Date;
 }
 
-interface HasTime {
+export interface HasTime {
   hasBegining?: Date;
   hasEnd?: Date;
   hasPointInTime?: Date;
   due?: Date;
 }
 
-interface ReaBase {
+export interface ReaBase {
   provider: string;                   // Agent ID
   receiver: string;                   // Agent ID
   resourceInventoriedAs?: string;     // ResourceSprecification ID
@@ -20,9 +20,10 @@ interface ReaBase {
   resourceQuantity?: MeasurementShape;
   effortQuantity?: MeasurementShape;
   resourceClassifiedAs?: string;      // General classification or grouping
+  inScopeOf?: string;
 }
 
-interface HasAction {
+export interface HasAction {
   action: string;
 }
 
@@ -88,7 +89,6 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
   plannedWithin: string;
   independentDemandOf?: string;
   finished?: boolean;
-  inScopeOf?: string;
   note?: string;
   agreedIn?: string;
   atLocation?: GeoDataShape;
@@ -134,6 +134,8 @@ export interface FulfillmentShape extends HasIdDate {
   fulfills: string;
   fulfilledBy: string;
 }
+
+export type FlowShape = CommitmentShape | EconomicEventShape;
 
 // Geo
 
