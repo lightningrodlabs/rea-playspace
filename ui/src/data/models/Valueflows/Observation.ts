@@ -69,6 +69,7 @@ export class EconomicEvent implements EconomicEventShape {
   hasBegining?: Date;
   hasEnd?: Date;
   hasPointInTime?: Date;
+  inScopeOf: string;
   triggeredBy: string;              // EconomicEvent ID
 
   constructor(init: EconomicEventShape) {
