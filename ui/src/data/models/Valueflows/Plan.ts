@@ -3,11 +3,11 @@ import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { DisplayNode, DisplayEdge } from "../Application/Display";
 import {
-  GeoPoint,
   PlanShape,
   ProcessShape,
   CommitmentShape,
-  MeasurementShape
+  MeasurementShape,
+  GeoDataShape
 } from "../../../types/valueflows";
 import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
 
@@ -157,7 +157,7 @@ export class Commitment implements CommitmentShape, PathedData {
   inScopeOf?: string;
   note?: string;
   agreedIn?: string;
-  atLocation?: GeoPoint;
+  atLocation?: GeoDataShape;
   state?: string;
 
   constructor(init: CommitmentShape) {

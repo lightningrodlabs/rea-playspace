@@ -1,11 +1,10 @@
 import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
-import React, { useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import getDataStore from '../../data/DataStore';
 import { PathedData } from '../../data/models/PathedData';
 import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
 import { Process } from "../../data/models/Valueflows/Plan";
 import { AgentShape, ProcessShape } from '../../types/valueflows';
-import { assignFields } from '../../utils';
 
 const initialState: ProcessShape = {
   id: '',
@@ -57,25 +56,13 @@ const ProcessModal: React.FC<Props> = ({
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    const processUpdates = { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf };
     const store = getDataStore();
-    if (id) {
-      const process = store.getById(id);
-      assignFields(
-        { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf },
-        process
-      );
-      store.set(process);
-      if (afterward) afterward(process);
-    } else {
-      const process: Process = new Process(
-        { basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf }
-      );
-      store.set(process);
-      if (afterward) afterward(process);
-    }
+    const newProcess = store.upsert<ProcessShape, Process>(processUpdates, Process);
+    if (afterward) afterward(newProcess);
 
     clearState();
     closeModal();

@@ -1,18 +1,18 @@
 // Building Blocks
 
-interface HasIdDate {
+export interface HasIdDate {
   id?: string;
   created?: Date;
 }
 
-interface HasTime {
+export interface HasTime {
   hasBegining?: Date;
   hasEnd?: Date;
   hasPointInTime?: Date;
   due?: Date;
 }
 
-interface ReaBase {
+export interface ReaBase {
   provider: string;                   // Agent ID
   receiver: string;                   // Agent ID
   resourceInventoriedAs?: string;     // ResourceSprecification ID
@@ -20,9 +20,10 @@ interface ReaBase {
   resourceQuantity?: MeasurementShape;
   effortQuantity?: MeasurementShape;
   resourceClassifiedAs?: string;      // General classification or grouping
+  inScopeOf?: string;
 }
 
-interface HasAction {
+export interface HasAction {
   action: string;
 }
 
@@ -88,10 +89,9 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
   plannedWithin: string;
   independentDemandOf?: string;
   finished?: boolean;
-  inScopeOf?: string;
   note?: string;
   agreedIn?: string;
-  atLocation?: GeoPoint;
+  atLocation?: GeoDataShape;
   state?: string;
   inputOf?: string;
   outputOf?: string;
@@ -100,36 +100,52 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
 // Observation
 export interface EconomicResourceShape {
   name: string;
+  conformsTo: string;         // ResourceSpecification
+  primaryAccountable: string; // Agent ID of the accountable party
   trackingIndentifier: string;
-  accountingQuantity?: number;
   onhandQuantity: number;
-  currentLocation?: GeoPoint;
+  accountingQuantity?: number;
+  currentLocation?: GeoDataShape;
   note?: string;
   classifiedAs?: string;
   image?: string;
   unitOfEffort?: string;      // Unit ID
   state?: string;
-  conformsTo: string;         // ResourceSpecification
-  containedIn?: string;       // EconomicResource ID
   stage?: string;             // ProcessSpecification ID
-  primaryAccountable: string; // Agent ID of the accountable party
+  containedIn?: string;       // EconomicResource ID
+  lot?: string;
 }
 
 export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBase {
   note?: string;
   image?: string;
   agreedIn?: string;
-  atLocation?: GeoPoint;
-  toLocation?: GeoPoint;
+  atLocation?: GeoDataShape;
+  toLocation?: GeoDataShape;
   state?: string;
-  toResourceInventoriedAs: string; // EconomicResource ID that the transfer will be inventoried as.
+  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as.
   inputOf?: string;
   outputOf?: string;
 }
 
+export interface FulfillmentShape extends HasIdDate {
+  resourceQuantity?: number;
+  effortQuantity?: number;
+  fulfills: string;
+  fulfilledBy: string;
+}
+
+export type FlowShape = CommitmentShape | EconomicEventShape;
+
 // Geo
 
-export interface GeoPoint {
+export interface GeoDataShape extends HasIdDate {
+  type: string;
+  address?: string;
+  point?: GeoPointShape;
+}
+
+export interface GeoPointShape extends HasIdDate {
   lat: number;
   lng: number;
 }

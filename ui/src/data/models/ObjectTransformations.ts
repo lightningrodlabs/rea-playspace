@@ -14,7 +14,10 @@ import {
   PlanShape,
   ProcessShape,
   CommitmentShape,
-  UnitShape
+  UnitShape,
+  EconomicResourceShape,
+  EconomicEventShape,
+  FulfillmentShape
 } from "../../types/valueflows";
 import {
   Root
@@ -23,14 +26,18 @@ import {
   Agent,
   ResourceSpecification,
   ProcessSpecification,
-  Unit,
-  Measurement
+  Unit
 } from "./Valueflows/Knowledge";
 import {
   Commitment,
   Plan,
   Process
 } from "./Valueflows/Plan";
+import {
+  EconomicResource,
+  EconomicEvent,
+  Fulfillment
+} from './Valueflows/Observation';
 import {
   DisplayNode,
   DisplayNodeShape,
@@ -51,7 +58,9 @@ export const ObjectTransformations = {
   'displayEdge': (object: Object) => new DisplayEdge(object as DisplayEdgeShape),
   'commitment': (object: Object) => new Commitment(object as CommitmentShape),
   'unit': (object: Object) => new Unit(object as UnitShape),
-  'economicEvent': function () { throw new Error('Not yet implemented'); }
+  'economicResource': (object: Object) => new EconomicResource(object as EconomicResourceShape),
+  'economicEvent': (object: Object) => new EconomicEvent(object as EconomicEventShape),
+  'fulfillment': (object: Object) => new Fulfillment(object as FulfillmentShape)
 };
 
 /**
@@ -79,8 +88,9 @@ export const ObjectTypeMap = {
   'displayEdge': DisplayEdge,
   'commitment': Commitment,
   'unit': Unit,
-  // TODO:
-  'economicEvent': undefined
+  'economicResource': EconomicResource,
+  'economicEvent': EconomicEvent,
+  'fulfillment': Fulfillment
 };
 
 /**

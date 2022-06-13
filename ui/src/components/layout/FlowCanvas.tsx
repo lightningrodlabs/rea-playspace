@@ -20,7 +20,7 @@ import ReactFlow, {
   EdgeChange
 } from 'react-flow-renderer';
 import AgentModal from '../modals/AgentModal';
-import CommitmentModal from '../modals/CommitmentModal';
+import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
@@ -30,10 +30,10 @@ import { DisplayEdge, DisplayEdgeShape, DisplayNode } from "../../data/models/Ap
 import ProcessNode from '../nodes/ProcessNode';
 import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/PathedData';
 import { NamedData } from '../../data/models/NamedData';
-import { ObjectTypeMap } from '../../data/models/ObjectTransformations';
-import { Commitment, Process } from '../../data/models/Valueflows/Plan';
-import { CommitmentShape, ProcessShape } from '../../types/valueflows';
-import { commitmentDefaults, commitmentUpdates, displayEdgeToEdge, validateConnection } from '../../logic/commitment';
+import { Process } from '../../data/models/Valueflows/Plan';
+import { FlowShape, ProcessShape } from '../../types/valueflows';
+import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow } from '../../logic/flows';
+import { assignFields } from '../../utils';
 
 interface Props {};
 
@@ -59,7 +59,6 @@ const FlowCanvas: React.FC<Props> = () => {
    *   + position
    */
   const [type, setType] = useState<string>();
-  const [commitmentState, setCommitmentState] = useState<CommitmentShape>();
   const [processState, setProcessState] = useState<ProcessShape>();
   const [source, setSource] = useState<string>();
   const [target, setTarget] = useState<string>();
@@ -323,26 +322,16 @@ const FlowCanvas: React.FC<Props> = () => {
   /**
    * This is called each time a connection is made between two nodes.
    */
-   const onConnect = (params: Connection) => {
+  const onConnect = (params: Connection) => {
     const {source, target} = params;
 
-    // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getById(source);
-    const sourceType = getAlmostLastPart(sourceNode.vfPath);
-    const T = ObjectTypeMap[sourceType];
-    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
-
-    const targetNode: DisplayNode = store.getById(target);
-    const targetType = getAlmostLastPart(targetNode.vfPath);
-    const U = ObjectTypeMap[sourceType];
-    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
+    // Grab vfTypes and vfNodes off the DisplayNodes
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
 
     // If the connection is valid, open the commitment modal
-    if (validateConnection(sourceType, targetType)) {
-      // based on the flows in the commitment, let's set up some sensible defaults
-      const initial: CommitmentShape = commitmentDefaults[`${sourceType}-${targetType}`](store.getCurrentPlanId(), sourceVfNode, targetVfNode);
+    if (validateFlow(sourceVfType, targetVfType)) {
       setType('commitment');
-      setCommitmentState(initial);
       setSource(source);
       setTarget(target);
       openModal();
@@ -352,22 +341,19 @@ const FlowCanvas: React.FC<Props> = () => {
  /**
    * Adds a DisplayEdge and React Flow Edge corresponding to a commitment
    */
-  const afterAddCommitment = (commitment: Commitment) => {
-    setType(null);
-    setCommitmentState(null);
-    setSource(null);
-    setTarget(null);
-
+  const afterAddCommitment = (items: PathedData[]) => {
     // Add the edge
     const edge = new DisplayEdge({
       source,
       target,
-      label: commitment.action,
-      vfPath: commitment.path,
+      vfPath: items.map((item) => item.path),
       planId: store.getCurrentPlanId()
     } as DisplayEdgeShape);
     setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
     store.set(edge);
+    setType(null);
+    setSource(null);
+    setTarget(null);
   }
 
   /**
@@ -380,19 +366,12 @@ const FlowCanvas: React.FC<Props> = () => {
   const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
     const {source, target} = newConnection;
 
-    // Grab the paths to the objects by their ID and grab the type of their vfPath
-    const sourceNode: DisplayNode = store.getById(source);
-    const sourceType = getAlmostLastPart(sourceNode.vfPath);
-    const T = ObjectTypeMap[sourceType];
-    const sourceVfNode: typeof T = store.getCursor(sourceNode.vfPath);
-
-    const targetNode: DisplayNode = store.getById(target);
-    const targetType = getAlmostLastPart(targetNode.vfPath);
-    const U = ObjectTypeMap[targetType];
-    const targetVfNode: typeof U = store.getCursor(targetNode.vfPath);
+    // Grab vfTypes and vfNodes off the DisplayNodes
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
 
     // Check if it's allowed
-    if (validateConnection(sourceType, targetType)) {
+    if (validateFlow(sourceVfType, targetVfType)) {
       setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
 
       const vfEdge: DisplayEdge = store.getById(edge.data.id);
@@ -401,16 +380,22 @@ const FlowCanvas: React.FC<Props> = () => {
       vfEdge.sourceHandle = newConnection.sourceHandle;
       vfEdge.targetHandle = newConnection.targetHandle;
 
-      const vfCommitment = store.getCursor(vfEdge.vfPath);
-      const updatedCommitment: Commitment = commitmentUpdates[`${sourceType}-${targetType}`](vfCommitment, sourceVfNode, targetVfNode);
-
-      setCommitmentState(updatedCommitment);
-      setSelectedDisplayEdge(vfEdge.id);
-      setType('updateCommitment');
-      openModal();
+      const updatedFlows: PathedData[] = vfEdge.vfPath.map((path: string) => {
+        const vfFlow = store.getCursor(path);
+        const updates = flowUpdates[`${sourceVfType}-${targetVfType}`](vfFlow, sourceVfNode, targetVfNode);
+        assignFields<FlowShape, FlowShape>(updates, vfFlow);
+        return vfFlow;
+      })
 
       store.set(vfEdge);
-      store.set(updatedCommitment);
+      store.putAll(updatedFlows);
+
+      setSelectedDisplayEdge(vfEdge.id);
+      setSource(source);
+      setTarget(target);
+      // XXX: Need to rename
+      setType('updateCommitment');
+      openModal();
     }
   }
 
@@ -419,9 +404,10 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onEdgeEdit = (event: SyntheticEvent, edge: Edge) => {
     const vfEdge = store.getById(edge.data.id) as DisplayEdge;
-    const vfCommitment = store.getCursor(vfEdge.vfPath);
-    setCommitmentState(vfCommitment);
     setSelectedDisplayEdge(vfEdge.id);
+    setSource(vfEdge.source);
+    setTarget(vfEdge.target);
+    // XXX: Need to rename
     setType('updateCommitment');
     openModal();
   }
@@ -431,8 +417,11 @@ const FlowCanvas: React.FC<Props> = () => {
    *
    * TIL: The comment in `afterProcessEdit` should apply here, too.
    */
-  const afterEdgeEdit = (commitment: Commitment) => {
+  const afterEdgeEdit = (items: PathedData[]) => {
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
+    displayEdge.vfPath = items.map((item) => item.path);
+    store.set(displayEdge);
+
     const newEdge = displayEdgeToEdge(displayEdge);
     setEdges((es) => {
       const newNodes = es.filter((edge) => edge.id !== newEdge.id);
@@ -440,12 +429,10 @@ const FlowCanvas: React.FC<Props> = () => {
       return newNodes;
     });
 
-    setCommitmentState(null);
     setSelectedDisplayEdge(null);
     setType(null);
-
-    store.set(commitment);
-    store.set(displayEdge);
+    setSource(null);
+    setTarget(null);
   }
 
   /**
@@ -462,10 +449,14 @@ const FlowCanvas: React.FC<Props> = () => {
       const edgeId = edge.data.id;
       const edgeToDelete = store.getById(edgeId);
       const edgePath: string = edgeToDelete.path;
-      const vfPath: string = edgeToDelete.vfPath;
+      if (Array.isArray(edgeToDelete.vfPath)) {
+        edgeToDelete.vfPath.forEach((flow: string) => store.delete(flow))
+      } else {
+        const vfPath: string = edgeToDelete.vfPath;
+        store.delete(vfPath);
+      }
 
       store.delete(edgePath);
-      store.delete(vfPath);
     });
   }
 
@@ -535,9 +526,11 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'agent':
         return <AgentModal />;
       case 'commitment':
-        return <CommitmentModal commitmentState={{...commitmentState}} closeModal={closeModal} afterward={afterAddCommitment} />;
+        return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddCommitment} />;
       case 'updateCommitment':
-        return <CommitmentModal commitmentState={{...commitmentState}} closeModal={closeModal} afterward={afterEdgeEdit}/>;
+        return <FlowModal vfPath={store.getById(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterEdgeEdit}/>;
+      default:
+        return <></>
     }
   }
 

@@ -1,5 +1,6 @@
 import { PathedData } from "../PathedData";
 import { ResourceSpecification, ProcessSpecification, Agent, Action, Actions, Unit, Units } from "../Valueflows/Knowledge";
+import { EconomicEvent, EconomicResource, Fulfillment } from "../Valueflows/Observation";
 import { Plan } from "../Valueflows/Plan";
 
 /**
@@ -24,13 +25,16 @@ export class Root implements RootShape, PathedData {
   planId: string;
 
   // All of the different child types under the root node, these are serialized
-  // separately byt their own classes under their own paths.
+  // separately by their own classes under their own paths.
+  action: Record<string, Action>;
   resourceSpecification: Record<string, ResourceSpecification>;
   processSpecification: Record<string, ProcessSpecification>;
   agent: Record<string, Agent>;
   plan: Record<string, Plan>;
-  action: Record<string, Action>;
   unit: Record<string, Unit>;
+  economicResource: Record<string, EconomicResource>;
+  economicEvent: Record<string, EconomicEvent>;
+  fulfillment: Record<string, Fulfillment>;
 
   get path() {
     return 'root';
@@ -43,6 +47,11 @@ export class Root implements RootShape, PathedData {
     this.processSpecification = {};
     this.agent = {};
     this.plan = {};
+    this.economicResource = {};
+    this.economicEvent = {};
+    this.fulfillment = {};
+
+    // Actions should not be blank
     this.action = Actions;
     this.unit = Units;
 

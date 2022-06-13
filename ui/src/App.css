@@ -323,7 +323,20 @@
   margin-bottom: 0.66em;
 }
 
+.modal-form {
+  height: 100%;
+  position: 'relative';
+}
+
 /* form controls */
+
+.form-heading {
+  display: inline-flex;
+  line-height: 2em;
+  height: 2em;
+  vertical-align: middle;
+  padding-bottom: 0.33em;
+}
 
 .measurementInput {
   display: flex;
@@ -347,4 +360,37 @@
   flex-direction: column;
   width: 48%;
   align-content: flex-end;
+}
+
+/* Slide-panel */
+
+.panel-container {
+  display: block;
+  overflow-x: hidden;
+  width: 100%;
+  max-height: 100%;
+}
+
+.panel-slider {
+  display: flex;
+  flex-direction: row;
+  width: 200%;
+  max-height: 100%;
+}
+
+.panel-slider .panel {
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  background-color: white;
+}
+
+.panel-slider .open {
+  margin-left: -50%;
+  transition: margin 400ms ease-in-out;
+}
+
+.panel-slider .close {
+  margin-left: 0%;
 }

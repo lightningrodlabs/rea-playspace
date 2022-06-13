@@ -1,4 +1,5 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
+import { autoUpdater } from "electron";
 import React from "react";
 import Modal from "react-modal";
 
@@ -18,14 +19,14 @@ const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, title, children}) 
         overlay: {zIndex: 2000},
         content: {
           width: '50%',
-          maxHeight: '80%',
+          height: '80%',
           top: '50%',
           left: '50%',
           right: 'auto',
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
-          overflow: 'auto',
+          overflowY: 'auto',
           WebkitOverflowScrolling: 'touch'
         }
       }}
