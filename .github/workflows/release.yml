@@ -31,6 +31,7 @@ jobs:
           name: holochain-ci
       - name: Prepare Nix environment
         run: nix-shell --command "echo Completed"
+      - run: pmpn run install-deps
       - name: Build webhApp
         run: |
           nix-shell --command "pnpm run webhapp-pack"
