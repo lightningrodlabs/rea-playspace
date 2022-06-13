@@ -40,8 +40,9 @@ jobs:
           name: holochain-ci
       - name: Prepare Nix environment
         run: nix-shell --command "echo Completed"
-      - name: Install PNPM and dependencies
+      - name: Install PNPM and root dependencies
         run: nix-shell --command "pnpm install --no-frozen-lockfile"
+      - name: Install PNPM and UI dependencies
         run: cd ui && nix-shell --command "pnpm install --no-frozen-lockfile & cd .."
       - name: Build webhApp
         run: |
