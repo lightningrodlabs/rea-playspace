@@ -41,7 +41,7 @@ jobs:
         run: nix-shell --command "echo Completed"
       - name: Install PNPM and root dependencies
         run: nix-shell --command "pnpm install --no-frozen-lockfile"
-      - name: Install PNPM and UI dependencies
+      - name: Install UI dependencies
         run: nix-shell --command "pnpm run  web-install"
       - name: Build webhApp
         run: |
@@ -50,4 +50,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${GITHUB_REF#refs/tags/}" "workdir/application.webhapp" --clobber
+          gh release upload "${GITHUB_REF#refs/tags/}" "workdir/rea-playspace.webhapp" --clobber
