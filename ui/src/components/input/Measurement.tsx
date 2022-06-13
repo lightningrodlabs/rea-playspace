@@ -14,23 +14,26 @@ interface Props {
 const initialState: MeasurementShape = new Measurement();
 
 const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}) => {
-  const [{hasNumericalValue, hasUnit}, setState] = useState({...initialState, ...value});
-  const componentName = name;
+  const [{hasNumericalValue, hasUnit}, setState] = useState({...initialState});
 
-  const deferOnChange = (measurement: MeasurementShape) => {
+  useEffect(() => {
+    setState(prevState => ({ ...prevState, ...value }));
+  }, [value]);
+
+  const deferOnChange = (value: MeasurementShape) => {
     setTimeout(() => {
-      onChange({target: {name: componentName, value: measurement}})
+      onChange({target: {name, value}})
     }, 1);
-  }
+  };
 
   const onSlChange = (e: any) => {
-    const { name, value } = e.target;
+    const { name: fieldName, value } = e.target;
     setState(prevMeasurement => {
       let parsedValue = value;
-      if (name == 'hasNumericalValue') {
+      if (fieldName == 'hasNumericalValue') {
         parsedValue = parseFloat(value);
       }
-      const measurement = { ...prevMeasurement, [name]: parsedValue };
+      const measurement = { ...prevMeasurement, [fieldName]: parsedValue };
       deferOnChange(measurement);
       return measurement;
     });
@@ -51,6 +54,6 @@ const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}
         </div>
       </>
   );
-}
+};
 
 export default MeasurementInput;

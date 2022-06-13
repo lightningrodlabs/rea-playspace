@@ -16,6 +16,9 @@ import {
 } from "./models/Application/Display";
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
+import { HasIdDate } from "../types/valueflows";
+import { PathedData } from "./models/PathedData";
+import { assignFields } from "../utils";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
@@ -102,7 +105,6 @@ export class DataStore extends DataStoreBase {
     return this.fetchAll(ProcessSpecification.getPrefix());
   }
 
-
   // ResourceSpecification helpers
 
   public getResourceSpecification(id: string): ResourceSpecification {
@@ -120,7 +122,6 @@ export class DataStore extends DataStoreBase {
   public async fetchResourceSpecifications() {
     return await this.fetchAll(ResourceSpecification.getPrefix());
   }
-
 
   // Agent helpers
 
@@ -140,11 +141,11 @@ export class DataStore extends DataStoreBase {
     return await this.fetchAll(Agent.getPrefix());
   }
 
+  // Plan helpers
   public getCurrentPlanId(): string {
     return this.root['planId'];
   }
 
-  // Plan helpers
   public getPlan(id: string): Plan {
     return this.root.plan[id];
   }
@@ -177,6 +178,28 @@ export class DataStore extends DataStoreBase {
 
   public getUnits(): Unit[] {
     return Object.values(this.root.unit);
+  }
+
+  /**
+   * Generic function for upserting a PathedData object
+   *
+   * Example usage:
+   * const newCommitment = upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
+   */
+  public upsert<T extends HasIdDate, U extends PathedData> (updates: T, constructor: {new (init: any): U}): U {
+    const store = getDataStore();
+    let obj: U;
+    if (updates && updates.id && updates.id !== null) {
+      obj = store.getById(updates.id);
+    } else {
+      obj = new constructor(updates);
+    }
+    assignFields(
+      updates,
+      obj
+    );
+    store.set(obj);
+    return obj;
   }
 }
 

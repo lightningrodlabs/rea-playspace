@@ -9,7 +9,7 @@ specifiers:
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': ^2.7.2
   '@scoped-elements/material-web': 0.0.19
-  '@shoelace-style/shoelace': ^2.0.0-beta.72
+  '@shoelace-style/shoelace': ^2.0.0-beta.75
   '@types/jest': ^27.4.1
   '@types/node': ^17.0.23
   '@types/react': ^17.0.43
@@ -47,7 +47,7 @@ dependencies:
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': 2.7.2
   '@scoped-elements/material-web': 0.0.19
-  '@shoelace-style/shoelace': 2.0.0-beta.72
+  '@shoelace-style/shoelace': 2.0.0-beta.75
   blob-to-buffer: 1.2.9
   d3: 7.4.0
   electron: 11.5.0
@@ -373,14 +373,14 @@ packages:
       - supports-color
     dev: false
 
-  /@floating-ui/core/0.5.1:
-    resolution: {integrity: sha512-LOFg65vdU4o4eZjVKNhu7VXbjdnY0amMw9sydLtKZiCNwj0eMD06rmktbWp9L/f6w6s9Qqe22lkks8PbwYwy4Q==}
+  /@floating-ui/core/0.7.2:
+    resolution: {integrity: sha512-FRVAkSNU/vGXLIsgbggcs70GkXKEOXgBBbNpYPNHSaKsCAMMd00NrjbtKTesxkdv9xm9N3+XiDlcFGY6WnatBg==}
     dev: false
 
-  /@floating-ui/dom/0.3.1:
-    resolution: {integrity: sha512-HJX/2xgGPt01YHQNAya2taqg5HDnY6ipF0B0Bk/Th2s4FD9R89Ecw3TEegLLO+VrQnPEGbuHOGJ6Fr3BPM0DYg==}
+  /@floating-ui/dom/0.5.2:
+    resolution: {integrity: sha512-z1DnEa7F3d8Fm/eXSbii8UEGpcjZGkQaYYUI0WpEVgD3vBfebDW8j/3ysusxonuMexoigA+A3b/fYH7sEqiwyg==}
     dependencies:
-      '@floating-ui/core': 0.5.1
+      '@floating-ui/core': 0.7.2
     dev: false
 
   /@holo-host/identicon/0.1.0:
@@ -461,10 +461,6 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.11
     dev: true
 
-  /@lit-labs/react/1.0.2:
-    resolution: {integrity: sha512-jfcHoNsdbxA3vHTnvm4Q08skWFFYvpXRdPZ7Z31oC3lxeKfLR5WGQldr/fTF1Q0gKY3zusLsvX5UiSurV/F+og==}
-    dev: false
-
   /@lit-labs/react/1.0.4:
     resolution: {integrity: sha512-Sy4RCxTZpTE2TwByjVac6gC7jzr8bCQC6s9bJhhJDKos4ZlN2cqcuVz63n0mpSSr1zxFh+Z0o0VR223l36Y4Ag==}
     dev: false
@@ -475,6 +471,10 @@ packages:
 
   /@lit/reactive-element/1.3.1:
     resolution: {integrity: sha512-nOJARIr3pReqK3hfFCSW2Zg/kFcFsSAlIE7z4a0C9D2dPrgD/YSn3ZP2ET/rxKB65SXyG7jJbkynBRm+tGlacw==}
+    dev: false
+
+  /@lit/reactive-element/1.3.2:
+    resolution: {integrity: sha512-A2e18XzPMrIh35nhIdE4uoqRzoIpEU5vZYuQN4S3Ee1zkGdYC27DP12pewbw/RLgPHzaE4kx/YqxMzebOpm0dA==}
     dev: false
 
   /@material/animation/14.0.0-canary.261f2db59.0:
@@ -1383,8 +1383,8 @@ packages:
     resolution: {integrity: sha512-Be+cahtZyI2dPKRm8EZSx3YJQ+jLvEcn3xzRP7tM4tqBnvd/eW/64Xh0iOf0t2w5P8iJKfdBbpVNE9naCaOf2g==}
     dev: false
 
-  /@shoelace-style/localize/2.1.3:
-    resolution: {integrity: sha512-AY3uF1Dzg3sBK4nKxvZ2KAjsdFxhLfHVWUpXXjIPaR+rPp8fxBWoNVvnLiROOV/cLg/zdLcU+Nn/xJdqcbEuDw==}
+  /@shoelace-style/localize/2.2.1:
+    resolution: {integrity: sha512-bzKaqla+yF4qQhgZAaURq1HKtTP8fwIvIxcDw9JqHjophuMR1MI2xl1SnhFTYJhlQRctdKs2imZvFVtg5WERjQ==}
     dev: false
 
   /@shoelace-style/shoelace/2.0.0-beta.60:
@@ -1397,16 +1397,16 @@ packages:
       qr-creator: 1.0.0
     dev: false
 
-  /@shoelace-style/shoelace/2.0.0-beta.72:
-    resolution: {integrity: sha512-8ahXPheZjQMXGhu0L+10hiMbfPzbuYW5UroTX3M5wAYUKL1VSI9IQJwlXCf7cBcQGiyjSIIdHsjbfRKxxDFo7w==}
+  /@shoelace-style/shoelace/2.0.0-beta.75:
+    resolution: {integrity: sha512-WavVn/A6VsSZB2XqUy0k8O5oimaBqzYbq5+DZ6bJpd7+JAt1JGETcn9mtOoSI5Hww6TVuhnqcBhQkk1s5iGzNA==}
     engines: {node: '>=14.17.0'}
     dependencies:
-      '@floating-ui/dom': 0.3.1
-      '@lit-labs/react': 1.0.2
+      '@floating-ui/dom': 0.5.2
+      '@lit-labs/react': 1.0.4
       '@shoelace-style/animations': 1.1.0
-      '@shoelace-style/localize': 2.1.3
+      '@shoelace-style/localize': 2.2.1
       color: 4.2.1
-      lit: 2.2.1
+      lit: 2.2.5
       qr-creator: 1.0.0
     dev: false
 
@@ -2592,6 +2592,12 @@ packages:
       '@types/trusted-types': 2.0.2
     dev: false
 
+  /lit-html/2.2.5:
+    resolution: {integrity: sha512-e56Y9V+RNA+SGYsWP2DGb/wad5Ccd3xUZYjmcmbeZcnc0wP4zFQRXeXn7W3bbfBekmHDK2dOnuYNYkg0bQjh/w==}
+    dependencies:
+      '@types/trusted-types': 2.0.2
+    dev: false
+
   /lit-svelte-stores/0.1.6:
     resolution: {integrity: sha512-KLx8rwiigh+/+rL+fJ1xmp3itWfeFWovRJ0DkdZJkNI/Y4xD2yQZDap6it5wlremzXus0mC3MxCJiT4B1KmLkg==}
     dependencies:
@@ -2605,6 +2611,14 @@ packages:
       '@lit/reactive-element': 1.3.1
       lit-element: 3.2.0
       lit-html: 2.2.1
+    dev: false
+
+  /lit/2.2.5:
+    resolution: {integrity: sha512-Ln463c0xJZfzVxBcHddNvFQQ8Z22NK7KgNmrzwFF1iESHUud412RRExzepj18wpTbusgwoTnOYuoTpo9uyNBaQ==}
+    dependencies:
+      '@lit/reactive-element': 1.3.2
+      lit-element: 3.2.0
+      lit-html: 2.2.5
     dev: false
 
   /localStorage/1.0.4:
