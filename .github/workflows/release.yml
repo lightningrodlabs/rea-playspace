@@ -47,7 +47,7 @@ jobs:
         run: |
           nix-shell --command "pnpm run webhapp-pack"
       - name: upload webhapp
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release upload "${GITHUB_REF#refs/tags/}" "workdir/application.webhapp" --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${GITHUB_REF#refs/tags/}" "workdir/application.webhapp" --clobber
