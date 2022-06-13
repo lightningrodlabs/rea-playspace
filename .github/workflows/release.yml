@@ -10,7 +10,16 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Fetch source code
+        uses: actions/checkout@v2
+      - uses: taiki-e/create-gh-release-action@v1
+        env:
+          # (required)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
       - name: Fetch source code
         uses: actions/checkout@v2
       - name: Use Nix
@@ -31,7 +40,9 @@ jobs:
           name: holochain-ci
       - name: Prepare Nix environment
         run: nix-shell --command "echo Completed"
-      - run: pmpn run install-deps
+      - name: Install PNPM and dependencies
+        run: nix-shell --command "pnpm install --no-frozen-lockfile"
+        run: cd ui && nix-shell --command "pnpm install --no-frozen-lockfile & cd .."
       - name: Build webhApp
         run: |
           nix-shell --command "pnpm run webhapp-pack"
@@ -40,10 +51,6 @@ jobs:
         with:
           name: webhapp-artifact
           path: workdir/application.webhapp
-      - uses: taiki-e/create-gh-release-action@v1
-        env:
-          # (required)
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
