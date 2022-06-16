@@ -8,6 +8,7 @@ use tracing::{info};
 use data::*;
 use tree_clean::{mark_tree, reindex_tree, prune_tree};
 
+// entry defs
 entry_defs![
   PathEntry::entry_def(),
   Thing::entry_def()
@@ -23,7 +24,11 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
   let entry_hash = hash_entry(&thing)?;
 
   let anchor_hash = path.path_entry_hash()?;
-  create_link(anchor_hash, entry_hash.clone(), LinkTag::new("data"))?;
+  create_link(
+    anchor_hash, 
+    entry_hash.clone(),
+    LinkType(0),
+    LinkTag::new("data"))?;
 
   let output = AddOutput {
     header_hash: HeaderHashB64::from(header_hash),
@@ -109,7 +114,7 @@ pub fn delete_thing(path_str: String) -> ExternResult<()> {
   for link in links.into_iter() {
     // get the entry from the link
     let thing_entry_hash = link.target;
-    let element = try_get_element(thing_entry_hash, GetOptions::default())?;
+    let element = try_get_element(thing_entry_hash.into_entry_hash().expect("Not an entryhash."), GetOptions::default())?;
 
     // get the header hash from the entry
     let thing_header = element.header_address().clone();
