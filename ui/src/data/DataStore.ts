@@ -33,7 +33,10 @@ let dataStore: DataStore;
  export async function initConnection(): Promise<DataStore> {
   dataStorePromise = new Promise(async (res) => {
     const client = await getHolochainClient();
+    console.log('client: ', client);
     const app_info = client.appInfo;
+    console.log('app_info: ', app_info);
+    console.log('cell_data: ', app_info.cell_data);
     const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
 
     const zomeApi = new ZomeApi(client);
