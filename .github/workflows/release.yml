@@ -43,6 +43,14 @@ jobs:
         run: nix-shell --command "pnpm install --no-frozen-lockfile"
       - name: Install UI dependencies
         run: nix-shell --command "pnpm run  web-install"
+      - name: Build happ
+        run: |
+          nix-shell --command "pnpm run happ-pack"
+      - name: upload happ
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${GITHUB_REF#refs/tags/}" "happ/workdir/application.happ" --clobber
       - name: Build webhApp
         run: |
           nix-shell --command "pnpm run webhapp-pack"
