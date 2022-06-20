@@ -241,10 +241,10 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const handleSubmit = () => {
     closeModal();
     const items: PathedData[] = [...events];
+
     if (commitment && commitment !== null) {
       items.unshift(commitment);
     }
-    console.log(items);
     if (afterward) afterward(items);
   };
 
