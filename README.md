@@ -16,8 +16,8 @@ The REA Playspace is an electron based environment that lets people play with th
 
 4) Use the default AppId. Select 0.0.136 for the Holochain version to install.
 
-4+) Advanced: If you want to leave the UID option empty, you can. This will connect you to a network with everyone else who has also left the option empty. If you want to create a playspace with only a few others, enter a UID (any string of characters) and share it with them.
-
+   * Advanced: If you want to leave the UID option empty, you can. This will connect you to a network with everyone else who has also left the option empty. If you want to create a playspace with only a few others, enter a UID (any string of characters) and share it with them.
+<br></br>
 5) Click 'Install App'. Find the app in the Installed Apps view. Click open. This will launch it in the browser.
 
 
