@@ -8,7 +8,7 @@ The REA Playspace is an electron based environment that lets people play with th
 ![](./docs/assets/demo_flow.png)
 
 ## Installing
-1) Download and install the latest [Holochain Launcher](https://github.com/holochain/launcher/tags/v0.4.7).
+1) Download and install the latest [Holochain Launcher](https://github.com/holochain/launcher/releases/tag/v0.4.7).
 
 2) From the [releases page](https://github.com/lightningrodlabs/rea-playspace/releases/) download the latest `rea-playspace.webhapp` file.
 
