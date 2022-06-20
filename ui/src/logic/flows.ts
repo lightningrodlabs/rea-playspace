@@ -205,14 +205,17 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
  */
  export const getLabelForDisplayEdge = (displayEdge: DisplayEdge): string => {
   const store = getDataStore();
-
-  const flow: FlowShape = getFirstCommitmentOrEvent(displayEdge);
-  const actions: Action[] = store.getActions();
-  const units: Unit[] = store.getUnits();
-  const provider = store.getById(flow.provider);
-  const receiver = store.getById(flow.receiver);
-
-  return getLabelForFlow(flow, provider, receiver, actions, units);
+  try {
+    const flow: FlowShape = getFirstCommitmentOrEvent(displayEdge);
+    const actions: Action[] = store.getActions();
+    const units: Unit[] = store.getUnits();
+    const provider = store.getById(flow.provider);
+    const receiver = store.getById(flow.receiver);
+    return getLabelForFlow(flow, provider, receiver, actions, units);
+  } catch(err) {
+    console.error(err);
+    return "placeholder";
+  }
 }
 
 /**
