@@ -41,8 +41,8 @@ jobs:
         run: nix-shell --command "echo Completed"
       - name: Install PNPM and root dependencies
         run: nix-shell --command "pnpm install --no-frozen-lockfile"
-      - name: Install UI dependencies
-        run: nix-shell --command "pnpm run  web-install"
+      - name: Install workspace dependencies
+        run: nix-shell --command "pnpm run install-deps"
       - name: Build happ
         run: |
           nix-shell --command "pnpm run happ-pack"
