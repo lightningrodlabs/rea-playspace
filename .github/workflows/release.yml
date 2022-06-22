@@ -49,9 +49,8 @@ jobs:
       - name: Build webhApp
         run: |
           nix-shell --run "pnpm run webhapp-pack"
-      - name: upload bundles
+      - name: upload webhapp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${GITHUB_REF#refs/tags/}" "happ/workdir/application.happ" --clobber
           gh release upload "${GITHUB_REF#refs/tags/}" "workdir/rea-playspace.webhapp" --clobber
