@@ -59,7 +59,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     setAgents(store.getAgents());
     setActions(store.getActions());
     setUnits(store.getUnits());
-  }, [vfPath]);
+  }, []);
 
   // Pick an event to edit, but make a clone so edits don't propagate through the app.
   const pickEvent = (event: EconomicEvent) => {
@@ -123,9 +123,11 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * Save the commitment
    */
   const handleCommitmentSubmit = () => {
-    setCommitmentOpen(false);
     const store = getDataStore();
-    store.upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
+    let newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>
+    (commitmentUpdates, Commitment);
+    setCommitment(newCommitment);
+    setCommitmentOpen(false);
   };
 
   /**
