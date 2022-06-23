@@ -123,9 +123,11 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * Save the commitment
    */
   const handleCommitmentSubmit = () => {
-    setCommitmentOpen(false);
     const store = getDataStore();
-    store.upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
+    let newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>
+    (commitmentUpdates, Commitment);
+    setCommitment(newCommitment);
+    setCommitmentOpen(false);
   };
 
   /**
