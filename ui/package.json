@@ -31,7 +31,7 @@
     "@lit-labs/react": "1.0.4",
     "@msgpack/msgpack": "^2.7.2",
     "@scoped-elements/material-web": "0.0.19",
-    "@shoelace-style/shoelace": "^2.0.0-beta.75",
+    "@shoelace-style/shoelace": "^2.0.0-beta.76",
     "blob-to-buffer": "^1.2.9",
     "d3": "^7.4.0",
     "electron": "^11.5.0",
