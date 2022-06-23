@@ -187,7 +187,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   }
 
   const unit: Unit = units.find((unit) => unit.id == measurement.hasUnit);
-
+  
   const baseLabel = `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`
 
   if (flow.inputOf && flow.provider) {
