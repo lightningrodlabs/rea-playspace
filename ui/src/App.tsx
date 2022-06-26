@@ -12,15 +12,11 @@ import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
 import Modal from "react-modal"
 import {
-  profilesStoreContext,
   ProfilesStore
 } from "@holochain-open-dev/profiles";
-import {
-  ContextProvider,
-  CreateProfile
-} from "./elements";
 import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
+import { ProfilesContext } from "./elements";
 
 Modal.setAppElement("#root");
 
@@ -123,11 +119,13 @@ const App: React.FC<Props> = () => {
     return <span>Loading.......</span>;
   }
   return (
-    <ContextProvider context={profilesStoreContext} value={store}>
-      <ProfilePrompt>
-        <Main />
-      </ProfilePrompt>
-    </ContextProvider> 
+    <div>
+      <ProfilesContext store={store}>
+        <ProfilePrompt>
+          <Main />
+        </ProfilePrompt>
+      </ProfilesContext>
+    </div>
   );
 };
 

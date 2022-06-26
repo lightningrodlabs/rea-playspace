@@ -13,14 +13,13 @@
     "electron"
   ],
   "scripts": {
-    "// ## INSTALL ##":"",
+    "// ## INSTALL ##": "",
     "install-deps": "pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
     "tests-install": "cd tests && pnpm install",
     "web-install": "cd ui && pnpm install",
     "electron-install": "cd electron && pnpm install",
-
-    "// ## HOLOCHAIN ##":"",
-    "hc:redo":"pnpm run happ-reset && pnpm run happ-run",
+    "// ## HOLOCHAIN ##": "",
+    "hc:redo": "pnpm run happ-reset && pnpm run happ-run",
     "happ-pack": "bash scripts/happ-pack.sh",
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "happ-run": "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",
@@ -28,21 +27,18 @@
     "hc:playground": "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
     "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
     "webhapp-pack": "pnpm run web-zip && hc web-app pack workdir/",
-
-    "// ## UI ##":"",
+    "// ## UI ##": "",
     "web-lint": "cd ui && pnpm run lint",
     "web": "cd ui && pnpx vite",
     "web2": "cd ui && pnpx vite --mode dev2",
     "web-build": "cd ui && pnpx vite build",
     "web-zip": "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
-
-    "// ## ELECTRON ##":"",
+    "// ## ELECTRON ##": "",
     "electron": "set -o allexport; . environments/.env; set +o allexport; cd electron && pnpm run start",
     "electron2": "set -o allexport; . environments/.env.dev2; set +o allexport; cd electron && pnpm run start",
     "electron-tsc": "cd electron && pnpm run tsc",
     "build": "bash scripts/build.sh",
-
-    "// ## TEST ##":"",
+    "// ## TEST ##": "",
     "happ-test-ts": "cd tests && pnpm test",
     "test": "cd ui && pnpm test"
   },

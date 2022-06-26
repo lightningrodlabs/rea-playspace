@@ -5,16 +5,16 @@ import {
   CreateProfile as NativeCreateProfile,
   ListProfiles as NativeListProfiles,
   SearchAgent as NativeSearchAgent,
-  ProfilePrompt as NativeProfilePrompt
+  ProfilePrompt as NativeProfilePrompt,
+  ProfilesContext as NativeProfilesContext
 } from "@holochain-open-dev/profiles";
 
-export const ContextProvider = createComponent(
+export const ProfilesContext = createComponent(
   React,
-  "context-provider",
-  ContextProviderElement,
+  "profiles-context",
+  NativeProfilesContext,
   {}
 );
-
 export const ListProfiles = createComponent(
   React,
   "list-profiles",
