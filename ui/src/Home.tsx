@@ -13,6 +13,7 @@ const Home: React.FC<Props> = () => {
 
   useEffect(()=>{
     const store = getDataStore();
+    console.log('store: ', store);
     setResourceSpecifications(store.getResourceSpecifications());
     setProcessSpecifications(store.getProcessSpecifications());
     setAgents(store.getAgents());

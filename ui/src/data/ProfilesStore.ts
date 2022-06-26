@@ -1,32 +1,40 @@
 import { CellClient } from "@holochain-open-dev/cell-client";
-import { AgentProfile, MyProfile, ProfilesConfig, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { AgentProfile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
 import { InstalledCell } from "@holochain/client";
 import { getHolochainClient } from "../hcWebsockets";
+import { APP_ID } from "../holochainConf";
 
 let profilesStore: ProfilesStore;
 let profilesService: ProfilesService;
 let myProfile: AgentProfile;
 
-// can add additonal fields here for Organization or whatever
-const config: Partial<ProfilesConfig> = {
-  avatarMode: "identicon"
-};
 
 export async function getProfilesStore() {
   console.log('getting profile store...');
-  if (profilesStore) {
+  console.log('profilesStore: ', profilesStore);
+  if (profilesStore !== undefined) {
     console.log('exists returning...', profilesStore);
     return profilesStore;
   }
   const client = await getHolochainClient();
   console.log('got holochainClient: ', client);
-  const cellData: InstalledCell = client.cellDataByRoleId('reaplayspace'); // maybe this is screwing up?
-  console.log('got cellData: ', cellData);
-  const cellClient: CellClient = client.forCell(cellData);
+  const appInfo = await client.appWebsocket.appInfo({
+    installed_app_id: APP_ID
+  });
+  const cell: InstalledCell = appInfo.cell_data[0];
+  console.log('cell: ', cell);
+
+  const cellClient = new CellClient(client, cell);
   console.log('got cellClient: ', cellClient);
-  profilesStore = new ProfilesStore(cellClient, config);
+
   profilesService = new ProfilesService(cellClient);
-  myProfile = await profilesService.getMyProfile();
+  const newProfilesStore = new ProfilesStore(profilesService, {
+    avatarMode: "avatar-optional",
+  });
+
+  profilesStore = newProfilesStore
+  console.log('profilesStore: ', profilesStore);
+
   return profilesStore;
 }
 
