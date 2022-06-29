@@ -14,17 +14,8 @@ export default class ZomeApi {
   };
 
   public async get_thing (path_str: string) : Promise<Array<RustNode>> {
-    console.log('get thing: ', );
-    console.log('path_str: ', path_str );
-    console.log('cellId: ', getCellId());
-    // errors here vvv
-    try {
-      const res = (await this.client.callZome(getCellId(), 'projects', 'get_thing', path_str)).tree as Promise<Array<RustNode>>;
-      console.log('res: ', res);
+    const res = (await this.client.callZome(getCellId(), 'projects', 'get_thing', path_str)).tree as Promise<Array<RustNode>>;
     return  res;
-    } catch (err) {
-      console.error('call Zome: ', err);
-    }
   }
 
   public async delete_thing (path_str: string) : Promise<void> {

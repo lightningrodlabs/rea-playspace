@@ -12,12 +12,4 @@ initConnection().then(() => {
     <App />,
     document.getElementById('root')
   );
-}).catch((err)=> {
-  ReactDOM.render(
-    <>
-      <h1>Init Failed</h1>,
-      <p>{err}</p>
-    </>,
-    document.getElementById('root')
-  );
 });

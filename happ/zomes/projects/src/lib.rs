@@ -110,28 +110,21 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
     let v: &Vec<Component> = child_path.as_ref();
 
     let data = match get_entry(&child_path, LinkTag::new("data"))? {
-      Some(thing) => {
-        debug!("got thing: {:?}", thing.clone());
-        thing.data
-      },
+      Some(thing) => thing.data,
       None => "".into()
     };
-    debug!("data: {:?}", data.clone());
     let val = Content {
       name: String::try_from(&v[v.len()-1])?,
       data: data
     };
-    debug!("val in build tree: {:?}", val.clone());
     let idx = tree.insert(node, val);
     build_tree(tree, idx, child_path)?;
   }
-  debug!("done building tree");
   Ok(())
 }
 
 #[hdk_extern]
 pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
-  debug!("get thing with path: {}", path_str.clone());
   let root_path = Path::from(path_str.clone());
   let val = Content {
       name: String::from(path_str.clone()),
@@ -140,22 +133,15 @@ pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
         None => "".into()
       }
   };
-  debug!("val: {:?}", val.clone());
 
   let mut tree = Tree::new(val);
   build_tree(&mut tree, 0, root_path)?;
-  debug!("built tree?");
-  debug!("tree: {:?}", tree.clone());
   let mut to_delete = vec![false; tree.tree.len()];
   mark_tree(&mut tree, &mut to_delete)?;
-  debug!("to_delete: {:?}", to_delete);
   let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
   prune_tree(&mut tree, &mut pruned_tree, &mut to_delete)?;
-  debug!("pruned_tree: {:?}", pruned_tree.clone());
   let mut reindexed_tree: Tree<Content> = Tree { tree: vec![] };
   reindex_tree(pruned_tree, &mut reindexed_tree)?;
-  
-  debug!("reindexed_tree: {:?}", reindexed_tree);
   Ok(Some(reindexed_tree))
 }
 
