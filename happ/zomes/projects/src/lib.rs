@@ -2,13 +2,12 @@ mod test;
 mod data;
 mod tree_clean;
 
-use hdk::prelude::*;
+use hdk::{prelude::*, hash_path::path::Component};
 use holo_hash::{EntryHashB64, HeaderHashB64};
 use tracing::{info};
 use data::*;
 use tree_clean::{mark_tree, reindex_tree, prune_tree};
 
-// entry defs
 entry_defs![
   PathEntry::entry_def(),
   Thing::entry_def()
@@ -27,7 +26,7 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
   create_link(
     anchor_hash, 
     entry_hash.clone(),
-    LinkType(0),
+    HdkLinkType::Any,
     LinkTag::new("data"))?;
 
   let output = AddOutput {
@@ -56,12 +55,61 @@ fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
   }  
 }
 
-fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult<()>{
-  // root.plan.p1-guid.process.pr-guid -> for each segment in path
-  for path in path.children_paths()? {
-    let v = path.as_ref();
+/// Copy of Path::children(). See comments above fn children_pathz() below.
+fn children2(path: &Path) -> ExternResult<Vec<holochain_zome_types::link::Link>> {
+  path.ensure()?;
+  let mut unwrapped = get_links(path.path_entry_hash()?, None)?;
+  // retain all links without "data" linkTag, which will be all Path links
+  unwrapped.retain(|l| l.tag.ne(&LinkTag::new("data")));
+  // Only need one of each hash to build the tree.
+  unwrapped.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
+  unwrapped.dedup_by(|a, b| a.tag.eq(&b.tag));
+  Ok(unwrapped)
+}
 
-    let data = match get_entry(&path, LinkTag::new("data"))? {
+/// Copy of Path::children_paths() to access and change the call to
+/// Path::children, which we have also pulled out and changed.
+/// This will go away after hdk 0.0.136 when we upgrade to
+/// deterministic integrity. The root cause is that Path::children()
+/// is returning non-Path links. This get's fixed in hdk 0.0.137
+/// where LinkTypes become mandatory for creating and getting
+/// Path links.
+fn children_pathz(path: Path) -> ExternResult<Vec<Path>> {
+  let children = children2(&path)?;
+  let components: ExternResult<Vec<Option<Component>>> = children
+      .into_iter()
+      .map(|link| {
+          let component_bytes = &link.tag.0[..];
+          if component_bytes.is_empty() {
+              Ok(None)
+          } else {
+              let vec_bytes = component_bytes.to_vec();
+              let unsafe_bytes = UnsafeBytes::from(vec_bytes);
+              let serialized_bytes = SerializedBytes::from(unsafe_bytes);
+              Ok(Some(
+                serialized_bytes.try_into().map_err(WasmError::Serialize)?      
+              ))
+          }
+      })
+      .collect();
+  Ok(components?
+      .into_iter()
+      .map(|maybe_component| {
+          let mut new_path = path.clone();
+          if let Some(component) = maybe_component {
+              new_path.append_component(component);
+          }
+          new_path
+      })
+      .collect()
+    )
+}
+
+fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult<()>{
+  for child_path in children_pathz(path.clone())? {
+    let v: &Vec<Component> = child_path.as_ref();
+
+    let data = match get_entry(&child_path, LinkTag::new("data"))? {
       Some(thing) => thing.data,
       None => "".into()
     };
@@ -70,7 +118,7 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
       data: data
     };
     let idx = tree.insert(node, val);
-    build_tree(tree, idx, path)?;
+    build_tree(tree, idx, child_path)?;
   }
   Ok(())
 }
@@ -78,7 +126,6 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
 #[hdk_extern]
 pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
   let root_path = Path::from(path_str.clone());
-
   let val = Content {
       name: String::from(path_str.clone()),
       data: match get_entry(&root_path, LinkTag::new("data"))? {
@@ -89,16 +136,12 @@ pub fn get_thing(path_str: String) -> ExternResult<Option<Tree<Content>>> {
 
   let mut tree = Tree::new(val);
   build_tree(&mut tree, 0, root_path)?;
- 
   let mut to_delete = vec![false; tree.tree.len()];
   mark_tree(&mut tree, &mut to_delete)?;
-  
   let mut pruned_tree: Tree<Content> = Tree { tree: vec![] };
   prune_tree(&mut tree, &mut pruned_tree, &mut to_delete)?;
-
   let mut reindexed_tree: Tree<Content> = Tree { tree: vec![] };
   reindex_tree(pruned_tree, &mut reindexed_tree)?;
-
   Ok(Some(reindexed_tree))
 }
 

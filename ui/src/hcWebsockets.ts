@@ -17,13 +17,11 @@ let cellId: CellId
 let zomeApi: ZomeApi
 
 export async function getHolochainClient() {
-  const installed_app_id = APP_ID;
   if (holochainClient) {
     return holochainClient;
   }
-  const client: HolochainClient = await HolochainClient.connect(
-    APP_WS_URL,
-    installed_app_id
+  const client: HolochainClient = new HolochainClient(
+    await getAppWs()
   );
   holochainClient = client;
   return client;
