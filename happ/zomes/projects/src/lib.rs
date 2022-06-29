@@ -103,7 +103,7 @@ fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult
   }
 
   debug!("Building tree at node: {}, tree: {:?}, path: {:?}", &node, tree.clone(), path.clone());
-  for child_path in children_paths(path.clone())? {
+  for child_path in children_pathz(path.clone())? {
     let v: &Vec<Component> = child_path.as_ref();
 
     let data = match get_entry(&child_path, LinkTag::new("data"))? {
