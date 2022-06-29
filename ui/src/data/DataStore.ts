@@ -19,10 +19,10 @@ import { Root } from "./models/Application/Root";
 import { HasIdDate } from "../types/valueflows";
 import { PathedData } from "./models/PathedData";
 import { assignFields } from "../utils";
+import { APP_ID } from "../holochainConf";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
-
 
 /**
  * Initialize Holochain WS connection, set up Zome API client and DataStore singletons.
@@ -32,20 +32,26 @@ let dataStore: DataStore;
  */
  export async function initConnection(): Promise<DataStore> {
   dataStorePromise = new Promise(async (res) => {
+
     const client = await getHolochainClient();
     console.log('client: ', client);
-    const app_info = client.appInfo;
-    console.log('app_info: ', app_info);
-    console.log('cell_data: ', app_info.cell_data);
-    const [_dnaHash, agentPubKey] = app_info.cell_data[0].cell_id;
-
+    const appInfo = await client.appWebsocket.appInfo({
+      installed_app_id: APP_ID
+    });
+    console.log('app_info: ', appInfo);
+    const cell = appInfo.cell_data[0];
+    const [_dnaHash, agentPubKey] = cell.cell_id;
     const zomeApi = new ZomeApi(client);
+    console.log('zomeApi: ', zomeApi);
     setAgentPubKey(agentPubKey);
-    setCellId(app_info.cell_data[0].cell_id);
+    setCellId(cell.cell_id);
     setZomeApi(zomeApi);
 
     dataStore = new DataStore();
+    console.log('dataStore: ', dataStore);
     await dataStore.fetchOrCreateRoot();
+    console.log('dataStore promise: resolved');
+
     res(dataStore);
   });
   return dataStorePromise;
@@ -71,7 +77,9 @@ export class DataStore extends DataStoreBase {
    */
   public override async fetchOrCreateRoot() {
     // check if root object exists
+    console.log('check if root object exists: ', );
     const res = await this.zomeApi.get_thing('root');
+    console.log('fetchOrCreate res: ', res);
     if (res.length === 0) {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
@@ -82,6 +90,7 @@ export class DataStore extends DataStoreBase {
       this.put(this.root);
       this.set(plan);
     } else  {
+      console.log('hydrateFromZome: ', );
       // We have the data, lets hydrate it
       this.hydrateFromZome(res);
     }

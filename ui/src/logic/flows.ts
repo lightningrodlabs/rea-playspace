@@ -170,7 +170,6 @@ export const validateFlow = (sourceType: string, targetType: string): boolean =>
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
 export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
-  const store = getDataStore();
   const action: Action = actions.find((action) => action.id == flow.action);
   const measurement: MeasurementShape = {
     hasNumericalValue: 0,
