@@ -38,7 +38,6 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {
 }
 
 fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
-  debug!("getting entry...");
   let links = get_links(path.path_entry_hash()?, Some(tag))?;
   match links.into_iter().max_by(|x, y| x.timestamp.cmp(&y.timestamp)) {
     None => Ok(None),
@@ -56,38 +55,49 @@ fn get_entry(path: &Path, tag: LinkTag) -> ExternResult<Option<Thing>> {
   }  
 }
 
+/// Copy of Path::children(). See comments above fn children_pathz() below.
+fn children2(path: &Path) -> ExternResult<Vec<holochain_zome_types::link::Link>> {
+  path.ensure()?;
+  let mut unwrapped = get_links(path.path_entry_hash()?, None)?;
+  // retain all links without "data" linkTag, which will be all Path links
+  unwrapped.retain(|l| l.tag.ne(&LinkTag::new("data")));
+  // Only need one of each hash to build the tree.
+  unwrapped.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
+  unwrapped.dedup_by(|a, b| a.tag.eq(&b.tag));
+  Ok(unwrapped)
+}
+
+/// Copy of Path::children_paths() to access and change the call to
+/// Path::children, which we have also pulled out and changed.
+/// This will go away after hdk 0.0.136 when we upgrade to
+/// deterministic integrity. The root cause is that Path::children()
+/// is returning non-Path links. This get's fixed in hdk 0.0.137
+/// where LinkTypes become mandatory for creating and getting
+/// Path links.
 fn children_pathz(path: Path) -> ExternResult<Vec<Path>> {
-  let children = path.children()?;
+  let children = children2(&path)?;
   let components: ExternResult<Vec<Option<Component>>> = children
       .into_iter()
       .map(|link| {
           let component_bytes = &link.tag.0[..];
-          warn!("bytes: {:?}", component_bytes.clone());
           if component_bytes.is_empty() {
               Ok(None)
           } else {
               let vec_bytes = component_bytes.to_vec();
-              warn!("bytes to vec: {:?}", vec_bytes);
               let unsafe_bytes = UnsafeBytes::from(vec_bytes);
-              warn!("unsafeBytes: {:?}", unsafe_bytes);
               let serialized_bytes = SerializedBytes::from(unsafe_bytes);
-              warn!("Serialized Bytes: {:?}", serialized_bytes);
               Ok(Some(
                 serialized_bytes.try_into().map_err(WasmError::Serialize)?      
               ))
           }
       })
       .collect();
-  warn!("made it here: {:?}", components.clone());
   Ok(components?
       .into_iter()
       .map(|maybe_component| {
           let mut new_path = path.clone();
-          debug!("new_path: {:?}", new_path.clone());
           if let Some(component) = maybe_component {
-              debug!("append component");
               new_path.append_component(component);
-              debug!("appended path: {:?}", new_path.clone());
           }
           new_path
       })
@@ -96,13 +106,6 @@ fn children_pathz(path: Path) -> ExternResult<Vec<Path>> {
 }
 
 fn build_tree(tree: &mut Tree<Content>, node: usize, path: Path) -> ExternResult<()>{
-  debug!("path: {:?}", path.path_entry()?);
-  match children_pathz(path.clone()) {
-    Ok(path) => debug!("path: {:?}", path),
-    Err(err) => error!("bad path or something: {}", err),
-  }
-
-  debug!("Building tree at node: {}, tree: {:?}, path: {:?}", &node, tree.clone(), path.clone());
   for child_path in children_pathz(path.clone())? {
     let v: &Vec<Component> = child_path.as_ref();
 
