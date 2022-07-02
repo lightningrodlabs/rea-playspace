@@ -377,12 +377,14 @@ const FlowCanvas: React.FC<Props> = () => {
     if (validateFlow(sourceVfType, targetVfType)) {
       setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
 
+      // Update display edge params
       const vfEdge: DisplayEdge = store.getById(edge.data.id);
       vfEdge.source = newConnection.source;
       vfEdge.target = newConnection.target;
       vfEdge.sourceHandle = newConnection.sourceHandle;
       vfEdge.targetHandle = newConnection.targetHandle;
 
+      // Update each flow to point to the correct new objects
       const updatedFlows: PathedData[] = vfEdge.vfPath.map((path: string) => {
         const vfFlow = store.getCursor(path);
         const updates = flowUpdates[`${sourceVfType}-${targetVfType}`](vfFlow, sourceVfNode, targetVfNode);
@@ -390,9 +392,11 @@ const FlowCanvas: React.FC<Props> = () => {
         return vfFlow;
       })
 
+      // Persist the changes
       store.set(vfEdge);
       store.putAll(updatedFlows);
 
+      // Show the flow modal
       setSelectedDisplayEdge(vfEdge.id);
       setSource(source);
       setTarget(target);
