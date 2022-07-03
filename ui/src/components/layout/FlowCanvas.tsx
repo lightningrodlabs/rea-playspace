@@ -341,14 +341,14 @@ const FlowCanvas: React.FC<Props> = () => {
  /**
    * Adds a DisplayEdge and React Flow Edge corresponding to a set of flows
    */
-  const afterAddFlow = (items: PathedData[]) => {
+  const afterAddFlow = (flows: PathedData[]) => {
     // Only add the edge if we have a set of flows
-    if (items.length > 0) {
+    if (flows.length > 0) {
       // Add the edge
       const edge = new DisplayEdge({
         source,
         target,
-        vfPath: items.map((item) => item.path),
+        vfPath: flows.map((flow) => flow.path),
         planId: store.getCurrentPlanId()
       } as DisplayEdgeShape);
       setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
