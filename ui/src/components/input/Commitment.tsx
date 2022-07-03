@@ -81,15 +81,15 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
 
   return (
     <>
-      <SlSelect label="Action" name='action' value={action} onSlChange={onSlChange} required>
+      <SlSelect placeholder="Select action" label="Action" name='action' value={action} onSlChange={onSlChange} required>
         {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      <SlSelect label="Provider" name='provider' value={provider ? provider : agents[0]?.id} onSlChange={onSlChange} required>
+      <SlSelect placeholder="Select provider" label="Provider" name='provider' value={provider ? provider : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      <SlSelect label="Receiver" name='receiver' value={receiver ? receiver : agents[0]?.id} onSlChange={onSlChange} required>
+      <SlSelect placeholder="Select reciever" label="Receiver" name='receiver' value={receiver ? receiver : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br/>
