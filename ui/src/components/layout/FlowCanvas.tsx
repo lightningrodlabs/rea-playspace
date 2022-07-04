@@ -54,7 +54,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * + add or edit edge
    *   + source
    *   + target
-   *   + type (Commitment, InputCommittment, and OutputCommitment)
+   *   + type (flow: Commitment, EconomicEvent)
    * + dragging
    *   + position
    */
@@ -329,9 +329,9 @@ const FlowCanvas: React.FC<Props> = () => {
     const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
     const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
 
-    // If the connection is valid, open the commitment modal
+    // If the connection is valid, open the flow modal
     if (validateFlow(sourceVfType, targetVfType)) {
-      setType('commitment');
+      setType('flow');
       setSource(source);
       setTarget(target);
       openModal();
@@ -339,18 +339,21 @@ const FlowCanvas: React.FC<Props> = () => {
   };
 
  /**
-   * Adds a DisplayEdge and React Flow Edge corresponding to a commitment
+   * Adds a DisplayEdge and React Flow Edge corresponding to a set of flows
    */
-  const afterAddCommitment = (items: PathedData[]) => {
-    // Add the edge
-    const edge = new DisplayEdge({
-      source,
-      target,
-      vfPath: items.map((item) => item.path),
-      planId: store.getCurrentPlanId()
-    } as DisplayEdgeShape);
-    setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
-    store.set(edge);
+  const afterAddFlow = (flows: PathedData[]) => {
+    // Only add the edge if we have a set of flows
+    if (flows.length > 0) {
+      // Add the edge
+      const edge = new DisplayEdge({
+        source,
+        target,
+        vfPath: flows.map((flow) => flow.path),
+        planId: store.getCurrentPlanId()
+      } as DisplayEdgeShape);
+      setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
+      store.set(edge);
+    }
     setType(null);
     setSource(null);
     setTarget(null);
@@ -374,12 +377,14 @@ const FlowCanvas: React.FC<Props> = () => {
     if (validateFlow(sourceVfType, targetVfType)) {
       setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
 
+      // Update display edge params
       const vfEdge: DisplayEdge = store.getById(edge.data.id);
       vfEdge.source = newConnection.source;
       vfEdge.target = newConnection.target;
       vfEdge.sourceHandle = newConnection.sourceHandle;
       vfEdge.targetHandle = newConnection.targetHandle;
 
+      // Update each flow to point to the correct new objects
       const updatedFlows: PathedData[] = vfEdge.vfPath.map((path: string) => {
         const vfFlow = store.getCursor(path);
         const updates = flowUpdates[`${sourceVfType}-${targetVfType}`](vfFlow, sourceVfNode, targetVfNode);
@@ -387,14 +392,15 @@ const FlowCanvas: React.FC<Props> = () => {
         return vfFlow;
       })
 
+      // Persist the changes
       store.set(vfEdge);
       store.putAll(updatedFlows);
 
+      // Show the flow modal
       setSelectedDisplayEdge(vfEdge.id);
       setSource(source);
       setTarget(target);
-      // XXX: Need to rename
-      setType('updateCommitment');
+      setType('updateFlow');
       openModal();
     }
   }
@@ -407,8 +413,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setSelectedDisplayEdge(vfEdge.id);
     setSource(vfEdge.source);
     setTarget(vfEdge.target);
-    // XXX: Need to rename
-    setType('updateCommitment');
+    setType('updateFlow');
     openModal();
   }
 
@@ -417,7 +422,7 @@ const FlowCanvas: React.FC<Props> = () => {
    *
    * TIL: The comment in `afterProcessEdit` should apply here, too.
    */
-  const afterEdgeEdit = (items: PathedData[]) => {
+  const afterFlowEdit = (items: PathedData[]) => {
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
     displayEdge.vfPath = items.map((item) => item.path);
     store.set(displayEdge);
@@ -525,10 +530,10 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ResourceModal />;
       case 'agent':
         return <AgentModal />;
-      case 'commitment':
-        return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddCommitment} />;
-      case 'updateCommitment':
-        return <FlowModal vfPath={store.getById(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterEdgeEdit}/>;
+      case 'flow':
+        return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddFlow} />;
+      case 'updateFlow':
+        return <FlowModal vfPath={store.getById(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterFlowEdit}/>;
       default:
         return <></>
     }
