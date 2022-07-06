@@ -12,8 +12,8 @@ import getDataStore from '../../data/DataStore';
 
 interface Props {
   vfPath?: string[];
-  source?: string;
-  target?: string;
+  source: string;
+  target: string;
   closeModal: () => void;
   afterward?: (items: PathedData[]) => void;
 }
@@ -42,22 +42,31 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   // Set up the initial state
   useEffect(() => {
     resetState();
+
+    const store = getDataStore();
+
+    // Grab vfTypes and vfNodes off the DisplayNodes
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
+    const initialState = flowDefaults[`${sourceVfType}-${targetVfType}`](store.getCurrentPlanId(), sourceVfNode, targetVfNode);
+    setInitial(initialState);
+
+    const allActions = store.getActions();
+    if(initialState && Object.hasOwn(initialState, 'inputOf')) {
+      setActions(allActions.filter((action) => (action.inputOutput == 'input' || action.inputOutput == 'both')));
+    } else if (initialState && Object.hasOwn(initialState, 'outputOf')) {
+      setActions(allActions.filter((action) => (action.inputOutput == 'output' || action.inputOutput == 'both')));
+    } else {
+      setActions(allActions.filter((action) => action.inputOutput == 'na'));
+    }
+
     if (vfPath) {
       const state = getCommitmentAndEvents(vfPath);
       setCommitment(state.commitment);
       setEvents(state.events);
     }
-    const store = getDataStore();
-
-    if (source && target) {
-      // Grab vfTypes and vfNodes off the DisplayNodes
-      const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
-      const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
-      setInitial(flowDefaults[`${sourceVfType}-${targetVfType}`](store.getCurrentPlanId(), sourceVfNode, targetVfNode));
-    }
 
     setAgents(store.getAgents());
-    setActions(store.getActions());
     setUnits(store.getUnits());
   }, []);
 
