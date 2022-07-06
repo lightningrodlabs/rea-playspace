@@ -1,10 +1,8 @@
+import { ProfilesService } from "@holochain-open-dev/profiles";
 import React from "react";
-import {
-  SlInput,
-  SlAvatar,
-  SlIcon,
-} from "@shoelace-style/shoelace/dist/react";
-import { getMyProfile } from "../../data/ProfilesStore";
+import { getMyProfile, getProfilesService } from "../../data/ProfilesStore";
+import { AgentAvatar } from "../../elements";
+import { getAgentPubKey } from "../../hcWebsockets";
 
 export type HeaderProps = {};
 
@@ -13,7 +11,8 @@ const Header: React.FC<HeaderProps> = () => {
   return (
     <div className="header">
       <div>
-        <SlAvatar shape="circle" label="Circle avatar" />
+        <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
+         </AgentAvatar> 
         {" "}
         {getMyProfile().profile.nickname.slice(0, 8)}
       </div>
