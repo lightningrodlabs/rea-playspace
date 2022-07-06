@@ -94,7 +94,82 @@ export class Measurement implements MeasurementShape {
 /**
  * Small selection of units for demo purpose
  */
-export const Units = {
+ export const Units = {
+  'piece': new Unit({
+    id: 'piece',
+    name: 'piece',
+    symbol: ''
+  }),
+  'day': new Unit({
+    id: 'day',
+    name: 'day',
+    symbol: 'd'
+  }),
+  'hour': new Unit({
+    id: 'hour',
+    name: 'hour',
+    symbol: 'h'
+  }),
+  'minute': new Unit({
+    id: 'minute',
+    name: 'minute',
+    symbol: 'min'
+  }),
+  'foot-USSurvey': new Unit({
+    id: 'foot-USSurvey',
+    name: 'foot (US survey)',
+    symbol: 'ft'
+  }),
+  'metre': new Unit({
+    id: 'metre',
+    name: 'metre',
+    symbol: 'm'
+  }),
+  'centimetre': new Unit({
+    id: 'centimetre',
+    name: 'centimetre',
+    symbol: 'cm'
+  }),
+  'kilometre': new Unit({
+    id: 'kilometre',
+    name: 'kilometre',
+    symbol: 'km'
+  }),
+  'mile-USSurvey': new Unit({
+    id: 'mile-USSurvey',
+    name: 'mile (US survey)',
+    symbol: ''
+  }),
+  'acre-USSurvey': new Unit({
+    id: 'acre-USSurvey',
+    name: 'acre (US survey)',
+    symbol: 'ac'
+  }),
+  'gallon-US': new Unit({
+    id: 'gallon-US',
+    name: 'gallon (US)',
+    symbol: 'gal'
+  }),
+  'litre': new Unit({
+    id: 'litre',
+    name: 'litre',
+    symbol: 'l'
+  }),
+  'gram': new Unit({
+    id: 'gram',
+    name: 'gram',
+    symbol: 'g'
+  }),
+  'kilogram': new Unit({
+    id: 'kilogram',
+    name: 'kilogram',
+    symbol: 'kg'
+  }),
+  'tonne': new Unit({
+    id: 'tonne',
+    name: 'tonne',
+    symbol: 't'
+  }),
   'cup-USCustomary': new Unit({
     id: 'cup-USCustomary',
     name: 'cup (US customary)',
@@ -109,16 +184,6 @@ export const Units = {
     id: 'teaspoon-US',
     name: 'teaspoon (US)',
     symbol: 'tsp.'
-  }),
-  'hour': new Unit({
-    id: 'hour',
-    name: 'hour',
-    symbol: 'h'
-  }),
-  'minute': new Unit({
-    id: 'minute',
-    name: 'minute',
-    symbol: 'min'
   })
 }
 
