@@ -25,7 +25,7 @@ specifiers:
   prettier: 2.2.1
   react: ^16.14.0
   react-dom: ^16.14.0
-  react-flow-renderer: ^10.0.7
+  react-flow-renderer: ^10.3.8
   react-modal: ^3.14.4
   react-redux: 7.2.8
   react-refresh: 0.10.0
@@ -55,7 +55,7 @@ dependencies:
   lit-svelte-stores: 0.1.6
   react: 16.14.0
   react-dom: 16.14.0_react@16.14.0
-  react-flow-renderer: 10.0.7_react-dom@16.14.0+react@16.14.0
+  react-flow-renderer: 10.3.8_react-dom@16.14.0+react@16.14.0
   react-modal: 3.14.4_react-dom@16.14.0+react@16.14.0
   react-redux: 7.2.8_react-dom@16.14.0+react@16.14.0
   react-router-dom: 6.3.0_react-dom@16.14.0+react@16.14.0
@@ -315,6 +315,13 @@ packages:
 
   /@babel/runtime/7.17.8:
     resolution: {integrity: sha512-dQpEpK0O9o6lj6oPu0gRDbbnk+4LeHlNcBpspf6Olzt3GIX4P1lWF1gS+pHLDFlaJvbR6q7jCfQ08zA4QJBnmA==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.13.9
+    dev: false
+
+  /@babel/runtime/7.18.6:
+    resolution: {integrity: sha512-t9wi7/AW6XtKahAe20Yw0/mMljKq0B1r2fPdvaAdV/KPDZewFXdaaa6K7lxmZBZ8FBNpCiAT6iHPmd6QO9bKfQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.9
@@ -1697,11 +1704,6 @@ packages:
       mimic-response: 1.0.1
     dev: false
 
-  /clsx/1.1.1:
-    resolution: {integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==}
-    engines: {node: '>=6'}
-    dev: false
-
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
     dependencies:
@@ -2964,33 +2966,21 @@ packages:
       scheduler: 0.19.1
     dev: false
 
-  /react-draggable/4.4.4_react-dom@16.14.0+react@16.14.0:
-    resolution: {integrity: sha512-6e0WdcNLwpBx/YIDpoyd2Xb04PB0elrDrulKUgdrIlwuYvxh5Ok9M+F8cljm8kPXXs43PmMzek9RrB1b7mLMqA==}
+  /react-flow-renderer/10.3.8_react-dom@16.14.0+react@16.14.0:
+    resolution: {integrity: sha512-owtDCSK6rATiZipew2OYSPPu2sd0VM/QCydN9S+ivrMVwR0vNSSwtsWKqJSq8DL5wXtIEed5gPi4yJqXJA7tLQ==}
+    engines: {node: '>=14'}
     peerDependencies:
-      react: '>= 16.3.0'
-      react-dom: '>= 16.3.0'
+      react: 16 || 17 || 18
+      react-dom: 16 || 17 || 18
     dependencies:
-      clsx: 1.1.1
-      prop-types: 15.8.1
-      react: 16.14.0
-      react-dom: 16.14.0_react@16.14.0
-    dev: false
-
-  /react-flow-renderer/10.0.7_react-dom@16.14.0+react@16.14.0:
-    resolution: {integrity: sha512-OJ5WAD67k8+wqgtsPwMpdgWmMsms9GX6lQpo+2Mnck8MitlFaT6eL6OUvdY0QyOEgHry62KRXhCGgzz5BUWdPQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      react: 16 || 17
-      react-dom: 16 || 17
-    dependencies:
-      '@babel/runtime': 7.17.8
+      '@babel/runtime': 7.18.6
       classcat: 5.0.3
+      d3-drag: 3.0.0
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
       react: 16.14.0
       react-dom: 16.14.0_react@16.14.0
-      react-draggable: 4.4.4_react-dom@16.14.0+react@16.14.0
-      zustand: 3.7.1_react@16.14.0
+      zustand: 3.7.2_react@16.14.0
     dev: false
 
   /react-is/16.13.1:
@@ -3431,8 +3421,8 @@ packages:
       fd-slicer: 1.1.0
     dev: false
 
-  /zustand/3.7.1_react@16.14.0:
-    resolution: {integrity: sha512-wHBCZlKj+bg03/hP+Tzv24YhnqqP8MCeN9ECPDXoF01062SIbnfl3j9O0znkDw1lNTY0a8WN3F///a0UhhaEqg==}
+  /zustand/3.7.2_react@16.14.0:
+    resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
       react: '>=16.8'
