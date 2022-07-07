@@ -56,6 +56,10 @@ const ProcessModal: React.FC<Props> = ({
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
+  const toggleFinished = () => {
+    setState(prevState => ({ ...prevState, finished: !prevState['finished'] }));
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -91,7 +95,8 @@ const ProcessModal: React.FC<Props> = ({
           required>
           {agents.map((agent) => (<SlMenuItem key={`agent_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
         </SlSelect>
-
+        <br />
+        <SlButton onClick={toggleFinished} variant="primary">{finished ? "Unfinish" : "Finish"}</SlButton>
         <br />
         <SlTextarea
           label='Note'
