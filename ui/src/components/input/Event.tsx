@@ -96,9 +96,9 @@ const EventInput: React.FC<Props> = ({eventState, conformingResource, agents, ac
       {inputOrOutputOf()}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
-      <MeasurementInput label="Resource" value={resourceQuantity} name='resourceQuantity' onChange={onSlChange} units={units} />
+      <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
       <br />
-      <MeasurementInput label="Effort" value={effortQuantity} name='effortQuantity' onChange={onSlChange} units={units} />
+      <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
       <br />
       <SlTextarea
         label='Note'
