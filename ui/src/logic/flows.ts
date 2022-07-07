@@ -170,33 +170,101 @@ export const validateFlow = (sourceType: string, targetType: string): boolean =>
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
 export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
-  const action: Action = actions.find((action) => action.id == flow.action);
-  const measurement: MeasurementShape = {
+  let label = "Well, this is embrassing. I couldn't make a label.";
+
+  let action = new Action({
+    id: 'na',
+    label: 'blank action',
+    inputOutput: 'na',
+    comment: "This indicates there's no action selected."
+  });
+
+  let resourceMeasurement: MeasurementShape = {
     hasNumericalValue: 0,
     hasUnit: ''
   };
 
-  if (flow.resourceQuantity != null && flow.effortQuantity == null) {
-    measurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    measurement.hasUnit = flow.resourceQuantity.hasUnit;
-  }
-  if (flow.resourceQuantity == null && flow.effortQuantity != null) {
-    measurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    measurement.hasUnit = flow.effortQuantity.hasUnit;
+  let resourceUnit = new Unit({
+    id: 'na',
+    name: 'blank unit',
+    symbol: 'blank unit'
+  });
+
+  let effortMeasurement: MeasurementShape = {
+    hasNumericalValue: 0,
+    hasUnit: ''
+  };
+
+  let effortUnit = new Unit({
+    id: 'na',
+    name: 'blank unit',
+    symbol: 'blank unit'
+  });
+
+  // Get the action
+  if (flow.action && flow.action !== null) {
+    action = actions.find((action) => action.id == flow.action);
   }
 
-  const unit: Unit = units.find((unit) => unit.id == measurement.hasUnit);
-  
-  const baseLabel = `${action.label} ${measurement.hasNumericalValue} ${unit.symbol}`
+  /**
+   * All conditionals should be arranged from most specific to least specific.
+   * TODO: eventually we may just define templates per action per language
+   */
+
+  // Use
+  if (action.id == 'use' && flow.resourceQuantity != null && flow.effortQuantity != null) {
+    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
+    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit;
+    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
+
+    // Don't show the unit for pieces;
+    let resourceSymbol = '';
+    if (resourceUnit.id !== 'piece') {
+      resourceSymbol = ` ${resourceUnit.symbol}`;
+    }
+
+    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
+    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit;
+    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
+
+    return `${action.label} ${resourceMeasurement.hasNumericalValue}${resourceSymbol} from ${provider.name} for ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
+  }
+
+  // Only resourceQuantity
+  if (flow.resourceQuantity != null && flow.effortQuantity == null) {
+    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
+    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit;
+    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
+
+    label = `${action.label} ${resourceMeasurement.hasNumericalValue} ${resourceUnit.symbol}`;
+  }
+
+  // Only effortQuantity
+  if (flow.resourceQuantity == null && flow.effortQuantity != null) {
+    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
+    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit;
+    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
+
+    label = `${action.label} ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
+  }
+
+  // Transfer
+  if (
+    (action.id == 'transfer' || action.id == 'transfer-all-rights' || action.id == 'transfer-custody')
+    && flow.provider
+    && flow.receiver) {
+    return `${label} from ${provider.name} to ${receiver.name}`;
+  }
 
   if (flow.inputOf && flow.provider) {
-    return `${provider.name}: ${baseLabel}`;
-  } else if (flow.outputOf && flow.receiver) {
-    return `${baseLabel} for ${receiver.name}`;
-  } else if (flow.provider && flow.receiver) {
-    return `${baseLabel} from ${provider.name} to ${receiver.name}`;
+    return `${provider.name}: ${label}`;
   }
-  return baseLabel;
+
+  if (flow.outputOf && flow.receiver) {
+    return `${label} for ${receiver.name}`;
+  }
+
+  return label;
 }
 
 /**
