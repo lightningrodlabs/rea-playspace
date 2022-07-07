@@ -133,8 +133,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    */
   const handleCommitmentSubmit = () => {
     const store = getDataStore();
-    let newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>
-    (commitmentUpdates, Commitment);
+    let newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
     setCommitment(newCommitment);
     setCommitmentOpen(false);
   };
@@ -152,18 +151,14 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     setEventOpen(false);
     const store = getDataStore();
     const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(eventUpdates, EconomicEvent);
-    console.log(newEvent);
     setEvents((prevEvents) => {
       const eventIndex = events.findIndex((event) => event.id === newEvent.id);
-      console.log(eventIndex)
       if (eventIndex > -1) {
         const newEvents = [...prevEvents];
         newEvents[eventIndex] = newEvent;
-        console.log(newEvents);
         return newEvents;
       } else {
         const newEvents = [...prevEvents, newEvent];
-        console.log(newEvents);
         return newEvents;
       }
     });

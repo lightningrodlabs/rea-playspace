@@ -34,6 +34,16 @@ export function assignFields<T extends Object, U extends Object>(unfiltered: T, 
 }
 
 /**
+ * Overwrites properties of the current object
+ */
+export function overwriteFields<T extends Object, U extends Object>(unfiltered: T, context: U) {
+  const fields = Reflect.ownKeys(unfiltered);
+  fields.forEach((key) => {
+    context[key] = unfiltered[key];
+  });
+}
+
+/**
  * Only exports not-inherited properties as a POJO for serialization
  * If you need to explort a list of properties that includes inherited properties, use `fieldsToJSON`
  */

@@ -74,15 +74,14 @@ export class Unit {
  * Basic model of a measurement from the OM Schema
  */
 export class Measurement implements MeasurementShape {
-  hasNumericalValue: number;  // actual quantity
+  hasNumericalValue: number | string;  // actual quantity
   hasUnit: string;            // ID of unit
 
   constructor(init?: MeasurementShape) {
+    this.hasNumericalValue = '';
+    this.hasUnit = '';
     if (init) {
       assignFields<MeasurementShape, Measurement>(init, this);
-    } else {
-      this.hasNumericalValue = 0;
-      this.hasUnit = '';
     }
   }
 
