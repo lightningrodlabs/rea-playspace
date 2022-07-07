@@ -11,13 +11,13 @@ interface Props {
   onChange: (measurement: any) => void;
 }
 
-const initialState: MeasurementShape = new Measurement();
-
 const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}) => {
-  const [{hasNumericalValue, hasUnit}, setState] = useState({...initialState});
+  const [{hasNumericalValue, hasUnit}, setState] = useState<MeasurementShape>(new Measurement());
 
   useEffect(() => {
-    setState(prevState => ({ ...prevState, ...value }));
+    if (value != null && value.hasNumericalValue && value.hasNumericalValue != '' && value.hasUnit && value.hasUnit != '') {
+      setState(value);
+    }
   }, [value]);
 
   const deferOnChange = (value: MeasurementShape) => {
@@ -26,15 +26,30 @@ const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}
     }, 1);
   };
 
+  const toString = (value: number | string): string => {
+    if (typeof value == 'number') {
+      return value.toString();
+    }
+    return value;
+  }
+
   const onSlChange = (e: any) => {
     const { name: fieldName, value } = e.target;
     setState(prevMeasurement => {
       let parsedValue = value;
       if (fieldName == 'hasNumericalValue') {
-        parsedValue = parseFloat(value);
+        if (value == '') {
+          parsedValue = value;
+        } else {
+          parsedValue = parseFloat(value);
+        }
       }
       const measurement = { ...prevMeasurement, [fieldName]: parsedValue };
-      deferOnChange(measurement);
+      if (measurement.hasNumericalValue && measurement.hasNumericalValue != '' && measurement.hasUnit && measurement.hasUnit != '') {
+        deferOnChange(measurement);
+      } else {
+        deferOnChange(null);
+      }
       return measurement;
     });
   };
@@ -46,9 +61,9 @@ const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}
   return (
       <>
         <div className='measurementInput'>
-          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
+          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" onSlInput={onSlChange} value={(toString(hasNumericalValue))} clearable></SlInput>
           <span className='measurementSpacer'></span>
-          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} value={hasUnit}>
+          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} value={hasUnit} clearable>
             {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
           </SlSelect>
         </div>

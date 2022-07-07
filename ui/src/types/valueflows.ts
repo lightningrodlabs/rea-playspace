@@ -157,6 +157,6 @@ export interface UnitShape {
 }
 
 export interface MeasurementShape {
-  hasNumericalValue: number;  // actual quantity
+  hasNumericalValue: number | string;  // actual quantity
   hasUnit: string;            // ID of unit
 }

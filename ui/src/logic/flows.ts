@@ -252,7 +252,8 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   if (
     (action.id == 'transfer' || action.id == 'transfer-all-rights' || action.id == 'transfer-custody')
     && flow.provider
-    && flow.receiver) {
+    && flow.receiver
+    ) {
     return `${label} from ${provider.name} to ${receiver.name}`;
   }
 

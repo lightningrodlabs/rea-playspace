@@ -164,7 +164,6 @@ export class Commitment implements CommitmentShape, PathedData {
     assignFields<CommitmentShape, Commitment>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? this.created : new Date();
-
   }
 
   static getPrefix(planId: string): string {
