@@ -1,4 +1,4 @@
-import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
+import { SlButton, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { ActionShape, AgentShape, CommitmentShape, ResourceSpecificationShape, UnitShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
@@ -41,7 +41,7 @@ const initialState: CommitmentShape = {
 
 const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, agents, actions, units, name, onChange}) => {
   const [
-    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note}, setState
+    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, finished}, setState
   ] = useState({ ...initialState });
 
   useEffect(() => {
@@ -62,6 +62,14 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       return state;
     });
   };
+
+  const toggleFinished = () => {
+    setState(prevState => {
+      const state = { ...prevState, finished: !prevState['finished'] };
+      deferOnChange(state);
+      return state;
+    });
+  }
 
   const inputOrOutputOf = () => {
     if (inputOf) {
@@ -92,6 +100,8 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       <SlSelect placeholder="Select reciever" label="Receiver" name='receiver' value={receiver ? receiver : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
+      <br />
+        <SlButton onClick={toggleFinished} variant="primary">{finished ? "Unfinish" : "Finish"}</SlButton>
       <br/>
       {inputOrOutputOf()}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
