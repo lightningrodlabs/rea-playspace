@@ -6,13 +6,19 @@ import { MeasurementShape, UnitShape } from '../../types/valueflows';
 interface Props {
   label: string;
   name: string;
+  defaultUnit: string;
   value: MeasurementShape;
   units: UnitShape[];
   onChange: (measurement: any) => void;
 }
 
-const MeasurementInput: React.FC<Props> = ({label, name, value, units, onChange}) => {
-  const [{hasNumericalValue, hasUnit}, setState] = useState<MeasurementShape>(new Measurement());
+const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, units, onChange}) => {
+  const [{hasNumericalValue, hasUnit}, setState] = useState<MeasurementShape>(new Measurement(
+    {
+      hasNumericalValue: defaultUnit ? 0 : '',
+      hasUnit: defaultUnit ? defaultUnit : ''
+    } as MeasurementShape)
+  );
 
   useEffect(() => {
     if (value != null && value.hasNumericalValue && value.hasNumericalValue != '' && value.hasUnit && value.hasUnit != '') {
