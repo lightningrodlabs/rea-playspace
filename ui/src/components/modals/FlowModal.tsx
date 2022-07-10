@@ -232,7 +232,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         ></EventInput>
         <SlDivider></SlDivider>
         <SlButtonGroup slot="footer">
-          <SlButton onClick={handleEventSubmit} variant="primary">{commitment?.id? 'Update' : 'Create'}</SlButton>
+          <SlButton onClick={handleEventSubmit} variant="primary">{eventState?.id? 'Update' : 'Create'}</SlButton>
           <SlButton onClick={resetState} variant="default">Cancel</SlButton>
         </SlButtonGroup>
       </>;
@@ -273,7 +273,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const makeEventClickHandler = (event: EconomicEvent): (()=>void) => {
     return () => {
       pickEvent(event);
-      setCommitmentOpen(true);
+      setEventOpen(true);
     }
   };
 
@@ -304,7 +304,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
               </div>
             </div>
             {events.map((ev) =>
-              <SlButton variant="default" id={`edit-${ev.id}`} key={ev.id} onClick={makeEventClickHandler(event)}>
+              <SlButton variant="default" id={`edit-${ev.id}`} key={ev.id} onClick={makeEventClickHandler(ev)}>
                 {getLabelForFlow(ev, getProvider(ev), getReceiver(ev), actions, units)}
               </SlButton>
             )}
