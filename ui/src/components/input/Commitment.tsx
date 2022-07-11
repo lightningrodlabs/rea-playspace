@@ -4,6 +4,7 @@ import { ActionShape, AgentShape, CommitmentShape, ResourceSpecificationShape, U
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, deferOnChange, slChangeConstructor } from '../util';
 import { inputOrOutputOf } from './shared';
+import LocationInput from './Location';
 
 interface Props {
   commitmentState: CommitmentShape;
@@ -43,7 +44,7 @@ const initialState: CommitmentShape = {
 
 const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, agents, actions, units, name, onChange}) => {
   const [
-    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, due, finished}, setState
+    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, due, finished, atLocation}, setState
   ] = useState({ ...initialState });
 
   useEffect(() => {
@@ -87,7 +88,9 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       <br />
       <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
       <br />
-      <SlInput label="Due" type="datetime-local" valueAsDate={due} value={due ? DateToInputValueString(due): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput label="Due" type="datetime-local" valueAsDate={due as Date} value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <br />
+      <LocationInput label="Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
       <br />
       <SlTextarea
         label='Note'
