@@ -2,8 +2,9 @@ import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoel
 import React, { useEffect, useState } from 'react';
 import { ActionShape, AgentShape, EconomicEventShape, ResourceSpecificationShape, UnitShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
-import { DateToInputValueString, deferOnChange, slChangeConstructor } from '../util';
+import { DateToInputValueString, slChangeConstructor } from '../util';
 import { inputOrOutputOf } from './shared';
+import LocationInput from './Location';
 
 interface Props {
   eventState: EconomicEventShape;
@@ -42,7 +43,7 @@ const initialState: EconomicEventShape = {
 
 const EventInput: React.FC<Props> = ({eventState, conformingResource, agents, actions, units, name, onChange}) => {
   const [
-    {id, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note, hasPointInTime}, setState
+    {id, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note, hasPointInTime, atLocation, toLocation}, setState
   ] = useState({...initialState});
 
   useEffect(() => {
@@ -76,7 +77,11 @@ const EventInput: React.FC<Props> = ({eventState, conformingResource, agents, ac
       <br />
       <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
       <br />
-      <SlInput label="Datetime" type="datetime-local" valueAsDate={hasPointInTime} value={hasPointInTime ? DateToInputValueString(hasPointInTime): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput label="Datetime" type="datetime-local" valueAsDate={hasPointInTime as Date} value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <br />
+      <LocationInput label="At Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
+      <br />
+      <LocationInput label="To Location" name="toLocation" value={toLocation} onChange={onSlChange}></LocationInput>
       <br />
       <SlTextarea
         label='Note'
