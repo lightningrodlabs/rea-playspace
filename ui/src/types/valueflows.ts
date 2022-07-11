@@ -6,10 +6,10 @@ export interface HasIdDate {
 }
 
 export interface HasTime {
-  hasBegining?: Date;
-  hasEnd?: Date;
-  hasPointInTime?: Date;
-  due?: Date;
+  hasBegining?: Date | string;
+  hasEnd?: Date | string;
+  hasPointInTime?: Date | string;
+  due?: Date | string;
 }
 
 export interface ReaBase {
@@ -141,8 +141,9 @@ export type FlowShape = CommitmentShape | EconomicEventShape;
 
 export interface GeoDataShape extends HasIdDate {
   type: string;
+  name?: string;
   address?: string;
-  point?: GeoPointShape;
+  point?: GeoPointShape | string;
 }
 
 export interface GeoPointShape extends HasIdDate {
