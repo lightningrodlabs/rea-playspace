@@ -5,7 +5,7 @@ specifiers:
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': ^0.2.0
   '@holochain-open-dev/profiles': 0.3.2
-  '@holochain/client': ^0.4.1
+  '@holochain/client': ^0.6.0
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': ^2.7.2
   '@scoped-elements/material-web': 0.0.19
@@ -43,7 +43,7 @@ dependencies:
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
   '@holochain-open-dev/profiles': 0.3.2_ws@8.5.0
-  '@holochain/client': 0.4.1_ws@8.5.0
+  '@holochain/client': 0.6.0_ws@8.5.0
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': 2.7.2
   '@scoped-elements/material-web': 0.0.19
@@ -474,6 +474,23 @@ packages:
 
   /@holochain/client/0.4.1_ws@8.5.0:
     resolution: {integrity: sha512-YCz1IEWL/e7qSo3l0Z7rKmnZk6tm8CSqZ3RplFZxw0wCfTb2cdI+/LgU4TLnRdutCsIOGUJ25ZCpXjHztb33Dg==}
+    engines: {node: ^14.13.1 || >=16.0.0 || >=18.0.0}
+    dependencies:
+      '@msgpack/msgpack': 2.7.2
+      cross-fetch: 3.1.5
+      eslint-config-prettier: 8.5.0
+      eslint-plugin-prettier: 4.0.0_ea1eeaadaf203da9735bd1eacb520c93
+      eslint-plugin-tsdoc: 0.2.16
+      isomorphic-ws: 4.0.1_ws@8.5.0
+      prettier: 2.7.1
+    transitivePeerDependencies:
+      - encoding
+      - eslint
+      - ws
+    dev: false
+
+  /@holochain/client/0.6.0_ws@8.5.0:
+    resolution: {integrity: sha512-QvrOrdC6nhyon2OlRlY9DeKZBZ8asP5ZmMGVPpDSuJxOQyKGTmXR9XWkYm1Ebhl3wUzTAdVu2sWujW9GeCAlrw==}
     engines: {node: ^14.13.1 || >=16.0.0 || >=18.0.0}
     dependencies:
       '@msgpack/msgpack': 2.7.2
