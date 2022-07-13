@@ -44,9 +44,9 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
   return (
       <>
         <div className='measurementInput'>
-          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" onSlInput={onSlChange} value={(NumberToString(hasNumericalValue))} clearable></SlInput>
+          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" clearable onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
           <span className='measurementSpacer'></span>
-          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} value={hasUnit} clearable>
+          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
             {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
           </SlSelect>
         </div>
