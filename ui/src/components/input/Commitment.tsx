@@ -2,6 +2,9 @@ import { SlButton, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-s
 import React, { useEffect, useState } from 'react';
 import { ActionShape, AgentShape, CommitmentShape, ResourceSpecificationShape, UnitShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
+import { DateToInputValueString, deferOnChange, slChangeConstructor } from '../util';
+import { inputOrOutputOf } from './shared';
+import LocationInput from './Location';
 
 interface Props {
   commitmentState: CommitmentShape;
@@ -10,7 +13,7 @@ interface Props {
   actions: ActionShape[];
   units: UnitShape[];
   name: string;
-  onChange?: (event: any) => void;
+  onChange?: (event: {}) => void;
 }
 
 const initialState: CommitmentShape = {
@@ -41,51 +44,26 @@ const initialState: CommitmentShape = {
 
 const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, agents, actions, units, name, onChange}) => {
   const [
-    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, finished}, setState
+    {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, due, finished, atLocation}, setState
   ] = useState({ ...initialState });
 
   useEffect(() => {
     setState(prevState => ({ ...prevState, ...commitmentState }));
   }, [commitmentState]);
 
-  const deferOnChange = (value: CommitmentShape) => {
-    setTimeout(() => {
-      onChange({target: {name, value}})
-    }, 1);
-  };
+  const parsers = {
+    'due': (value: string) => new Date(Date.parse(value))
+  }
 
-  const onSlChange = (e: any) => {
-    const { name: fieldName, value } = e.target;
-    setState(prevState => {
-      const state = { ...prevState, [fieldName]: value };
-      deferOnChange(state);
-      return state;
-    });
-  };
+  const onSlChange = slChangeConstructor<CommitmentShape>(name, onChange, setState, parsers);
 
   const toggleFinished = () => {
     setState(prevState => {
       const state = { ...prevState, finished: !prevState['finished'] };
-      deferOnChange(state);
+      deferOnChange(name, state, onChange);
       return state;
     });
   }
-
-  const inputOrOutputOf = () => {
-    if (inputOf) {
-      return (<>
-        <SlInput disabled label="Input of" name="inputOf" value={inputOf}></SlInput>
-        <br />
-      </>)
-    } else if (outputOf) {
-      return (<>
-        <SlInput disabled label="Output of" name="outputOf" value={outputOf}></SlInput>
-        <br />
-      </>)
-    } else {
-      return (<></>)
-    }
-  };
 
   return (
     <>
@@ -103,12 +81,16 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       <br />
         <SlButton onClick={toggleFinished} variant="primary">{finished ? "Unfinish" : "Finish"}</SlButton>
       <br/>
-      {inputOrOutputOf()}
+      {inputOrOutputOf(inputOf, outputOf)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
       <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
       <br />
       <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      <br />
+      <SlInput label="Due" type="datetime-local" valueAsDate={due as Date} value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <br />
+      <LocationInput label="Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
       <br />
       <SlTextarea
         label='Note'
