@@ -27,7 +27,7 @@
     "@holochain-open-dev/context": "0.0.3",
     "@holochain-open-dev/core-types": "^0.2.0",
     "@holochain-open-dev/profiles": "0.3.2",
-    "@holochain/client": "^0.4.1",
+    "@holochain/client": "^0.6.0",
     "@lit-labs/react": "1.0.4",
     "@msgpack/msgpack": "^2.7.2",
     "@scoped-elements/material-web": "0.0.19",
