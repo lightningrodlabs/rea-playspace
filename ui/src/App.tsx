@@ -17,6 +17,7 @@ import {
 import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
+import EventLedger from "./components/layout/EventLedger";
 
 Modal.setAppElement("#root");
 
@@ -88,6 +89,10 @@ const App: React.FC<Props> = () => {
                   <Route
                     path="/processes/new"
                     element={<NewProcessSpecification />}
+                  />
+                  <Route
+                    path="/events"
+                    element={<EventLedger />}
                   />
                 </Routes>
             </div>
