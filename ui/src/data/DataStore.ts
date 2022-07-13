@@ -11,6 +11,9 @@ import {
   Plan
 } from "./models/Valueflows/Plan";
 import {
+  Fulfillment
+} from "./models/Valueflows/Observation";
+import {
   DisplayNode,
   DisplayEdge
 } from "./models/Application/Display";
@@ -174,6 +177,19 @@ export class DataStore extends DataStoreBase {
     return await this.fetchAll(Plan.getPrefix());
   }
 
+  // Fulfillment helpers
+  public filterFulfillmentsByCommitmentAndEvent(commitmentId: string, eventId: string) {
+    return Object.values(this.root.fulfillment).filter((f: Fulfillment) => f.fulfills == commitmentId && f.fulfilledBy == eventId);
+  }
+
+  public filterFulfillmentsByCommitment(commitmentId: string) {
+    return Object.values(this.root.fulfillment).filter((f: Fulfillment) => f.fulfills == commitmentId);
+  }
+
+  public filterFulfillmentsByEvent( eventId: string) {
+    return Object.values(this.root.fulfillment).filter((f: Fulfillment) => f.fulfilledBy == eventId);
+  }
+
   // Display* helpers
   public getDisplayNodes(planId: string): DisplayNode[] {
     return Object.values(this.getCursor(DisplayNode.getPrefix(planId)));
@@ -197,6 +213,8 @@ export class DataStore extends DataStoreBase {
    *
    * Example usage:
    * const newCommitment = upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
+   *
+   * TODO: this is in the wrong file, should be in DataStoreBase
    */
   public upsert<T extends HasIdDate, U extends PathedData> (updates: T, constructor: {new (init: any): U}): U {
     const store = getDataStore();

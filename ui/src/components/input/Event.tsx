@@ -2,6 +2,9 @@ import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoel
 import React, { useEffect, useState } from 'react';
 import { ActionShape, AgentShape, EconomicEventShape, ResourceSpecificationShape, UnitShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
+import { DateToInputValueString, slChangeConstructor } from '../util';
+import { inputOrOutputOf } from './shared';
+import LocationInput from './Location';
 
 interface Props {
   eventState: EconomicEventShape;
@@ -40,44 +43,18 @@ const initialState: EconomicEventShape = {
 
 const EventInput: React.FC<Props> = ({eventState, conformingResource, agents, actions, units, name, onChange}) => {
   const [
-    {id, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note}, setState
+    {id, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note, hasPointInTime, atLocation, toLocation}, setState
   ] = useState({...initialState});
-
 
   useEffect(() => {
     setState(prevState => ({ ...prevState, ...eventState }));
   }, [eventState]);
 
-  const deferOnChange = (value: EconomicEventShape) => {
-    setTimeout(() => {
-      onChange({target: {name, value}})
-    }, 1);
-  };
+  const parsers = {
+    'hasPointInTime': (value: string) => new Date(Date.parse(value))
+  }
 
-  const onSlChange = (e: any) => {
-    const { name: fieldName, value } = e.target;
-    setState(prevState => {
-      const state = { ...prevState, [fieldName]: value };
-      deferOnChange(state);
-      return state;
-    });
-  };
-
-  const inputOrOutputOf = () => {
-    if (inputOf) {
-      return (<>
-        <SlInput disabled label="Input of" name="inputOf" value={inputOf}></SlInput>
-        <br />
-      </>)
-    } else if (outputOf) {
-      return (<>
-        <SlInput disabled label="Output of" name="outputOf" value={outputOf}></SlInput>
-        <br />
-      </>)
-    } else {
-      return (<></>)
-    }
-  };
+  const onSlChange = slChangeConstructor<EconomicEventShape>(name, onChange, setState, parsers);
 
   return (
     <>
@@ -93,12 +70,18 @@ const EventInput: React.FC<Props> = ({eventState, conformingResource, agents, ac
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      {inputOrOutputOf()}
+      {inputOrOutputOf(inputOf, outputOf)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
       <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
       <br />
       <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      <br />
+      <SlInput label="Datetime" type="datetime-local" valueAsDate={hasPointInTime as Date} value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <br />
+      <LocationInput label="At Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
+      <br />
+      <LocationInput label="To Location" name="toLocation" value={toLocation} onChange={onSlChange}></LocationInput>
       <br />
       <SlTextarea
         label='Note'

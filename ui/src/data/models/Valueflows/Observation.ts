@@ -76,6 +76,9 @@ export class EconomicEvent implements EconomicEventShape {
     assignFields<EconomicEventShape, EconomicEvent>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? this.created : new Date();
+    this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
+    this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
+    this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
   }
 
   static getPrefix(): string {
