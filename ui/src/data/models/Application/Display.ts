@@ -3,6 +3,9 @@ import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, fieldsToJSON } from '../../../utils';
+import { EconomicEventShape, GeoDataShape, MeasurementShape } from "../../../types/valueflows";
+import getDataStore from "../../DataStore";
+import { getProfileNameById } from "../../ProfilesStore";
 
 export interface DisplayNodeShape {
   id?: string;
@@ -115,5 +118,44 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
       this,
       ['id', 'source', 'target', 'sourceHandle', 'targetHandle', 'vfPath', 'planId']
     );
+  }
+}
+
+export class DisplayEconomicEvent {
+  id: string;
+  created: Date;
+  action: string;
+  provider?: string;                 // Agent nickname
+  receiver?: string;                 // Agent nickname
+  resourceConformsTo?: string;      // ResourceSprecification name
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
+
+  constructor(init: EconomicEventShape) {
+    this.id = this.id ? this.id : Guid.raw();
+    this.created = init.created;
+    this.action = init.action;
+    this.resourceQuantity = init.resourceQuantity;
+    this.effortQuantity = init.effortQuantity;
+  }
+
+  public async getNamesForId(init: EconomicEventShape): Promise<void> {
+    const dataStore = getDataStore();
+
+    if (init.provider) {
+      this.provider = await getProfileNameById(init.provider);
+    } else {
+      this.provider = null;
+    }
+    if (init.receiver) {
+      this.receiver = await getProfileNameById(init.receiver);
+    } else {
+      this.receiver = null;
+    }
+    if (init.resourceConformsTo) {
+      this.resourceConformsTo = (await dataStore.getById(init.resourceConformsTo)).name;
+    } else {
+      this.resourceConformsTo = null;
+    }
   }
 }
