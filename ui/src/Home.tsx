@@ -18,12 +18,25 @@ const Home: React.FC<Props> = () => {
     setAgents(store.getAgents());
   }, []);
 
+  function updateState(id: string, type: string): void {
+      if (type === 'resourceSpecification') {
+        setResourceSpecifications(resourceSpecifications.filter(resource => resource.id !== id));
+      }
+      if (type === 'processSpecification') {
+        setProcessSpecifications(processSpecifications.filter(process => process.id !== id));
+      }
+      if (type === 'agent') {
+        setAgents(agents.filter(agent => agent.id !== id));
+      }
+  }
+
   return(
     <div style={{display:"flex"}}>
       <Pallet
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
         agents={agents}
+        updateState={updateState}
       />
       <FlowCanvas />
     </div>
