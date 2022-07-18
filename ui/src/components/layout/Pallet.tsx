@@ -4,17 +4,20 @@ import { Link } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
+import getDataStore from '../../data/DataStore';
 
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>
+  updateState: (id: string, type: string) => void
 }
 
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
   processSpecifications,
-  agents
+  agents,
+  updateState
 }) => {
 
   /**
@@ -43,6 +46,8 @@ const Pallet: React.FC<Props> = ({
         className={'pallet-node ' + pickStyle(type)}>
           <PalletNode
             thing={item}
+            onClick={palletNodeHandler}
+            type={type}
           />
         </div>
       )));
@@ -58,11 +63,22 @@ const Pallet: React.FC<Props> = ({
         className={'pallet-node ' + pickStyle(type)}>
           <PalletNode
             thing={item}
+            onClick={palletNodeHandler}
+            type={type}
           />
         </div>
       )));
     }
     return (<p style={{textAlign: "center"}}>No items</p>);
+  }
+
+  function palletNodeHandler(event, id: string, type: string) {
+    const store = getDataStore();
+    if (event.shiftKey) {
+      store.delete(store.lookUpPath(id));
+      store.fetchAll('root');
+      updateState(id, type);
+    }
   }
 
   return (
