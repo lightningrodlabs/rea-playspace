@@ -18,7 +18,7 @@ const Home: React.FC<Props> = () => {
     setAgents(store.getAgents());
   }, []);
 
-  function updateState(id: string, type: string): void {
+  function updateDisplayState(id: string, type: string): void {
       if (type === 'resourceSpecification') {
         setResourceSpecifications(resourceSpecifications.filter(resource => resource.id !== id));
       }
@@ -36,7 +36,7 @@ const Home: React.FC<Props> = () => {
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
         agents={agents}
-        updateState={updateState}
+        updateDisplayState={updateDisplayState}
       />
       <FlowCanvas />
     </div>

@@ -1,24 +1,28 @@
-import { SlIconButton } from '@shoelace-style/shoelace/dist/react';
-import React, { CSSProperties } from 'react';
+import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
-import { PathedData } from "../../data/models/PathedData";
+import { getLastPart, PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
 import getDataStore from '../../data/DataStore';
-
+import { DisplayNode } from '../../data/models/Application/Display';
+import { Process } from '../../data/models/Valueflows/Plan';
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>
-  updateState: (id: string, type: string) => void
+  updateDisplayState: (id: string, type: string) => void
 }
 
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
   processSpecifications,
   agents,
-  updateState
+  updateDisplayState
 }) => {
+
+  const [open, setOpen] = useState(false);
+  const [dependentCount, setDependentCount] = useState<number>();
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
@@ -29,6 +33,10 @@ const Pallet: React.FC<Props> = ({
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
   };
+
+  const errorMessage = (): string => {
+    return `Cannot delete as it is has ${dependentCount} dependent nodes.`;
+  }
 
   function pickStyle(type: string) {
     if (type === 'resourceSpecification') return 'resource-specification-pallet-node';
@@ -46,7 +54,7 @@ const Pallet: React.FC<Props> = ({
         className={'pallet-node ' + pickStyle(type)}>
           <PalletNode
             thing={item}
-            onClick={palletNodeHandler}
+            onClick={palletNodeDeleteHandler}
             type={type}
           />
         </div>
@@ -63,7 +71,7 @@ const Pallet: React.FC<Props> = ({
         className={'pallet-node ' + pickStyle(type)}>
           <PalletNode
             thing={item}
-            onClick={palletNodeHandler}
+            onClick={palletNodeDeleteHandler}
             type={type}
           />
         </div>
@@ -72,17 +80,47 @@ const Pallet: React.FC<Props> = ({
     return (<p style={{textAlign: "center"}}>No items</p>);
   }
 
-  function palletNodeHandler(event, id: string, type: string) {
+  function palletNodeDeleteHandler(event, id: string, type: string) {
     const store = getDataStore();
     if (event.shiftKey) {
-      store.delete(store.lookUpPath(id));
-      store.fetchAll('root');
-      updateState(id, type);
+      // check to see if it is in use
+      let displayNodes: DisplayNode[] = store.getDisplayNodes(store.getCurrentPlanId());
+      let matchedNodes: DisplayNode[] = [];
+      displayNodes.forEach((node, index) => {
+        // resource specs
+        let referenceId = '';
+        if (type === 'resourceSpecification') {
+          referenceId = getLastPart(node.vfPath); // get ID from end of path
+          console.log(`vfId of ${node.name}: `, referenceId);
+        }
+
+        if (type === 'processSpecification') {
+          const process: Process =  store.getCursor(node.vfPath);
+          referenceId = process.basedOn;
+        }
+
+        if (referenceId === id) {
+          matchedNodes.push(node);
+        }
+      });
+
+      if (matchedNodes.length === 0) {
+        store.delete(store.lookUpPath(id));
+        updateDisplayState(id, type);
+
+      } else {
+        setDependentCount(matchedNodes.length);
+        setOpen(true);
+      }
     }
   }
 
   return (
     <aside className='pallet-styles'>
+      <SlAlert variant="danger" duration={2000} open={open} closable onSlAfterHide={() => setOpen(false)}>
+        <SlIcon slot="icon" name="info-circle" />
+          {errorMessage()}
+      </SlAlert>
       <div className='category-styles'>
       <h2>
         <Link to="/resources/new">

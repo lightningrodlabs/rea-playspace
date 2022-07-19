@@ -165,6 +165,9 @@ export class DataStoreBase {
   * @param path
   */
   public delete(path: string) {
+    let parent = this.getCursor(getParentPath(path));
+    const childKey = getLastPart(path);
+    delete parent[childKey];
     this.fiber.schedule([
       () => this.zomeApi.delete_thing(path)
     ]);
@@ -231,7 +234,6 @@ export class DataStoreBase {
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const { name, data } = node.val;
-      console.log(data);
       const path = getRustNodePath(i, res);
       const parentPath = getParentPath(path);
 
