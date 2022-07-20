@@ -27,6 +27,7 @@ const EventLedger: React.FC<EventLedgerProps> = ({}) => {
   }
 
   const assembleCard = (econEvent: DisplayEconomicEvent) => {
+    console.log('econEvent', econEvent); 
     let body: string = '';
     body += (`Date: ${new Date(econEvent.created).toISOString().split('T')[0]} || `);
     if (econEvent.resourceQuantity && econEvent.resourceQuantity.hasNumericalValue) {
@@ -41,7 +42,13 @@ const EventLedger: React.FC<EventLedgerProps> = ({}) => {
       body += (`Provider: ${econEvent.provider} || `);
     }
     if (econEvent.receiver) {
-      body += (`Receiver: ${econEvent.receiver}`);
+      body += (`Receiver: ${econEvent.receiver} || `);
+    }
+    if (econEvent.inputOf) {
+      body += (`Input Of: ${econEvent.inputOf} `);
+    }
+    if (econEvent.outputOf) {
+      body += (`Output Of: ${econEvent.outputOf}`);
     }
     return body;
   }
