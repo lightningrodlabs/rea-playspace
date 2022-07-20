@@ -29,7 +29,12 @@ interface Props {}
 
 const App: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
-  const [rsEdit, setRSEdit] = useState<ResourceSpecificationShape>();
+  const [rsEdit, setRsEdit] = useState<ResourceSpecificationShape>();
+
+  function handleSetRsEdit(resourceSpec: ResourceSpecificationShape) {
+    console.log('handleSetRsEdit ', resourceSpec);
+    setRsEdit(resourceSpec);
+  }
 
   function piHandler(event) {
     const store = getDataStore();
@@ -76,7 +81,7 @@ const App: React.FC<Props> = () => {
               <Routes>
                 <Route
                     path="/"
-                    element={<Home setEdit={() => setRSEdit}/>}>
+                    element={<Home setEdit={handleSetRsEdit}/>}>
                   </Route>
 
                   <Route
