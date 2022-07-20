@@ -1,6 +1,6 @@
 import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { getLastPart, PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
@@ -10,19 +10,23 @@ import { Process } from '../../data/models/Valueflows/Plan';
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
-  agents: Array<Agent>
-  updateDisplayState: (id: string, type: string) => void
+  agents: Array<Agent>,
+  updateDisplayState: (id: string, type: string) => void,
+  setEdit: () => void
 }
 
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
   processSpecifications,
   agents,
-  updateDisplayState
+  updateDisplayState,
+  setEdit
 }) => {
 
   const [open, setOpen] = useState(false);
   const [dependentCount, setDependentCount] = useState<number>();
+
+  const navigate = useNavigate();
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
@@ -55,12 +59,16 @@ const Pallet: React.FC<Props> = ({
           <PalletNode
             thing={item}
             onClick={palletNodeDeleteHandler}
+            onDoubleClick={palletNodeEditHandler}
             type={type}
           />
         </div>
       )));
     }
-    return (<p style={{textAlign: "center"}}>No items</p>);
+    if (type === 'resourceSpecification') {
+      return (<p style={{textAlign: "center", color: '#9E9E9E'}}>Click [+] to begin</p>);
+    }
+    return (<><br></br></>);
   }
 
   function renderAgents(list: Array<any>, type: string) {
@@ -72,17 +80,29 @@ const Pallet: React.FC<Props> = ({
           <PalletNode
             thing={item}
             onClick={palletNodeDeleteHandler}
+            onDoubleClick={palletNodeEditHandler}
             type={type}
           />
         </div>
       )));
     }
-    return (<p style={{textAlign: "center"}}>No items</p>);
+    return (<></>);
+  }
+
+  function palletNodeEditHandler(event, id: string, type: string) {
+    const store = getDataStore();
+    if (event.detail === 2) {
+      console.log('doubleclick');
+      // set edit state in App.tsx
+      let entity = store.getById(id);
+      setEdit(entity);
+      navigate('/resources/edit');
+    }
   }
 
   function palletNodeDeleteHandler(event, id: string, type: string) {
     const store = getDataStore();
-    if (event.shiftKey) {
+    if (event.altKey) {
       // check to see if it is in use
       let displayNodes: DisplayNode[] = store.getDisplayNodes(store.getCurrentPlanId());
       let matchedNodes: DisplayNode[] = [];

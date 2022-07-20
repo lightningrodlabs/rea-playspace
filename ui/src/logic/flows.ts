@@ -170,7 +170,7 @@ export const validateFlow = (sourceType: string, targetType: string): boolean =>
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
 export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
-  let label = "Well, this is embrassing. I couldn't make a label.";
+  let label = "Reticualting splines...";
 
   let action = new Action({
     id: 'na',

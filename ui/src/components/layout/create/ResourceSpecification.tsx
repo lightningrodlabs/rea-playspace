@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge";
+import { ResourceSpecification as RS } from "../../../data/models/Valueflows/Knowledge";
 import MainPanelHeader from "../MainPanelHeader";
 import getDataStore from "../../../data/DataStore";
-import { UnitShape } from "../../../types/valueflows";
+import { ResourceSpecificationShape, UnitShape } from "../../../types/valueflows";
 
-export type NewResourceSpecificationProps = {
+export type ResourceSpecificationProps = {
+  edit: ResourceSpecificationShape
 }
 
 const initialState = {
@@ -17,12 +18,24 @@ const initialState = {
   defaultUnitOfResource: '',
   defaultUnitOfEffort: '',
   note: ''
-}
+};
 
-const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => {
+const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => {
   const [
     {name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
+  console.log('edit', edit);
+
+  if(edit) {
+    setState({
+      name: edit.name,
+      image: edit.image,
+      resourceClassifiedAs: edit.resourceClassifiedAs,
+      defaultUnitOfResource: edit.defaultUnitOfResource,
+      defaultUnitOfEffort: edit.defaultUnitOfEffort,
+      note: edit.note
+    })
+  } 
 
   const [units, setUnits] = useState<UnitShape[]>([]);
 
@@ -51,7 +64,7 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const store = getDataStore();
-    const rs: ResourceSpecification =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
+    const rs: RS =  new RS({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
     store.set(rs);
     clearState();
     navigate('/');
@@ -133,4 +146,4 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
   );
 };
 
-export default NewResourceSpecification;
+export default ResourceSpecification;

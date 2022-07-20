@@ -6,7 +6,7 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import NewAgent from "./components/layout/create/NewAgent";
-import NewResourceSpecification from "./components/layout/create/NewResourceSpecification";
+import ResourceSpecification from "./components/layout/create/ResourceSpecification";
 import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
 import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
@@ -17,6 +17,7 @@ import {
 import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
+import { ResourceSpecificationShape } from "./types/valueflows";
 
 Modal.setAppElement("#root");
 
@@ -28,6 +29,7 @@ interface Props {}
 
 const App: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
+  const [rsEdit, setRSEdit] = useState<ResourceSpecificationShape>();
 
   function piHandler(event) {
     const store = getDataStore();
@@ -74,7 +76,7 @@ const App: React.FC<Props> = () => {
               <Routes>
                 <Route
                     path="/"
-                    element={<Home />}>
+                    element={<Home setEdit={() => setRSEdit}/>}>
                   </Route>
 
                   <Route
@@ -83,7 +85,11 @@ const App: React.FC<Props> = () => {
                   />
                   <Route
                     path="/resources/new"
-                    element={<NewResourceSpecification />}
+                    element={<ResourceSpecification edit={rsEdit} />}
+                  />
+                  <Route
+                    path="/resources/edit"
+                    element={<ResourceSpecification edit={rsEdit} />}
                   />
                   <Route
                     path="/processes/new"
