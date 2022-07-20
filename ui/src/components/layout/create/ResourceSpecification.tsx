@@ -26,17 +26,6 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => 
   ] = useState(initialState);
   console.log('edit', edit);
 
-  if(edit) {
-    setState({
-      name: edit.name,
-      image: edit.image,
-      resourceClassifiedAs: edit.resourceClassifiedAs,
-      defaultUnitOfResource: edit.defaultUnitOfResource,
-      defaultUnitOfEffort: edit.defaultUnitOfEffort,
-      note: edit.note
-    })
-  } 
-
   const [units, setUnits] = useState<UnitShape[]>([]);
 
   const navigate = useNavigate();
@@ -44,6 +33,16 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => 
   useEffect(() => {
     const store = getDataStore();
     setUnits(store.getUnits());
+    if (edit) {
+      setState({
+        name: edit.name ? edit.name : '',
+        image: edit.image ? edit.image : '',
+        resourceClassifiedAs: edit.resourceClassifiedAs ? edit.resourceClassifiedAs : '',
+        defaultUnitOfResource: edit.defaultUnitOfResource ? edit.defaultUnitOfResource : '',
+        defaultUnitOfEffort: edit.defaultUnitOfEffort ? edit.defaultUnitOfEffort : '',
+        note: edit.note ? edit.note : ''
+      })
+    };
   }, []);
 
   const clearState = () => {

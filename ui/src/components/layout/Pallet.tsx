@@ -12,7 +12,7 @@ interface Props {
   processSpecifications: Array<ProcessSpecification>,
   agents: Array<Agent>,
   updateDisplayState: (id: string, type: string) => void,
-  setEdit: () => void
+  setEdit: (entity: any) => void
 }
 
 const Pallet: React.FC<Props> = ({
@@ -92,10 +92,9 @@ const Pallet: React.FC<Props> = ({
   function palletNodeEditHandler(event, id: string, type: string) {
     const store = getDataStore();
     if (event.detail === 2) {
-      console.log('doubleclick');
       // set edit state in App.tsx
       let entity = store.getById(id);
-      setEdit(entity);
+      setEdit(entity); // is this working?
       navigate('/resources/edit');
     }
   }
