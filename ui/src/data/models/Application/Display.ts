@@ -130,6 +130,8 @@ export class DisplayEconomicEvent {
   resourceConformsTo?: string;      // ResourceSprecification name
   resourceQuantity?: MeasurementShape;
   effortQuantity?: MeasurementShape;
+  inputOf?: string                       // process name
+  outputOf?: string                     // process name  
 
   constructor(init: EconomicEventShape) {
     this.id = this.id ? this.id : Guid.raw();
@@ -156,6 +158,16 @@ export class DisplayEconomicEvent {
       this.resourceConformsTo = (await dataStore.getById(init.resourceConformsTo)).name;
     } else {
       this.resourceConformsTo = null;
+    }
+    if (init.inputOf) {
+      this.inputOf = (await dataStore.getById(init.inputOf)).name;
+    } else {
+      this.inputOf = null;
+    }
+    if (init.outputOf) {
+      this.outputOf = (await dataStore.getById(init.outputOf)).name;
+    } else {
+      this.outputOf = null;
     }
   }
 }
