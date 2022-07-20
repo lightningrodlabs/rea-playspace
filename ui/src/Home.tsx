@@ -4,9 +4,11 @@ import Pallet from "./components/layout/Pallet";
 import { Agent, ProcessSpecification, ResourceSpecification } from "./data/models/Valueflows/Knowledge";
 import getDataStore from "./data/DataStore"
 
-interface Props {}
+interface Props {
+  setEdit: (entity: any) => void;
+}
 
-const Home: React.FC<Props> = () => {
+const Home: React.FC<Props> = ({setEdit}) => {
   const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
   const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -37,6 +39,7 @@ const Home: React.FC<Props> = () => {
         processSpecifications={processSpecifications}
         agents={agents}
         updateDisplayState={updateDisplayState}
+        setEdit={setEdit}
       />
       <FlowCanvas />
     </div>
