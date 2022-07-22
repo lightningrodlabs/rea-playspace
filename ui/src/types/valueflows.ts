@@ -13,18 +13,18 @@ export interface HasTime {
 }
 
 export interface ReaBase {
-  provider: string;                   // Agent ID
-  receiver: string;                   // Agent ID
-  resourceInventoriedAs?: string;     // ResourceSprecification ID
-  resourceConformsTo?: string;        // ResourceSprecification ID
+  provider: string | AgentShape;                              // Agent ID or object
+  receiver: string | AgentShape;                              // Agent ID or object
+  resourceInventoriedAs?: string | EconomicResourceShape;     // EconomicResource ID or object
+  resourceConformsTo?: string | ResourceSpecificationShape;   // ResourceSprecification ID or object
   resourceQuantity?: MeasurementShape;
   effortQuantity?: MeasurementShape;
-  resourceClassifiedAs?: string;      // General classification or grouping
+  resourceClassifiedAs?: string;                              // General classification or grouping
   inScopeOf?: string;
 }
 
 export interface HasAction {
-  action: string;
+  action: string | ActionShape;
 }
 
 // Knowledge
@@ -93,8 +93,8 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
   agreedIn?: string;
   atLocation?: GeoDataShape;
   state?: string;
-  inputOf?: string;
-  outputOf?: string;
+  inputOf?: string | ProcessShape;
+  outputOf?: string | ProcessShape;
 }
 
 // Observation
@@ -123,9 +123,9 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
   atLocation?: GeoDataShape;
   toLocation?: GeoDataShape;
   state?: string;
-  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as.
-  inputOf?: string;
-  outputOf?: string;
+  toResourceInventoriedAs?: string | EconomicResourceShape; // EconomicResource ID that the transfer will be inventoried as.
+  inputOf?: string | ProcessShape;
+  outputOf?: string | ProcessShape;
 }
 
 export interface FulfillmentShape extends HasIdDate {
@@ -159,5 +159,5 @@ export interface UnitShape {
 
 export interface MeasurementShape {
   hasNumericalValue: number | string;  // actual quantity
-  hasUnit: string;            // ID of unit
+  hasUnit: string | UnitShape;            // ID of unit
 }

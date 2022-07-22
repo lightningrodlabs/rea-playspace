@@ -1,7 +1,7 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
 import getDataStore from "../../data/DataStore";
-import { getProfileNameById } from "../../data/ProfilesStore";
+import { Action, Unit } from "../../data/models/Valueflows/Knowledge";
 import { ActionShape, AgentShape, EconomicEventShape, ProcessShape, ResourceSpecificationShape } from "../../types/valueflows";
 
 export type Props = {
@@ -20,45 +20,66 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
       resourceQuantity,
       effortQuantity,
       inputOf, 
-      outputOf}, setState
+      outputOf
+    }, setState
   ] = useState<EconomicEventShape>(economicEvent);
 
   useEffect(()=>{
     getNamesForId();
   },[]);
   
-  const getNamesForId = async (): Promise<void> => {
+  const getNamesForId = (): void => {
     const dataStore = getDataStore();
+    
+    const stateCopy = { 
+      id,
+      created,
+      action,
+      provider, 
+      receiver, 
+      resourceConformsTo,
+      resourceQuantity,
+      effortQuantity,
+      inputOf, 
+      outputOf
+    };
+    
+    const actions: Action[] = dataStore.getActions();
+    // Get the action
 
-    if (action) {
-      const actionObj = await getProfileNameById(action as string);
-      setState(prevState => ({ ...prevState, action: actionObj}));
+    if (action && action != undefined) {
+      stateCopy.action = actions.find((a) => a.id == action);
     }
 
-    if (provider) {
-      const providerObj = await getProfileNameById(provider as string);
-      setState(prevState => ({ ...prevState, provider: providerObj}));
+    if (provider && provider != undefined) {
+      stateCopy.provider = dataStore.getById(provider as string);
     }
 
-    if (receiver) {
-      const receiverObj = await getProfileNameById(receiver as string);
-      setState(prevState => ({ ...prevState, receiver: receiverObj}));
+    if (receiver && receiver != undefined) {
+      stateCopy.receiver = dataStore.getById(receiver as string);
     } 
 
-    if (resourceConformsTo) {
-      const resourceConformsToObj = await dataStore.getById(resourceConformsTo as string);
-      setState(prevState => ({ ...prevState, resourceConformsTo: resourceConformsToObj}));
+    if (resourceConformsTo && resourceConformsTo != undefined) {
+      stateCopy.resourceConformsTo = dataStore.getById(resourceConformsTo as string);
     }
 
-    if (inputOf) {
-      const inputOfObj = await dataStore.getById(inputOf as string);
-      setState(prevState => ({ ...prevState, inputOf: inputOfObj}));
+    if (inputOf && inputOf != undefined) {
+      stateCopy.inputOf = dataStore.getById(inputOf as string);
     } 
 
-    if (outputOf) {
-      const outputOfObj = await dataStore.getById(outputOf as string);
-      setState(prevState => ({ ...prevState, outputOf: outputOfObj}));
+    if (outputOf && outputOf != undefined) {
+      stateCopy.outputOf = dataStore.getById(outputOf as string);
     }
+
+    const units = dataStore.getUnits();
+    if (resourceQuantity && resourceQuantity != undefined && resourceQuantity.hasUnit && resourceQuantity.hasUnit != undefined) {
+      resourceQuantity.hasUnit = units.find((unit) => unit.id == resourceQuantity.hasUnit);
+    }
+
+    if (resourceQuantity && effortQuantity != undefined && effortQuantity.hasUnit && effortQuantity.hasUnit != undefined) {
+      effortQuantity.hasUnit = units.find((unit) => unit.id == effortQuantity.hasUnit);
+    }
+    setState(stateCopy);
   }
 
   const assembleCard = () => {
@@ -66,20 +87,20 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
     body += (`Date: ${new Date(created).toISOString().split('T')[0]} `);
     if (resourceQuantity && resourceQuantity.hasNumericalValue) {
       body += (`, ${(action as ActionShape).label}: `);
-      body += (`${resourceQuantity.hasNumericalValue} ${resourceQuantity.hasUnit} of ${(resourceConformsTo as ResourceSpecificationShape).name}  `);
+      body += (`${resourceQuantity.hasNumericalValue} ${(resourceQuantity.hasUnit as Unit).symbol} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
     }
     if (effortQuantity && effortQuantity.hasNumericalValue) {
       body += (`, ${(action as ActionShape).label}: `);
-      body += (`${effortQuantity.hasNumericalValue} ${effortQuantity.hasUnit} of ${(resourceConformsTo as ResourceSpecificationShape).name} `);
+      body += (`${effortQuantity.hasNumericalValue} ${(effortQuantity.hasUnit as Unit).symbol} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
     }
     if (provider) {
-      body += (`, Provider: ${(provider as AgentShape).name} `);
+      body += (`, Provider: ${(provider as AgentShape).name}`);
     }
     if (receiver) {
-      body += (`, Receiver: ${(receiver as AgentShape).name} `);
+      body += (`, Receiver: ${(receiver as AgentShape).name}`);
     }
     if (inputOf) {
-      body += (`, Input Of: ${(inputOf as ProcessShape).name} `);
+      body += (`, Input Of: ${(inputOf as ProcessShape).name}`);
     }
     if (outputOf) {
       body += (`, Output Of: ${(outputOf as ProcessShape).name}`);
