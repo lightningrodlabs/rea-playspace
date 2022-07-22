@@ -49,7 +49,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
-      <SlCard className="create-resource">
+      <SlCard className="create-resource scrollable-view">
       <form onSubmit={handleSubmit}>
       <br />
         <br />
