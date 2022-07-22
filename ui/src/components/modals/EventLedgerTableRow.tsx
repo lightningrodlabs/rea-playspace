@@ -87,7 +87,6 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
     body += (`Date: ${new Date(created).toISOString().split('T')[0]} `);
     if (resourceQuantity && resourceQuantity.hasNumericalValue) {
       body += (`, ${(action as ActionShape).label}: `);
-      console.log(resourceQuantity.hasUnit);
       body += (`${resourceQuantity.hasNumericalValue} ${(resourceQuantity.hasUnit as Unit).name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
     }
     if (effortQuantity && effortQuantity.hasNumericalValue) {
