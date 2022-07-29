@@ -20,6 +20,7 @@
     "electron-install": "cd electron && pnpm install",
     "// ## HOLOCHAIN ##": "",
     "hc:redo": "pnpm run happ-reset && pnpm run happ-run",
+    "hc:redo2": "pnpm run happ-reset && pnpm run happ-run2",
     "happ-pack": "bash scripts/happ-pack.sh",
     "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
     "happ-run": "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",

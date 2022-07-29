@@ -127,7 +127,7 @@ const App: React.FC<Props> = () => {
     <div>
       <ProfilesContext store={store}>
         <ProfilePrompt>
-          <Main />
+            <Main />
         </ProfilePrompt>
       </ProfilesContext>
     </div>

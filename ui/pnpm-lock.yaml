@@ -1,10 +1,10 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@holochain-open-dev/cell-client': 0.5.3
+  '@holochain-open-dev/cell-client': 0.6.1
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': ^0.2.0
-  '@holochain-open-dev/profiles': 0.3.2
+  '@holochain-open-dev/profiles': 0.4.1
   '@holochain/client': ^0.6.0
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': ^2.7.2
@@ -39,10 +39,10 @@ specifiers:
   ws: ^8.5.0
 
 dependencies:
-  '@holochain-open-dev/cell-client': 0.5.3_ws@8.5.0
+  '@holochain-open-dev/cell-client': 0.6.1_ws@8.5.0
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
-  '@holochain-open-dev/profiles': 0.3.2_ws@8.5.0
+  '@holochain-open-dev/profiles': 0.4.1_ws@8.5.0
   '@holochain/client': 0.6.0_ws@8.5.0
   '@lit-labs/react': 1.0.4
   '@msgpack/msgpack': 2.7.2
@@ -394,10 +394,10 @@ packages:
     resolution: {integrity: sha512-Dn5pTV/m3XaK1Zvq3liw/vQUt7goM7Y84x2zUyH8cb9CNMs4kPCNHs3kalbJZ/ymzFvwcdiLwwNW8AKk+WWN5A==}
     dev: false
 
-  /@holochain-open-dev/cell-client/0.5.3_ws@8.5.0:
-    resolution: {integrity: sha512-OEbRCRLRXgPAfvIOg7PCsKaSrUzRA74jysUGZqqzX60mBFqLbesvUH7UZHCV6oiDW8DLHBZbGEHYfguiWjjadw==}
+  /@holochain-open-dev/cell-client/0.6.1_ws@8.5.0:
+    resolution: {integrity: sha512-5P/0g2gL8iYecXxTtIMp/0Es1dXJzdPjivh3/XG8idKpFVPzGyd3Vp2adzqMPOhg5KRGsDDyfAxoohYLVGtplQ==}
     dependencies:
-      '@holochain/client': 0.4.1_ws@8.5.0
+      '@holochain/client': 0.6.0_ws@8.5.0
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - encoding
@@ -422,19 +422,19 @@ packages:
       - ws
     dev: false
 
-  /@holochain-open-dev/profiles/0.3.2_ws@8.5.0:
-    resolution: {integrity: sha512-fyLHEcmZg6bqeqj/HJyc21Si1woiU7CnA5KJXBeGyqFDv3NdC7ONmcupjKpHX3y+TaGOwT/OaVUe8sVbUe9CoA==}
+  /@holochain-open-dev/profiles/0.4.1_ws@8.5.0:
+    resolution: {integrity: sha512-BmMwbt7yUKFkslfz1PKrXmuN6MoKFhXI6W7K10CGFC2BKFychefHoLiWfg7Agq2fchz5SYo3+FWT39xU0IWjMQ==}
     dependencies:
-      '@holochain-open-dev/cell-client': 0.5.3_ws@8.5.0
+      '@holochain-open-dev/cell-client': 0.6.1_ws@8.5.0
       '@holochain-open-dev/core-types': 0.2.0_ws@8.5.0
-      '@holochain-open-dev/utils': 0.0.14_ws@8.5.0
-      '@holochain/client': 0.4.1_ws@8.5.0
+      '@holochain-open-dev/utils': 0.2.4_ws@8.5.0
+      '@holochain/client': 0.6.0_ws@8.5.0
       '@lit-labs/context': 0.1.2
       '@lit/localize': 0.11.3
+      '@msgpack/msgpack': 2.7.2
       '@open-wc/scoped-elements': 2.1.1
       '@scoped-elements/material-web': 0.0.19
       '@scoped-elements/shoelace': 0.0.8
-      '@webcomponents/scoped-custom-element-registry': 0.0.5
       lit: 2.2.5
       lit-svelte-stores: 0.2.1
       lodash-es: 4.17.21
@@ -445,11 +445,12 @@ packages:
       - ws
     dev: false
 
-  /@holochain-open-dev/utils/0.0.14_ws@8.5.0:
-    resolution: {integrity: sha512-LBapOCSJ49nsIOtF9pDJC4OWt8DXpK9oStxOXWgwoESuEuP6E0pm4kxSNJIjxuGYahaIN5TbaznP6u+sI0WIzw==}
+  /@holochain-open-dev/utils/0.2.4_ws@8.5.0:
+    resolution: {integrity: sha512-jkMdSPGUeckt61kQAnk0V6eY2GnxXDjDvGqrHEYNZ+iyblrQImTUdMRHGhqijxGj7AILhDFs5d2suxY5do9+Zw==}
     dependencies:
       '@holo-host/identicon': 0.1.0
-      '@holochain/client': 0.3.2_ws@8.5.0
+      '@holochain/client': 0.6.0_ws@8.5.0
+      '@msgpack/msgpack': 2.7.2
       '@open-wc/scoped-elements': 2.1.1
       '@scoped-elements/material-web': 0.0.19
       '@scoped-elements/shoelace': 0.0.8
@@ -458,6 +459,7 @@ packages:
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - encoding
+      - eslint
       - ws
     dev: false
 
@@ -469,23 +471,6 @@ packages:
       isomorphic-ws: 4.0.1_ws@8.5.0
     transitivePeerDependencies:
       - encoding
-      - ws
-    dev: false
-
-  /@holochain/client/0.4.1_ws@8.5.0:
-    resolution: {integrity: sha512-YCz1IEWL/e7qSo3l0Z7rKmnZk6tm8CSqZ3RplFZxw0wCfTb2cdI+/LgU4TLnRdutCsIOGUJ25ZCpXjHztb33Dg==}
-    engines: {node: ^14.13.1 || >=16.0.0 || >=18.0.0}
-    dependencies:
-      '@msgpack/msgpack': 2.7.2
-      cross-fetch: 3.1.5
-      eslint-config-prettier: 8.5.0
-      eslint-plugin-prettier: 4.0.0_ea1eeaadaf203da9735bd1eacb520c93
-      eslint-plugin-tsdoc: 0.2.16
-      isomorphic-ws: 4.0.1_ws@8.5.0
-      prettier: 2.7.1
-    transitivePeerDependencies:
-      - encoding
-      - eslint
       - ws
     dev: false
 
@@ -1607,10 +1592,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@webcomponents/scoped-custom-element-registry/0.0.5:
-    resolution: {integrity: sha512-vtlIyf+b657A1MWY69uTTJaGYwqUS3Lnm0+n2vLyuVf5MYOwSOB3Mx42AyBxz/6t9gw+IDelm1HQFOiA1xZCEQ==}
-    dev: false
 
   /ajv/6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}

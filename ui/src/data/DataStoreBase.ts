@@ -5,6 +5,7 @@ import { getLastPart, getParentPath, getRustNodePath, PathedData } from "./model
 import { ObjectTransformations } from "./models/ObjectTransformations";
 import { Root, RootShape } from "./models/Application/Root";
 import { Action, Fiber } from "../lib/fiber";
+import { overwriteFields } from "../utils";
 
 /**
  * Data store object
@@ -22,6 +23,10 @@ export class DataStoreBase {
     this.fiber = new Fiber<void>();
     this.root = new Root();
     this.pathIndex = new Map<string, string>();
+  }
+
+  public getRoot(): Root {
+    return this.root;
   }
 
   /**
@@ -73,10 +78,28 @@ export class DataStoreBase {
    * @returns
    */
   public async fetch(path: string): Promise<PathedData> {
+    console.log('path', path);
     const res = await this.zomeApi.get_thing(path);
     this.hydrateFromZome(res);
     return this.getCursor(path);
   }
+
+    /**
+   * Fetches a single terminal object given its full path when triggered by a p2p signal.
+   *
+   * TODO: Should we schedule these for execution after all updates have been made?
+   *
+   * @param path
+   * @returns
+   */
+     public async fetchFromSignal(path: string): Promise<void> {
+      console.log('path', path);
+      const res = await this.zomeApi.get_thing(path);
+      this.hydrateFromZome(res);
+      const freshRoot = new Root(this.root);
+      overwriteFields<Root, Root>(this.root, freshRoot);
+      this.root = freshRoot;
+    }
 
   /**
    * Fetches all of the entries under a particular path
@@ -102,6 +125,9 @@ export class DataStoreBase {
     };
     return async () => {
       await this.zomeApi.put_thing(itemThing);
+      console.log('signal start');
+      await this.zomeApi.signal_call(item.path);
+      console.log('signal end');
       return;
     }
   }

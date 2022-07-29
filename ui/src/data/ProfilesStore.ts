@@ -1,7 +1,7 @@
 import { CellClient } from "@holochain-open-dev/cell-client";
 import { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
-import { AgentProfile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
-import { InstalledCell } from "@holochain/client";
+import { AgentProfile, Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { AgentPubKey, InstalledCell } from "@holochain/client";
 import { getHolochainClient } from "../hcWebsockets";
 import { APP_ID } from "../holochainConf";
 
@@ -39,8 +39,4 @@ export function getMyProfile() {
 
 export function setMyProfile(profile: AgentProfile) {
   myProfile = profile;
-}
-
-export async function getProfileNameById(id: AgentPubKeyB64) {
-  return (await profilesService.getAgentProfile(id)).profile.nickname;
 }

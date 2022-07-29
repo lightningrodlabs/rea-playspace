@@ -3,6 +3,7 @@
 # add any additional zomes here, in the same way
 cargo build --release --target wasm32-unknown-unknown --manifest-path happ/zomes/projects/Cargo.toml
 cargo build --release --target wasm32-unknown-unknown --manifest-path happ/zomes/profiles/Cargo.toml
+cargo build --release --target wasm32-unknown-unknown --manifest-path happ/zomes/ping/Cargo.toml
 
 # Pack DNAs
 # add any additional dnas here, in the same way

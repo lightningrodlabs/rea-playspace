@@ -21,5 +21,10 @@ export default class ZomeApi {
     await this.client.callZome(getCellId(), 'projects', 'delete_thing', path_str);
     return;
   }
+
+  public async signal_call (path: String): Promise<void> {
+    await this.client.callZome(getCellId(), 'ping', 'ui_updated', path);
+    return;
+  }
 }
 
