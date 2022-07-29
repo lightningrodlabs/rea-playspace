@@ -1,11 +1,17 @@
-import { createContext, useReducer } from 'react';
+import { useReducer } from 'react';
 import { StraightEdge } from 'react-flow-renderer';
 import { ResourceSpecificationShape } from '../types/valueflows';
 import Context from './context';
 import { reducer, actions, initialState } from './reducers';
 
+export default React.createContext({
+  state: {},
+  addResourceSpec: resourceSpec => {},
+  updateResourceSpec: resourceSpec => {},
+  deleteResourceSpec: resourceSpecId => {}
+});
 
-const GlobalState  {
+const GlobalState = ({children}) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -27,18 +33,18 @@ const GlobalState  {
     }, 700);
   };
 
-  // return (
-  //   <Context.Provider
-  //     value={{
-  //       state: state,
-  //       addResourceSpec: addResourceSpecification,
-  //       updateResourceSpec: updateResourceSpecification,
-  //       deleteResourceSpec: deleteResourceSpecification
-  //     }}
-  //   >
-  //     {children}
-  //   </Context.Provider>
-  // );
+  return (
+    <Context.Provider
+      value={{
+        state: state,
+        addResourceSpec: addResourceSpecification,
+        updateResourceSpec: updateResourceSpecification,
+        deleteResourceSpec: deleteResourceSpecification
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
 };
 
 export default GlobalState;
