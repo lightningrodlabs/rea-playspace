@@ -21,13 +21,13 @@ interface Props {
 const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterward}) => {
   const [commitmentOpen, setCommitmentOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
-  const [commitment, setCommitment] = useState(null as Commitment);
-  const [events, setEvents] = useState(new Array<EconomicEvent>());
-  const [event, setEvent] = useState(null as EconomicEvent);
-  const [initial, setInitial] = useState(null as FlowShape);
-  const [agents, setAgents] = useState(new Array<Agent>());
-  const [actions, setActions] = useState(new Array<Action>());
-  const [units, setUnits] = useState(new Array<Unit>());
+  const [commitment, setCommitment] = useState<Commitment>();
+  const [events, setEvents] = useState<Array<EconomicEvent>>([]);
+  const [event, setEvent] = useState<EconomicEvent>();
+  const [initial, setInitial] = useState<FlowShape>();
+  const [agents, setAgents] = useState<Array<Agent>>([]);
+  const [actions, setActions] = useState<Array<Action>>([]);
+  const [units, setUnits] = useState<Array<Unit>>([]);
 
   // store updates to flows until saving or discarding
   let commitmentUpdates = null;
@@ -81,7 +81,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const getProvider = (flow: FlowShape) => {
     const store = getDataStore();
     if (flow && flow.provider) {
-      return store.getById(flow.provider);
+      return store.getById(flow.provider as string);
     }
     return null;
   };
@@ -92,7 +92,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const getReceiver = (flow: FlowShape) => {
     const store = getDataStore();
     if (flow && flow.receiver) {
-      return store.getById(flow.receiver);
+      return store.getById(flow.receiver as string);
     }
     return null;
   };
@@ -103,9 +103,9 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const getConformingResource = (flow: FlowShape) => {
     const store = getDataStore();
     if (flow && flow.resourceConformsTo) {
-      return store.getById(flow.resourceConformsTo);
+      return store.getById(flow.resourceConformsTo as string);
     } else {
-      return store.getById(initial.resourceConformsTo);
+      return store.getById(initial.resourceConformsTo as string);
     }
   };
 

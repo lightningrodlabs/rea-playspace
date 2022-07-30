@@ -58,7 +58,8 @@
 }
 
 .create-resource {
-  width: 40%;
+  width: 50%;
+  max-height: 80vh;
 }
 
 .resource-list-header {
@@ -329,6 +330,10 @@
 }
 
 /* form controls */
+
+.scrollable-view {
+  overflow-y: scroll;
+}
 
 .form-heading {
   display: inline-flex;
