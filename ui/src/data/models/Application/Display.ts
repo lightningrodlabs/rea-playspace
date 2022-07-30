@@ -3,6 +3,9 @@ import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, fieldsToJSON } from '../../../utils';
+import { EconomicEventShape, GeoDataShape, MeasurementShape } from "../../../types/valueflows";
+import getDataStore from "../../DataStore";
+import { getProfileNameById } from "../../ProfilesStore";
 
 export interface DisplayNodeShape {
   id?: string;

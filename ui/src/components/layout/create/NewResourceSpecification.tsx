@@ -65,70 +65,70 @@ const NewResourceSpecification: React.FC<NewResourceSpecificationProps> = () => 
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
-      <SlCard className="create-resource">
-      <form onSubmit={handleSubmit}>
-        <br />
-        <SlInput
-          required
-          label="Name"
-          name="name"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={name}
+        <SlCard className="create-resource scrollable-view">
+          <form onSubmit={handleSubmit}>
+            <br />
+            <SlInput
+              required
+              label="Name"
+              name="name"
+              // @ts-ignore
+              onSlInput={onChange}
+              value={name}
 
-        />
-        <br />
-        <SlInput
-          label="Image"
-          name="image"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={image}
+            />
+            <br />
+            <SlInput
+              label="Image"
+              name="image"
+              // @ts-ignore
+              onSlInput={onChange}
+              value={image}
 
-        />
-        <br />
-        <SlInput
-          label='Resource Classified As'
-          name='resourceClassifiedAs'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={resourceClassifiedAs}
+            />
+            <br />
+            <SlInput
+              label='Resource Classified As'
+              name='resourceClassifiedAs'
+              // @ts-ignore
+              onSlInput={onChange}
+              value={resourceClassifiedAs}
 
-        />
-        <br />
-        <SlSelect
-          label='Default Unit Of Resource'
-          name='defaultUnitOfResource'
-          // @ts-ignore
-          onSlChange={onChange}
-          value={defaultUnitOfResource}
-        >
-          {units.map((unit) => (<SlMenuItem key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
-        </SlSelect>
-        <br />
-        <SlSelect
-          label='Default Unit Of Effort'
-          name='defaultUnitOfEffort'
-          // @ts-ignore
-          onSlChange={onChange}
-          value={defaultUnitOfEffort}
-        >
-          {units.map((unit) => (<SlMenuItem key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
-        </SlSelect>
-        <br />
-        <SlTextarea
-          label='Note'
-          name='note'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={note}
-        />
-        <br />
-        <SlButton type="submit" variant="primary">
-          Create
-        </SlButton>
-      </form>
-    </SlCard>
+            />
+            <br />
+            <SlSelect
+              label='Default Unit Of Resource'
+              name='defaultUnitOfResource'
+              // @ts-ignore
+              onSlChange={onChange}
+              value={defaultUnitOfResource}
+            >
+              {units.map((unit) => (<SlMenuItem key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+            </SlSelect>
+            <br />
+            <SlSelect
+              label='Default Unit Of Effort'
+              name='defaultUnitOfEffort'
+              // @ts-ignore
+              onSlChange={onChange}
+              value={defaultUnitOfEffort}
+            >
+              {units.map((unit) => (<SlMenuItem key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+            </SlSelect>
+            <br />
+            <SlTextarea
+              label='Note'
+              name='note'
+              // @ts-ignore
+              onSlInput={onChange}
+              value={note}
+            />
+            <br />
+            <SlButton type="submit" variant="primary">
+              Create
+            </SlButton>
+          </form>
+        </SlCard>
     </>
   );
 };

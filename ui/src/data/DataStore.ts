@@ -23,6 +23,7 @@ import { HasIdDate } from "../types/valueflows";
 import { PathedData } from "./models/PathedData";
 import { assignFields, overwriteFields } from "../utils";
 import { APP_ID } from "../holochainConf";
+import { EconomicEvent } from "./models/Valueflows/Observation";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
@@ -136,6 +137,12 @@ export class DataStore extends DataStoreBase {
 
   public async fetchResourceSpecifications() {
     return await this.fetchAll(ResourceSpecification.getPrefix());
+  }
+
+  // Economic Event helpers
+
+  public async fetchAllEconomicEvents(): Promise<Array<EconomicEvent>> {
+    return (await this.fetchAll("root.economicEvent")) as Array<EconomicEvent>;
   }
 
   // Agent helpers

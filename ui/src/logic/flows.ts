@@ -1,4 +1,3 @@
-
 // EDGE BUSINESS LOGIC
 
 import { Edge, MarkerType } from "react-flow-renderer";
@@ -143,7 +142,7 @@ export const flowUpdates = {
   'resourceSpecification-resourceSpecification': (flow: FlowShape, source: ResourceSpecification, target: ResourceSpecification): FlowShape => {
     const clone = {...flow};
     clone.resourceConformsTo = source.id;
-    clone.action = flow.action in ['transfer', 'transfer-all-rights', 'transfer-custody'] ? flow.action : 'transfer';
+    clone.action = flow.action as string in ['transfer', 'transfer-all-rights', 'transfer-custody'] ? flow.action : 'transfer';
     clone.inputOf = '';
     clone.outputOf = '';
     return clone;
@@ -203,7 +202,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
 
   // Get the action
   if (flow.action && flow.action !== null) {
-    action = actions.find((action) => action.id == flow.action);
+    action = actions.find((action) => action.id == flow.action as string);
   }
 
   /**
@@ -214,7 +213,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   // Use
   if (action.id == 'use' && flow.resourceQuantity != null && flow.effortQuantity != null) {
     resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit;
+    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
     resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
 
     // Don't show the unit for pieces;
@@ -224,7 +223,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
     }
 
     effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit;
+    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
     effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
 
     return `${action.label} ${resourceMeasurement.hasNumericalValue}${resourceSymbol} from ${provider.name} for ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
@@ -233,7 +232,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   // Only resourceQuantity
   if (flow.resourceQuantity != null && flow.effortQuantity == null) {
     resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit;
+    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
     resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
 
     label = `${action.label} ${resourceMeasurement.hasNumericalValue} ${resourceUnit.symbol}`;
@@ -242,7 +241,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   // Only effortQuantity
   if (flow.resourceQuantity == null && flow.effortQuantity != null) {
     effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit;
+    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
     effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
 
     label = `${action.label} ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
@@ -277,8 +276,8 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
     const flow: FlowShape = getFirstCommitmentOrEvent(displayEdge);
     const actions: Action[] = store.getActions();
     const units: Unit[] = store.getUnits();
-    const provider = store.getById(flow.provider);
-    const receiver = store.getById(flow.receiver);
+    const provider = store.getById(flow.provider as string);
+    const receiver = store.getById(flow.receiver as string);
     return getLabelForFlow(flow, provider, receiver, actions, units);
   } catch(err) {
     console.error(err);
