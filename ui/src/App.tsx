@@ -6,7 +6,6 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import NewAgent from "./components/layout/create/NewAgent";
-import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
 import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
 import Modal from "react-modal"
@@ -18,6 +17,7 @@ import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
 import { ResourceSpecificationShape } from "./types/valueflows";
 import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
+import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
 
 Modal.setAppElement("#root");
 
@@ -102,11 +102,11 @@ const App: React.FC<Props> = () => {
                   </Route>
                   <Route
                     path="/processes/new"
-                    element={<NewProcessSpecification />}
+                    element={<ProcessSpecificationView />}
                   />
                   <Route
                     path="/processes/edit">
-                    <Route path=":id" element={<NewProcessSpecification />} />
+                    <Route path=":id" element={<ProcessSpecificationView />} />
                   </Route>
                 </Routes>
             </div>
