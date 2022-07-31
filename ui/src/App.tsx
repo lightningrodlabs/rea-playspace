@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
-import NewAgent from "./components/layout/create/NewAgent";
 import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
 import Modal from "react-modal"
@@ -18,6 +17,7 @@ import { ProfilesContext } from "./elements";
 import { ResourceSpecificationShape } from "./types/valueflows";
 import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
 import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
+import AgentView from "./components/layout/create/AgentView";
 
 Modal.setAppElement("#root");
 
@@ -86,11 +86,11 @@ const App: React.FC<Props> = () => {
 
                   <Route
                     path="/agents/new"
-                    element={<NewAgent />}
+                    element={<AgentView />}
                   />
                   <Route
                     path="/agents/edit">
-                    <Route path=":id" element={<NewAgent />} />
+                    <Route path=":id" element={<AgentView />} />
                   </Route>
                   <Route
                     path="/resources/new"
