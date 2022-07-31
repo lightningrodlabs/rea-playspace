@@ -1,48 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ResourceSpecification as RS } from "../../../data/models/Valueflows/Knowledge";
+import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge";
 import MainPanelHeader from "../MainPanelHeader";
 import getDataStore from "../../../data/DataStore";
 import { ResourceSpecificationShape, UnitShape } from "../../../types/valueflows";
 
 export type ResourceSpecificationProps = {
-  edit: ResourceSpecificationShape
 }
 
-const initialState = {
-  name: '',
-  image: '',
-  resourceClassifiedAs: '',
-  defaultUnitOfResource: '',
-  defaultUnitOfEffort: '',
-  note: ''
-};
+const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
+  const initialState: ResourceSpecificationShape = {
+    name: '',
+    image: '',
+    resourceClassifiedAs: '',
+    defaultUnitOfResource: '',
+    defaultUnitOfEffort: '',
+    note: ''
+  };
 
-const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => {
   const [
     {name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
-  console.log('edit', edit);
 
   const [units, setUnits] = useState<UnitShape[]>([]);
 
   const navigate = useNavigate();
+  let { id } = useParams();
 
   useEffect(() => {
     const store = getDataStore();
     setUnits(store.getUnits());
-    if (edit) {
+    console.log('id', id);
+
+    if (id) {
+      const obj = store.getById(id);
       setState({
-        name: edit.name ? edit.name : '',
-        image: edit.image ? edit.image : '',
-        resourceClassifiedAs: edit.resourceClassifiedAs ? edit.resourceClassifiedAs : '',
-        defaultUnitOfResource: edit.defaultUnitOfResource ? edit.defaultUnitOfResource : '',
-        defaultUnitOfEffort: edit.defaultUnitOfEffort ? edit.defaultUnitOfEffort : '',
-        note: edit.note ? edit.note : ''
+        name: obj.name ? obj.name : '',
+        image: obj.image ? obj.image : '',
+        resourceClassifiedAs: obj.resourceClassifiedAs ? obj.resourceClassifiedAs : '',
+        defaultUnitOfResource: obj.defaultUnitOfResource ? obj.defaultUnitOfResource : '',
+        defaultUnitOfEffort: obj.defaultUnitOfEffort ? obj.defaultUnitOfEffort : '',
+        note: obj.note ? obj.note : ''
       })
     };
+    
   }, []);
 
   const clearState = () => {
@@ -63,8 +66,14 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const store = getDataStore();
-    const rs: RS =  new RS({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
-    store.set(rs);
+
+    const rs =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
+    if (id) {
+      rs.id = id;
+      store.upsert<ResourceSpecificationShape, ResourceSpecification>(rs, ResourceSpecification);
+    } else {
+      store.set(rs);
+    }
     clearState();
     navigate('/');
   }
@@ -137,7 +146,7 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => 
         />
         <br />
         <SlButton type="submit" variant="primary">
-          Create
+          {id ? 'Update' : 'Create'}
         </SlButton>
       </form>
     </SlCard>
@@ -145,4 +154,4 @@ const ResourceSpecification: React.FC<ResourceSpecificationProps> = ({edit}) => 
   );
 };
 
-export default ResourceSpecification;
+export default ResourceSpecificationView;

@@ -90,12 +90,22 @@ const Pallet: React.FC<Props> = ({
   }
 
   function palletNodeEditHandler(event, id: string, type: string) {
-    const store = getDataStore();
+    event.preventDefault();
     if (event.detail === 2) {
-      // set edit state in App.tsx
-      let entity = store.getById(id);
-      setEdit(entity); // is this working?
-      navigate('/resources/edit');
+      console.log('type', type);
+      switch (type) {
+        case 'resourceSpecification':
+          navigate(`/resources/edit/${id}`);
+          break;
+        case 'processSpecification':
+          navigate(`/processes/edit/${id}`);
+          break;
+        case 'agent':
+          navigate(`/agents/edit/${id}`);
+          break;
+        default:
+          console.log('nothing to do here');
+      }
     }
   }
 
