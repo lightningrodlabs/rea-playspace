@@ -92,7 +92,6 @@ const Pallet: React.FC<Props> = ({
   function palletNodeEditHandler(event, id: string, type: string) {
     event.preventDefault();
     if (event.detail === 2) {
-      console.log('type', type);
       switch (type) {
         case 'resourceSpecification':
           navigate(`/resources/edit/${id}`);
@@ -103,8 +102,6 @@ const Pallet: React.FC<Props> = ({
         case 'agent':
           navigate(`/agents/edit/${id}`);
           break;
-        default:
-          console.log('nothing to do here');
       }
     }
   }
