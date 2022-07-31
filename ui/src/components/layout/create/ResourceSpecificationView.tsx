@@ -32,8 +32,6 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
   useEffect(() => {
     const store = getDataStore();
     setUnits(store.getUnits());
-    console.log('id', id);
-
     if (id) {
       const obj = store.getById(id);
       setState({
@@ -49,7 +47,6 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
   }, []);
 
   const clearState = () => {
-    console.log('clearing')
     setState({ ...initialState });
   };
 

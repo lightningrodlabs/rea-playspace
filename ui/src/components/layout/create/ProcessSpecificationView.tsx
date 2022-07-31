@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
 import { ProcessSpecification } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
 import getDataStore from "../../../data/DataStore";
+import { ProcessSpecificationShape } from "../../../types/valueflows";
 
 export type NewProcessSpecificationProps = {}
 
@@ -19,11 +20,22 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   ] = useState(initialState);
 
   const navigate = useNavigate();
+  let { id } = useParams();
 
   const clearState = () => {
-    console.log('clearing')
     setState({ ...initialState });
   };
+
+  useEffect(() => {
+    if (id) {
+      const store = getDataStore();
+      const obj = store.getById(id);
+      setState({
+        name: obj.name ? obj.name : '',
+        note: obj.note ? obj.note : ''
+      })
+    };
+  }, []);
 
   const onChange = e => {
     const { name, value } = e.target;
@@ -32,11 +44,15 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    //getResourceSpecificationListSize();
-
     const store = getDataStore();
-    const ps: ProcessSpecification =  new ProcessSpecification({name, note});
-    store.set(ps);
+
+    const rs =  new ProcessSpecification({name, note});
+    if (id) {
+      rs.id = id;
+      store.upsert<ProcessSpecificationShape, ProcessSpecification>(rs, ProcessSpecification);
+    } else {
+      store.set(rs);
+    }
     clearState();
     navigate('/');
   }
@@ -72,7 +88,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
         />
         <br />
         <SlButton type="submit" variant="primary">
-          Create
+          { id ? 'Update' : 'Create' }
         </SlButton>
       </form>
     </SlCard>
