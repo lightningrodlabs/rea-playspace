@@ -6,6 +6,7 @@ import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge
 import MainPanelHeader from "../MainPanelHeader";
 import getDataStore from "../../../data/DataStore";
 import { ResourceSpecificationShape, UnitShape } from "../../../types/valueflows";
+import { DisplayNode, DisplayNodeShape } from "../../../data/models/Application/Display";
 
 export type ResourceSpecificationProps = {
 }
@@ -19,10 +20,12 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
     defaultUnitOfEffort: '',
     note: ''
   };
+  const store = getDataStore();
 
   const [
     {name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note}, setState
   ] = useState(initialState);
+  const [oldName, setOldName] = useState<string>('');
 
   const [units, setUnits] = useState<UnitShape[]>([]);
 
@@ -42,13 +45,26 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
         defaultUnitOfEffort: obj.defaultUnitOfEffort ? obj.defaultUnitOfEffort : '',
         note: obj.note ? obj.note : ''
       })
+      setOldName(obj.name);
     };
-    
   }, []);
 
   const clearState = () => {
     setState({ ...initialState });
+    setOldName('');
   };
+
+  const updateDependants = (): void => {
+    const displayNodes = store.getDisplayNodes(store.getCurrentPlanId());
+    displayNodes.forEach(ele => {
+      if (ele.type === 'resourceSpecification') {
+        if (ele.name === oldName) {
+          ele.name = name;
+        }
+      }
+      store.upsert<DisplayNodeShape, DisplayNode>(ele, DisplayNode);
+    });
+  }
 
   /**
    * Handle changes.
@@ -61,13 +77,13 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const store = getDataStore();
+    e.preventDefault();
 
     const rs =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
     if (id) {
       rs.id = id;
       store.upsert<ResourceSpecificationShape, ResourceSpecification>(rs, ResourceSpecification);
+      updateDependants();
     } else {
       store.set(rs);
     }

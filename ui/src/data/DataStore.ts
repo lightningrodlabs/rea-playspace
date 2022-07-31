@@ -219,8 +219,7 @@ export class DataStore extends DataStoreBase {
   public upsert<T extends HasIdDate, U extends PathedData> (updates: T, constructor: {new (init: any): U}): U {
     const store = getDataStore();
     let obj: U;
-
-    console.log('upserting: ', );
+    
     // We have an existing object, update it
     if (updates && updates.id && updates.id != null && updates.id != '') {
       obj = store.getById(updates.id);
