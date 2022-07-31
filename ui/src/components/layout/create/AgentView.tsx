@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
 import { Agent } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
 import getDataStore from "../../../data/DataStore";
 import { ListProfiles } from "../../../elements";
 import { getProfilesService } from "../../../data/ProfilesStore";
+import { AgentShape } from "../../../types/valueflows";
 
 export type NewAgentProps = {
 }
@@ -18,13 +19,27 @@ const initialState = {
   note: ''
 }
 
-const NewAgent: React.FC<NewAgentProps> = () => {
+const AgentView: React.FC<NewAgentProps> = () => {
   const [
     {name, image, primaryLocation, note}, setState
   ] = useState(initialState);
-
-
+  const store = getDataStore();
   const navigate = useNavigate();
+  let { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      const store = getDataStore();
+      const obj = store.getById(id);
+      console.log('obj', obj);
+      setState({
+        name: obj.name ? obj.name : '',
+        image: obj.image ? obj.image : '',
+        primaryLocation: obj.primaryLocation ? obj.primaryLocation : '',
+        note: obj.note ? obj.note : '',
+      })
+    };
+  }, []);
 
   const clearState = () => {
     setState({ ...initialState });
@@ -36,10 +51,8 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   };
 
   const handleAddAgentFromProfile = async (e: CustomEvent) => {
-    console.log('event: ', e);
     const agentPubKey = e.detail.agentPubKey;
     const agent = await getProfilesService().getAgentProfile(agentPubKey);
-    const store = getDataStore();
     await store.fetchAgents();
     const agent2 = store.getAgent(agentPubKey);
     if (agent2) {
@@ -59,10 +72,16 @@ const NewAgent: React.FC<NewAgentProps> = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     const store = getDataStore();
+
     const ag: Agent =  new Agent({name, note});
-    store.set(ag);
+
+    if (id) {
+      ag.id = id;
+      store.upsert<AgentShape, Agent>(ag, Agent);
+    } else {
+      store.set(ag);
+    }
     clearState();
     navigate('/');
   }
@@ -118,7 +137,7 @@ const NewAgent: React.FC<NewAgentProps> = () => {
           />
           <br />
           <SlButton type="submit" variant="primary">
-            Create
+            {id ? 'Update' : 'Create'}
           </SlButton>
         </form>
         </SlCard>
@@ -135,6 +154,6 @@ const NewAgent: React.FC<NewAgentProps> = () => {
   );
 };
 
-export default NewAgent;
+export default AgentView;
 
 
