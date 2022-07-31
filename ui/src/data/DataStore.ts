@@ -220,6 +220,7 @@ export class DataStore extends DataStoreBase {
     const store = getDataStore();
     let obj: U;
 
+    console.log('upserting: ', );
     // We have an existing object, update it
     if (updates && updates.id && updates.id != null && updates.id != '') {
       obj = store.getById(updates.id);

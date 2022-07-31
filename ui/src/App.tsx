@@ -6,7 +6,6 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import NewAgent from "./components/layout/create/NewAgent";
-import ResourceSpecification from "./components/layout/create/ResourceSpecification";
 import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
 import Pi from "./components/layout/Pi";
 import getDataStore from "./data/DataStore";
@@ -18,6 +17,7 @@ import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
 import { ResourceSpecificationShape } from "./types/valueflows";
+import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
 
 Modal.setAppElement("#root");
 
@@ -89,17 +89,25 @@ const App: React.FC<Props> = () => {
                     element={<NewAgent />}
                   />
                   <Route
+                    path="/agents/edit">
+                    <Route path=":id" element={<NewAgent />} />
+                  </Route>
+                  <Route
                     path="/resources/new"
-                    element={<ResourceSpecification edit={rsEdit} />}
+                    element={<ResourceSpecificationView />}
                   />
                   <Route
-                    path="/resources/edit"
-                    element={<ResourceSpecification edit={rsEdit} />}
-                  />
+                    path="/resources/edit">
+                    <Route path=":id" element={<ResourceSpecificationView />} />
+                  </Route>
                   <Route
                     path="/processes/new"
                     element={<NewProcessSpecification />}
                   />
+                  <Route
+                    path="/processes/edit">
+                    <Route path=":id" element={<NewProcessSpecification />} />
+                  </Route>
                 </Routes>
             </div>
           </div>
