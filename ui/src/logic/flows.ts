@@ -206,45 +206,56 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
   }
 
   /**
-   * All conditionals should be arranged from most specific to least specific.
-   * TODO: eventually we may just define templates per action per language
+   * Simple conditional for not showing 'piece'.
+   */
+  function mungeSymbol(unit: Unit) {
+    // Don't show the unit for pieces;
+    return unit.id !== 'piece' ? unit.symbol: '';
+  }
+
+  /**
+   * This turns a MeasurementShape into a string representation.
+   * TODO: if we ensure that `flow.{resource,effort}Quantity is a `Measurement`
+   *   we can move these functions onto the `Measurement` class.
+   */
+  function measumentString(quantity: MeasurementShape) {
+    resourceUnit = units.find((unit) => unit.id == quantity.hasUnit);
+    return `${quantity.hasNumericalValue} ${mungeSymbol(resourceUnit)}`;
+  }
+
+  /**
+   * Conditionals are arranged to contruct the string in order.
+   * TODO: see issue #72
    */
 
+  label = `${action.label} `;
+
+  // resourceQuantity
+  if (
+    flow.resourceQuantity != null
+    && typeof flow.resourceQuantity == 'object'
+    && flow.resourceQuantity.hasNumericalValue
+    && flow.resourceQuantity.hasUnit
+  ) {
+    label += measumentString(flow.resourceQuantity);
+  }
+
   // Use
-  if (action.id == 'use' && flow.resourceQuantity != null && flow.effortQuantity != null) {
-    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
-    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
+  if (action.id == 'use') {
+    label += ` from ${provider.name}`;
+  }
 
-    // Don't show the unit for pieces;
-    let resourceSymbol = '';
-    if (resourceUnit.id !== 'piece') {
-      resourceSymbol = ` ${resourceUnit.symbol}`;
+  // effortQuantity
+  if (
+    flow.effortQuantity != null
+    && typeof flow.effortQuantity == 'object'
+    && flow.effortQuantity.hasNumericalValue
+    && flow.effortQuantity.hasUnit
+  ) {
+    if (action.id = 'use') {
+      label += ' for ';
     }
-
-    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
-    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
-
-    return `${action.label} ${resourceMeasurement.hasNumericalValue}${resourceSymbol} from ${provider.name} for ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
-  }
-
-  // Only resourceQuantity
-  if (flow.resourceQuantity != null && flow.effortQuantity == null) {
-    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
-    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
-
-    label = `${action.label} ${resourceMeasurement.hasNumericalValue} ${resourceUnit.symbol}`;
-  }
-
-  // Only effortQuantity
-  if (flow.resourceQuantity == null && flow.effortQuantity != null) {
-    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
-    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
-
-    label = `${action.label} ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
+    label += measumentString(flow.effortQuantity);
   }
 
   // Transfer
