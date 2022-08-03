@@ -18,10 +18,10 @@ const Header: React.FC<HeaderProps> = () => {
         <SlButton variant="primary"outline >Ledger</SlButton>
       </Link>
       <div>
-        <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
-         </AgentAvatar> 
+        {/* <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
+         </AgentAvatar>  */}
         {" "}
-        {getMyProfile().profile.nickname.slice(0, 8)}
+        {/* {getMyProfile().profile.nickname.slice(0, 8)} */}
       </div>
     </div>
   );
