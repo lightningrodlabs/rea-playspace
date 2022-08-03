@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { app } from 'electron'
-import { HolochainRunnerOptions, StateSignal, PathOptions } from 'electron-holochain'
+import { ElectronHolochainOptions, StateSignal, PathOptions } from '@sprillow-connor/electron-holochain'
 
 const MAIN_APP_ID = 'rea-playspace'
 const COMMUNITY_PROXY_URL =
@@ -64,7 +64,7 @@ const BINARY_PATHS: PathOptions | undefined = app.isPackaged
   : undefined
 
 // These options are in use when the application is under development
-const devOptions: HolochainRunnerOptions = {
+const devOptions: ElectronHolochainOptions = {
   happPath: happPath, // preload
   datastorePath: path.join(__dirname, '../../', process.env.REA_PLAYSPACE_DATASTORE_PATH as string),
   appId: process.env.REA_PLAYSPACE_APP_ID,
@@ -72,11 +72,12 @@ const devOptions: HolochainRunnerOptions = {
   adminWsPort: Number.parseInt(process.env.REA_PLAYSPACE_ADMIN_WS_PORT),
   keystorePath: path.join(__dirname, '../../', process.env.REA_PLAYSPACE_KEYSTORE_PATH as string),
   proxyUrl: COMMUNITY_PROXY_URL,
+  passphrase: "fish"
 }
 
 // These options are in use when the application is packaged
 // for shipping
-const prodOptions: HolochainRunnerOptions = {
+const prodOptions: ElectronHolochainOptions = {
   happPath: happPath, // preload
   datastorePath: path.join(app.getPath('userData'), `databases-${DATABASES_VERSION_ID}`),
   appId: MAIN_APP_ID,
@@ -84,6 +85,7 @@ const prodOptions: HolochainRunnerOptions = {
   adminWsPort: 1235,
   keystorePath: path.join(app.getPath('userData'), `keystore-${KEYSTORE_VERSION_ID}`),
   proxyUrl: COMMUNITY_PROXY_URL,
+  passphrase: "fish"
 }
 
 export { happPath, BINARY_PATHS, devOptions, prodOptions }

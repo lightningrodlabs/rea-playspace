@@ -1,7 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import * as path from 'path'
 // import log from 'electron-log'
-import initAgent, { StateSignal, STATUS_EVENT } from 'electron-holochain'
+import initAgent, { StateSignal, STATUS_EVENT } from '@sprillow-connor/electron-holochain'
 
 import {
   devOptions,

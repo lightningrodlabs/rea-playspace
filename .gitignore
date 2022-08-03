@@ -28,3 +28,5 @@ my-proxy-cert.cert
 
 **/.DS_Store
 .DS_Store
+
+.pnpm-debug.log
