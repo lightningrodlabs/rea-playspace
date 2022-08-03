@@ -1,55 +1,43 @@
-import React, { useEffect, useState } from "react";
+import { useState, FC, useEffect } from "react";
 import {
-  CreateProfile
+CreateProfile
 } from "../elements";
-import { getMyProfile, getProfilesService, setMyProfile } from "../data/ProfilesStore";
-import { ProfilesService } from "@holochain-open-dev/profiles";
+import { Profile, ProfilesStore } from "@holochain-open-dev/profiles";
+import { useStore } from "../hooks/useStore";
+import { getMyProfileReadable } from "../data/DataStore";
 
-interface Props {}
+interface Props {
+}
 
-/**
- * 
- * This is a workaround because ProfilePrompt doesn't work with React out 
- * of the box.
- */
-const ProfilePrompt: React.FC<Props> = ({children}) => {
-  const [profileExists, setProfileExists] = useState<Boolean>(false);
-  let service: ProfilesService = getProfilesService();
+const ProfilePrompt: FC<Props> = ({children}) => {
+  const [profile, setProfile] = useState<Profile>();
 
-  function handleCreateProfile() {
-    service.getMyProfile().then((profile) => {
-      if (profile) {
-        setMyProfile(profile);
-        // I don't want this. Right now it's just to trigger a re-render
-        setProfileExists(true);
-      }
-    });
-  }
-
-  window.addEventListener('profile-created', handleCreateProfile);
+  let storeSubscriber = useStore(getMyProfileReadable());
+  console.log('storeSubscriber: ', storeSubscriber);
 
   useEffect(() => {
-    service.getMyProfile().then((profile) => {
-      setMyProfile(profile);
-      if (profile) {
-        setProfileExists(true);
-      }
-    });
+    if (storeSubscriber.value !== undefined && storeSubscriber.value !== null) {
+      setProfile(storeSubscriber.value as Profile);
+    }
   }, []);
 
+  const handleProfileCreated = (e) => {
+    setProfile(e.detail.profile);
+  }
+
   const RenderPrompt = () => {
-    if (getMyProfile() == null) {
+    if (!profile) {
       return (
         <div className="profile-prompt">
-            <CreateProfile></CreateProfile>
+            <CreateProfile onProfileCreated={(e) => handleProfileCreated(e)}></CreateProfile>
         </div>
       );
     } else {
-      return(
-        <slot>{children}</slot>
-      )
-    }
+    return(
+      <slot>{children}</slot>
+    )
   }
+}
 
   return(
     <RenderPrompt></RenderPrompt>

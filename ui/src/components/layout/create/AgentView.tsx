@@ -6,7 +6,6 @@ import { Agent } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
 import getDataStore from "../../../data/DataStore";
 import { ListProfiles } from "../../../elements";
-import { getProfilesService } from "../../../data/ProfilesStore";
 import { AgentShape } from "../../../types/valueflows";
 
 export type NewAgentProps = {
@@ -23,6 +22,7 @@ const AgentView: React.FC<NewAgentProps> = () => {
   const [
     {name, image, primaryLocation, note}, setState
   ] = useState(initialState);
+
   const store = getDataStore();
   const navigate = useNavigate();
   let { id } = useParams();
@@ -31,7 +31,6 @@ const AgentView: React.FC<NewAgentProps> = () => {
     if (id) {
       const store = getDataStore();
       const obj = store.getById(id);
-      console.log('obj', obj);
       setState({
         name: obj.name ? obj.name : '',
         image: obj.image ? obj.image : '',
@@ -52,7 +51,11 @@ const AgentView: React.FC<NewAgentProps> = () => {
 
   const handleAddAgentFromProfile = async (e: CustomEvent) => {
     const agentPubKey = e.detail.agentPubKey;
-    const agent = await getProfilesService().getAgentProfile(agentPubKey);
+    const agentReadable = await profilesStore.fetchAgentProfile(agentPubKey);
+    let agent;
+    agentReadable.subscribe(ag => {
+      agent = ag;
+    });
     await store.fetchAgents();
     const agent2 = store.getAgent(agentPubKey);
     if (agent2) {
@@ -61,8 +64,8 @@ const AgentView: React.FC<NewAgentProps> = () => {
     }
     const ag: Agent = new Agent({
       id: e.detail.agentPubKey, 
-      name: agent.profile.nickname, 
-      note
+      name: agent,
+      note: note
     });
     store.set(ag);
     store.fetchAgents();

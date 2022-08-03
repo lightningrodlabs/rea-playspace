@@ -1,4 +1,3 @@
-import { HeaderHashB64 } from "@holochain-open-dev/core-types"
 import { HoloHashB64 } from "@holochain/client"
 
 // container for a set things. Only 1 to begin with
@@ -19,7 +18,7 @@ export interface NewProjectOutput {
 }
 
 export interface UpdateProjectInput {
-  original_header_hash: HeaderHashB64,
+  original_header_hash: HoloHashB64,
   updated_project: Project
 }
 
