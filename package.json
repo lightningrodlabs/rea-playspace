@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "// ## INSTALL ##":     "",
-    "install-deps":         "pnpm run tests-install && pnpm run web-install && tsc",
+    "install-deps":         "pnpm run tests-install && pnpm run web-install",
     "tests-install":        "cd tests && pnpm install",
     "web-install":          "cd ui && pnpm install",
 
