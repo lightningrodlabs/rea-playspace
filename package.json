@@ -1,7 +1,7 @@
 {
   "name": "rea-playspace",
   "version": "0.0.1",
-  "description": "This repository helps get started with electron and holochain",
+  "description": "A visual node-and-edge playspace for exploring Valueflows and REA accounting",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lightningrodlabs/rea-playspace.git"
@@ -9,38 +9,33 @@
   "private": true,
   "workspaces": [
     "ui",
-    "tests",
-    "electron"
+    "tests"
   ],
   "scripts": {
-    "// ## INSTALL ##": "",
-    "install-deps": "pnpm run tests-install && pnpm run web-install && pnpm run electron-install && pnpm run electron-tsc",
-    "tests-install": "cd tests && pnpm install",
-    "web-install": "cd ui && pnpm install",
-    "electron-install": "cd electron && pnpm install",
-    "// ## HOLOCHAIN ##": "",
-    "hc:redo": "pnpm run happ-reset && pnpm run happ-run",
-    "happ-pack": "bash scripts/happ-pack.sh",
-    "happ-reset": "pnpm run happ-pack && pnpm run user-data-reset",
-    "happ-run": "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",
-    "happ-run2": "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; . scripts/happ-run.sh'",
-    "hc:playground": "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
-    "user-data-reset": "rm -rf user-data && rm -rf user2-data && mkdir user-data user2-data",
-    "webhapp-pack": "pnpm run web-zip && hc web-app pack workdir/",
-    "// ## UI ##": "",
-    "web-lint": "cd ui && pnpm run lint",
-    "web": "cd ui && pnpx vite",
-    "web2": "cd ui && pnpx vite --mode dev2",
-    "web-build": "cd ui && pnpx vite build",
-    "web-zip": "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
-    "// ## ELECTRON ##": "",
-    "electron": "set -o allexport; . environments/.env; set +o allexport; cd electron && pnpm run start",
-    "electron2": "set -o allexport; . environments/.env.dev2; set +o allexport; cd electron && pnpm run start",
-    "electron-tsc": "cd electron && pnpm run tsc",
-    "build": "bash scripts/build.sh",
-    "// ## TEST ##": "",
-    "happ-test-ts": "cd tests && pnpm test",
-    "test": "cd ui && pnpm test"
+    "// ## INSTALL ##":     "",
+    "install-deps":         "pnpm run tests-install && pnpm run web-install && tsc",
+    "tests-install":        "cd tests && pnpm install",
+    "web-install":          "cd ui && pnpm install",
+
+    "// ## HOLOCHAIN ##":   "",
+    "hc:redo":              "pnpm run hc:reset && pnpm run happ-run",
+    "hc:happ-pack":         "bash scripts/happ-pack.sh",
+    "hc:reset":             "pnpm run hc:happ-pack && rm .hc",
+    "hc:run":               "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",
+    "hc:run2":              "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; . scripts/happ-run.sh'",
+    "playground":           "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
+    "webhapp-pack":         "pnpm run web-zip && hc web-app pack workdir/",
+
+    "// ## UI ##":          "",
+    "web-lint":             "cd ui && pnpm run lint",
+    "web":                  "cd ui && pnpx vite",
+    "web2":                 "cd ui && pnpx vite --mode dev2",
+    "web-build":            "cd ui && pnpx vite build",
+    "web-zip":              "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
+
+    "// ## TEST ##":        "",
+    "happ-test":            "cd tests && pnpm test",
+    "test":                 "cd ui && pnpm test"
   },
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0"
