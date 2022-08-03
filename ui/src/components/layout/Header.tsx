@@ -1,5 +1,5 @@
 import React from "react";
-import { getMyProfile } from "../../data/ProfilesStore";
+import { getMyProfile } from "../../data/DataStore";
 
 export type HeaderProps = {};
 
@@ -8,9 +8,8 @@ const Header: React.FC<HeaderProps> = () => {
   return (
     <div className="header">
       <div>
-        {/* <SlAvatar shape="circle" label="Circle avatar" /> */}
         {" "}
-        {getMyProfile().profile.nickname.slice(0, 8)}
+         {/* {getMyProfile().nickname.slice(0, 8)} */}
       </div>
     </div>
   );

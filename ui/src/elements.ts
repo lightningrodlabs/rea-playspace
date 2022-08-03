@@ -1,6 +1,5 @@
 import { createComponent } from "@lit-labs/react";
 import * as React from "react";
-import { ContextProviderElement } from "@holochain-open-dev/context";
 import {
   CreateProfile as NativeCreateProfile,
   ListProfiles as NativeListProfiles,
@@ -28,7 +27,9 @@ export const CreateProfile = createComponent(
   React,
   "create-profile",
   NativeCreateProfile,
-  {}
+  {
+    onProfileCreated: "profile-created"
+  }
 );
 
 export const ProfilePrompt = createComponent(
@@ -37,12 +38,4 @@ export const ProfilePrompt = createComponent(
   NativeProfilePrompt,
   {}
 );
-
-export const SearchAgent = createComponent(
-  React,
-  "search-agent",
-  NativeSearchAgent,
-  {}
-);
-
 

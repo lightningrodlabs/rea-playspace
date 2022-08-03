@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -6,18 +6,15 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import Pi from "./components/layout/Pi";
-import getDataStore from "./data/DataStore";
+import getDataStore, { getProfilesStore } from "./data/DataStore";
 import Modal from "react-modal"
-import {
-  ProfilesStore
-} from "@holochain-open-dev/profiles";
-import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
 import { ResourceSpecificationShape } from "./types/valueflows";
 import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
 import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
 import AgentView from "./components/layout/create/AgentView";
+import { ProfilesStore } from "@holochain-open-dev/profiles";
 
 Modal.setAppElement("#root");
 
@@ -30,6 +27,11 @@ interface Props {}
 const App: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [rsEdit, setRsEdit] = useState<ResourceSpecificationShape>();
+  const [profilesStore, setProfilesStore] = useState<ProfilesStore>();
+
+  useEffect(()=>{
+    setProfilesStore(getProfilesStore());
+  },[]);
 
   function handleSetRsEdit(resourceSpec: ResourceSpecificationShape) {
     console.log('handleSetRsEdit ', resourceSpec);
@@ -62,87 +64,78 @@ const App: React.FC<Props> = () => {
     }
   }
 
-  const [store, setStore] = useState<ProfilesStore>();
-
-  useEffect(() => {
-    getProfilesStore().then((store) => {
-      setStore(store);
-    });
-  }, []);
-
-
   const Main = () => {
     return (
-      <BrowserRouter>
-        <div className="container">
-          <Header />
-          <div className="below-header">
-            <div className="main-panel">
-              <Routes>
-                <Route
-                    path="/"
-                    element={<Home setEdit={handleSetRsEdit}/>}>
-                  </Route>
+        <BrowserRouter>
+          <div className="container">
+            <Header />
+            <div className="below-header">
+              <div className="main-panel">
+                  <Routes>
+                    <Route
+                        path="/"
+                        element={<Home setEdit={handleSetRsEdit}/>}>
+                      </Route>
 
-                  <Route
-                    path="/agents/new"
-                    element={<AgentView />}
-                  />
-                  <Route
-                    path="/agents/edit">
-                    <Route path=":id" element={<AgentView />} />
-                  </Route>
-                  <Route
-                    path="/resources/new"
-                    element={<ResourceSpecificationView />}
-                  />
-                  <Route
-                    path="/resources/edit">
-                    <Route path=":id" element={<ResourceSpecificationView />} />
-                  </Route>
-                  <Route
-                    path="/processes/new"
-                    element={<ProcessSpecificationView />}
-                  />
-                  <Route
-                    path="/processes/edit">
-                    <Route path=":id" element={<ProcessSpecificationView />} />
-                  </Route>
-                </Routes>
+                      <Route
+                        path="/agents/new"
+                        element={<AgentView />}
+                      />
+                      <Route
+                        path="/agents/edit">
+                        <Route path=":id" element={<AgentView />} />
+                      </Route>
+                      <Route
+                        path="/resources/new"
+                        element={<ResourceSpecificationView />}
+                      />
+                      <Route
+                        path="/resources/edit">
+                        <Route path=":id" element={<ResourceSpecificationView />} />
+                      </Route>
+                      <Route
+                        path="/processes/new"
+                        element={<ProcessSpecificationView />}
+                      />
+                      <Route
+                        path="/processes/edit">
+                        <Route path=":id" element={<ProcessSpecificationView />} />
+                      </Route>
+                    </Routes>
+              </div>
             </div>
+            <Modal
+              style={{
+                overlay: {zIndex: 2000},
+                content: {
+                  top: '30%',
+                  left: '30%',
+                  right: '30%',
+                  bottom: 'auto',
+                  transform: 'translate(-20%, -20%)',
+                }
+              }}
+              isOpen={isModelOpen}>
+              <div style={{
+                textAlign: 'center',
+                alignContent: 'center',
+                width: '100%'
+              }}><img src="/img/net.gif" /></div>
+            </Modal>
+            <Pi onClick={piHandler} />
           </div>
-          <Modal
-            style={{
-              overlay: {zIndex: 2000},
-              content: {
-                top: '30%',
-                left: '30%',
-                right: '30%',
-                bottom: 'auto',
-                transform: 'translate(-20%, -20%)',
-              }
-            }}
-            isOpen={isModelOpen}>
-            <div style={{
-              textAlign: 'center',
-              alignContent: 'center',
-              width: '100%'
-            }}><img src="/img/net.gif" /></div>
-          </Modal>
-          <Pi onClick={piHandler} />
-        </div>
-      </BrowserRouter>
+        </BrowserRouter>
     );
   }
-  if (!store) {
+  if (!profilesStore) {
     return <span>Loading.......</span>;
   }
   return (
     <div>
-      <ProfilesContext store={store}>
-        <ProfilePrompt>
-          <Main />
-        </ProfilePrompt>
+      <ProfilesContext store={profilesStore}>
+          <ProfilePrompt>
+            <Main />
+          </ProfilePrompt>
       </ProfilesContext>
     </div>
   );

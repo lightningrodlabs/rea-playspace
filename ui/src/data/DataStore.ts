@@ -23,9 +23,19 @@ import { HasIdDate } from "../types/valueflows";
 import { PathedData } from "./models/PathedData";
 import { assignFields, overwriteFields } from "../utils";
 import { APP_ID } from "../holochainConf";
+import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { InstalledCell } from "@holochain/client";
+import { CellClient } from "@holochain-open-dev/cell-client";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
+let profilesStore: ProfilesStore;
+let myProfileReadable;
+
+export function getMyProfileReadable() {
+  console.log('myProfileReadle: ', myProfileReadable);
+  return myProfileReadable;
+}
 
 /**
  * Initialize Holochain WS connection, set up Zome API client and DataStore singletons.
@@ -37,27 +47,46 @@ let dataStore: DataStore;
   dataStorePromise = new Promise(async (res) => {
 
     const client = await getHolochainClient();
-    console.log('client: ', client);
+    // console.log('client: ', client);
     const appInfo = await client.appWebsocket.appInfo({
       installed_app_id: APP_ID
     });
-    console.log('app_info: ', appInfo);
+    //console.log('app_info: ', appInfo);
     const cell = appInfo.cell_data[0];
     const [_dnaHash, agentPubKey] = cell.cell_id;
     const zomeApi = new ZomeApi(client);
-    console.log('zomeApi: ', zomeApi);
+    //console.log('zomeApi: ', zomeApi);
     setAgentPubKey(agentPubKey);
     setCellId(cell.cell_id);
     setZomeApi(zomeApi);
 
     dataStore = new DataStore();
-    console.log('dataStore: ', dataStore);
+    //console.log('dataStore: ', dataStore);
     await dataStore.fetchOrCreateRoot();
-    console.log('dataStore promise: resolved');
+    //console.log('dataStore promise: resolved');
+
+    profilesStore = await connectProfiles();
+    myProfileReadable = await profilesStore.fetchMyProfile();
 
     res(dataStore);
   });
   return dataStorePromise;
+}
+
+async function connectProfiles(): Promise<ProfilesStore> {
+  const client = await getHolochainClient();
+  const appInfo = await client.appWebsocket.appInfo({
+    installed_app_id: APP_ID
+  });
+  const cell: InstalledCell = appInfo.cell_data[0];
+  const profilesService = new ProfilesService(new CellClient(client, cell));
+  return new ProfilesStore(profilesService, {
+    avatarMode: "avatar-optional",
+  });
+}
+
+export function getProfilesStore() {
+  return profilesStore;
 }
 
 /**
