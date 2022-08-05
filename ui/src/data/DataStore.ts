@@ -19,9 +19,6 @@ import {
 } from "./models/Application/Display";
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
-import { HasIdDate } from "../types/valueflows";
-import { PathedData } from "./models/PathedData";
-import { assignFields, overwriteFields } from "../utils";
 import { APP_ID } from "../holochainConf";
 import { EconomicEvent } from "./models/Valueflows/Observation";
 
@@ -215,41 +212,5 @@ export class DataStore extends DataStoreBase {
     return Object.values(this.root.unit);
   }
 
-  /**
-   * Generic function for upserting a PathedData object
-   *
-   * Example usage:
-   * const newCommitment = upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
-   *
-   * TODO: this is in the wrong file, should be in DataStoreBase
-   */
-  public upsert<T extends HasIdDate, U extends PathedData> (updates: T, constructor: {new (init: any): U}): U {
-    const store = getDataStore();
-    let obj: U;
-
-    // We have an existing object, update it
-    if (updates && updates.id && updates.id != null && updates.id != '') {
-      obj = store.getById(updates.id);
-      overwriteFields<T, U>(
-        updates,
-        obj
-      );
-      const updateFields = Object.getOwnPropertyNames(updates);
-      const originalFields = Object.getOwnPropertyNames(obj);
-      const fieldsToDelete = originalFields.filter((field) => !updateFields.includes(field));
-      for (let fieldName in fieldsToDelete) {
-        obj[fieldName] = null;
-      }
-    // We have a new object, insert it
-    } else {
-      obj = new constructor(updates);
-      assignFields<T, U>(
-        updates,
-        obj
-      );
-    }
-    store.set(obj);
-    return obj;
-  }
 }
 
