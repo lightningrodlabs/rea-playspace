@@ -7,7 +7,7 @@ import { Commitment } from '../../data/models/Valueflows/Plan';
 import { EconomicEvent } from '../../data/models/Valueflows/Observation';
 import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
-import { flowDefaults, getCommitmentAndEvents, getDisplayNodeBy, getLabelForFlow } from '../../logic/flows';
+import { flowDefaults, getEventDefaultsFromCommitment, getEventDefaultsFromEvent, getCommitmentAndEvents, getDisplayNodeBy, getLabelForFlow } from '../../logic/flows';
 import getDataStore from '../../data/DataStore';
 import { objectsDiff } from '../../utils';
 
@@ -111,33 +111,6 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
       return store.getById(initial.resourceConformsTo as string);
     }
   };
-
-  /**
-   * Removes fields that shouldn't be set or not present in an Event and sets defaults
-   */
-  const getEventDefaultsFromCommitment = (commitment: CommitmentShape): FlowShape => {
-    const init = {...commitment};
-    delete init.id;
-    delete init.created;
-    delete init.plannedWithin;
-    delete init.due;
-    delete init.note;
-    init.hasPointInTime = new Date();
-    return init;
-  }
-
-  /**
-   * Removes fields that shouldn't be set or not present in an Event and sets defaults
-   */
-  const getEventDefaultsFromEvent = (event: EconomicEventShape): FlowShape => {
-    const init = {...event};
-    delete init.id;
-    delete init.created;
-    delete init.due;
-    delete init.note;
-    init.hasPointInTime = new Date();
-    return init;
-  }
 
   /**
    * When the commitment changes, update it.
