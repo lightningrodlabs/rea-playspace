@@ -38,6 +38,8 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const resetState = () => {
     setCommitmentOpen(false);
     setEventOpen(false);
+    commitmentUpdates = null;
+    eventUpdates = null;
   }
 
   // Set up the initial state
@@ -111,7 +113,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   };
 
   /**
-   * Removes fields that shouldn't be set or not present in an Event
+   * Removes fields that shouldn't be set or not present in an Event and sets defaults
    */
   const getEventDefaultsFromCommitment = (commitment: CommitmentShape): FlowShape => {
     const init = {...commitment};
@@ -119,6 +121,21 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     delete init.created;
     delete init.plannedWithin;
     delete init.due;
+    delete init.note;
+    init.hasPointInTime = new Date();
+    return init;
+  }
+
+  /**
+   * Removes fields that shouldn't be set or not present in an Event and sets defaults
+   */
+  const getEventDefaultsFromEvent = (event: EconomicEventShape): FlowShape => {
+    const init = {...event};
+    delete init.id;
+    delete init.created;
+    delete init.due;
+    delete init.note;
+    init.hasPointInTime = new Date();
     return init;
   }
 
@@ -221,16 +238,35 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * Form for events 
    */
   const eventForm = () => {
-    let eventState = {...initial, ...currentEditEvent}
+    let eventState = {...initial, ...currentEditEvent};
+    const readonlyFields = [];
+
+    function disableFields(flow: FlowShape) {
+      if (flow.action && flow.action != null) {
+        readonlyFields.unshift('action');
+      }
+      if (flow.resourceQuantity && flow.resourceQuantity != null) {
+        readonlyFields.unshift('resourceQuantityUnit');
+      }
+      if (flow.effortQuantity && flow.effortQuantity != null) {
+        readonlyFields.unshift('effortQuantityUnit');
+      }
+    }
 
     /**
-     * XXX: This needs to track exactly which fields were copied over from the
-     *   commitment and not allow changing them. This should be as simple as
-     *   making a set of fields read only. I'm actually not sure we have this as
-     *   defined as we want it to be. See issues #80 and #81.
+     * This should prevent editing certain fields when they are present and
+     * copied over from a Commitment.
      */
-    if (editCommitment) {
+    if (editCommitment && editCommitment != null) {
       eventState = {...initial, ...getEventDefaultsFromCommitment(editCommitment), ...currentEditEvent};
+      disableFields(editCommitment);
+    } else {
+      // Do the same with Events.
+      if (editEvents.length > 0) {
+        const firstEvent = editEvents[0];
+        eventState = {...initial, ...getEventDefaultsFromEvent(firstEvent), ...currentEditEvent};
+        disableFields(firstEvent);
+      }
     }
     if (eventOpen) {
       return <>
@@ -238,6 +274,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         <h4 className='panel-heading'>Event</h4>
         <EventInput
           eventState={eventState}
+          readonlyFields={readonlyFields}
           conformingResource={getConformingResource(currentEditEvent)}
           agents={agents}
           actions={actions}
