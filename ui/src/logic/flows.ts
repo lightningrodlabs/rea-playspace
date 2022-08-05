@@ -51,7 +51,7 @@ export const getFirstCommitmentOrEvent = (displayEdge: DisplayEdge): FlowShape =
 }
 
 /**
- * Returns the Commitment and Events associated with a display edge in a structured fashion.
+ * Returns a clone of Commitment and Events associated with a display edge in a structured fashion.
  * @param vfPath 
  * @returns 
  */
@@ -65,14 +65,14 @@ export const getCommitmentAndEvents = (vfPath: string[] | string): {commitment: 
         if (getAlmostLastPart(flowPath) === 'commitment') {
           commitmentPath = flowPath;
         } else {
-          events.push(store.getCursor(flowPath) as EconomicEvent);
+          events.push(new EconomicEvent(store.getCursor(flowPath) as EconomicEvent));
         }
       }
     );
   } else {
     commitmentPath = vfPath;
   }
-  const commitment = commitmentPath ? store.getCursor(commitmentPath) as Commitment: null;
+  const commitment = commitmentPath ? new Commitment(store.getCursor(commitmentPath) as Commitment): null;
   return {commitment, events};
 }
 

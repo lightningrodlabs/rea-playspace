@@ -1,4 +1,4 @@
-import { SlButton, SlButtonGroup, SlDivider, SlDrawer, SlIcon, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
+import { SlButton, SlButtonGroup, SlDivider, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { PathedData } from '../../data/models/PathedData';
 import { Action, Agent, Unit } from '../../data/models/Valueflows/Knowledge';
@@ -9,6 +9,7 @@ import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
 import { flowDefaults, getCommitmentAndEvents, getDisplayNodeBy, getLabelForFlow } from '../../logic/flows';
 import getDataStore from '../../data/DataStore';
+import { objectsDiff } from '../../utils';
 
 interface Props {
   vfPath?: string[];
@@ -21,17 +22,17 @@ interface Props {
 const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterward}) => {
   const [commitmentOpen, setCommitmentOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
-  const [commitment, setCommitment] = useState<Commitment>();
-  const [events, setEvents] = useState<Array<EconomicEvent>>([]);
-  const [event, setEvent] = useState<EconomicEvent>();
+  const [editCommitment, setEditCommitment] = useState<Commitment>();
+  const [editEvents, setEditEvents] = useState<Array<EconomicEvent>>([]);
+  const [currentEditEvent, setCurrentEditEvent] = useState<EconomicEvent>();
   const [initial, setInitial] = useState<FlowShape>();
   const [agents, setAgents] = useState<Array<Agent>>([]);
   const [actions, setActions] = useState<Array<Action>>([]);
   const [units, setUnits] = useState<Array<Unit>>([]);
 
   // store updates to flows until saving or discarding
-  let commitmentUpdates = null;
-  let eventUpdates = null;
+  let commitmentUpdates: CommitmentShape = null;
+  let eventUpdates: EconomicEventShape = null;
 
   // close the panel
   const resetState = () => {
@@ -61,9 +62,9 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     }
 
     if (vfPath) {
-      const state = getCommitmentAndEvents(vfPath);
-      setCommitment(state.commitment);
-      setEvents(state.events);
+      const {commitment, events} = getCommitmentAndEvents(vfPath);
+      setEditCommitment(commitment);
+      setEditEvents(events);
     }
 
     setAgents(store.getAgents());
@@ -72,7 +73,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
 
   // Pick an event to edit, but make a clone so edits don't propagate through the app.
   const pickEvent = (event: EconomicEvent) => {
-    setEvent(event);
+    setCurrentEditEvent(event);
   };
 
   /**
@@ -110,7 +111,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   };
 
   /**
-   * Removes fields not present in an Event
+   * Removes fields that shouldn't be set or not present in an Event
    */
   const getEventDefaultsFromCommitment = (commitment: CommitmentShape): FlowShape => {
     const init = {...commitment};
@@ -129,30 +130,33 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   }
 
   /**
-   * Save the commitment
-   */
-  const handleCommitmentSubmit = () => {
-    const store = getDataStore();
-    let newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
-    setCommitment(newCommitment);
-    setCommitmentOpen(false);
-  };
-
-  /**
    * When the current event changes, update it.
    */
-  const handleEventChange = (e: any) => {
+   const handleEventChange = (e: any) => {
     eventUpdates = e.target.value;
   }
 
-  // If the event is in the list of events, update it
-  // If it's not, then add it
+  /**
+   * Store the commitment so we can save it later
+   */
+  const handleCommitmentSubmit = () => {
+    const commitment = new Commitment(commitmentUpdates);
+    setEditCommitment(commitment);
+    setCommitmentOpen(false);
+
+    // Clean up
+    commitmentUpdates = null;
+  };
+
+  /**
+   * Store the event so we can save it later
+   * If the event is in the list of events, update it. If it's not, then add it
+   */
   const handleEventSubmit = () => {
     setEventOpen(false);
-    const store = getDataStore();
-    const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(eventUpdates, EconomicEvent);
-    setEvents((prevEvents) => {
-      const eventIndex = events.findIndex((event) => event.id === newEvent.id);
+    const newEvent = new EconomicEvent(eventUpdates);
+    setEditEvents((prevEvents) => {
+      const eventIndex = editEvents.findIndex((event) => newEvent.id === event.id);
       if (eventIndex > -1) {
         const newEvents = [...prevEvents];
         newEvents[eventIndex] = newEvent;
@@ -162,6 +166,10 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         return newEvents;
       }
     });
+
+    // Clean up
+    setCurrentEditEvent(null);
+    eventUpdates = null;
   };
 
   /**
@@ -169,8 +177,8 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * to edit a commitment.
    */
   const commitmentEditOrCreate = () => {
-    if (commitment) {
-      const label = getLabelForFlow(commitment, getProvider(commitment), getReceiver(commitment), actions, units);
+    if (editCommitment) {
+      const label = getLabelForFlow(editCommitment, getProvider(editCommitment), getReceiver(editCommitment), actions, units);
       return <>
         <SlButton variant="default" onClick={() => setCommitmentOpen(true)}>{label}</SlButton>
       </>;
@@ -190,8 +198,8 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         <SlIconButton onClick={resetState} name="chevron-left" label="Cancel. Go Back."></SlIconButton>
         <h4 className='panel-heading'>Commitment</h4>
         <CommitmentInput
-          commitmentState={{...initial, ...commitment}}
-          conformingResource={getConformingResource(commitment)}
+          commitmentState={{...initial, ...editCommitment}}
+          conformingResource={getConformingResource(editCommitment)}
           agents={agents}
           actions={actions}
           units={units}
@@ -200,7 +208,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         ></CommitmentInput>
         <SlDivider></SlDivider>
         <SlButtonGroup slot="footer">
-          <SlButton onClick={handleCommitmentSubmit} variant="primary">{commitment?.id? 'Update' : 'Create'}</SlButton>
+          <SlButton onClick={handleCommitmentSubmit} variant="primary">{editCommitment?.id? 'Update' : 'Create'}</SlButton>
           <SlButton onClick={resetState} variant="default">Cancel</SlButton>
         </SlButtonGroup>
       </>;
@@ -213,9 +221,16 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * Form for events 
    */
   const eventForm = () => {
-    let eventState = {...initial, ...event}
-    if (commitment) {
-      eventState = {...initial, ...getEventDefaultsFromCommitment(commitment), ...event};
+    let eventState = {...initial, ...currentEditEvent}
+
+    /**
+     * XXX: This needs to track exactly which fields were copied over from the
+     *   commitment and not allow changing them. This should be as simple as
+     *   making a set of fields read only. I'm actually not sure we have this as
+     *   defined as we want it to be. See issues #80 and #81.
+     */
+    if (editCommitment) {
+      eventState = {...initial, ...getEventDefaultsFromCommitment(editCommitment), ...currentEditEvent};
     }
     if (eventOpen) {
       return <>
@@ -223,7 +238,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         <h4 className='panel-heading'>Event</h4>
         <EventInput
           eventState={eventState}
-          conformingResource={getConformingResource(event)}
+          conformingResource={getConformingResource(currentEditEvent)}
           agents={agents}
           actions={actions}
           units={units}
@@ -243,13 +258,55 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
 
   /**
    * Pass the array of objects back
+   *
+   * XXX: maybe it's time to break out the vfPath into vfCommitment and vfEvents
+   *      fields?
+   * XXX: This always replaces the vfPath array on the edge, which will always
+   *      cause a rerender and network traffic on Holochain even if it didn't
+   *      change. Might not be a big problem.
    */
   const handleSubmit = () => {
     closeModal();
-    const items: PathedData[] = [...events];
+    const store = getDataStore();
 
-    if (commitment && commitment !== null) {
-      items.unshift(commitment);
+    // Init array of changed items
+    const items: PathedData[] = [];
+
+    // Check for the Commitment
+    if (
+      editCommitment
+      && editCommitment !== null
+    ) {
+      // If it was changed
+      if (objectsDiff(store.getCursor(editCommitment.path), editCommitment)) {
+        // Store the object
+        const newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>(editCommitment, Commitment);
+        // Ensure it gets passed back to the DisplayEdge
+        items.unshift(newCommitment);
+      } else {
+        // It hasn't changed, ensure the original gets passed back to the DisplayEdge
+        items.unshift(editCommitment);
+      }
+    }
+
+    // Cycle through Events
+    for(let event of editEvents) {
+      // Check for the Event
+      if (
+        event
+        && event !== null
+      ) {
+        // If it was changed
+        if (objectsDiff(store.getCursor(event.path), event)) {
+          // Store the object
+          const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(event, EconomicEvent);
+          // Ensure it gets passed back to the DisplayEdge
+          items.unshift(newEvent);
+        } else {
+          // It hasn't changed, ensure the original gets passed back to the DisplayEdge
+          items.unshift(event);
+        }
+      }
     }
     if (afterward) afterward(items);
   };
@@ -264,11 +321,6 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   /**
    * Returns an event hanlder for the button. This is a hack, should use an
    * event listener and should inspect the key.
-   *
-   * TODO: This could be bad. For instance if we close this modal after canceling
-   * this will still save any new events, but they will not be associated with
-   * the edge. I need to separate out new/modified flows into a separate array
-   * that doesn't get persisted until this point. 
    */
   const makeEventClickHandler = (event: EconomicEvent): (()=>void) => {
     return () => {
@@ -303,7 +355,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
                 </SlTooltip>
               </div>
             </div>
-            {events.map((ev) =>
+            {editEvents.map((ev) =>
               <SlButton variant="default" id={`edit-${ev.id}`} key={ev.id} onClick={makeEventClickHandler(ev)}>
                 {getLabelForFlow(ev, getProvider(ev), getReceiver(ev), actions, units)}
               </SlButton>
