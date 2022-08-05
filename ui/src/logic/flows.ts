@@ -280,6 +280,11 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
 
 /**
  * Function to generate the label for a commitment edge.
+ *
+ * XXX: Need to summarize all flows and not just the first one.
+ *   Create a label for the commentment if there is one.
+ *   Create a synthetic event with a sum of the quantities of the events.
+ *   Create a label for the synthetic event.
  */
  export const getLabelForDisplayEdge = (displayEdge: DisplayEdge): string => {
   const store = getDataStore();
