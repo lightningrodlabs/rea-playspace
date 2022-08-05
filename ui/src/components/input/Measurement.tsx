@@ -11,9 +11,10 @@ interface Props {
   value: MeasurementShape;
   units: UnitShape[];
   onChange: (measurement: any) => void;
+  disableUnit: boolean;
 }
 
-const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, units, onChange}) => {
+const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, units, onChange, disableUnit}) => {
   const [{hasNumericalValue, hasUnit}, setState] = useState<MeasurementShape>(new Measurement(
     {
       hasNumericalValue: defaultUnit ? 0 : '',
@@ -46,7 +47,7 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
         <div className='measurementInput'>
           <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" clearable onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
           <span className='measurementSpacer'></span>
-          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
+          <SlSelect disabled={disableUnit} className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
             {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
           </SlSelect>
         </div>
