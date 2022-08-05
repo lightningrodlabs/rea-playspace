@@ -19,9 +19,6 @@ import {
 } from "./models/Application/Display";
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
-import { HasIdDate } from "../types/valueflows";
-import { PathedData } from "./models/PathedData";
-import { assignFields, overwriteFields } from "../utils";
 import { APP_ID } from "../holochainConf";
 import { EconomicEvent } from "./models/Valueflows/Observation";
 
