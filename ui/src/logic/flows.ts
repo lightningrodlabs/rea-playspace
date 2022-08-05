@@ -166,6 +166,32 @@ export const validateFlow = (sourceType: string, targetType: string): boolean =>
 }
 
 /**
+ * Removes fields that shouldn't be set or not present in an Event and sets defaults
+ */
+export const getEventDefaultsFromCommitment = (commitment: Commitment): FlowShape => {
+  const init = {...commitment};
+  delete init.id;
+  delete init.created;
+  delete init.plannedWithin;
+  delete init.due;
+  delete init.note;
+  init.hasPointInTime = new Date();
+  return init;
+}
+
+/**
+ * Removes fields that shouldn't be set or not present in an Event and sets defaults
+ */
+export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
+  const init = {...event};
+  delete init.id;
+  delete init.created;
+  delete init.note;
+  init.hasPointInTime = new Date();
+  return init;
+}
+
+/**
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
 export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
@@ -280,24 +306,82 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
 
 /**
  * Function to generate the label for a commitment edge.
- *
- * XXX: Need to summarize all flows and not just the first one.
- *   Create a label for the commentment if there is one.
- *   Create a synthetic event with a sum of the quantities of the events.
- *   Create a label for the synthetic event.
  */
  export const getLabelForDisplayEdge = (displayEdge: DisplayEdge): string => {
   const store = getDataStore();
+  const flowLabels = new Array<string>();
+  let label = "No flows.";
+
   try {
-    const flow: FlowShape = getFirstCommitmentOrEvent(displayEdge);
     const actions: Action[] = store.getActions();
     const units: Unit[] = store.getUnits();
-    const provider = store.getById(flow.provider as string);
-    const receiver = store.getById(flow.receiver as string);
-    return getLabelForFlow(flow, provider, receiver, actions, units);
+    const {commitment, events} = getCommitmentAndEvents(displayEdge.vfPath);
+  
+    // Generate label for the commitment
+    if (commitment && commitment != null) {
+      const provider = store.getById(commitment.provider as string);
+      const receiver = store.getById(commitment.receiver as string);
+      const commitmentLabel = getLabelForFlow(commitment, provider, receiver, actions, units)
+      flowLabels.push(`Commitment: ${commitmentLabel}`);
+    } else {
+      console.log('No commitment for label.')
+    }
+
+    // Summarize events into a single event
+    if (events.length > 0) {
+      const firstEvent = events.shift();
+      const summaryEvent = new EconomicEvent(getEventDefaultsFromEvent(firstEvent));
+      events.forEach((event) => {
+        // Guard against undefined or null values
+        if (
+          firstEvent.resourceQuantity
+          && firstEvent.resourceQuantity != null
+          && firstEvent.resourceQuantity.hasNumericalValue
+          && firstEvent.resourceQuantity.hasNumericalValue != null
+          && event.resourceQuantity
+          && event.resourceQuantity != null
+          && event.resourceQuantity.hasNumericalValue
+          && event.resourceQuantity.hasNumericalValue != null
+        ) {
+          console.log(event.resourceQuantity.hasNumericalValue);
+          summaryEvent.resourceQuantity.hasNumericalValue =
+            (Number.parseFloat(summaryEvent.resourceQuantity.hasNumericalValue as string) +
+            Number.parseFloat(event.resourceQuantity.hasNumericalValue as string)).toString();
+        }
+        // Guard against undefined or null values
+        if (
+          firstEvent.effortQuantity
+          && firstEvent.effortQuantity != null
+          && firstEvent.effortQuantity.hasNumericalValue
+          && firstEvent.effortQuantity.hasNumericalValue != null
+          && event.effortQuantity
+          && event.effortQuantity != null
+          && event.effortQuantity.hasNumericalValue
+          && event.effortQuantity.hasNumericalValue != null
+        ) {
+          console.log(event.effortQuantity.hasNumericalValue);
+          summaryEvent.effortQuantity.hasNumericalValue =
+            (Number.parseFloat(summaryEvent.effortQuantity.hasNumericalValue as string) +
+            Number.parseFloat(event.effortQuantity.hasNumericalValue as string)).toString();
+        }
+      });
+      // Generate label for the summarized event
+      const provider = store.getById(summaryEvent.provider as string);
+      const receiver = store.getById(summaryEvent.receiver as string);
+      const eventLabel = getLabelForFlow(summaryEvent, provider, receiver, actions, units)
+      flowLabels.push(`Events: ${eventLabel}`);
+    } else {
+      console.log('No events for label.');
+    }
+
+    if (flowLabels.length > 0) {
+      return flowLabels.join("\n");
+    } else {
+      return label;
+    }
   } catch(err) {
     console.error(err);
-    return "placeholder";
+    return "Error";
   }
 }
 
