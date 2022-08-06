@@ -63,19 +63,19 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
 
   return (
     <>
-      <SlSelect disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action} onSlChange={onSlChange} required>
+      <SlSelect disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
         {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      <SlSelect disabled={disabled('provider')} placeholder="Select provider" label="Provider" name='provider' value={provider ? provider : null} onSlChange={onSlChange} required>
+      <SlSelect disabled={disabled('provider')} placeholder="Select provider" label="Provider" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      <SlSelect disabled={disabled('receiver')} placeholder="Select reciever" label="Receiver" name='receiver' value={receiver ? receiver : null} onSlChange={onSlChange} required>
+      <SlSelect disabled={disabled('receiver')} placeholder="Select reciever" label="Receiver" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br/>
-      {inputOrOutputOf(inputOf, outputOf)}
+      {inputOrOutputOf(inputOf as string, outputOf as string)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
       <MeasurementInput disableUnit={disabled('resourceQuantityUnit')} label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
