@@ -1,14 +1,14 @@
-import { SlCard, SlInput, SlMenuItem, SlRadio, SlRadioButton, SlRadioGroup, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlInput, SlRadio, SlRadioGroup } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { GeoDataShape, GeoPointShape } from '../../types/valueflows';
-import { NumberToString, slChangeConstructor } from '../util';
+import { GeoDataShape } from '../../types/valueflows';
+import { slChangeConstructor } from '../util';
 
 interface Props {
   label: string;
   name: string;
   value: GeoDataShape;
   onChange: (measurement: any) => void;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const LocationInput: React.FC<Props> = ({label, name, value, onChange, disabled}) => {

@@ -345,8 +345,8 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
         ) {
           console.log(event.resourceQuantity.hasNumericalValue);
           summaryEvent.resourceQuantity.hasNumericalValue =
-            (Number.parseFloat(summaryEvent.resourceQuantity.hasNumericalValue as string) +
-            Number.parseFloat(event.resourceQuantity.hasNumericalValue as string)).toString();
+            summaryEvent.resourceQuantity.hasNumericalValue +
+            event.resourceQuantity.hasNumericalValue;
         }
         // Guard against undefined or null values
         if (
@@ -361,8 +361,8 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
         ) {
           console.log(event.effortQuantity.hasNumericalValue);
           summaryEvent.effortQuantity.hasNumericalValue =
-            (Number.parseFloat(summaryEvent.effortQuantity.hasNumericalValue as string) +
-            Number.parseFloat(event.effortQuantity.hasNumericalValue as string)).toString();
+            summaryEvent.effortQuantity.hasNumericalValue +
+            event.effortQuantity.hasNumericalValue;
         }
       });
       // Generate label for the summarized event

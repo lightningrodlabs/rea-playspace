@@ -292,10 +292,10 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         // Store the object
         const newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>(editCommitment, Commitment);
         // Ensure it gets passed back to the DisplayEdge
-        items.unshift(newCommitment);
+        items.push(newCommitment);
       } else {
         // It hasn't changed, ensure the original gets passed back to the DisplayEdge
-        items.unshift(editCommitment);
+        items.push(editCommitment);
       }
     }
 
@@ -311,10 +311,10 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
           // Store the object
           const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(event, EconomicEvent);
           // Ensure it gets passed back to the DisplayEdge
-          items.unshift(newEvent);
+          items.push(newEvent);
         } else {
           // It hasn't changed, ensure the original gets passed back to the DisplayEdge
-          items.unshift(event);
+          items.push(event);
         }
       }
     }
