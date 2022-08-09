@@ -2,7 +2,9 @@
 resolver = "2"
 members = [
     "happ/zomes/projects",
+    "happ/zomes/projects_core",
     "happ/zomes/profiles",
+    "happ/zomes/profiles_core",
 ]
 
 [profile.dev]

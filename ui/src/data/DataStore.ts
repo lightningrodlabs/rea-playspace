@@ -19,13 +19,14 @@ import {
 } from "./models/Application/Display";
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
-import { HasIdDate } from "../types/valueflows";
-import { PathedData } from "./models/PathedData";
-import { assignFields, overwriteFields } from "../utils";
 import { APP_ID } from "../holochainConf";
 import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
 import { InstalledCell } from "@holochain/client";
 import { CellClient } from "@holochain-open-dev/cell-client";
+import { EconomicEvent } from "./models/Valueflows/Observation";
+import { HasIdDate } from "../types/valueflows";
+import { PathedData } from "./models/PathedData";
+import { assignFields, overwriteFields } from "../utils";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
@@ -107,12 +108,11 @@ export class DataStore extends DataStoreBase {
   /**
    * Checks to see if we have anything in our DHT and chain, if not sets it up.
    */
-  public override async fetchOrCreateRoot() {
+  public override async fetchOrCreateRoot(): Promise<any> {
     // check if root object exists
-    console.log('check if root object exists: ', );
-    const res = await this.zomeApi.get_thing('root');
-    console.log('fetchOrCreate res: ', res);
-    if (res.length === 0) {
+    const result = await this.zomeApi.get_thing('root');
+    console.log('fetchOrCreate res: ', result);
+    if (result.length === 0) {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
       const plan = new Plan({
@@ -124,7 +124,8 @@ export class DataStore extends DataStoreBase {
     } else  {
       console.log('hydrateFromZome: ', );
       // We have the data, lets hydrate it
-      this.hydrateFromZome(res);
+      this.hydrateFromZome(result);
+      console.log(this.pathIndex);
     }
   }
 
@@ -165,6 +166,12 @@ export class DataStore extends DataStoreBase {
 
   public async fetchResourceSpecifications() {
     return await this.fetchAll(ResourceSpecification.getPrefix());
+  }
+
+  // Economic Event helpers
+
+  public async fetchAllEconomicEvents(): Promise<Array<EconomicEvent>> {
+    return (await this.fetchAll("root.economicEvent")) as Array<EconomicEvent>;
   }
 
   // Agent helpers

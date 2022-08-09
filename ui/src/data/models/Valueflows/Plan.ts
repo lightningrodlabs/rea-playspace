@@ -10,6 +10,7 @@ import {
   GeoDataShape
 } from "../../../types/valueflows";
 import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
+import { Measurement } from "./Knowledge";
 
 // Plan Classes
 
@@ -168,6 +169,8 @@ export class Commitment implements CommitmentShape, PathedData {
     this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
     this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
     this.due = init.due ? new Date(Date.parse(init.due as string)) : null;
+    this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
+    this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
   }
 
   static getPrefix(planId: string): string {
