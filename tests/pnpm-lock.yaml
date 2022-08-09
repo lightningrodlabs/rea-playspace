@@ -7,7 +7,6 @@ specifiers:
   '@types/lodash': ^4.14.182
   '@types/node': ^18.6.3
   '@types/tape': ^4.13.2
-  '@types/tape-promise': ^4.0.1
   lodash-es: ^4.17.21
   tape: ^5.5.3
   ts-node: ^10.9.1
@@ -25,7 +24,6 @@ devDependencies:
   '@types/lodash': 4.14.182
   '@types/node': 18.6.3
   '@types/tape': 4.13.2
-  '@types/tape-promise': 4.0.1
   tape: 5.5.3
 
 packages:
@@ -168,12 +166,6 @@ packages:
 
   /@types/node/18.6.3:
     resolution: {integrity: sha512-6qKpDtoaYLM+5+AFChLhHermMQxc3TOEFIDzrZLPRGHPrLEwqFkkT5Kx3ju05g6X7uDPazz3jHbKPX0KzCjntg==}
-    dev: true
-
-  /@types/tape-promise/4.0.1:
-    resolution: {integrity: sha512-1yBeq9y0EmJ2RpxfXMPrFeD3yMetBapY9zArTexp/wCRdBToJac/y//rtcZZjmiArgodTqz0RrK0VxxySoKyVg==}
-    dependencies:
-      '@types/tape': 4.13.2
     dev: true
 
   /@types/tape/4.13.2:
