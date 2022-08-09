@@ -8,10 +8,10 @@ crate-type = ["cdylib", "rlib"]
 name = "projects"
 
 [dependencies]
-holo_hash = { version = "=0.0.27", features = ["encoding", "fixturators"] }
-hdk = {version = "0.0.136", features = ["encoding"]}
+hdk = {version = "0.0.142", features = ["encoding"]}
+projects_core = { path = "../projects_core" }
 chrono = {version = "0.4", features = ['alloc', 'std']}
-derive_more = "0.99"
+derive_more = "0"
 serde = "*"
 paste = "*"
 tracing = "0.1.26"

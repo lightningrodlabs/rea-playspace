@@ -5,7 +5,8 @@ import {
   ListProfiles as NativeListProfiles,
   SearchAgent as NativeSearchAgent,
   ProfilePrompt as NativeProfilePrompt,
-  ProfilesContext as NativeProfilesContext
+  ProfilesContext as NativeProfilesContext,
+  AgentAvatar as NativeAgentAvatar
 } from "@holochain-open-dev/profiles";
 
 export const ProfilesContext = createComponent(
@@ -38,4 +39,3 @@ export const ProfilePrompt = createComponent(
   NativeProfilePrompt,
   {}
 );
-

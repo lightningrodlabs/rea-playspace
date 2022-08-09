@@ -1,18 +1,10 @@
 use hdk::prelude::*;
-use holo_hash::{HeaderHashB64, EntryHashB64};
-
-// Actual blob of data stored on the DHT
-#[hdk_entry(id = "thing")]
-#[derive(Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Thing {
-  pub data: String,
-}
+use holo_hash::{ActionHashB64, EntryHashB64};
 
 // returned after successful write to DHT
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddOutput {
-  pub header_hash: HeaderHashB64,
+  pub header_hash: ActionHashB64,
   pub entry_hash: EntryHashB64,
 }
 

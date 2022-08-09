@@ -1,4 +1,4 @@
-import { HoloHashB64 } from "@holochain/client"
+import { HoloHashB64, ActionHash } from "@holochain/client"
 
 // container for a set things. Only 1 to begin with
 export interface Project {
@@ -18,7 +18,7 @@ export interface NewProjectOutput {
 }
 
 export interface UpdateProjectInput {
-  original_header_hash: HoloHashB64,
+  original_header_hash: ActionHash,
   updated_project: Project
 }
 

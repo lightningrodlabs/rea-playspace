@@ -32,7 +32,7 @@ import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/Pa
 import { NamedData } from '../../data/models/NamedData';
 import { Process } from '../../data/models/Valueflows/Plan';
 import { FlowShape, ProcessShape } from '../../types/valueflows';
-import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow } from '../../logic/flows';
+import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
 import { assignFields } from '../../utils';
 
 interface Props {};
@@ -108,7 +108,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const planId = store.getCursor('root.planId');
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
-    setNodes(displayNodes);
+    setNodes(displayNodes.map((node: DisplayNode) => displayNodeToNode(node)));
     setEdges(displayEdges.map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
   };
 

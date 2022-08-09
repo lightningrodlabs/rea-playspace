@@ -99,34 +99,34 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
-      <SlCard className="create-resource">
-      <form onSubmit={handleSubmit}>
-        <br />
-        <SlInput
-          required
-          label="Name"
-          name="name"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={name}
+        <SlCard className="create-resource scrollable-view">
+          <form onSubmit={handleSubmit}>
+            <br />
+            <SlInput
+              required
+              label="Name"
+              name="name"
+              // @ts-ignore
+              onSlInput={onChange}
+              value={name}
 
-        />
-        <br />
-        <SlInput
-          label="Image"
-          name="image"
-          // @ts-ignore
-          onSlInput={onChange}
-          value={image}
+            />
+            <br />
+            <SlInput
+              label="Image"
+              name="image"
+              // @ts-ignore
+              onSlInput={onChange}
+              value={image}
 
-        />
-        <br />
-        <SlInput
-          label='Resource Classified As'
-          name='resourceClassifiedAs'
-          // @ts-ignore
-          onSlInput={onChange}
-          value={resourceClassifiedAs}
+            />
+            <br />
+            <SlInput
+              label='Resource Classified As'
+              name='resourceClassifiedAs'
+              // @ts-ignore
+              onSlInput={onChange}
+              value={resourceClassifiedAs}
 
         />
         <br />
