@@ -1,16 +1,10 @@
 import {runScenario, Scenario, pause, getZomeCaller } from "@holochain/tryorama";
 import { info } from "console";
-import test from "tape-promise/tape.js";
 import { reaPlayspaceDnaPath } from './utils';
-
-// TODO - tests are not working because of
-// an issue with tape-promise. Calling callZome()
-// three times triggers onetime (tape-promise dep)
-//to throw an error and abort the test scenario.
+import test from 'tape';
 
 test("Put Thing: Plan and Commitment", async (t) => {
   await runScenario(async (scenario: Scenario) => {
-    // const dnas: DnaSource[] = [{ path: reaPlayspaceDnaPath}];
 
     const alice = await scenario.addPlayerWithHapp([
       { path: reaPlayspaceDnaPath},
@@ -50,7 +44,9 @@ test("Put Thing: Plan and Commitment", async (t) => {
 
     await pause(500);
 
+    info("Has Header Hash");
     t.ok(put_output.header_hash);
+    info("Has Entry Hash");
     t.ok(put_output.entry_hash);
 
     let get_output: any = await projectZomeCall(
@@ -63,18 +59,21 @@ test("Put Thing: Plan and Commitment", async (t) => {
 
     info('######## GET_OUTPUT: PLANS #######');
 
-    let get_output2 = await projectZomeCall(
+    let get_output2: any = await projectZomeCall(
         "get_thing",
         "plans"
     );
-    info('get_output: ', get_output2);
+    
+    info('get_output2: ', get_output2);
 
     t.ok(get_output2);
 
     info('get_output: ', get_output);
 
     t.ok(get_output)
-    let jsTree = buildTree(get_output.tree,get_output.tree[0])
+
+    let jsTree = buildTree(get_output2.tree, get_output2.tree[0])
+    info('jsTree: ', jsTree);
 
     info('######## DEEP EQUAL #######');
     t.deepEqual(jsTree, {
