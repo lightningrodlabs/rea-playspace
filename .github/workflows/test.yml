@@ -34,7 +34,9 @@ jobs:
       run: nix-shell --command "echo Completed"
     - name: Install deps
       run: nix-shell --command "pnpm run install-deps"
-    - name: List contents
-      run: nix-shell --command "ls -a tests"
+    - name: check hc
+      run: nix-shell --command "holochain --build-info"
+    - name: build happ
+      run: nix-shell --command "pnpm run hc:happ-pack"
     - name: Run all tests
       run: nix-shell --command "pnpm run test"
