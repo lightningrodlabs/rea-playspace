@@ -33,6 +33,6 @@ jobs:
     - name: Prepare Nix environment
       run: nix-shell --command "echo Completed"
     - name: Install deps
-      run: nix-shell --command "pnpm run tests-install"
+      run: nix-shell --command "pnpm run install-deps"
     - name: Run all tests
       run: nix-shell --command "pnpm run test"
