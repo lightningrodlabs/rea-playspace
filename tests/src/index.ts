@@ -34,7 +34,7 @@ test("Put Thing: Plan and Commitment", async (t) => {
       fn_name: "put_thing",
       payload: {path: "plans.p1", data: JSON.stringify(plan)}
     });
-    await pause(100);
+    await pause(1000);
 
     // Alice adds a commitment
     let put_output: any = await projectZomeCall(
@@ -42,7 +42,7 @@ test("Put Thing: Plan and Commitment", async (t) => {
         {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
     );
 
-    await pause(500);
+    await pause(1000);
 
     info("Has Header Hash");
     t.ok(put_output.header_hash);
