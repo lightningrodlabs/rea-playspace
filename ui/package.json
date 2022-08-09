@@ -27,7 +27,7 @@
     "@holochain-open-dev/context": "0.0.3",
     "@holochain-open-dev/profiles": "0.4.3",
     "@holochain/client": "^0.7.0",
-    "@lit-labs/react": "1.0.4",
+    "@lit-labs/react": "1.0.7",
     "@scoped-elements/material-web": "0.0.19",
     "@shoelace-style/shoelace": "^2.0.0-beta.76",
     "blob-to-buffer": "^1.2.9",
