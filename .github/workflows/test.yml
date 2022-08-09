@@ -35,4 +35,4 @@ jobs:
     - name: Install deps
       run: nix-shell --command "pnpm run tests-install"
     - name: Run all tests
-      run: nix-shell --command "pnpm run happ-test-ts"
+      run: nix-shell --command "pnpm run test"
