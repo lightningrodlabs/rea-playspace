@@ -34,7 +34,6 @@ let profilesStore: ProfilesStore;
 let myProfileReadable;
 
 export function getMyProfileReadable() {
-  console.log('myProfileReadle: ', myProfileReadable);
   return myProfileReadable;
 }
 

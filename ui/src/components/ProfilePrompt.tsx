@@ -2,7 +2,7 @@ import { useState, FC, useEffect } from "react";
 import {
 CreateProfile
 } from "../elements";
-import { Profile, ProfilesStore } from "@holochain-open-dev/profiles";
+import { Profile } from "@holochain-open-dev/profiles";
 import { useStore } from "../hooks/useStore";
 import { getMyProfileReadable } from "../data/DataStore";
 
@@ -13,7 +13,6 @@ const ProfilePrompt: FC<Props> = ({children}) => {
   const [profile, setProfile] = useState<Profile>();
 
   let storeSubscriber = useStore(getMyProfileReadable());
-  console.log('storeSubscriber: ', storeSubscriber);
 
   useEffect(() => {
     if (storeSubscriber.value !== undefined && storeSubscriber.value !== null) {
