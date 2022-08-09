@@ -199,15 +199,16 @@ export class DataStoreBase {
    */
   public async fetchOrCreateRoot() {
     // check if root object exists
-    const res = await this.zomeApi.get_thing('root');
-    if (res[0].val.data === '') {
-      // if it doesn't, create it and a placeholder plan
+    const result = await this.zomeApi.get_thing('root');
+    if (result.length === 0) {
+      // if it doesn't, create it
       console.log('root does not exist. creating...');
       this.put(this.root);
     } else {
       // We have the data, lets hydrate it
-      this.hydrateFromZome(res);
+      this.hydrateFromZome(result);
     }
+    return this.root;
   }
 
   public async saveLocalRoot() {

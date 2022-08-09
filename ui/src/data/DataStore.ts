@@ -76,12 +76,11 @@ export class DataStore extends DataStoreBase {
   /**
    * Checks to see if we have anything in our DHT and chain, if not sets it up.
    */
-  public override async fetchOrCreateRoot() {
+  public override async fetchOrCreateRoot(): Promise<any> {
     // check if root object exists
-    console.log('check if root object exists: ', );
-    const res = await this.zomeApi.get_thing('root');
-    console.log('fetchOrCreate res: ', res);
-    if (res.length === 0) {
+    const result = await this.zomeApi.get_thing('root');
+    console.log('fetchOrCreate res: ', result);
+    if (result.length === 0) {
       // if it doesn't, create it and a placeholder plan
       console.log('root does not exist. creating...');
       const plan = new Plan({
@@ -93,7 +92,8 @@ export class DataStore extends DataStoreBase {
     } else  {
       console.log('hydrateFromZome: ', );
       // We have the data, lets hydrate it
-      this.hydrateFromZome(res);
+      this.hydrateFromZome(result);
+      console.log(this.pathIndex);
     }
   }
 

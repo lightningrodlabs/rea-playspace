@@ -1,6 +1,6 @@
 // EDGE BUSINESS LOGIC
 
-import { Edge, MarkerType } from "react-flow-renderer";
+import { Edge, MarkerType, Node } from "react-flow-renderer";
 import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
 import { ObjectTypeMap } from "../data/models/ObjectTransformations";
@@ -392,7 +392,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
  * TODO: maybe submit a PR to React Flows to either export the function that
  * builds these IDs, or make it more amenable to unique external IDs.
  */
-export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge  => {
+export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge => {
   return {
     id: `reactflow__edge-${displayEdge.source}${displayEdge.sourceHandle || ''}-${displayEdge.target}${displayEdge.targetHandle || ''}`,
     source: displayEdge.source,
@@ -406,6 +406,28 @@ export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge  => {
     },
     data: {
       id: displayEdge.id
+    }
+  }
+}
+
+export const displayNodeToNode = (displayNode: DisplayNode): Node => {
+  const store = getDataStore();
+  const {id, name, type, vfPath, position} = displayNode;
+  const vfObject = store.getCursor(vfPath);
+
+  let agent = null;
+  if (Object.hasOwn(vfObject,'inScopeOf')) {
+    agent = store.getById(vfObject.inScopeOf).name;
+  }
+
+  return {
+    id,
+    position,
+    type,
+    data: {
+      id,
+      name,
+      agent
     }
   }
 }
