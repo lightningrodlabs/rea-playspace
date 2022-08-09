@@ -71,3 +71,34 @@ export function fieldsToJSON<T extends Object, U extends Object> (context: U, fi
   });
   return filtered;
 }
+
+/**
+ * Naive diffing function
+ */
+export function objectsDiff<T extends Object> (A: T, B: T): boolean {
+  if (A && A != null && B && B != null) {
+    const aFields = Reflect.ownKeys(A);
+    const bFields = Reflect.ownKeys(B);
+
+    // Compare right side with left side
+    const right = aFields.reduce((acc, aField) => {
+      return (
+        acc
+        && bFields.includes(aField)
+        && aFields[aField] === bFields[aField]
+      );
+    }, true);
+
+    // Compare left side with right side
+    const left = bFields.reduce((acc, bField) => {
+      return (
+        acc
+        && aFields.includes(bField)
+        && aFields[bField] === bFields[bField]
+      );
+    }, true);
+
+    return !(left&&right);
+  }
+  return true;
+}

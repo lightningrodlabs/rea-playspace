@@ -3,9 +3,7 @@ import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, fieldsToJSON } from '../../../utils';
-import { EconomicEventShape, GeoDataShape, MeasurementShape } from "../../../types/valueflows";
 import getDataStore from "../../DataStore";
-import { getProfileNameById } from "../../ProfilesStore";
 
 export interface DisplayNodeShape {
   id?: string;
@@ -42,19 +40,6 @@ export class DisplayNode implements Node, PathedData, NamedData {
   constructor(init: DisplayNodeShape) {
     assignFields<DisplayNodeShape, DisplayNode>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.data = this.makeData();
-  }
-
-  /**
-   * Creates the data field that React Flows uses to render the node.
-   */
-  public makeData(): Object {
-    const type = getAlmostLastPart(this.vfPath);
-    return {
-      id: this.id,
-      label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`,
-      name: this.name
-    }
   }
 
   static getPrefix(planId: string): string {

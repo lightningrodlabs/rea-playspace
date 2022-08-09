@@ -2,7 +2,7 @@ import { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace/dist/rea
 import React, { useEffect, useState } from 'react';
 import { Measurement } from '../../data/models/Valueflows/Knowledge';
 import { MeasurementShape, UnitShape } from '../../types/valueflows';
-import { NumberToString, slChangeConstructor } from '../util';
+import { slChangeConstructor } from '../util';
 
 interface Props {
   label: string;
@@ -11,18 +11,19 @@ interface Props {
   value: MeasurementShape;
   units: UnitShape[];
   onChange: (measurement: any) => void;
+  disableUnit?: boolean;
 }
 
-const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, units, onChange}) => {
+const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, units, onChange, disableUnit}) => {
   const [{hasNumericalValue, hasUnit}, setState] = useState<MeasurementShape>(new Measurement(
     {
-      hasNumericalValue: defaultUnit ? 0 : '',
+      hasNumericalValue: 0,
       hasUnit: defaultUnit ? defaultUnit : ''
     } as MeasurementShape)
   );
 
   useEffect(() => {
-    if (value != null && value.hasNumericalValue && value.hasNumericalValue != '' && value.hasUnit && value.hasUnit != '') {
+    if (value != null && value.hasNumericalValue && value.hasUnit && value.hasUnit != '') {
       setState(value);
     }
   }, [value]);
@@ -32,7 +33,7 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
   }
 
   const validator = (m: MeasurementShape) => {
-    return m.hasNumericalValue && m.hasNumericalValue != '' && m.hasUnit && m.hasUnit != '';
+    return Number.isFinite(m.hasNumericalValue) && m.hasUnit && m.hasUnit != '';
   };
 
   const onSlChange = slChangeConstructor<MeasurementShape>(name, onChange, setState, parsers, validator);
@@ -44,9 +45,9 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
   return (
       <>
         <div className='measurementInput'>
-          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" clearable onSlInput={onSlChange} value={hasNumericalValue.toString()}></SlInput>
+          <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" clearable onSlInput={onSlChange} valueAsNumber={hasNumericalValue} value={hasNumericalValue.toString()}></SlInput>
           <span className='measurementSpacer'></span>
-          <SlSelect className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
+          <SlSelect disabled={disableUnit} className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
             {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
           </SlSelect>
         </div>

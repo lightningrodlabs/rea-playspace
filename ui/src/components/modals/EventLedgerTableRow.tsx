@@ -24,12 +24,13 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
     }, setState
   ] = useState<EconomicEventShape>(economicEvent);
 
+  const dataStore = getDataStore();
+
   useEffect(()=>{
     getNamesForId();
   },[]);
   
   const getNamesForId = (): void => {
-    const dataStore = getDataStore();
     
     const stateCopy = { 
       id,
@@ -71,27 +72,28 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
       stateCopy.outputOf = dataStore.getById(outputOf as string);
     }
 
-    const units = dataStore.getUnits();
-    if (resourceQuantity && resourceQuantity != undefined && resourceQuantity.hasUnit && resourceQuantity.hasUnit != undefined) {
-      resourceQuantity.hasUnit = units.find((unit) => unit.id == resourceQuantity.hasUnit);
-    }
-
-    if (resourceQuantity && effortQuantity != undefined && effortQuantity.hasUnit && effortQuantity.hasUnit != undefined) {
-      effortQuantity.hasUnit = units.find((unit) => unit.id == effortQuantity.hasUnit);
-    }
     setState(stateCopy);
   }
 
   const assembleCard = () => {
+    let resourceQuantityUnit: Unit, effortQuantityUnit: Unit;
+    const units = dataStore.getUnits();
+    if (resourceQuantity && resourceQuantity != undefined && resourceQuantity.hasUnit && resourceQuantity.hasUnit != undefined) {
+      resourceQuantityUnit = units.find((unit) => unit.id == resourceQuantity.hasUnit);
+    }
+
+    if (effortQuantity && effortQuantity != undefined && effortQuantity.hasUnit && effortQuantity.hasUnit != undefined) {
+      effortQuantityUnit = units.find((unit) => unit.id == effortQuantity.hasUnit);
+    }
     let body: string = '';
     body += (`Date: ${new Date(created).toISOString().split('T')[0]} `);
     if (resourceQuantity && resourceQuantity.hasNumericalValue) {
       body += (`, ${(action as ActionShape).label}: `);
-      body += (`${resourceQuantity.hasNumericalValue} ${(resourceQuantity.hasUnit as Unit).name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
+      body += (`${resourceQuantity.hasNumericalValue} ${resourceQuantityUnit.name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
     }
     if (effortQuantity && effortQuantity.hasNumericalValue) {
       body += (`, ${(action as ActionShape).label}: `);
-      body += (`${effortQuantity.hasNumericalValue} ${(effortQuantity.hasUnit as Unit).name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
+      body += (`${effortQuantity.hasNumericalValue} ${effortQuantityUnit.name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
     }
     if (provider) {
       body += (`, Provider: ${(provider as AgentShape).name}`);
