@@ -1,16 +1,19 @@
-import {runScenario, Scenario, pause, getZomeCaller } from "@holochain/tryorama";
+import {runScenario, Scenario, pause, getZomeCaller, Player } from "@holochain/tryorama";
 import { info } from "console";
 import { reaPlayspaceDnaPath } from './utils';
 import test from 'tape';
 
-test("Put Thing: Plan and Commitment", async (t) => {
+async function setup(scenario: Scenario) {
+  const alice = await scenario.addPlayerWithHapp([
+    { path: reaPlayspaceDnaPath},
+  ]);
+  return getZomeCaller(alice.cells[0], "projects");
+}
+
+test("01 - IF commitment created WHEN get_thing called THEN assert put success", async (t) => {
   await runScenario(async (scenario: Scenario) => {
 
-    const alice = await scenario.addPlayerWithHapp([
-      { path: reaPlayspaceDnaPath},
-    ]);
-
-    const projectZomeCall = getZomeCaller(alice.cells[0], "projects");
+    const projectZomeCall = await setup(scenario);
 
     let commitment = {
         // vf:Commitment
@@ -29,12 +32,15 @@ test("Put Thing: Plan and Commitment", async (t) => {
     }
 
     // Alice adds a plan
-    await alice.cells[0].callZome({
-      zome_name: "projects",
-      fn_name: "put_thing",
-      payload: {path: "plans.p1", data: JSON.stringify(plan)}
-    });
-    await pause(1000);
+    await projectZomeCall(
+      "put_thing",
+      {
+        path: "plans.p1", 
+        data: JSON.stringify(plan)
+      }
+    );
+
+    await pause(500);
 
     // Alice adds a commitment
     let put_output: any = await projectZomeCall(
@@ -42,40 +48,79 @@ test("Put Thing: Plan and Commitment", async (t) => {
         {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
     );
 
-    await pause(1000);
+    await pause(500);
 
-    info("Has Header Hash");
     t.ok(put_output.header_hash);
-    info("Has Entry Hash");
     t.ok(put_output.entry_hash);
+  });
+});
 
+test("02- IF nothing created WHEN get_thing called THEN assert looseEqual undefined", async (t) => {
+  await runScenario(async (scenario: Scenario) => {
+
+    const projectZomeCall = await setup(scenario);
+
+    // Get thing that doesn't not exist
     let get_output: any = await projectZomeCall(
       "get_thing",
       "doesntexist"
     );
-
-    info('get_output: ', get_output);
+    info('02 - get_output: ', get_output);
     t.looseEqual(get_output.tree[0], undefined);
+  });
+});
 
-    info('######## GET_OUTPUT: PLANS #######');
+test("03 - IF commitment created when GET_THING called THEN assert deepEquals", async (t) => {
+  await runScenario(async (scenario: Scenario) => {
 
-    let get_output2: any = await projectZomeCall(
+    const projectZomeCall = await setup(scenario);
+
+    let commitment = {
+      // vf:Commitment
+      'inputOf': 'pr1',
+      'id': 'cm1',
+      'effortQuantity': {
+          // om:Measure
+          'hasNumericalValue': 12,
+          'hasUnit': 'minute'
+      }
+    }
+
+    let plan = {
+      'id': 'p1',
+      'name': 'Default Plan'
+    }
+
+    // Alice adds a plan
+    await projectZomeCall(
+      "put_thing",
+      {
+        path: "plans.p1", 
+        data: JSON.stringify(plan)
+      }
+    );
+
+    await pause(500);
+
+    // Alice adds a commitment
+    await projectZomeCall(
+        "put_thing",
+        {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
+    );
+
+    await pause(500);
+
+    let get_output: any = await projectZomeCall(
         "get_thing",
         "plans"
     );
-    
-    info('get_output2: ', get_output2);
 
-    t.ok(get_output2);
+    info('03 - get_output: ', get_output);
+    t.ok(get_output);
 
-    info('get_output: ', get_output);
+    let jsTree = buildTree(get_output.tree, get_output.tree[0])
+    info('03 - get_output - jsTree Plans: ', JSON.stringify(jsTree, null, 2));
 
-    t.ok(get_output)
-
-    let jsTree = buildTree(get_output2.tree, get_output2.tree[0])
-    info('jsTree: ', jsTree);
-
-    info('######## DEEP EQUAL #######');
     t.deepEqual(jsTree, {
       val: {
         name: "plans",
@@ -123,39 +168,177 @@ test("Put Thing: Plan and Commitment", async (t) => {
         },
       ],
     });
+  });
+});
+
+test("04 - IF commitment created with update WHEN get_thing called THEN assert deepEquals", async (t) => {
+  await runScenario(async (scenario: Scenario) => {
+
+    const projectZomeCall = await setup(scenario);
+
+    let commitment = {
+      // vf:Commitment
+      'inputOf': 'pr1',
+      'id': 'cm1',
+      'effortQuantity': {
+          // om:Measure
+          'hasNumericalValue': 12,
+          'hasUnit': 'minute'
+      }
+    }
+
+    let plan = {
+      'id': 'p1',
+      'name': 'Default Plan'
+    }
+
+    // Alice adds a plan
+    await projectZomeCall(
+      "put_thing",
+      {
+        path: "plans.p1", 
+        data: JSON.stringify(plan)
+      }
+    );
+
+    await pause(500);
+
+    // Alice adds a commitment
+    await projectZomeCall(
+        "put_thing",
+        {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
+    );
+
+    await pause(500);
+
+    await projectZomeCall(
+        "get_thing",
+        "plans"
+    );
 
     commitment.effortQuantity.hasNumericalValue = 15
     // Alice updates a commitment
-    put_output = await alice.cells[0].callZome({
-        zome_name: "projects",
-        fn_name: "put_thing",
-        payload: {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
-    });
-    get_output = await alice.cells[0].callZome({
-        zome_name: "projects",
-        fn_name: "get_thing",
-        payload: "plans"
-    });
-    info('######## OUTPUT AFTER UPDATE #######');
-    t.ok(get_output)
-    jsTree = buildTree(get_output.tree,get_output.tree[0])
-    info('######## EQUAL AFTER UPDATE#######');
+    await projectZomeCall(
+      "put_thing",
+      {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
+    );
 
-    t.equal(JSON.parse(jsTree.children[0].children[0].children[0].children[0].children[0].val.data).effortQuantity.hasNumericalValue, 15 )
+    let get_output: any = await projectZomeCall(
+      "get_thing",
+      "plans"
+    );
+
+    t.ok(get_output)
+
+    let jsTree = buildTree(get_output.tree, get_output.tree[0])
+    info('04 - get_output - jsTree Plans: ', JSON.stringify(jsTree, null, 2));
+
+    t.deepEqual(jsTree, {
+      val: {
+        name: "plans",
+        data: "",
+      },
+      children: [
+        {
+          val: {
+            name: "p1",
+            data: '{"id":"p1","name":"Default Plan"}',
+          },
+          children: [
+            {
+              val: {
+                name: "processes",
+                data: "",
+              },
+              children: [
+                {
+                  val: {
+                    name: "pr1",
+                    data: "",
+                  },
+                  children: [
+                    {
+                      val: {
+                        name: "commitments",
+                        data: "",
+                      },
+                      children: [
+                        {
+                          val: {
+                            name: "cm1",
+                            data: '{"inputOf":"pr1","id":"cm1","effortQuantity":{"hasNumericalValue":15,"hasUnit":"minute"}}'
+                          },
+                          children: [],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+  });
+});
+
+test("05 - IF commitment created and then deleted WHEN get_thing called THEN assert deepEquals", async (t) => {
+  await runScenario(async (scenario: Scenario) => {
+
+    const projectZomeCall = await setup(scenario);
+
+    let commitment = {
+      // vf:Commitment
+      'inputOf': 'pr1',
+      'id': 'cm1',
+      'effortQuantity': {
+          // om:Measure
+          'hasNumericalValue': 12,
+          'hasUnit': 'minute'
+      }
+    }
+
+    let plan = {
+      'id': 'p1',
+      'name': 'Default Plan'
+    }
+
+    // Alice adds a plan
+    await projectZomeCall(
+      "put_thing",
+      {
+        path: "plans.p1", 
+        data: JSON.stringify(plan)
+      }
+    );
+
+    await pause(500);
+
+    // Alice adds a commitment
+    await projectZomeCall(
+        "put_thing",
+        {path: "plans.p1.processes.pr1.commitments.cm1", data: JSON.stringify(commitment)}
+    );
+
+    await pause(500);
 
     // delete thing + links
-    await alice.cells[0].callZome({
-      zome_name: "projects",
-      fn_name: "delete_thing",
-      payload: "plans.p1.processes.pr1.commitments.cm1"
-    });
+    await projectZomeCall(
+      "delete_thing",
+      "plans.p1.processes.pr1.commitments.cm1"
+    );
 
-    get_output = await alice.cells[0].callZome({
-      zome_name: "projects",
-      fn_name: "get_thing",
-      payload: "plans"
-    });
-    info('########   DEEP EQUAL AFTER DELETE #######');
+    let get_output: any = await projectZomeCall(
+      "get_thing",
+      "plans"
+    );
+
+    info('05 - get_output: ', get_output);
+    t.ok(get_output);
+
+    let jsTree = buildTree(get_output.tree, get_output.tree[0])
+    info('05 - get_output - jsTree Plans: ', JSON.stringify(jsTree, null, 2));
 
     jsTree = buildTree(get_output.tree,get_output.tree[0]);
     info(JSON.stringify(jsTree, null, 2));
@@ -177,6 +360,7 @@ test("Put Thing: Plan and Commitment", async (t) => {
   });
 });
 
+
 type RustNode = {
   idx: number;
   val: any;
@@ -195,6 +379,7 @@ function buildTree(tree: Array<RustNode>, node: RustNode | undefined): Node {
     return nullNode;
   }
   let t: Node = { val: node?.val, children: [] };
+
   for (const n of node.children) {
     t.children.push(buildTree(tree, tree[n]));
   }
