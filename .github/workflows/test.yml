@@ -35,6 +35,6 @@ jobs:
     - name: Install deps
       run: nix-shell --command "pnpm run install-deps"
     - name: List contents
-      run: nix-shell --command "ls"
+      run: nix-shell --command "ls -a tests"
     - name: Run all tests
       run: nix-shell --command "pnpm run test"
