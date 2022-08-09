@@ -3,6 +3,7 @@ import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape, MeasurementShape } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
+import { Measurement } from "./Knowledge";
 
 export class EconomicResource implements EconomicResourceShape, PathedData, NamedData {
   id: string;
@@ -79,6 +80,8 @@ export class EconomicEvent implements EconomicEventShape {
     this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
     this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
     this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
+    this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
+    this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
   }
 
   static getPrefix(): string {

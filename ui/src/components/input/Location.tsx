@@ -1,16 +1,17 @@
-import { SlCard, SlInput, SlMenuItem, SlRadio, SlRadioButton, SlRadioGroup, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlInput, SlRadio, SlRadioGroup } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { GeoDataShape, GeoPointShape } from '../../types/valueflows';
-import { NumberToString, slChangeConstructor } from '../util';
+import { GeoDataShape } from '../../types/valueflows';
+import { slChangeConstructor } from '../util';
 
 interface Props {
   label: string;
   name: string;
   value: GeoDataShape;
   onChange: (measurement: any) => void;
+  disabled?: boolean;
 }
 
-const LocationInput: React.FC<Props> = ({label, name, value, onChange}) => {
+const LocationInput: React.FC<Props> = ({label, name, value, onChange, disabled}) => {
   const [{type, name: locationName, address, point}, setState] = useState<GeoDataShape>(
     {...{type: ''}, ...value}
   );
@@ -50,15 +51,15 @@ const LocationInput: React.FC<Props> = ({label, name, value, onChange}) => {
     switch(type) {
       case 'address':
         return <>
-        <SlInput label="Address" name="address" value={address ? address : ''} onSlInput={onSlChange}></SlInput>
+        <SlInput disabled={disabled} label="Address" name="address" value={address ? address : ''} onSlInput={onSlChange}></SlInput>
         </>;
       case 'named':
         return <>
-        <SlInput label="Location name" name="name" value={locationName ? locationName : ''} onSlInput={onSlChange}></SlInput>
+        <SlInput disabled={disabled} label="Location name" name="name" value={locationName ? locationName : ''} onSlInput={onSlChange}></SlInput>
         </>
       case 'point':
         return <>
-        <SlInput label="Address" name="point" value={point ? point as string : ''} onSlInput={onSlChange}></SlInput>
+        <SlInput disabled={disabled} label="Address" name="point" value={point ? point as string : ''} onSlInput={onSlChange}></SlInput>
         </>
     }
   }
@@ -68,13 +69,13 @@ const LocationInput: React.FC<Props> = ({label, name, value, onChange}) => {
         <SlCard>
           <label>{`${label}`}</label>
           <SlRadioGroup label="Select a Location type">
-            <SlRadio name="option" value="1" onClick={setAddress} checked={type == 'address'}>
+            <SlRadio disabled={disabled} name="option" value="1" onClick={setAddress} checked={type == 'address'}>
               Address
             </SlRadio>
-            <SlRadio name="option" value="2" onClick={setNamedLocation} checked={type == 'named'}>
+            <SlRadio disabled={disabled} name="option" value="2" onClick={setNamedLocation} checked={type == 'named'}>
               Named Location
             </SlRadio>
-            <SlRadio name="option" value="3" onClick={setPoint} checked={type == 'point'}>
+            <SlRadio disabled={disabled} name="option" value="3" onClick={setPoint} checked={type == 'point'}>
               Lat/Long
             </SlRadio>
           </SlRadioGroup>
