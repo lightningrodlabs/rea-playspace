@@ -4,8 +4,7 @@ import { Handle, Position } from 'react-flow-renderer';
 
 interface Data {
   id: string,
-  name: string,
-  label: string
+  name: string
 }
 
 interface Props {

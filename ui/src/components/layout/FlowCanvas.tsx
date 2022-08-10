@@ -204,7 +204,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setCurrentPosition(undefined);
 
     // Add to local state to render new node on canvas
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => nds.concat(displayNodeToNode(newNode)));
 
     // Persist to DHT
     store.set(newNode);
@@ -252,7 +252,7 @@ const FlowCanvas: React.FC<Props> = () => {
      */
     setNodes((ns) => {
       const nsNew = ns.filter((node) => node.id !== displayNode.id);
-      nsNew.push(newNode);
+      nsNew.push(displayNodeToNode(newNode));
       return nsNew;
     });
 
