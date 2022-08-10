@@ -5,7 +5,7 @@ import MainPanelHeader from "../MainPanelHeader";
 import { Agent } from "../../../data/models/Valueflows/Knowledge";
 import { useNavigate } from "react-router-dom";
 import getDataStore from "../../../data/DataStore";
-import { ListProfiles } from "../../../elements";
+import { ListProfiles, MyProfile } from "../../../elements";
 import { AgentShape } from "../../../types/valueflows";
 
 export type NewAgentProps = {
@@ -29,7 +29,6 @@ const AgentView: React.FC<NewAgentProps> = () => {
 
   useEffect(() => {
     if (id) {
-      const store = getDataStore();
       const obj = store.getById(id);
       setState({
         name: obj.name ? obj.name : '',
@@ -50,25 +49,26 @@ const AgentView: React.FC<NewAgentProps> = () => {
   };
 
   const handleAddAgentFromProfile = async (e: CustomEvent) => {
-    const agentPubKey = e.detail.agentPubKey;
-    const agentReadable = await profilesStore.fetchAgentProfile(agentPubKey);
-    let agent;
-    agentReadable.subscribe(ag => {
-      agent = ag;
-    });
-    await store.fetchAgents();
-    const agent2 = store.getAgent(agentPubKey);
-    if (agent2) {
-      alert('Agent already exists.');
-      return;
-    }
-    const ag: Agent = new Agent({
-      id: e.detail.agentPubKey, 
-      name: agent,
-      note: note
-    });
-    store.set(ag);
-    store.fetchAgents();
+    console.log('handleAddAgent: ', e);
+    // const agentPubKey = e.detail.agentPubKey;
+    // const agentReadable = await profilesStore.fetchAgentProfile(agentPubKey);
+    // let agent;
+    // agentReadable.subscribe(ag => {
+    //   agent = ag;
+    // });
+    // await store.fetchAgents();
+    // const agent2 = store.getAgent(agentPubKey);
+    // if (agent2) {
+    //   alert('Agent already exists.');
+    //   return;
+    // }
+    // const ag: Agent = new Agent({
+    //   id: e.detail.agentPubKey, 
+    //   name: agent,
+    //   note: note
+    // });
+    // store.set(ag);
+    // store.fetchAgents();
     clearState();
     navigate('/');
   }
@@ -146,9 +146,10 @@ const AgentView: React.FC<NewAgentProps> = () => {
         </SlCard>
       
         <SlCard className="new-agent-card">
-          <ListProfiles
+          {/* <ListProfiles
               onagentselected={(e:CustomEvent) => handleAddAgentFromProfile(e)}
-            ></ListProfiles>
+            ></ListProfiles> */}
+            <p>Placeholder for AgentList</p>
           <form onSubmit={handleSubmit}>
           </form>
         </SlCard>
