@@ -5,7 +5,7 @@ import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
 import { ObjectTypeMap } from "../data/models/ObjectTransformations";
 import { getAlmostLastPart } from "../data/models/PathedData";
-import { Action, Agent, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
+import { Action, Agent, isInSet, isTransfer, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
 import { EconomicEvent } from "../data/models/Valueflows/Observation";
 import { Commitment, Process } from "../data/models/Valueflows/Plan";
 import { FlowShape, MeasurementShape } from "../types/valueflows";
@@ -194,9 +194,11 @@ export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
 /**
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
-export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
+export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
+  // default label
   let label = "Well, this is embrassing. I couldn't make a label.";
 
+  // default action, for debugging
   let action = new Action({
     id: 'na',
     label: 'blank action',
@@ -204,32 +206,17 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
     comment: "This indicates there's no action selected."
   });
 
-  let resourceMeasurement: MeasurementShape = {
-    hasNumericalValue: 0,
-    hasUnit: ''
-  };
-
-  let resourceUnit = new Unit({
-    id: 'na',
-    name: 'blank unit',
-    symbol: 'blank unit'
-  });
-
-  let effortMeasurement: MeasurementShape = {
-    hasNumericalValue: 0,
-    hasUnit: ''
-  };
-
-  let effortUnit = new Unit({
-    id: 'na',
-    name: 'blank unit',
-    symbol: 'blank unit'
-  });
-
   // Get the action
   if (flow.action && flow.action !== null) {
     action = actions.find((action) => action.id == flow.action as string);
   }
+
+  // Blank unit
+  const blankUnit = new Unit({
+    id: 'na',
+    name: 'blank unit',
+    symbol: 'blank unit'
+  });
 
   /**
    * Simple conditional for not showing 'piece'.
@@ -244,64 +231,144 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
    * TODO: if we ensure that `flow.{resource,effort}Quantity is a `Measurement`
    *   we can move these functions onto the `Measurement` class.
    */
-  function measumentString(quantity: MeasurementShape) {
-    resourceUnit = units.find((unit) => unit.id == quantity.hasUnit);
-    return `${quantity.hasNumericalValue} ${mungeSymbol(resourceUnit)}`;
+  function measurementString(quantity: MeasurementShape) {
+    let unit = units.find((unit) => unit.id == quantity.hasUnit);
+    return `${quantity.hasNumericalValue} ${mungeSymbol(unit ? unit : blankUnit)}`;
+  }
+
+  /**
+   * Get the flow's resourceQuantity as a string
+   */
+  function resourceQuantity(flow: FlowShape): string {
+    if (
+      flow.resourceQuantity != null
+      && typeof flow.resourceQuantity == 'object'
+      && flow.resourceQuantity.hasNumericalValue
+      && flow.resourceQuantity.hasUnit
+    ) {
+      return ` ${measurementString(flow.resourceQuantity)} `;
+    }
+    return '';
+  }
+
+  /**
+   * Get the flow's resourceQuantity as a string
+   */
+  function effortQuantity(flow: FlowShape, show?: boolean): string {
+    console.log(flow)
+    if (
+      flow.effortQuantity != null
+      && typeof flow.effortQuantity == 'object'
+      && flow.effortQuantity.hasNumericalValue
+      && flow.effortQuantity.hasUnit
+    ) {
+      return `${show ? ' for': ''} ${measurementString(flow.effortQuantity)} `;
+    }
+    return '';
   }
 
   /**
    * Conditionals are arranged to contruct the string in order.
-   * TODO: see issue #72
+   *
+   * work: action N unit by provider [due date]
+   * cite: action [resource name] by provider
+   * use: action N unit (resourceQty) for M unit (effortQty) [resource name] from provider [due date]
+   * transfers: action N unit [resource name] from provider to receiver [due date]
+   * move, raise, lower: action N unit [resource name] in provider
+   * other inputs: action N unit [resource name] from provider [due date]
+   * outputs: action N unit [resource name] for receiver [due date]
+   *
+   * XXX: need due date getter/formatter
    */
 
-  label = `${action.label} `;
+  // Work
+  if (action.id == 'work') {
+    return `${action.label}${effortQuantity(flow)}by ${provider.name}`;
+  }
 
-  // resourceQuantity
-  if (
-    flow.resourceQuantity != null
-    && typeof flow.resourceQuantity == 'object'
-    && flow.resourceQuantity.hasNumericalValue
-    && flow.resourceQuantity.hasUnit
-  ) {
-    label += measumentString(flow.resourceQuantity);
+  // Cite
+  if (action.id == 'cite') {
+    return `${action.label} ${resource.name} by ${provider.name}`;
   }
 
   // Use
   if (action.id == 'use') {
-    label += ` from ${provider.name}`;
-  }
-
-  // effortQuantity
-  if (
-    flow.effortQuantity != null
-    && typeof flow.effortQuantity == 'object'
-    && flow.effortQuantity.hasNumericalValue
-    && flow.effortQuantity.hasUnit
-  ) {
-    if (action.id = 'use') {
-      label += ' for ';
-    }
-    label += measumentString(flow.effortQuantity);
+    return `${action.label}${resourceQuantity(flow)}${effortQuantity(flow, true)}${resource.name} from ${provider.name}`;
   }
 
   // Transfer
   if (
-    (action.id == 'transfer' || action.id == 'transfer-all-rights' || action.id == 'transfer-custody')
+    isTransfer(action.id)
     && flow.provider
     && flow.receiver
-    ) {
-    return `${label} from ${provider.name} to ${receiver.name}`;
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name} to ${receiver.name}`;
   }
 
-  if (flow.inputOf && flow.provider) {
-    return `${provider.name}: ${label}`;
+  // Move, Raise, Lower
+  if (isInSet(['move', 'raise', 'lower'], action.id)) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} in ${provider.name}`;
   }
 
-  if (flow.outputOf && flow.receiver) {
-    return `${label} for ${receiver.name}`;
+  // Input
+  if (
+    isInSet(['input', 'both'], action.inputOutput)
+    && flow.inputOf && flow.provider
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name}`;
+  }
+
+  // Output
+  if (
+    isInSet(['output', 'both'], action.inputOutput)
+    && flow.outputOf && flow.receiver
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} for ${receiver.name}`;
   }
 
   return label;
+}
+
+/**
+ * Summarizes a set of events in one event
+ */
+function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
+  const clone = [...events];
+  const firstEvent = clone.shift();
+  const summaryEvent = new EconomicEvent(getEventDefaultsFromEvent(firstEvent));
+  clone.forEach((event) => {
+    // Guard against undefined or null values
+    if (
+      firstEvent.resourceQuantity
+      && firstEvent.resourceQuantity != null
+      && firstEvent.resourceQuantity.hasNumericalValue
+      && firstEvent.resourceQuantity.hasNumericalValue != null
+      && event.resourceQuantity
+      && event.resourceQuantity != null
+      && event.resourceQuantity.hasNumericalValue
+      && event.resourceQuantity.hasNumericalValue != null
+    ) {
+      summaryEvent.resourceQuantity.hasNumericalValue =
+        summaryEvent.resourceQuantity.hasNumericalValue +
+        event.resourceQuantity.hasNumericalValue;
+    }
+    // Guard against undefined or null values
+    if (
+      firstEvent.effortQuantity
+      && firstEvent.effortQuantity != null
+      && firstEvent.effortQuantity.hasNumericalValue
+      && firstEvent.effortQuantity.hasNumericalValue != null
+      && event.effortQuantity
+      && event.effortQuantity != null
+      && event.effortQuantity.hasNumericalValue
+      && event.effortQuantity.hasNumericalValue != null
+    ) {
+      summaryEvent.effortQuantity.hasNumericalValue =
+        summaryEvent.effortQuantity.hasNumericalValue +
+        event.effortQuantity.hasNumericalValue;
+    }
+  });
+  return summaryEvent;
 }
 
 /**
@@ -316,12 +383,13 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
     const actions: Action[] = store.getActions();
     const units: Unit[] = store.getUnits();
     const {commitment, events} = getCommitmentAndEvents(displayEdge.vfPath);
-  
+
     // Generate label for the commitment
     if (commitment && commitment != null) {
       const provider = store.getById(commitment.provider as string);
       const receiver = store.getById(commitment.receiver as string);
-      const commitmentLabel = getLabelForFlow(commitment, provider, receiver, actions, units)
+      const resource = store.getById(commitment.resourceConformsTo);
+      const commitmentLabel = getLabelForFlow(commitment, resource, provider, receiver, actions, units)
       flowLabels.push(`Commitment: ${commitmentLabel}`);
     } else {
       console.log('No commitment for label.')
@@ -329,46 +397,12 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
 
     // Summarize events into a single event
     if (events.length > 0) {
-      const firstEvent = events.shift();
-      const summaryEvent = new EconomicEvent(getEventDefaultsFromEvent(firstEvent));
-      events.forEach((event) => {
-        // Guard against undefined or null values
-        if (
-          firstEvent.resourceQuantity
-          && firstEvent.resourceQuantity != null
-          && firstEvent.resourceQuantity.hasNumericalValue
-          && firstEvent.resourceQuantity.hasNumericalValue != null
-          && event.resourceQuantity
-          && event.resourceQuantity != null
-          && event.resourceQuantity.hasNumericalValue
-          && event.resourceQuantity.hasNumericalValue != null
-        ) {
-          console.log(event.resourceQuantity.hasNumericalValue);
-          summaryEvent.resourceQuantity.hasNumericalValue =
-            summaryEvent.resourceQuantity.hasNumericalValue +
-            event.resourceQuantity.hasNumericalValue;
-        }
-        // Guard against undefined or null values
-        if (
-          firstEvent.effortQuantity
-          && firstEvent.effortQuantity != null
-          && firstEvent.effortQuantity.hasNumericalValue
-          && firstEvent.effortQuantity.hasNumericalValue != null
-          && event.effortQuantity
-          && event.effortQuantity != null
-          && event.effortQuantity.hasNumericalValue
-          && event.effortQuantity.hasNumericalValue != null
-        ) {
-          console.log(event.effortQuantity.hasNumericalValue);
-          summaryEvent.effortQuantity.hasNumericalValue =
-            summaryEvent.effortQuantity.hasNumericalValue +
-            event.effortQuantity.hasNumericalValue;
-        }
-      });
       // Generate label for the summarized event
+      const summaryEvent = summarizeEvents(events);
       const provider = store.getById(summaryEvent.provider as string);
       const receiver = store.getById(summaryEvent.receiver as string);
-      const eventLabel = getLabelForFlow(summaryEvent, provider, receiver, actions, units)
+      const resource = store.getById(summaryEvent.resourceConformsTo);
+      const eventLabel = getLabelForFlow(summaryEvent, resource, provider, receiver, actions, units)
       flowLabels.push(`Events: ${eventLabel}`);
     } else {
       console.log('No events for label.');
