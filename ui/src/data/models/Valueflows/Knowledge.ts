@@ -276,6 +276,17 @@ export type ActionKey = 'accept'
                       | 'use'
                       | 'work';
 
+export const isInSet = (set: string[], action: string): boolean => {
+  return set.findIndex((t) => action == t) > -1;
+}
+
+export const isTransfer = (action: string):boolean => {
+  return isInSet([
+    'transfer',
+    'transfer-all-rights',
+    'transfer-custody'], action);
+}
+
 /**
  * Action determines which rules are applied to the flows through the various
  * objects: Intent, Commitment, Fulfillment, & Claim. These rules are responsible

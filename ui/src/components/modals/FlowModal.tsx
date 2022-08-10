@@ -1,7 +1,7 @@
 import { SlButton, SlButtonGroup, SlDivider, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { PathedData } from '../../data/models/PathedData';
-import { Action, Agent, Unit } from '../../data/models/Valueflows/Knowledge';
+import { Action, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
 import { CommitmentShape, EconomicEventShape, FlowShape } from '../../types/valueflows';
 import { Commitment } from '../../data/models/Valueflows/Plan';
 import { EconomicEvent } from '../../data/models/Valueflows/Observation';
@@ -77,6 +77,17 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const pickEvent = (event: EconomicEvent) => {
     setCurrentEditEvent(event);
   };
+
+  /**
+   * Hydrate the resource from the key
+   */
+  const getResource = (flow: FlowShape) => {
+    const store  = getDataStore();
+    if (flow && flow.resourceConformsTo) {
+      return store.getById(flow.resourceConformsTo as string);
+    }
+    return null;
+  }
 
   /**
    * Hydrate the provider from the key
@@ -168,7 +179,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    */
   const commitmentEditOrCreate = () => {
     if (editCommitment) {
-      const label = getLabelForFlow(editCommitment, getProvider(editCommitment), getReceiver(editCommitment), actions, units);
+      const label = getLabelForFlow(editCommitment, getResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
       return <>
         <SlButton variant="default" onClick={() => setCommitmentOpen(true)}>{label}</SlButton>
       </>;
@@ -215,7 +226,9 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     const readonlyFields = [];
 
     function disableFields(flow: FlowShape) {
-      if (flow.action && flow.action != null) {
+      if (
+        flow.action && flow.action != null
+        && !isTransfer(flow.action as string)) {
         readonlyFields.unshift('action');
       }
       if (flow.resourceQuantity && flow.resourceQuantity != null) {
@@ -235,7 +248,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
       disableFields(editCommitment);
     } else {
       // Do the same with Events.
-      if (editEvents.length > 0) {
+      if (editEvents.length > 1) {
         const firstEvent = editEvents[0];
         eventState = {...initial, ...getEventDefaultsFromEvent(firstEvent), ...currentEditEvent};
         disableFields(firstEvent);
@@ -367,7 +380,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
             </div>
             {editEvents.map((ev) =>
               <SlButton variant="default" id={`edit-${ev.id}`} key={ev.id} onClick={makeEventClickHandler(ev)}>
-                {getLabelForFlow(ev, getProvider(ev), getReceiver(ev), actions, units)}
+                {getLabelForFlow(ev, getResource(ev), getProvider(ev), getReceiver(ev), actions, units)}
               </SlButton>
             )}
             <br />
