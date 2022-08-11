@@ -119,6 +119,11 @@ export class Measurement implements MeasurementShape {
     name: 'foot (US survey)',
     symbol: 'ft'
   }),
+  'yard-International': new Unit({
+    id: 'yard-International',
+    name: 'yard (international)',
+    symbol: 'yd'
+  }),
   'metre': new Unit({
     id: 'metre',
     name: 'metre',
@@ -149,10 +154,30 @@ export class Measurement implements MeasurementShape {
     name: 'gallon (US)',
     symbol: 'gal'
   }),
+  'cup-USCustomary': new Unit({
+    id: 'cup-USCustomary',
+    name: 'cup (US customary)',
+    symbol: 'cup'
+  }),
+  'tablespoon-US': new Unit({
+    id: 'tablespoon-US',
+    name: 'tablespoon (US)',
+    symbol: 'tbsp.'
+  }),
+  'teaspoon-US': new Unit({
+    id: 'teaspoon-US',
+    name: 'teaspoon (US)',
+    symbol: 'tsp.'
+  }),
   'litre': new Unit({
     id: 'litre',
     name: 'litre',
     symbol: 'l'
+  }),
+  'millilitre': new Unit({
+    id: 'millilitre',
+    name: 'millilitre',
+    symbol: 'ml'
   }),
   'gram': new Unit({
     id: 'gram',
@@ -169,20 +194,10 @@ export class Measurement implements MeasurementShape {
     name: 'tonne',
     symbol: 't'
   }),
-  'cup-USCustomary': new Unit({
-    id: 'cup-USCustomary',
-    name: 'cup (US customary)',
-    symbol: 'cup'
-  }),
-  'tablespoon-US': new Unit({
-    id: 'tablespoon-US',
-    name: 'tablespoon (US)',
-    symbol: 'tbsp.'
-  }),
-  'teaspoon-US': new Unit({
-    id: 'teaspoon-US',
-    name: 'teaspoon (US)',
-    symbol: 'tsp.'
+  'poundAvoirdupois': new Unit({
+    id: 'poundAvoirdupois',
+    name: 'pound',
+    symbol: 'lb'
   })
 }
 
