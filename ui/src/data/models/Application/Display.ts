@@ -39,19 +39,6 @@ export class DisplayNode implements Node, PathedData, NamedData {
   constructor(init: DisplayNodeShape) {
     assignFields<DisplayNodeShape, DisplayNode>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.data = this.makeData();
-  }
-
-  /**
-   * Creates the data field that React Flows uses to render the node.
-   */
-  public makeData(): Object {
-    const type = getAlmostLastPart(this.vfPath);
-    return {
-      id: this.id,
-      label: `${type.charAt(0).toUpperCase()}${type.slice(1)}`,
-      name: this.name
-    }
   }
 
   static getPrefix(planId: string): string {

@@ -1,11 +1,11 @@
 // EDGE BUSINESS LOGIC
 
-import { Edge, MarkerType } from "react-flow-renderer";
+import { Edge, MarkerType, Node } from "react-flow-renderer";
 import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
 import { ObjectTypeMap } from "../data/models/ObjectTransformations";
 import { getAlmostLastPart } from "../data/models/PathedData";
-import { Action, Agent, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
+import { Action, Agent, isInSet, isTransfer, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
 import { EconomicEvent } from "../data/models/Valueflows/Observation";
 import { Commitment, Process } from "../data/models/Valueflows/Plan";
 import { FlowShape, MeasurementShape } from "../types/valueflows";
@@ -51,7 +51,7 @@ export const getFirstCommitmentOrEvent = (displayEdge: DisplayEdge): FlowShape =
 }
 
 /**
- * Returns the Commitment and Events associated with a display edge in a structured fashion.
+ * Returns a clone of Commitment and Events associated with a display edge in a structured fashion.
  * @param vfPath 
  * @returns 
  */
@@ -65,14 +65,14 @@ export const getCommitmentAndEvents = (vfPath: string[] | string): {commitment: 
         if (getAlmostLastPart(flowPath) === 'commitment') {
           commitmentPath = flowPath;
         } else {
-          events.push(store.getCursor(flowPath) as EconomicEvent);
+          events.push(new EconomicEvent(store.getCursor(flowPath) as EconomicEvent));
         }
       }
     );
   } else {
     commitmentPath = vfPath;
   }
-  const commitment = commitmentPath ? store.getCursor(commitmentPath) as Commitment: null;
+  const commitment = commitmentPath ? new Commitment(store.getCursor(commitmentPath) as Commitment): null;
   return {commitment, events};
 }
 
@@ -166,11 +166,39 @@ export const validateFlow = (sourceType: string, targetType: string): boolean =>
 }
 
 /**
+ * Removes fields that shouldn't be set or not present in an Event and sets defaults
+ */
+export const getEventDefaultsFromCommitment = (commitment: Commitment): FlowShape => {
+  const init = {...commitment};
+  delete init.id;
+  delete init.created;
+  delete init.plannedWithin;
+  delete init.due;
+  delete init.note;
+  init.hasPointInTime = new Date();
+  return init;
+}
+
+/**
+ * Removes fields that shouldn't be set or not present in an Event and sets defaults
+ */
+export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
+  const init = {...event};
+  delete init.id;
+  delete init.created;
+  delete init.note;
+  init.hasPointInTime = new Date();
+  return init;
+}
+
+/**
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
-export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
-  let label = "Well, this is embrassing. I couldn't make a label.";
+export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
+  // default label
+  let label = "Reticualting splines...";
 
+  // default action, for debugging
   let action = new Action({
     id: 'na',
     label: 'blank action',
@@ -178,93 +206,177 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
     comment: "This indicates there's no action selected."
   });
 
-  let resourceMeasurement: MeasurementShape = {
-    hasNumericalValue: 0,
-    hasUnit: ''
-  };
-
-  let resourceUnit = new Unit({
-    id: 'na',
-    name: 'blank unit',
-    symbol: 'blank unit'
-  });
-
-  let effortMeasurement: MeasurementShape = {
-    hasNumericalValue: 0,
-    hasUnit: ''
-  };
-
-  let effortUnit = new Unit({
-    id: 'na',
-    name: 'blank unit',
-    symbol: 'blank unit'
-  });
-
   // Get the action
   if (flow.action && flow.action !== null) {
     action = actions.find((action) => action.id == flow.action as string);
   }
 
+  // Blank unit
+  const blankUnit = new Unit({
+    id: 'na',
+    name: 'blank unit',
+    symbol: 'blank unit'
+  });
+
   /**
-   * All conditionals should be arranged from most specific to least specific.
-   * TODO: eventually we may just define templates per action per language
+   * Simple conditional for not showing 'piece'.
+   */
+  function mungeSymbol(unit: Unit) {
+    // Don't show the unit for pieces;
+    return unit.id !== 'piece' ? unit.symbol: '';
+  }
+
+  /**
+   * This turns a MeasurementShape into a string representation.
+   * TODO: if we ensure that `flow.{resource,effort}Quantity is a `Measurement`
+   *   we can move these functions onto the `Measurement` class.
+   */
+  function measurementString(quantity: MeasurementShape) {
+    let unit = units.find((unit) => unit.id == quantity.hasUnit);
+    return `${quantity.hasNumericalValue} ${mungeSymbol(unit ? unit : blankUnit)}`;
+  }
+
+  /**
+   * Get the flow's resourceQuantity as a string
+   */
+  function resourceQuantity(flow: FlowShape): string {
+    if (
+      flow.resourceQuantity != null
+      && typeof flow.resourceQuantity == 'object'
+      && flow.resourceQuantity.hasNumericalValue
+      && flow.resourceQuantity.hasUnit
+    ) {
+      return ` ${measurementString(flow.resourceQuantity)} `;
+    }
+    return '';
+  }
+
+  /**
+   * Get the flow's resourceQuantity as a string
+   */
+  function effortQuantity(flow: FlowShape, show?: boolean): string {
+    console.log(flow)
+    if (
+      flow.effortQuantity != null
+      && typeof flow.effortQuantity == 'object'
+      && flow.effortQuantity.hasNumericalValue
+      && flow.effortQuantity.hasUnit
+    ) {
+      return `${show ? ' for': ''} ${measurementString(flow.effortQuantity)} `;
+    }
+    return '';
+  }
+
+  function dateString(flow: FlowShape):string {
+    if (flow.due) {
+      return ` ${flow.due.toLocaleString()}`;
+    }
+    if (flow.hasPointInTime) {
+      return ` ${flow.hasPointInTime.toLocaleString()}`;
+    }
+    return '';
+  }
+
+  /**
+   * Conditionals are arranged to contruct the string in order.
+   *
+   * work: action N unit by provider [due date]
+   * cite: action [resource name] by provider
+   * use: action N unit (resourceQty) for M unit (effortQty) [resource name] from provider [due date]
+   * transfers: action N unit [resource name] from provider to receiver [due date]
+   * move, raise, lower: action N unit [resource name] in provider
+   * other inputs: action N unit [resource name] from provider [due date]
+   * outputs: action N unit [resource name] for receiver [due date]
    */
 
+  // Work
+  if (action.id == 'work') {
+    return `${action.label}${effortQuantity(flow)}by ${provider.name}${dateString(flow)}`;
+  }
+
+  // Cite
+  if (action.id == 'cite') {
+    return `${action.label} ${resource.name} by ${provider.name}`;
+  }
+
   // Use
-  if (action.id == 'use' && flow.resourceQuantity != null && flow.effortQuantity != null) {
-    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
-    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
-
-    // Don't show the unit for pieces;
-    let resourceSymbol = '';
-    if (resourceUnit.id !== 'piece') {
-      resourceSymbol = ` ${resourceUnit.symbol}`;
-    }
-
-    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
-    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
-
-    return `${action.label} ${resourceMeasurement.hasNumericalValue}${resourceSymbol} from ${provider.name} for ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
-  }
-
-  // Only resourceQuantity
-  if (flow.resourceQuantity != null && flow.effortQuantity == null) {
-    resourceMeasurement.hasNumericalValue = flow.resourceQuantity.hasNumericalValue;
-    resourceMeasurement.hasUnit = flow.resourceQuantity.hasUnit as string;
-    resourceUnit = units.find((unit) => unit.id == resourceMeasurement.hasUnit);
-
-    label = `${action.label} ${resourceMeasurement.hasNumericalValue} ${resourceUnit.symbol}`;
-  }
-
-  // Only effortQuantity
-  if (flow.resourceQuantity == null && flow.effortQuantity != null) {
-    effortMeasurement.hasNumericalValue = flow.effortQuantity.hasNumericalValue;
-    effortMeasurement.hasUnit = flow.effortQuantity.hasUnit as string;
-    effortUnit = units.find((unit) => unit.id == effortMeasurement.hasUnit);
-
-    label = `${action.label} ${effortMeasurement.hasNumericalValue} ${effortUnit.symbol}`;
+  if (action.id == 'use') {
+    return `${action.label}${resourceQuantity(flow)}${effortQuantity(flow, true)}${resource.name} from ${provider.name}${dateString(flow)}`;
   }
 
   // Transfer
   if (
-    (action.id == 'transfer' || action.id == 'transfer-all-rights' || action.id == 'transfer-custody')
+    isTransfer(action.id)
     && flow.provider
     && flow.receiver
-    ) {
-    return `${label} from ${provider.name} to ${receiver.name}`;
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name} to ${receiver.name}${dateString(flow)}`;
   }
 
-  if (flow.inputOf && flow.provider) {
-    return `${provider.name}: ${label}`;
+  // Move, Raise, Lower
+  if (isInSet(['move', 'raise', 'lower'], action.id)) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} in ${provider.name}`;
   }
 
-  if (flow.outputOf && flow.receiver) {
-    return `${label} for ${receiver.name}`;
+  // Input
+  if (
+    isInSet(['input', 'both'], action.inputOutput)
+    && flow.inputOf && flow.provider
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name}${dateString(flow)}`;
+  }
+
+  // Output
+  if (
+    isInSet(['output', 'both'], action.inputOutput)
+    && flow.outputOf && flow.receiver
+  ) {
+    return `${action.label}${resourceQuantity(flow)}${resource.name} for ${receiver.name}${dateString(flow)}`;
   }
 
   return label;
+}
+
+/**
+ * Summarizes a set of events in one event
+ */
+function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
+  const clone = [...events];
+  const firstEvent = clone.shift();
+  const summaryEvent = new EconomicEvent(getEventDefaultsFromEvent(firstEvent));
+  clone.forEach((event) => {
+    // Guard against undefined or null values
+    if (
+      firstEvent.resourceQuantity
+      && firstEvent.resourceQuantity != null
+      && firstEvent.resourceQuantity.hasNumericalValue
+      && firstEvent.resourceQuantity.hasNumericalValue != null
+      && event.resourceQuantity
+      && event.resourceQuantity != null
+      && event.resourceQuantity.hasNumericalValue
+      && event.resourceQuantity.hasNumericalValue != null
+    ) {
+      summaryEvent.resourceQuantity.hasNumericalValue =
+        summaryEvent.resourceQuantity.hasNumericalValue +
+        event.resourceQuantity.hasNumericalValue;
+    }
+    // Guard against undefined or null values
+    if (
+      firstEvent.effortQuantity
+      && firstEvent.effortQuantity != null
+      && firstEvent.effortQuantity.hasNumericalValue
+      && firstEvent.effortQuantity.hasNumericalValue != null
+      && event.effortQuantity
+      && event.effortQuantity != null
+      && event.effortQuantity.hasNumericalValue
+      && event.effortQuantity.hasNumericalValue != null
+    ) {
+      summaryEvent.effortQuantity.hasNumericalValue =
+        summaryEvent.effortQuantity.hasNumericalValue +
+        event.effortQuantity.hasNumericalValue;
+    }
+  });
+  return summaryEvent;
 }
 
 /**
@@ -272,16 +384,46 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
  */
  export const getLabelForDisplayEdge = (displayEdge: DisplayEdge): string => {
   const store = getDataStore();
+  const flowLabels = new Array<string>();
+  let label = "No flows.";
+
   try {
-    const flow: FlowShape = getFirstCommitmentOrEvent(displayEdge);
     const actions: Action[] = store.getActions();
     const units: Unit[] = store.getUnits();
-    const provider = store.getById(flow.provider as string);
-    const receiver = store.getById(flow.receiver as string);
-    return getLabelForFlow(flow, provider, receiver, actions, units);
+    const {commitment, events} = getCommitmentAndEvents(displayEdge.vfPath);
+
+    // Generate label for the commitment
+    if (commitment && commitment != null) {
+      const provider = store.getById(commitment.provider as string);
+      const receiver = store.getById(commitment.receiver as string);
+      const resource = store.getById(commitment.resourceConformsTo);
+      const commitmentLabel = getLabelForFlow(commitment, resource, provider, receiver, actions, units)
+      flowLabels.push(`Commitment: ${commitmentLabel}`);
+    } else {
+      console.log('No commitment for label.')
+    }
+
+    // Summarize events into a single event
+    if (events.length > 0) {
+      // Generate label for the summarized event
+      const summaryEvent = summarizeEvents(events);
+      const provider = store.getById(summaryEvent.provider as string);
+      const receiver = store.getById(summaryEvent.receiver as string);
+      const resource = store.getById(summaryEvent.resourceConformsTo);
+      const eventLabel = getLabelForFlow(summaryEvent, resource, provider, receiver, actions, units)
+      flowLabels.push(`Events: ${eventLabel}`);
+    } else {
+      console.log('No events for label.');
+    }
+
+    if (flowLabels.length > 0) {
+      return flowLabels.join("\n");
+    } else {
+      return label;
+    }
   } catch(err) {
     console.error(err);
-    return "placeholder";
+    return "Error";
   }
 }
 
@@ -292,7 +434,7 @@ export const getLabelForFlow = (flow: FlowShape, provider: Agent, receiver: Agen
  * TODO: maybe submit a PR to React Flows to either export the function that
  * builds these IDs, or make it more amenable to unique external IDs.
  */
-export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge  => {
+export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge => {
   return {
     id: `reactflow__edge-${displayEdge.source}${displayEdge.sourceHandle || ''}-${displayEdge.target}${displayEdge.targetHandle || ''}`,
     source: displayEdge.source,
@@ -306,6 +448,28 @@ export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge  => {
     },
     data: {
       id: displayEdge.id
+    }
+  }
+}
+
+export const displayNodeToNode = (displayNode: DisplayNode): Node => {
+  const store = getDataStore();
+  const {id, name, type, vfPath, position} = displayNode;
+  const vfObject = store.getCursor(vfPath);
+
+  let agent = null;
+  if (Object.hasOwn(vfObject,'inScopeOf')) {
+    agent = store.getById(vfObject.inScopeOf).name;
+  }
+
+  return {
+    id,
+    position,
+    type,
+    data: {
+      id,
+      name,
+      agent
     }
   }
 }

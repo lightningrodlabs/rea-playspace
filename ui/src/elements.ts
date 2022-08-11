@@ -3,10 +3,9 @@ import * as React from "react";
 import {
   CreateProfile as NativeCreateProfile,
   ListProfiles as NativeListProfiles,
-  SearchAgent as NativeSearchAgent,
   ProfilePrompt as NativeProfilePrompt,
   ProfilesContext as NativeProfilesContext,
-  AgentAvatar as NativeAgentAvatar
+  MyProfile as NativeMyProfile,
 } from "@holochain-open-dev/profiles";
 
 export const ProfilesContext = createComponent(
@@ -15,6 +14,7 @@ export const ProfilesContext = createComponent(
   NativeProfilesContext,
   {}
 );
+
 export const ListProfiles = createComponent(
   React,
   "list-profiles",
@@ -24,11 +24,20 @@ export const ListProfiles = createComponent(
   }
 );
 
+export const MyProfile = createComponent(
+  React,
+  "my-profile",
+  NativeMyProfile,
+  {}
+);
+
 export const CreateProfile = createComponent(
   React,
   "create-profile",
   NativeCreateProfile,
-  {}
+  {
+    onProfileCreated: "profile-created"
+  }
 );
 
 export const ProfilePrompt = createComponent(
@@ -37,19 +46,3 @@ export const ProfilePrompt = createComponent(
   NativeProfilePrompt,
   {}
 );
-
-export const SearchAgent = createComponent(
-  React,
-  "search-agent",
-  NativeSearchAgent,
-  {}
-);
-
-export const AgentAvatar = createComponent(
-  React,
-  "agent-avatar",
-  NativeAgentAvatar,
-  {}
-);
-
-

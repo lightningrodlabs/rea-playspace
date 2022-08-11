@@ -32,7 +32,7 @@ import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/Pa
 import { NamedData } from '../../data/models/NamedData';
 import { Process } from '../../data/models/Valueflows/Plan';
 import { FlowShape, ProcessShape } from '../../types/valueflows';
-import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow } from '../../logic/flows';
+import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
 import { assignFields } from '../../utils';
 
 interface Props {};
@@ -108,7 +108,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const planId = store.getCursor('root.planId');
     const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
     const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
-    setNodes(displayNodes);
+    setNodes(displayNodes.map((node: DisplayNode) => displayNodeToNode(node)));
     setEdges(displayEdges.map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
   };
 
@@ -204,7 +204,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setCurrentPosition(undefined);
 
     // Add to local state to render new node on canvas
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => nds.concat(displayNodeToNode(newNode)));
 
     // Persist to DHT
     store.set(newNode);
@@ -252,7 +252,7 @@ const FlowCanvas: React.FC<Props> = () => {
      */
     setNodes((ns) => {
       const nsNew = ns.filter((node) => node.id !== displayNode.id);
-      nsNew.push(newNode);
+      nsNew.push(displayNodeToNode(newNode));
       return nsNew;
     });
 
@@ -564,7 +564,15 @@ const FlowCanvas: React.FC<Props> = () => {
             deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right">
-            <MiniMap />
+            <MiniMap 
+              nodeStrokeColor={(n) => {
+                if (n.type === 'resourceSpecification') return '#79c879';
+                if (n.type === 'process') return '#deb96f';
+              }}
+              nodeColor={(n) => {
+                if (n.type === 'resourceSpecification') return 'lightgreen';
+                if (n.type === 'process') return 'rgb(255, 213, 128)';
+              }}/>
             <Controls />
             <Background color="#aaa" gap={16} />
           </ReactFlow>

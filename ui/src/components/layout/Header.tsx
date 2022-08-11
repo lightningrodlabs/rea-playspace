@@ -1,7 +1,5 @@
 import React from "react";
-import { getMyProfile } from "../../data/ProfilesStore";
-import { AgentAvatar } from "../../elements";
-import { getAgentPubKey, getZomeApi } from "../../hcWebsockets";
+import { getZomeApi } from "../../hcWebsockets";
 import { SlButton } from '@shoelace-style/shoelace/dist/react';
 import { Link } from 'react-router-dom';
 
@@ -9,14 +7,6 @@ export type HeaderProps = {};
 
 const Header: React.FC<HeaderProps> = () => {
 
-  const signalCall = async (): Promise<void> => {
-    const zomeApi = getZomeApi();
-    try {
-      await zomeApi.signal_call();
-    } catch (e) { 
-      console.error(e)
-    }
-  }
 
   return (
     <div className="header">
@@ -28,10 +18,10 @@ const Header: React.FC<HeaderProps> = () => {
       </Link>
       <SlButton variant="primary"outline onClick={signalCall}>Tigger Signal Call</SlButton>
       <div>
-        <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
-         </AgentAvatar> 
+        {/* <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
+         </AgentAvatar>  */}
         {" "}
-        {getMyProfile().profile.nickname.slice(0, 8)}
+        {/* {getMyProfile().profile.nickname.slice(0, 8)} */}
       </div>
     </div>
   );

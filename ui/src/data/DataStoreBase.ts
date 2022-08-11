@@ -5,7 +5,8 @@ import { getLastPart, getParentPath, getRustNodePath, PathedData } from "./model
 import { ObjectTransformations } from "./models/ObjectTransformations";
 import { Root, RootShape } from "./models/Application/Root";
 import { Action, Fiber } from "../lib/fiber";
-import { overwriteFields } from "../utils";
+import { HasIdDate } from "../types/valueflows";
+import { assignFields, overwriteFields } from "../utils";
 
 /**
  * Data store object
@@ -49,7 +50,8 @@ export class DataStoreBase {
         traversed.push(slug);
       } else {
         const tPath = traversed.join('.');
-        throw new Error(`Could not find element '${slug}' in '${tPath}'.`);
+        console.log(`Could not find element '${slug}' in '${tPath}'.`);
+        cursor = null;
       }
     }
     return cursor;
@@ -165,6 +167,22 @@ export class DataStoreBase {
   }
 
   /**
+   * Generic function for upserting a PathedData object. Will always replace the object.
+   *
+   * Example usage:
+   * const newCommitment = upsert<CommitmentShape, Commitment>(commitmentUpdates, Commitment);
+   */
+   public upsert<T extends HasIdDate, U extends PathedData> (updates: T, constructor: {new (init: any): U}): U {
+    const obj: U = new constructor(updates);
+    assignFields<T, U>(
+      updates,
+      obj
+    );
+    this.set(obj);
+    return obj;
+  }
+
+  /**
    * Persists the entire tree, using the pathIndex as the reference
    */
   public saveTree() {
@@ -191,6 +209,9 @@ export class DataStoreBase {
   * @param path
   */
   public delete(path: string) {
+    let parent = this.getCursor(getParentPath(path));
+    const childKey = getLastPart(path);
+    delete parent[childKey];
     this.fiber.schedule([
       () => this.zomeApi.delete_thing(path)
     ]);
@@ -204,15 +225,16 @@ export class DataStoreBase {
    */
   public async fetchOrCreateRoot() {
     // check if root object exists
-    const res = await this.zomeApi.get_thing('root');
-    if (res[0].val.data === '') {
-      // if it doesn't, create it and a placeholder plan
+    const result = await this.zomeApi.get_thing('root');
+    if (result.length === 0) {
+      // if it doesn't, create it
       console.log('root does not exist. creating...');
       this.put(this.root);
     } else {
       // We have the data, lets hydrate it
-      this.hydrateFromZome(res);
+      this.hydrateFromZome(result);
     }
+    return this.root;
   }
 
   public async saveLocalRoot() {
@@ -257,7 +279,6 @@ export class DataStoreBase {
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const { name, data } = node.val;
-      console.log(data);
       const path = getRustNodePath(i, res);
       const parentPath = getParentPath(path);
 

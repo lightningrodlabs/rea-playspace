@@ -5,14 +5,13 @@ import { Agent, ProcessSpecification, ResourceSpecification } from "./data/model
 import { reducer as rReducer } from "./store/resourceSpecification/state";
 import { reducer as pReducer } from "./store/processSpecification/state";
 
-// import { globalStateContext } from "./data/DataStoreBase";
-
 interface Props {
+  setEdit: (entity: any) => void;
 }
 
-const Home: React.FC<Props> = () => {
-  // const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
-  // const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
+const Home: React.FC<Props> = ({setEdit}) => {
+  const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
+  const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
 
   const [{resourceSpecification}, rdispatch] = useReducer(rReducer, {
@@ -21,22 +20,29 @@ const Home: React.FC<Props> = () => {
     hasError: false
   });
 
-  const [{processSpecification}, pdispatch] = useReducer(pReducer, {
-    processSpecification: {},
-    isLoading: false,
-    hasError: false
-  });
+  // const [{processSpecification}, pdispatch] = useReducer(pReducer, {
+  //   processSpecification: {},
+  //   isLoading: false,
+  //   hasError: false
+  // });
 
   console.log('resourceSpecification', resourceSpecification);
   console.log('processSpecification', processSpecification);
 
   useEffect(()=>{
-    refreshFromDataStore();
+    //refreshFromDataStore();
   }, []);
 
-  const refreshFromDataStore = (): void => {
-    // setProcessSpecifications(Object.values(root.processSpecification));
-    // setAgents(Object.values(root.agent));
+  function updateDisplayState(id: string, type: string): void {
+      if (type === 'resourceSpecification') {
+        setResourceSpecifications(resourceSpecifications.filter(resource => resource.id !== id));
+      }
+      if (type === 'processSpecification') {
+        setProcessSpecifications(processSpecifications.filter(process => process.id !== id));
+      }
+      if (type === 'agent') {
+        setAgents(agents.filter(agent => agent.id !== id));
+      }
   }
 
   return(
@@ -45,6 +51,8 @@ const Home: React.FC<Props> = () => {
         resourceSpecifications={Object.values(resourceSpecification)}
         processSpecifications={Object.values(processSpecification)}
         agents={agents}
+        updateDisplayState={updateDisplayState}
+        setEdit={setEdit}
       />
       <FlowCanvas />
     </div>

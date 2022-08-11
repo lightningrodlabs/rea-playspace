@@ -74,11 +74,11 @@ export class Unit {
  * Basic model of a measurement from the OM Schema
  */
 export class Measurement implements MeasurementShape {
-  hasNumericalValue: number | string;  // actual quantity
+  hasNumericalValue: number;  // actual quantity
   hasUnit: string;            // ID of unit
 
   constructor(init?: MeasurementShape) {
-    this.hasNumericalValue = '';
+    this.hasNumericalValue = 0;
     this.hasUnit = '';
     if (init) {
       assignFields<MeasurementShape, Measurement>(init, this);
@@ -275,6 +275,17 @@ export type ActionKey = 'accept'
                       | 'transfer-custody'
                       | 'use'
                       | 'work';
+
+export const isInSet = (set: string[], action: string): boolean => {
+  return set.findIndex((t) => action == t) > -1;
+}
+
+export const isTransfer = (action: string):boolean => {
+  return isInSet([
+    'transfer',
+    'transfer-all-rights',
+    'transfer-custody'], action);
+}
 
 /**
  * Action determines which rules are applied to the flows through the various

@@ -1,12 +1,22 @@
 ---
 manifest_version: "1"
 name: reaplayspacedna
-uuid: 00000000-0000-0000-0000-000000000000
-properties: ~
-zomes: 
-  - name: projects
-    bundled: ../../target/wasm32-unknown-unknown/release/projects.wasm
-  - name: profiles
-    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
-  - name: ping
-    bundled: ../../target/wasm32-unknown-unknown/release/ping.wasm
+integrity:
+  uid: 00000000-0000-0000-0000-000000000000
+  properties: ~
+  origin_time: 2022-02-11T23:05:19.470323Z
+  zomes:
+    - name: projects_core
+      bundled: ../../target/wasm32-unknown-unknown/release/projects_core.wasm
+    - name: profiles_core
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_core.wasm
+coordinator:
+  zomes:
+    - name: projects
+      bundled: ../../target/wasm32-unknown-unknown/release/projects.wasm
+      dependencies:
+        - name: projects_core
+    - name: profiles
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
+      dependencies:
+        - name: profiles_core
