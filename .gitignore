@@ -19,7 +19,7 @@ back/2-conductor-config.yml
 back/scripts/2-install-happ.sh
 2-config-admin-ws
 2-config-app-ws
-.hc
+.hc*
 databases
 databases2
 keystore
@@ -28,3 +28,5 @@ my-proxy-cert.cert
 
 **/.DS_Store
 .DS_Store
+
+.pnpm-debug.log
