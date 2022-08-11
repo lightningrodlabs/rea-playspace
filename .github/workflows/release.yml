@@ -45,7 +45,7 @@ jobs:
         run: nix-shell --run "pnpm run install-deps"
       - name: Build happ
         run: |
-          nix-shell --run "pnpm run happ-pack"
+          nix-shell --run "pnpm run hc:happ-pack"
       - name: Build webhApp
         run: |
           nix-shell --run "pnpm run webhapp-pack"
