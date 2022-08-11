@@ -1,5 +1,4 @@
 import React from "react";
-import { getMyProfile } from "../../data/ProfilesStore";
 import { getAgentPubKey } from "../../hcWebsockets";
 import { SlButton } from '@shoelace-style/shoelace/dist/react';
 import { Link } from 'react-router-dom';
