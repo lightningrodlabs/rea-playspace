@@ -24,9 +24,6 @@ import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/pro
 import { InstalledCell } from "@holochain/client";
 import { CellClient } from "@holochain-open-dev/cell-client";
 import { EconomicEvent } from "./models/Valueflows/Observation";
-import { HasIdDate } from "../types/valueflows";
-import { PathedData } from "./models/PathedData";
-import { assignFields, overwriteFields } from "../utils";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;

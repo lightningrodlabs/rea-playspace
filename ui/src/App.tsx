@@ -14,6 +14,7 @@ import { ResourceSpecificationShape } from "./types/valueflows";
 import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
 import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
 import AgentView from "./components/layout/create/AgentView";
+import EventLedger from "./components/layout/EventLedger";
 import { ProfilesStore } from "@holochain-open-dev/profiles";
 
 Modal.setAppElement("#root");
@@ -71,37 +72,40 @@ const App: React.FC<Props> = () => {
             <Header />
             <div className="below-header">
               <div className="main-panel">
-                  <Routes>
-                    <Route
-                        path="/"
-                        element={<Home setEdit={handleSetRsEdit}/>}>
-                      </Route>
-
-                      <Route
-                        path="/agents/new"
-                        element={<AgentView />}
-                      />
-                      <Route
-                        path="/agents/edit">
-                        <Route path=":id" element={<AgentView />} />
-                      </Route>
-                      <Route
-                        path="/resources/new"
-                        element={<ResourceSpecificationView />}
-                      />
-                      <Route
-                        path="/resources/edit">
-                        <Route path=":id" element={<ResourceSpecificationView />} />
-                      </Route>
-                      <Route
-                        path="/processes/new"
-                        element={<ProcessSpecificationView />}
-                      />
-                      <Route
-                        path="/processes/edit">
-                        <Route path=":id" element={<ProcessSpecificationView />} />
-                      </Route>
-                    </Routes>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Home setEdit={handleSetRsEdit}/>}>
+                  </Route>
+                  <Route
+                    path="/agents/new"
+                    element={<AgentView />}
+                  />
+                  <Route
+                    path="/agents/edit">
+                    <Route path=":id" element={<AgentView />} />
+                  </Route>
+                  <Route
+                    path="/resources/new"
+                    element={<ResourceSpecificationView />}
+                  />
+                  <Route
+                    path="/resources/edit">
+                    <Route path=":id" element={<ResourceSpecificationView />} />
+                  </Route>
+                  <Route
+                    path="/processes/new"
+                    element={<ProcessSpecificationView />}
+                  />
+                  <Route
+                    path="/processes/edit">
+                    <Route path=":id" element={<ProcessSpecificationView />} />
+                  </Route>
+                  <Route
+                    path="/events"
+                    element={<EventLedger />}
+                  />
+                </Routes>
               </div>
             </div>
             <Modal
