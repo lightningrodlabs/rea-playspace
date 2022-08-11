@@ -127,9 +127,7 @@ export class DataStoreBase {
     };
     return async () => {
       await this.zomeApi.put_thing(itemThing);
-      console.log('signal start');
       await this.zomeApi.signal_call(item.path);
-      console.log('signal end');
       return;
     }
   }

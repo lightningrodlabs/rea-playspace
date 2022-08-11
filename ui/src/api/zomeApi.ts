@@ -23,7 +23,9 @@ export default class ZomeApi {
   }
 
   public async signal_call (path: String): Promise<void> {
-    await this.client.callZome(getCellId(), 'ping', 'ui_updated', path);
+    console.log('Home of a future signal call');
+    Promise.resolve();
+    //await this.client.callZome(getCellId(), 'ping', 'ui_updated', path);
     return;
   }
 }
