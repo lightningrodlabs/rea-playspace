@@ -5,7 +5,7 @@ specifiers:
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/profiles': 0.4.3
   '@holochain/client': ^0.7.0
-  '@lit-labs/react': 1.0.4
+  '@lit-labs/react': 1.0.7
   '@scoped-elements/material-web': 0.0.19
   '@shoelace-style/shoelace': ^2.0.0-beta.76
   '@types/jest': ^27.4.1
@@ -17,16 +17,17 @@ specifiers:
   '@vitejs/plugin-react': ^1.0.7
   blob-to-buffer: ^1.2.9
   guid-typescript: ^1.0.9
-  lit-svelte-stores: 0.1.6
+  lit-svelte-stores: ^0.2.1
   prettier: 2.2.1
   react: ^16.14.0
   react-dom: ^16.14.0
-  react-flow-renderer: ^10.3.8
+  react-flow-renderer: ^10.3.14
   react-modal: ^3.14.4
   react-refresh: 0.10.0
   react-refresh-typescript: ^2.0.4
   react-router-dom: ^6.3.0
   react-svelte-stores: 0.2.0
+  svelte: ^3.49.0
   terser: 4.4.2
   typescript: ^4.6.3
   vite: ^2.9.0
@@ -37,18 +38,19 @@ dependencies:
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/profiles': 0.4.3_ws@8.5.0
   '@holochain/client': 0.7.0_ws@8.5.0
-  '@lit-labs/react': 1.0.4
+  '@lit-labs/react': 1.0.7
   '@scoped-elements/material-web': 0.0.19
   '@shoelace-style/shoelace': 2.0.0-beta.76
   blob-to-buffer: 1.2.9
   guid-typescript: 1.0.9
-  lit-svelte-stores: 0.1.6
+  lit-svelte-stores: 0.2.1
   react: 16.14.0
   react-dom: 16.14.0_react@16.14.0
-  react-flow-renderer: 10.3.8_react-dom@16.14.0+react@16.14.0
+  react-flow-renderer: 10.3.14_react-dom@16.14.0+react@16.14.0
   react-modal: 3.14.4_react-dom@16.14.0+react@16.14.0
   react-router-dom: 6.3.0_react-dom@16.14.0+react@16.14.0
   react-svelte-stores: 0.2.0_react@16.14.0
+  svelte: 3.49.0
   ws: 8.5.0
 
 devDependencies:
@@ -301,15 +303,8 @@ packages:
       '@babel/types': 7.17.0
     dev: true
 
-  /@babel/runtime/7.17.8:
-    resolution: {integrity: sha512-dQpEpK0O9o6lj6oPu0gRDbbnk+4LeHlNcBpspf6Olzt3GIX4P1lWF1gS+pHLDFlaJvbR6q7jCfQ08zA4QJBnmA==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      regenerator-runtime: 0.13.9
-    dev: false
-
-  /@babel/runtime/7.18.6:
-    resolution: {integrity: sha512-t9wi7/AW6XtKahAe20Yw0/mMljKq0B1r2fPdvaAdV/KPDZewFXdaaa6K7lxmZBZ8FBNpCiAT6iHPmd6QO9bKfQ==}
+  /@babel/runtime/7.18.9:
+    resolution: {integrity: sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.9
@@ -397,7 +392,7 @@ packages:
       lit: 2.2.5
       lit-svelte-stores: 0.2.1
       lodash-es: 4.17.21
-      svelte: 3.48.0
+      svelte: 3.49.0
     transitivePeerDependencies:
       - encoding
       - eslint
@@ -479,8 +474,8 @@ packages:
       lit: 2.2.5
     dev: false
 
-  /@lit-labs/react/1.0.4:
-    resolution: {integrity: sha512-Sy4RCxTZpTE2TwByjVac6gC7jzr8bCQC6s9bJhhJDKos4ZlN2cqcuVz63n0mpSSr1zxFh+Z0o0VR223l36Y4Ag==}
+  /@lit-labs/react/1.0.7:
+    resolution: {integrity: sha512-ehnOFE5qMPKqApSjclAXyYSqSBWhjuvwF0ZkMJaggmtkGtMvti3gSq/kU5pwBQDgs+71TJWTzWZyQ83hdS8ofw==}
     dev: false
 
   /@lit-labs/task/1.1.2:
@@ -726,7 +721,7 @@ packages:
       '@lit/reactive-element': 1.0.0-rc.4
       '@material/base': 14.0.0-canary.261f2db59.0
       '@material/dom': 14.0.0-canary.261f2db59.0
-      lit: 2.2.1
+      lit: 2.2.5
       tslib: 2.4.0
     dev: false
 
@@ -805,7 +800,7 @@ packages:
     resolution: {integrity: sha512-3uFMi8Y680P0nzP5zih4YuOZJLl/C6Ux9G810Unwo44zblG/ckgJlFiM+T+oR+OH5KM8LbfNlV0ypo7FT5zYJA==}
     dependencies:
       '@material/floating-label': 14.0.0-canary.261f2db59.0
-      lit: 2.2.1
+      lit: 2.2.5
       tslib: 2.4.0
     dev: false
 
@@ -847,7 +842,7 @@ packages:
     resolution: {integrity: sha512-ANJzSyumb+shBVTIhqF1+YByPU/EpFXxI9CS26qThFqlUDpYXg5xcoZpkMSmZv3Wv/loF1rs2mJfFWOcC6nFnw==}
     dependencies:
       '@material/line-ripple': 14.0.0-canary.261f2db59.0
-      lit: 2.2.1
+      lit: 2.2.5
       tslib: 2.4.0
     dev: false
 
@@ -1397,7 +1392,7 @@ packages:
   /@shoelace-style/shoelace/2.0.0-beta.60:
     resolution: {integrity: sha512-iozuLRjIR2UvzVEXrgcPvRHjqkWhRnWhTOuZcXWfAI5mmSB2ko8lqNXxnzgOtpFak4Z7Vei/9qOWSkAt0+fxRA==}
     dependencies:
-      '@lit-labs/react': 1.0.4
+      '@lit-labs/react': 1.0.7
       '@popperjs/core': 2.11.5
       '@shoelace-style/animations': 1.1.0
       color: 3.2.1
@@ -1409,7 +1404,7 @@ packages:
     engines: {node: '>=14.17.0'}
     dependencies:
       '@floating-ui/dom': 0.5.2
-      '@lit-labs/react': 1.0.4
+      '@lit-labs/react': 1.0.7
       '@shoelace-style/animations': 1.1.0
       '@shoelace-style/localize': 3.0.0
       color: 4.2.1
@@ -2070,7 +2065,7 @@ packages:
   /history/5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
     dependencies:
-      '@babel/runtime': 7.17.8
+      '@babel/runtime': 7.18.9
     dev: false
 
   /is-arrayish/0.3.2:
@@ -2161,19 +2156,12 @@ packages:
       '@types/trusted-types': 2.0.2
     dev: false
 
-  /lit-svelte-stores/0.1.6:
-    resolution: {integrity: sha512-KLx8rwiigh+/+rL+fJ1xmp3itWfeFWovRJ0DkdZJkNI/Y4xD2yQZDap6it5wlremzXus0mC3MxCJiT4B1KmLkg==}
-    dependencies:
-      lit: 2.2.1
-      svelte: 3.48.0
-    dev: false
-
   /lit-svelte-stores/0.2.1:
     resolution: {integrity: sha512-PzvcgP5GNKoEDhIsodV2PyBHBoDFhs76/BE4+R4FXllWquMiOqdTifpzTq6b7vhD5WtV/jTRQe87PC2ncwABIA==}
     dependencies:
       '@lit-labs/task': 1.1.2
       lit: 2.2.5
-      svelte: 3.48.0
+      svelte: 3.49.0
     dev: false
 
   /lit/2.2.1:
@@ -2235,7 +2223,7 @@ packages:
     dev: true
 
   /object-assign/4.1.1:
-    resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=}
+    resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
     dev: false
 
@@ -2317,14 +2305,14 @@ packages:
       scheduler: 0.19.1
     dev: false
 
-  /react-flow-renderer/10.3.8_react-dom@16.14.0+react@16.14.0:
-    resolution: {integrity: sha512-owtDCSK6rATiZipew2OYSPPu2sd0VM/QCydN9S+ivrMVwR0vNSSwtsWKqJSq8DL5wXtIEed5gPi4yJqXJA7tLQ==}
+  /react-flow-renderer/10.3.14_react-dom@16.14.0+react@16.14.0:
+    resolution: {integrity: sha512-/4a9BjF4aiLx2JSDZj8ZOizv3IHXKwqJxXgO3raFIT46dEDCs68M4HzTTwIgd7GpIw/ZcxYx+/Mcba5sCvIztg==}
     engines: {node: '>=14'}
     peerDependencies:
       react: 16 || 17 || 18
       react-dom: 16 || 17 || 18
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.18.9
       classcat: 5.0.3
       d3-drag: 3.0.0
       d3-selection: 3.0.0
@@ -2511,8 +2499,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte/3.48.0:
-    resolution: {integrity: sha512-fN2YRm/bGumvjUpu6yI3BpvZnpIm9I6A7HR4oUNYd7ggYyIwSA/BX7DJ+UXXffLp6XNcUijyLvttbPVCYa/3xQ==}
+  /svelte/3.49.0:
+    resolution: {integrity: sha512-+lmjic1pApJWDfPCpUUTc1m8azDqYCG1JN9YEngrx/hUyIcFJo6VZhj0A1Ai0wqoHcEIuQy+e9tk+4uDgdtsFA==}
     engines: {node: '>= 8'}
     dev: false
 

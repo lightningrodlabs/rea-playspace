@@ -5,19 +5,17 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
-import NewAgent from "./components/layout/create/NewAgent";
-import NewResourceSpecification from "./components/layout/create/NewResourceSpecification";
-import NewProcessSpecification from "./components/layout/create/NewProcessSpecification";
 import Pi from "./components/layout/Pi";
-import getDataStore from "./data/DataStore";
+import getDataStore, { getProfilesStore } from "./data/DataStore";
 import Modal from "react-modal"
-import {
-  ProfilesStore
-} from "@holochain-open-dev/profiles";
-import { getProfilesStore } from "./data/ProfilesStore";
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
+import { ResourceSpecificationShape } from "./types/valueflows";
+import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
+import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
+import AgentView from "./components/layout/create/AgentView";
 import EventLedger from "./components/layout/EventLedger";
+import { ProfilesStore } from "@holochain-open-dev/profiles";
 
 Modal.setAppElement("#root");
 
@@ -29,6 +27,17 @@ interface Props {}
 
 const App: React.FC<Props> = () => {
   const [isModelOpen, setIsModalOpen] = useState(false);
+  const [rsEdit, setRsEdit] = useState<ResourceSpecificationShape>();
+  const [profilesStore, setProfilesStore] = useState<ProfilesStore>();
+
+  useEffect(()=>{
+    setProfilesStore(getProfilesStore());
+  },[]);
+
+  function handleSetRsEdit(resourceSpec: ResourceSpecificationShape) {
+    console.log('handleSetRsEdit ', resourceSpec);
+    setRsEdit(resourceSpec);
+  }
 
   function piHandler(event) {
     const store = getDataStore();
@@ -56,79 +65,81 @@ const App: React.FC<Props> = () => {
     }
   }
 
-  const [store, setStore] = useState<ProfilesStore>();
-
-  useEffect(() => {
-    getProfilesStore().then((store) => {
-      setStore(store);
-    });
-  }, []);
-
-
   const Main = () => {
     return (
-      <BrowserRouter>
-        <div className="container">
-          <Header />
-          <div className="below-header">
-            <div className="main-panel">
-              <Routes>
-                <Route
+        <BrowserRouter>
+          <div className="container">
+            <Header />
+            <div className="below-header">
+              <div className="main-panel">
+                <Routes>
+                  <Route
                     path="/"
-                    element={<Home />}>
+                    element={<Home setEdit={handleSetRsEdit}/>}>
                   </Route>
-
                   <Route
                     path="/agents/new"
-                    element={<NewAgent />}
+                    element={<AgentView />}
                   />
+                  <Route
+                    path="/agents/edit">
+                    <Route path=":id" element={<AgentView />} />
+                  </Route>
                   <Route
                     path="/resources/new"
-                    element={<NewResourceSpecification />}
+                    element={<ResourceSpecificationView />}
                   />
                   <Route
+                    path="/resources/edit">
+                    <Route path=":id" element={<ResourceSpecificationView />} />
+                  </Route>
+                  <Route
                     path="/processes/new"
-                    element={<NewProcessSpecification />}
+                    element={<ProcessSpecificationView />}
                   />
+                  <Route
+                    path="/processes/edit">
+                    <Route path=":id" element={<ProcessSpecificationView />} />
+                  </Route>
                   <Route
                     path="/events"
                     element={<EventLedger />}
                   />
                 </Routes>
+              </div>
             </div>
+            <Modal
+              style={{
+                overlay: {zIndex: 2000},
+                content: {
+                  top: '30%',
+                  left: '30%',
+                  right: '30%',
+                  bottom: 'auto',
+                  transform: 'translate(-20%, -20%)',
+                }
+              }}
+              isOpen={isModelOpen}>
+              <div style={{
+                textAlign: 'center',
+                alignContent: 'center',
+                width: '100%'
+              }}><img src="/img/net.gif" /></div>
+            </Modal>
+            <Pi onClick={piHandler} />
           </div>
-          <Modal
-            style={{
-              overlay: {zIndex: 2000},
-              content: {
-                top: '30%',
-                left: '30%',
-                right: '30%',
-                bottom: 'auto',
-                transform: 'translate(-20%, -20%)',
-              }
-            }}
-            isOpen={isModelOpen}>
-            <div style={{
-              textAlign: 'center',
-              alignContent: 'center',
-              width: '100%'
-            }}><img src="/img/net.gif" /></div>
-          </Modal>
-          <Pi onClick={piHandler} />
-        </div>
-      </BrowserRouter>
+        </BrowserRouter>
     );
   }
-  if (!store) {
+  if (!profilesStore) {
     return <span>Loading.......</span>;
   }
   return (
     <div>
-      <ProfilesContext store={store}>
-        <ProfilePrompt>
-          <Main />
-        </ProfilePrompt>
+      <ProfilesContext store={profilesStore}>
+          <ProfilePrompt>
+            <Main />
+          </ProfilePrompt>
       </ProfilesContext>
     </div>
   );
