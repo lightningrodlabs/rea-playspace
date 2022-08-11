@@ -4,7 +4,6 @@ members = [
     "happ/zomes/projects",
     "happ/zomes/projects_core",
     "happ/zomes/profiles",
-    "happ/zomes/ping",
     "happ/zomes/profiles_core",
 ]
 

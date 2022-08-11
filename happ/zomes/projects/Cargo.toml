@@ -15,3 +15,9 @@ derive_more = "0"
 serde = "*"
 paste = "*"
 tracing = "0.1.26"
+
+
+# hdk = {version = "0.0.136", features = ["encoding"]}
+# holo_hash = { version = "=0.0.27", features = ["encoding", "fixturators"] }
+# hc_zome_profiles_types = { git = "https://github.com/holochain-open-dev/profiles", rev = "for-hdk-v0.0.136", package = "hc_zome_profiles_types" }
+
