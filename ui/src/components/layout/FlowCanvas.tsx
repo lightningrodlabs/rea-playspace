@@ -252,7 +252,7 @@ const FlowCanvas: React.FC<Props> = () => {
      */
     setNodes((ns) => {
       const nsNew = ns.filter((node) => node.id !== displayNode.id);
-      nsNew.push(newNode);
+      nsNew.push(displayNodeToNode(newNode));
       return nsNew;
     });
 
