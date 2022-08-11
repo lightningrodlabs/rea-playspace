@@ -142,18 +142,6 @@ export class DataStoreBase {
   }
 
   /**
-   * Deletes thing corresponding to the path
-   * @param path
-   */
-  public delete(path: string) {
-    const id = this.getCursor(path).id;
-    delete this.getCursor(getParentPath(path))[id];
-    this.fiber.schedule([
-      () => this.zomeApi.delete_thing(path)
-    ]);
-  }
-
-  /**
    * Generic function for upserting a PathedData object. Will always replace the object.
    *
    * Example usage:
@@ -189,6 +177,19 @@ export class DataStoreBase {
       )
     );
     this.put(self.root);
+  }
+
+  /**
+  * Deletes thing corresponding to the path 
+  * @param path
+  */
+  public delete(path: string) {
+    let parent = this.getCursor(getParentPath(path));
+    const childKey = getLastPart(path);
+    delete parent[childKey];
+    this.fiber.schedule([
+      () => this.zomeApi.delete_thing(path)
+    ]);
   }
 
   // Root helpers
@@ -253,7 +254,6 @@ export class DataStoreBase {
     // The built up tree will be in parallelObjects[0] when done
     res.forEach((node: RustNode, i: number) => {
       const { name, data } = node.val;
-      console.log(data);
       const path = getRustNodePath(i, res);
       const parentPath = getParentPath(path);
 

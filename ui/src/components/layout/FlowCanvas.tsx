@@ -564,7 +564,15 @@ const FlowCanvas: React.FC<Props> = () => {
             deleteKeyCode='AltLeft+Backspace'
             fitView
             attributionPosition="top-right">
-            <MiniMap />
+            <MiniMap 
+              nodeStrokeColor={(n) => {
+                if (n.type === 'resourceSpecification') return '#79c879';
+                if (n.type === 'process') return '#deb96f';
+              }}
+              nodeColor={(n) => {
+                if (n.type === 'resourceSpecification') return 'lightgreen';
+                if (n.type === 'process') return 'rgb(255, 213, 128)';
+              }}/>
             <Controls />
             <Background color="#aaa" gap={16} />
           </ReactFlow>

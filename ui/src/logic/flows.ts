@@ -196,7 +196,7 @@ export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
  */
 export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
   // default label
-  let label = "Well, this is embrassing. I couldn't make a label.";
+  let label = "Reticualting splines...";
 
   // default action, for debugging
   let action = new Action({
