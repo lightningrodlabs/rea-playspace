@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@holochain-open-dev/cell-client': 0.7.1
+  '@holochain-open-dev/cell-client': 0.6.1
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/profiles': 0.4.3
   '@holochain/client': ^0.7.0
@@ -34,7 +34,7 @@ specifiers:
   ws: ^8.5.0
 
 dependencies:
-  '@holochain-open-dev/cell-client': 0.7.1_ws@8.5.0
+  '@holochain-open-dev/cell-client': 0.6.1_ws@8.5.0
   '@holochain-open-dev/context': 0.0.3
   '@holochain-open-dev/profiles': 0.4.3_ws@8.5.0
   '@holochain/client': 0.7.0_ws@8.5.0
@@ -355,39 +355,14 @@ packages:
       '@floating-ui/core': 0.7.2
     dev: false
 
-  /@holo-host/comb/0.3.0:
-    resolution: {integrity: sha512-Ksqh3Gukf/NFI7hzs7tZwnCG4IADisahdWktLpgXdt5y283Ha4uncEIvkjVcP1YSP07Rhq5Ht+JPgDIlwvvT5w==}
-    dependencies:
-      '@msgpack/msgpack': 2.7.2
-      postmate: 1.5.2
-    dev: false
-
   /@holo-host/identicon/0.1.0:
     resolution: {integrity: sha512-Dn5pTV/m3XaK1Zvq3liw/vQUt7goM7Y84x2zUyH8cb9CNMs4kPCNHs3kalbJZ/ymzFvwcdiLwwNW8AKk+WWN5A==}
-    dev: false
-
-  /@holo-host/web-sdk/0.6.6-prerelease:
-    resolution: {integrity: sha512-ZuHGtEtevN2O9KAxBfKZOlaR/LhRA791Wo4Kv5sdU5caUBsYMkP3XH8FX20Eu2wDnMFHBNGDUPDgqlkAyIZsxA==}
-    dependencies:
-      '@holo-host/comb': 0.3.0
     dev: false
 
   /@holochain-open-dev/cell-client/0.6.1_ws@8.5.0:
     resolution: {integrity: sha512-5P/0g2gL8iYecXxTtIMp/0Es1dXJzdPjivh3/XG8idKpFVPzGyd3Vp2adzqMPOhg5KRGsDDyfAxoohYLVGtplQ==}
     dependencies:
       '@holochain/client': 0.6.0_ws@8.5.0
-      lodash-es: 4.17.21
-    transitivePeerDependencies:
-      - encoding
-      - eslint
-      - ws
-    dev: false
-
-  /@holochain-open-dev/cell-client/0.7.1_ws@8.5.0:
-    resolution: {integrity: sha512-DArchp/dnmAVeRo+7UlsV0zk4vTGgnaMlvQWiYUcpLUnSjo5cozBv1jVA4IjwJV30MvOs6pJNetfLJrGQ35Y+g==}
-    dependencies:
-      '@holo-host/web-sdk': 0.6.6-prerelease
-      '@holochain/client': 0.7.0_ws@8.5.0
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - encoding
@@ -2272,10 +2247,6 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
-
-  /postmate/1.5.2:
-    resolution: {integrity: sha512-EHLlEmrUA/hALls49oBrtE7BzDXXjB9EiO4MZpsoO3R/jRuBmD+2WKQuYAbeuVEpTzrPpUTT79z2cz4qaFgPRg==}
-    dev: false
 
   /prettier-linter-helpers/1.0.0:
     resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
