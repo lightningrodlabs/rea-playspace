@@ -52,26 +52,44 @@ export function slChangeConstructor<T> (
   return onSlChange;
 }
 
+function padBy2 (n: number): string {
+  const num = n.toString();
+  const len = num.length;
+  let pad = '';
+  for (let i = 0; i < (2 - len); i ++) {
+    pad += '0';
+  }
+  return pad + num;
+}
+
+function getDateParts (dt: Date) {
+  const y = dt.getFullYear();
+  const M = padBy2(dt.getMonth()+1); // Date's getMonth() is zero based 
+  const d = padBy2(dt.getDate())
+  const h = padBy2(dt.getHours());
+  const m = padBy2(dt.getMinutes());
+  return {y, M, d, h, m };
+}
+
 /** 
  * Convert a Date to a weird ISO string
  * 
  * This is to get rid of the error:
  *   The specified value "*" does not conform to the required format. The format
  *   is "yyyy-MM-ddThh:mm" followed by optional ":ss" or ":ss.SSS".
- * 
- * For some reason, it still warns:
- *   The specified value "2022-07-16T10:45:00" does not conform to the required
- *   format.  The format is "yyyy-MM-ddThh:mm" followed by optional ":ss" or
- *   ":ss.SSS".
- * Yet, that does conform to the right format. /me shrugs.
  */
-export const DateToInputValueString = (dt: Date) => {
+export const DateToInputValueString = (dt: Date): string => {
   if (dt instanceof Date) {
-    // removes the milliseconds and Z from the end of the date string
-    return dt.toISOString().split('.')[0];
+    const { y, M, d, h, m } = getDateParts(dt);
+    return `${y}-${M}-${d}T${h}:${m}`;
   } else {
     throw new Error("Date is somehow not a Date");
   }
+}
+
+export const DateToUiString = (dt: Date): string => {
+  const { y, M, d, h, m } = getDateParts(dt);
+  return `${y}/${M}/${d} ${h}:${m}`;
 }
 
 /**

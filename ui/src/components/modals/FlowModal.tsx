@@ -127,14 +127,14 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    * When the commitment changes, update it.
    */
   const handleCommitmentChange = (e: any) => {
-    commitmentUpdates = e.target.value;
+    commitmentUpdates = new Commitment(e.target.value);
   }
 
   /**
    * When the current event changes, update it.
    */
    const handleEventChange = (e: any) => {
-    eventUpdates = e.target.value;
+    eventUpdates = new EconomicEvent(e.target.value);
   }
 
   /**

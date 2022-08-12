@@ -129,8 +129,8 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
 }
 
 export interface FulfillmentShape extends HasIdDate {
-  resourceQuantity?: number;
-  effortQuantity?: number;
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
   fulfills: string;
   fulfilledBy: string;
 }

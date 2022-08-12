@@ -82,7 +82,7 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
       <br />
       <MeasurementInput disableUnit={disabled('effortQuantityUnit')} label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
       <br />
-      <SlInput label="Datetime" type="datetime-local" valueAsDate={hasPointInTime as Date} value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput label="Datetime" type="datetime-local" value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
       <LocationInput disabled={disabled('atLocation')} label="At Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
       <br />
