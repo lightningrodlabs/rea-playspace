@@ -48,7 +48,7 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
   ] = useState({...initialState});
 
   useEffect(() => {
-    setState(eventState);
+    setState(prevState => ({ ...prevState, ...eventState }));
   }, [eventState]);
 
   const parsers = {
