@@ -52,10 +52,7 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
   }, [eventState]);
 
   const parsers = {
-    'hasPointInTime': (value: string): Date => {
-      console.log(value, Date.parse(value), new Date(Date.parse(value)))
-      return new Date(Date.parse(value))
-    }
+    'hasPointInTime': (value: string) => new Date(Date.parse(value))
   }
 
   const onSlChange = slChangeConstructor<EconomicEventShape>(name, onChange, setState, parsers);
