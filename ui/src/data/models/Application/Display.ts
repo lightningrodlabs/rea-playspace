@@ -3,7 +3,6 @@ import { XYPosition, Node } from 'react-flow-renderer';
 import { PathedData, getAlmostLastPart } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { assignFields, fieldsToJSON } from '../../../utils';
-import getDataStore from "../../DataStore";
 
 export interface DisplayNodeShape {
   id?: string;
