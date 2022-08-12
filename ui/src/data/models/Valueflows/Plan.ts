@@ -10,7 +10,7 @@ import {
   GeoDataShape
 } from "../../../types/valueflows";
 import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
-import { Measurement } from "./Knowledge";
+import { GeoData, Measurement } from "./Knowledge";
 
 // Plan Classes
 
@@ -34,7 +34,8 @@ export class Plan implements PlanShape, PathedData, NamedData {
   constructor(init: PlanShape) {
     assignFields<PlanShape, Plan>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
+    this.due = init.due ? new Date(init.due) : null;
     this.process = {};
     this.commitment = {};
     this.displayNode = {};
@@ -89,7 +90,11 @@ export class Process implements ProcessShape, PathedData, NamedData {
   constructor(init: ProcessShape) {
     assignFields<ProcessShape, Process>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
+    this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
+    this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
+    this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
+    this.due = init.due ? new Date(Date.parse(init.due as string)) : null;
   }
 
   static getPrefix(planId: string): string {
@@ -164,13 +169,14 @@ export class Commitment implements CommitmentShape, PathedData {
   constructor(init: CommitmentShape) {
     assignFields<CommitmentShape, Commitment>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
     this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
     this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
     this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
     this.due = init.due ? new Date(Date.parse(init.due as string)) : null;
     this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
     this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
+    this.atLocation = (this.atLocation && init.atLocation != null) ? new GeoData(this.atLocation) : null;
   }
 
   static getPrefix(planId: string): string {

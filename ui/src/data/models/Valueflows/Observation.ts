@@ -3,7 +3,7 @@ import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape, MeasurementShape } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
-import { Measurement } from "./Knowledge";
+import { GeoData, Measurement } from "./Knowledge";
 
 export class EconomicResource implements EconomicResourceShape, PathedData, NamedData {
   id: string;
@@ -27,7 +27,8 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
   constructor(init: EconomicResourceShape) {
     assignFields<EconomicResourceShape, EconomicResource>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
+    this.currentLocation = (this.currentLocation && this.currentLocation != null) ? new GeoData(this.currentLocation) : null;
   }
 
   static getPrefix(): string {
@@ -76,12 +77,14 @@ export class EconomicEvent implements EconomicEventShape {
   constructor(init: EconomicEventShape) {
     assignFields<EconomicEventShape, EconomicEvent>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
     this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
     this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
     this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
     this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
     this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
+    this.atLocation = (this.atLocation && init.atLocation != null) ? new GeoData(this.atLocation) : null;
+    this.toLocation = (this.toLocation && init.toLocation != null) ? new GeoData(this.toLocation) : null;
   }
 
   static getPrefix(): string {
@@ -104,15 +107,17 @@ export class EconomicEvent implements EconomicEventShape {
 export class Fulfillment implements FulfillmentShape {
   id: string;
   created: Date;
-  resourceQuantity?: number;
-  effortQuantity?: number;
+  resourceQuantity?: MeasurementShape;
+  effortQuantity?: MeasurementShape;
   fulfills: string;           // Commitment ID
   fulfilledBy: string;        // EconomicEvent ID
 
   constructor(init: FulfillmentShape) {
     assignFields<FulfillmentShape, Fulfillment>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
+    this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
+    this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
   }
 
   static getPrefix(): string {
