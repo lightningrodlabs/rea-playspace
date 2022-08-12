@@ -1,6 +1,7 @@
 // EDGE BUSINESS LOGIC
 
 import { Edge, MarkerType, Node } from "react-flow-renderer";
+import { DateToUiString } from "../components/util";
 import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
 import { ObjectTypeMap } from "../data/models/ObjectTransformations";
@@ -175,7 +176,6 @@ export const getEventDefaultsFromCommitment = (commitment: Commitment): FlowShap
   delete init.plannedWithin;
   delete init.due;
   delete init.note;
-  init.hasPointInTime = new Date();
   return init;
 }
 
@@ -187,7 +187,7 @@ export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
   delete init.id;
   delete init.created;
   delete init.note;
-  init.hasPointInTime = new Date();
+  init.hasPointInTime = event.hasPointInTime ? new Date(event.hasPointInTime) : null;
   return init;
 }
 
@@ -269,10 +269,10 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
 
   function dateString(flow: FlowShape):string {
     if (flow.due) {
-      return ` ${flow.due.toLocaleString()}`;
+      return ` ${DateToUiString(flow.due as Date)}`;
     }
     if (flow.hasPointInTime) {
-      return ` ${flow.hasPointInTime.toLocaleString()}`;
+      return ` ${DateToUiString(flow.hasPointInTime as Date)}`;
     }
     return '';
   }

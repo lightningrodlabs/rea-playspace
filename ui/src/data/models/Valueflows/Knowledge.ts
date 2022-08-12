@@ -1,7 +1,18 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { AgentShape, ResourceSpecificationShape, ProcessSpecificationShape, ActionShape, InputOutput, ResourceEffect, UnitShape, MeasurementShape} from "../../../types/valueflows";
+import {
+  AgentShape,
+  ResourceSpecificationShape,
+  ProcessSpecificationShape,
+  ActionShape,
+  InputOutput,
+  ResourceEffect,
+  UnitShape,
+  MeasurementShape,
+  GeoDataShape,
+  GeoPointShape
+} from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../../utils';
 
 // Knowledge Classes
@@ -20,7 +31,7 @@ export class Agent implements AgentShape, PathedData, NamedData {
   constructor(init: AgentShape) {
     assignFields<AgentShape, Agent>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
   }
 
   static getPrefix(): string {
@@ -201,6 +212,29 @@ export class Measurement implements MeasurementShape {
   })
 }
 
+export class GeoPoint implements GeoPointShape {
+  lat: number;
+  lng: number;
+
+  constructor(init: GeoPointShape) {
+    assignFields<GeoPointShape, GeoPoint>(init, this);
+  }
+}
+
+export class GeoData implements GeoDataShape {
+  type: string;
+  name?: string;
+  address?: string;
+  point?: GeoPoint | string;
+
+  constructor(init: GeoDataShape) {
+    assignFields<GeoDataShape, GeoData>(init, this);
+    if (init.point && typeof init.point == 'object') {
+      this.point = new GeoPoint(init.point);
+    }
+  }
+}
+
 /**
  * The archetype of a resource. The accounting happens on the `EconomicResource`.
  */
@@ -217,7 +251,7 @@ export class ResourceSpecification implements ResourceSpecificationShape, Pathed
   constructor(init: ResourceSpecificationShape) {
     assignFields<ResourceSpecificationShape, ResourceSpecification>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
   }
 
   static getPrefix(): string {
@@ -249,7 +283,7 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
   constructor(init: ProcessSpecificationShape) {
     assignFields<ProcessSpecificationShape, ProcessSpecification>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-    this.created = this.created ? this.created : new Date();
+    this.created = this.created ? new Date(this.created) : new Date();
   }
 
   static getPrefix(): string {
