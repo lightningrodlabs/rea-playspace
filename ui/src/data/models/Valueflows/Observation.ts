@@ -29,6 +29,7 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? new Date(this.created) : new Date();
     this.currentLocation = (this.currentLocation && this.currentLocation != null) ? new GeoData(this.currentLocation) : null;
+    this.note = init.note ? init.note : null;
   }
 
   static getPrefix(): string {
@@ -78,9 +79,10 @@ export class EconomicEvent implements EconomicEventShape {
     assignFields<EconomicEventShape, EconomicEvent>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? new Date(this.created) : new Date();
-    this.hasPointInTime = init.hasPointInTime ? new Date(Date.parse(init.hasPointInTime as string)) : null;
-    this.hasBegining = init.hasBegining ? new Date(Date.parse(init.hasBegining as string)) : null;
-    this.hasEnd = init.hasEnd ? new Date(Date.parse(init.hasEnd as string)) : null;
+    this.note = init.note ? init.note : null;
+    this.hasPointInTime = init.hasPointInTime ? new Date(init.hasPointInTime) : null;
+    this.hasBegining = init.hasBegining ? new Date(init.hasBegining) : null;
+    this.hasEnd = init.hasEnd ? new Date(init.hasEnd) : null;
     this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
     this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
     this.atLocation = (this.atLocation && init.atLocation != null) ? new GeoData(this.atLocation) : null;

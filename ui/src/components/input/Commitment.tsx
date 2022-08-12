@@ -88,7 +88,7 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       <br />
       <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
       <br />
-      <SlInput label="Due" type="datetime-local" valueAsDate={due as Date} value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput label="Due" type="datetime-local" value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
       <LocationInput label="Location" name="atLocation" value={atLocation} onChange={onSlChange}></LocationInput>
       <br />
