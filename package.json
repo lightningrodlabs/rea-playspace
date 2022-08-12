@@ -24,6 +24,7 @@
     "hc:run":               "sh -c 'set -o allexport; . environments/.env; set +o allexport; . scripts/happ-run.sh'",
     "hc:run2":              "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; . scripts/happ-run.sh'",
     "playground":           "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
+    "playground2":           "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
     "webhapp-pack":         "pnpm run web-zip && hc web-app pack workdir/",
 
     "// ## UI ##":          "",
