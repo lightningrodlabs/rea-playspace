@@ -80,24 +80,25 @@ export function objectsDiff<T extends Object> (A: T, B: T): boolean {
     const aFields = Reflect.ownKeys(A);
     const bFields = Reflect.ownKeys(B);
 
-    // Compare right side with left side
+    // Compare right side with left side (logical AND)
     const right = aFields.reduce((acc, aField) => {
       return (
         acc
         && bFields.includes(aField)
-        && aFields[aField] === bFields[aField]
+        && A[aField] === B[aField]
       );
     }, true);
 
-    // Compare left side with right side
+    // Compare left side with right side (logical AND)
     const left = bFields.reduce((acc, bField) => {
       return (
         acc
         && aFields.includes(bField)
-        && aFields[bField] === bFields[bField]
+        && A[bField] === B[bField]
       );
     }, true);
 
+    // If one side of the comparison is false, it's changed in some way
     return !(left&&right);
   }
   return true;
