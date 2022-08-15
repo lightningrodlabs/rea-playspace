@@ -86,23 +86,6 @@ export class DataStoreBase {
     return this.getCursor(path);
   }
 
-    /**
-   * Fetches a single terminal object given its full path when triggered by a p2p signal.
-   *
-   * TODO: Should we schedule these for execution after all updates have been made?
-   *
-   * @param path
-   * @returns
-   */
-     public async fetchFromSignal(path: string): Promise<void> {
-      console.log('path', path);
-      const res = await this.zomeApi.get_thing(path);
-      this.hydrateFromZome(res);
-      const freshRoot = new Root(this.root);
-      overwriteFields<Root, Root>(this.root, freshRoot);
-      this.root = freshRoot;
-    }
-
   /**
    * Fetches all of the entries under a particular path
    *
@@ -127,7 +110,7 @@ export class DataStoreBase {
     };
     return async () => {
       await this.zomeApi.put_thing(itemThing);
-      await this.zomeApi.signal_call('path');
+      //await this.zomeApi.signal_call(item.path, 'put');
       return;
     }
   }
@@ -211,8 +194,9 @@ export class DataStoreBase {
     const childKey = getLastPart(path);
     delete parent[childKey];
     this.fiber.schedule([
-      () => this.zomeApi.delete_thing(path)
-    ]);
+      () => this.zomeApi.delete_thing(path),
+      //() => this.zomeApi.signal_call(path, 'delete')
+    ]); 
   }
 
   // Root helpers

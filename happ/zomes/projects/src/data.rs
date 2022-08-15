@@ -24,9 +24,10 @@ pub struct Content {
 
 // Remote call input
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Payload {
+pub struct SignalPayload {
     pub path: String,
-    pub agent_pub_key: AgentPubKey
+    pub agent_pub_key: AgentPubKey,
+    pub op: String
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]

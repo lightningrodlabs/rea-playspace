@@ -7,10 +7,19 @@ export type HeaderProps = {};
 
 const Header: React.FC<HeaderProps> = () => {
 
-  const signalCall = async (): Promise<void> => {
+  const putSignalCall = async (): Promise<void> => {
     const zomeApi = getZomeApi();
     try {
-      await zomeApi.signal_call('path');
+      await zomeApi.signal_call('put.path', 'put');
+    } catch (e) { 
+      console.error(e)
+    }
+  }
+
+  const deleteSignalCall = async (): Promise<void> => {
+    const zomeApi = getZomeApi();
+    try {
+      await zomeApi.signal_call('delete.path', 'delete');
     } catch (e) { 
       console.error(e)
     }
@@ -24,7 +33,8 @@ const Header: React.FC<HeaderProps> = () => {
       <Link to="/events">
         <SlButton variant="primary"outline >Ledger</SlButton>
       </Link>
-      <SlButton variant="primary"outline onClick={signalCall}>Tigger Signal Call</SlButton>
+      <SlButton variant="primary"outline onClick={putSignalCall}>Tigger Put Signal Call</SlButton>
+      <SlButton variant="primary"outline onClick={deleteSignalCall}>Tigger Delete Signal Call</SlButton>
       <div>
         {/* <AgentAvatar size={32} agentPubKey={getAgentPubKey().toString()} >
          </AgentAvatar>  */}

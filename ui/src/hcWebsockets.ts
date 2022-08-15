@@ -20,11 +20,17 @@ let cellId: CellId
 let zomeApi: ZomeApi
 
 const signalCb: AppSignalCb =  async (signal: AppSignal) => {
-  console.log('signal', signal);
-  // const store = getDataStore();
-  alert(`Got message with payload ${signal.data.payload}`);
-  //await store.fetchFromSignal(signal.data.payload.path);
-  // trigger UI to update in Home.tsx
+  switch (signal.data.payload.op) {
+    case 'put':
+      console.log(`Put at ${signal.data.payload.path}`);
+      break;
+    case 'delete':
+      console.log(`Delete at ${signal.data.payload.path}`)
+      break;
+    default:
+      console.log(`Unknown op ${signal.data.payload.op}`);
+      break;
+  }
 }
 
 export async function getHolochainClient() {

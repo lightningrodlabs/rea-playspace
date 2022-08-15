@@ -28,7 +28,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 //  *  The UI will call this function when a change has been made when a CRUD operation has occured resulting to a change in UI state
 //  */
 #[hdk_extern]
-pub fn ui_updated(path: String) -> ExternResult<()> {  
+pub fn ui_updated((path, op): (String, String)) -> ExternResult<()> {  
   // get vec of all profiles
   let response: ZomeCallResponse = call(
       CallTargetCell::Local,
@@ -53,9 +53,10 @@ pub fn ui_updated(path: String) -> ExternResult<()> {
   let other_agent_pub_keys: Vec<AgentPubKey> = all_agent_pub_keys.into_iter().filter(|x| *x != this_agent_pub_key).collect();
 
   for other in other_agent_pub_keys {
-    let payload = Payload {
+    let payload = SignalPayload {
         path: path.clone(),
-        agent_pub_key: other.clone()
+        agent_pub_key: other.clone(),
+        op: op.clone()
     };
     debug!("Called agent {:?}", other.clone());
 
@@ -74,7 +75,7 @@ pub fn ui_updated(path: String) -> ExternResult<()> {
 
 // // agents call this function in other cells. emit_signal will be handled by a signalCallback in frontend
 #[hdk_extern]
-pub fn remote_update_for_ui(payload: Payload)  -> ExternResult<()> {
+pub fn remote_update_for_ui(payload: SignalPayload)  -> ExternResult<()> {
     emit_signal(payload.clone())?;
     debug!("External Call Recieved: update_for_ui with payload: {:?}", payload);
     Ok(())
