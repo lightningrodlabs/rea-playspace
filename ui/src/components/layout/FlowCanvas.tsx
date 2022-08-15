@@ -32,7 +32,8 @@ import { NamedData } from '../../data/models/NamedData';
 import { Process } from '../../data/models/Valueflows/Plan';
 import { FlowShape, ProcessShape } from '../../types/valueflows';
 import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
-import { assignFields } from '../../utils';
+import { assignFields } from '../../data/utils';
+import { usePath } from '../../data/YatiReactHook';
 
 interface Props {};
 
@@ -42,8 +43,10 @@ const FlowCanvas: React.FC<Props> = () => {
 
   // STATE MANAGEMENT
 
-  const [nodes, setNodes] = useNodesState([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const displayNodes = usePath(`root.plan.${store.getCurrentPlanId()}.displayNode`, store);
+  const displayEdges = usePath(`root.plan.${store.getCurrentPlanId()}.displayEdge`, store);
+  const [nodes, setNodes] = useNodesState(Object.values(displayNodes).map((node: DisplayNode) => displayNodeToNode(node)));
+  const [edges, setEdges] = useEdgesState(Object.values(displayEdges).map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   /**
    * we should probably add a more sophisticated state machine for this since we have:
@@ -102,14 +105,18 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onInit = async (reactFlowInstance: ReactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
-
-    const store = getDataStore();
-    const planId = store.getCursor('root.planId');
-    const displayNodes: DisplayNode[] = store.getDisplayNodes(planId);
-    const displayEdges: DisplayEdge[] = store.getDisplayEdges(planId);
-    setNodes(displayNodes.map((node: DisplayNode) => displayNodeToNode(node)));
-    setEdges(displayEdges.map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
   };
+
+  /**
+   * These use effect calls are not firing when there's a remote update. I'm not sure why.
+   */
+  useEffect(() => {
+    setNodes(Object.values(displayNodes).map((node: DisplayNode) => displayNodeToNode(node)));
+  }, [displayNodes]);
+
+  useEffect(() => {
+    setEdges(Object.values(displayEdges).map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
+  }, [displayEdges]);
 
   // NODE HANDLERS
 
@@ -138,7 +145,7 @@ const FlowCanvas: React.FC<Props> = () => {
         try {
           store.getCursor(path);
         } catch(e) {
-          console.log(e);
+          console.error(e);
           return;
         }
 
@@ -393,7 +400,9 @@ const FlowCanvas: React.FC<Props> = () => {
 
       // Persist the changes
       store.set(vfEdge);
-      store.putAll(updatedFlows);
+      updatedFlows.forEach((flow) => {
+        store.set(flow);
+      })
 
       // Show the flow modal
       setSelectedDisplayEdge(vfEdge.id);
@@ -527,8 +536,6 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ProcessModal processState={{...processState}} closeModal={closeModal} afterward={afterProcessEdit}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
-      case 'agent':
-        return <AgentModal />;
       case 'flow':
         return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddFlow} />;
       case 'updateFlow':

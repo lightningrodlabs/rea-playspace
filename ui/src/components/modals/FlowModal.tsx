@@ -1,7 +1,7 @@
 import { SlButton, SlButtonGroup, SlDivider, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { PathedData } from '../../data/models/PathedData';
-import { Action, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
+import { Action, ActionKey, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
 import { CommitmentShape, EconomicEventShape, FlowShape } from '../../types/valueflows';
 import { Commitment } from '../../data/models/Valueflows/Plan';
 import { EconomicEvent } from '../../data/models/Valueflows/Observation';
@@ -9,7 +9,7 @@ import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
 import { flowDefaults, getEventDefaultsFromCommitment, getEventDefaultsFromEvent, getCommitmentAndEvents, getDisplayNodeBy, getLabelForFlow } from '../../logic/flows';
 import getDataStore from '../../data/DataStore';
-import { objectsDiff } from '../../utils';
+import { objectsDiff } from '../../data/utils';
 
 interface Props {
   vfPath?: string[];
@@ -56,11 +56,11 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
 
     const allActions = store.getActions();
     if(initialState && Object.hasOwn(initialState, 'inputOf')) {
-      setActions(allActions.filter((action) => (action.inputOutput == 'input' || action.inputOutput == 'both')));
+      setActions(allActions.filter((action) => (action.inputOutput === 'input' || action.inputOutput === 'both')));
     } else if (initialState && Object.hasOwn(initialState, 'outputOf')) {
-      setActions(allActions.filter((action) => (action.inputOutput == 'output' || action.inputOutput == 'both')));
+      setActions(allActions.filter((action) => (action.inputOutput === 'output' || action.inputOutput === 'both')));
     } else {
-      setActions(allActions.filter((action) => action.inputOutput == 'na'));
+      setActions(allActions.filter((action) => action.inputOutput === 'na'));
     }
 
     if (vfPath) {
@@ -118,8 +118,10 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     const store = getDataStore();
     if (flow && flow.resourceConformsTo) {
       return store.getById(flow.resourceConformsTo as string);
-    } else {
+    } else if (initial && initial.resourceConformsTo) {
       return store.getById(initial.resourceConformsTo as string);
+    } else {
+      return null;
     }
   };
 
@@ -228,7 +230,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     function disableFields(flow: FlowShape) {
       if (
         flow.action && flow.action != null
-        && !isTransfer(flow.action as string)) {
+        && !isTransfer(flow.action as ActionKey)) {
         readonlyFields.unshift('action');
       }
       if (flow.resourceQuantity && flow.resourceQuantity != null) {

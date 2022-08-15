@@ -6,7 +6,8 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import Pi from "./components/layout/Pi";
-import getDataStore, { getProfilesStore } from "./data/DataStore";
+import getDataStore from "./data/DataStore";
+import { getProfilesStore } from "./data/Connection";
 import Modal from "react-modal"
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./elements";
@@ -36,33 +37,31 @@ const App: React.FC<Props> = () => {
   },[]);
 
   function handleSetRsEdit(resourceSpec: ResourceSpecificationShape) {
-    console.log('handleSetRsEdit ', resourceSpec);
     setRsEdit(resourceSpec);
   }
 
   function piHandler(event) {
     const store = getDataStore();
-    console.log(event.buttons);
     // Either 'shift' + 'meta' + 'alt' or 'shift' + 'ctrl' + 'alt' deletes the local root
     if (event.shiftKey && ((event.metaKey && event.altKey) || (event.ctrlKey && event.altKey))) {
-      store.deleteLocalRoot();
-      console.log('Deleted local root.');
+      store.deleteLocalTree();
+      console.warn('Deleted local root.');
     // Either 'shift' + one of {'meta', 'ctrl', 'alt'} uses the local root to hydrate and save to the chain
     } else if (event.shiftKey && (event.metaKey || event.ctrlKey || event.altKey)) {
       setIsModalOpen(true);
-      console.log('Should hydrate...');
-      store.fetchLocalRoot();
-      store.saveTree();
+      console.info('Should hydrate...');
+      store.fetchLocalTree();
+      store.saveInMemoryTree();
       setTimeout(() => setIsModalOpen(false), 1500);
     // Save to the local root if 'shift' if pressed
     } else if (event.shiftKey) {
-      store.saveLocalRoot().then(() => {
-        console.log('Saved root locally.');
+      store.saveLocalTree().then(() => {
+        console.info('Saved root locally.');
       }).catch((e) => {
-        console.log(`Could not store root because: ${e}`);
+        console.error(`Could not store root because: ${e}`);
       });
     } else {
-      console.log('oh, so close...');
+      console.error('oh, so close...');
     }
   }
 

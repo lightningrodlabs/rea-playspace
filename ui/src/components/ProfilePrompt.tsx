@@ -4,7 +4,7 @@ CreateProfile
 } from "../elements";
 import { Profile } from "@holochain-open-dev/profiles";
 import { useStore } from "../hooks/useStore";
-import { getMyProfileReadable } from "../data/DataStore";
+import { getMyProfileReadable } from "../data/Connection";
 
 interface Props {
 }

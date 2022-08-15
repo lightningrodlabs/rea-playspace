@@ -1,12 +1,12 @@
-import { AddOutput, RustNode, ThingInput } from "../types/holochain";
+import { AddOutput, RustNode, ThingInput } from "../../../../types/holochain";
 import { HolochainClient } from "@holochain-open-dev/cell-client";
-import { getCellId } from "../hcWebsockets";
+import { getCellId } from "../../../../hcWebsockets";
 
 export default class ZomeApi {
-  client: HolochainClient
+  client: HolochainClient;
 
   constructor(holochainClient: HolochainClient) {
-    this.client = holochainClient
+    this.client = holochainClient;
   }
 
   public async put_thing (input: ThingInput): Promise<AddOutput> {
@@ -19,6 +19,11 @@ export default class ZomeApi {
 
   public async delete_thing (path_str: string) : Promise<void> {
     await this.client.callZome(getCellId(), 'projects', 'delete_thing', path_str);
+    return;
+  }
+
+  public async signal_call (message: string): Promise<void> {
+    await this.client.callZome(getCellId(), 'projects', 'ui_updated', message);
     return;
   }
 }

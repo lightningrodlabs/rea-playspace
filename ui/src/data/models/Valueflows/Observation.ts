@@ -2,8 +2,8 @@ import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
 import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape, MeasurementShape } from "../../../types/valueflows";
-import { assignFields, toJSON } from '../../../utils';
-import { GeoData, Measurement } from "./Knowledge";
+import { assignFields, toJSON } from '../../utils';
+import { ActionKey, GeoData, Measurement } from "./Knowledge";
 
 export class EconomicResource implements EconomicResourceShape, PathedData, NamedData {
   id: string;
@@ -52,7 +52,7 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
 export class EconomicEvent implements EconomicEventShape {
   id: string;
   created: Date;
-  action: string;
+  action: ActionKey;
   provider: string;                 // Agent ID
   receiver: string;                 // Agent ID
   resourceInventoriedAs?: string;   // EconomicResource ID

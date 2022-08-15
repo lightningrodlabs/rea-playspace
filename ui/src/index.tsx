@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { initConnection } from './data/DataStore';
+import { initConnection } from "./data/Connection";
 import "@holochain-open-dev/profiles/create-profile";
 import "@holochain-open-dev/profiles/list-profiles";
 import "@holochain-open-dev/profiles/agent-avatar";

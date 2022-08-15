@@ -1,5 +1,7 @@
 // Building Blocks
 
+import { ActionKey } from "../data/models/Valueflows/Knowledge";
+
 export interface HasIdDate {
   id?: string;
   created?: Date;
@@ -24,7 +26,7 @@ export interface ReaBase {
 }
 
 export interface HasAction {
-  action: string | ActionShape;
+  action: ActionKey | ActionShape;
 }
 
 // Knowledge
@@ -55,7 +57,7 @@ export type InputOutput = 'input' | 'output' | 'both' | 'na';
 export type ResourceEffect = 'decrement' | 'decrementIncrement' | 'increment' | 'update' | 'remove' | 'noEffect';
 
 export interface ActionShape {
-  id: string;
+  id: ActionKey;
   label: string;
   inputOutput?: InputOutput;
   resourceEffect?: ResourceEffect;

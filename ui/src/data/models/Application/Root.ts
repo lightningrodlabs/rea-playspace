@@ -1,3 +1,4 @@
+import { assignFields } from "../../utils";
 import { PathedData } from "../PathedData";
 import { ResourceSpecification, ProcessSpecification, Agent, Action, Actions, Unit, Units } from "../Valueflows/Knowledge";
 import { EconomicEvent, EconomicResource, Fulfillment } from "../Valueflows/Observation";
@@ -8,6 +9,18 @@ import { Plan } from "../Valueflows/Plan";
  */
 export interface RootShape {
   planId: string;
+
+  // All of the different child types under the root node, these are serialized
+  // separately by their own classes under their own paths.
+  action?: Record<string, Action>;
+  resourceSpecification?: Record<string, ResourceSpecification>;
+  processSpecification?: Record<string, ProcessSpecification>;
+  agent?: Record<string, Agent>;
+  plan?: Record<string, Plan>;
+  unit?: Record<string, Unit>;
+  economicResource?: Record<string, EconomicResource>;
+  economicEvent?: Record<string, EconomicEvent>;
+  fulfillment?: Record<string, Fulfillment>;
 }
 
 /**
@@ -20,6 +33,7 @@ export interface RootShape {
  */
 
 export class Root implements RootShape, PathedData {
+  id: string;
 
   // Our root data
   planId: string;
@@ -40,8 +54,13 @@ export class Root implements RootShape, PathedData {
     return 'root';
   }
 
+  /**
+   * The constructor should be able to handle these situations:
+   *  - Starting fresh
+   *  - Deserializing a root object
+   *  - Cloning an existing root object
+   */
   constructor(data?: RootShape) {
-
     // All the indices should be blank to start
     this.resourceSpecification = {};
     this.processSpecification = {};
@@ -56,8 +75,11 @@ export class Root implements RootShape, PathedData {
     this.unit = Units;
 
     // If data has been passed in, set it otherwise, make it empty.
-
+    if (data) {
+      assignFields<RootShape, Root>(data, this);
+    }
     this.planId = data ? data.planId : '';
+    this.id = 'root';
   }
 
   public toJSON() {
