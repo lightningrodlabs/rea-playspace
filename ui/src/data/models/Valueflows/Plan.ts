@@ -9,8 +9,8 @@ import {
   MeasurementShape,
   GeoDataShape
 } from "../../../types/valueflows";
-import { assignFields, fieldsToJSON, toJSON } from '../../../utils';
-import { GeoData, Measurement } from "./Knowledge";
+import { assignFields, fieldsToJSON, toJSON } from '../../utils';
+import { ActionKey, GeoData, Measurement } from "./Knowledge";
 
 // Plan Classes
 
@@ -145,7 +145,7 @@ export class Process implements ProcessShape, PathedData, NamedData {
 export class Commitment implements CommitmentShape, PathedData {
   id: string;
   created: Date;
-  action: string;
+  action: ActionKey;
   provider: string;               // Agent ID
   receiver: string;               // Agent ID
   inputOf?: string;

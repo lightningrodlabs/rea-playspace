@@ -49,10 +49,9 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
     const rs =  new ProcessSpecification({name, note});
     if (id) {
       rs.id = id;
-      store.upsert<ProcessSpecificationShape, ProcessSpecification>(rs, ProcessSpecification);
-    } else {
-      store.set(rs);
     }
+    store.upsert<ProcessSpecificationShape, ProcessSpecification>(rs, ProcessSpecification);
+
     clearState();
     navigate('/');
   }

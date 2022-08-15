@@ -15,6 +15,7 @@
     "@types/react-modal": "^3.13.1",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^1.0.7",
+    "eslint": "^8.22.0",
     "prettier": "2.2.1",
     "react-refresh": "0.10.0",
     "react-refresh-typescript": "^2.0.4",
@@ -38,8 +39,9 @@
     "react-flow-renderer": "^10.3.14",
     "react-modal": "^3.14.4",
     "react-router-dom": "^6.3.0",
-    "svelte": "^3.49.0",
     "react-svelte-stores": "0.2.0",
+    "svelte": "^3.49.0",
+    "use-sync-external-store": "^1.2.0",
     "ws": "^8.5.0"
   },
   "peerDependencies": {

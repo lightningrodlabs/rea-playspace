@@ -1,5 +1,4 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
-import { autoUpdater } from "electron";
 import React from "react";
 import Modal from "react-modal";
 

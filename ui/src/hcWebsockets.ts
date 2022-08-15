@@ -1,28 +1,24 @@
-import { HolochainClient } from '@holochain-open-dev/cell-client'
-import { AppWebsocket, AdminWebsocket, CellId, AgentPubKey, RoleId  } from '@holochain/client'
-import ZomeApi from './api/zomeApi'
-import { APP_PORT, ADMIN_PORT, APP_ID } from './holochainConf'
-import { sleep100 } from './utils'
+import { HolochainClient } from '@holochain-open-dev/cell-client';
+import { AdminWebsocket, AgentPubKey, AppSignal, AppSignalCb, AppWebsocket, CellId } from '@holochain/client';
+import { APP_PORT, ADMIN_PORT } from './holochainConf';
+import { sleep100 } from './utils';
 
 // @ts-ignore
-export const APP_WS_URL = `ws://localhost:${APP_PORT}`
+export const APP_WS_URL = `ws://localhost:${APP_PORT}`;
 // @ts-ignore
-const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`
+const ADMIN_WS_URL = `ws://localhost:${ADMIN_PORT}`;
 
-let appWs: AppWebsocket
-let adminWs: AdminWebsocket
-let holochainClient: HolochainClient
-let agentPubKey: AgentPubKey
-let cellId: CellId
-let zomeApi: ZomeApi
+let appWs: AppWebsocket;
+let adminWs: AdminWebsocket;
+let holochainClient: HolochainClient;
+let agentPubKey: AgentPubKey;
+let cellId: CellId;
 
 export async function getHolochainClient() {
   if (holochainClient) {
     return holochainClient;
   }
-  const client: HolochainClient = new HolochainClient(
-    await getAppWs()
-  );
+  const client = new HolochainClient(await getAppWs());
   holochainClient = client;
   return client;
 }
@@ -36,22 +32,22 @@ export async function getAdminWs(): Promise<AdminWebsocket> {
       sleep100();
     }
     adminWs.client.socket.addEventListener('close', () => {
-      console.log('admin websocket closed')
+      console.info('admin websocket closed')
     })
     return adminWs;
   }
 }
 
-export async function getAppWs(signalsHandler?: any): Promise<AppWebsocket> {
+export async function getAppWs(): Promise<AppWebsocket> {
   if (appWs) {
     return appWs;
   } else {
-    appWs = await AppWebsocket.connect(APP_WS_URL, undefined, signalsHandler)
+    appWs = await AppWebsocket.connect(APP_WS_URL, 12000);
     while (!(appWs.client.socket.readyState === appWs.client.socket.OPEN)) {
       await sleep100();
     }
     appWs.client.socket.addEventListener('close', () => {
-      console.log('app websocket closed')
+      console.info('app websocket closed')
     })
     return appWs;
   }
@@ -71,12 +67,4 @@ export function getCellId() {
 
 export function setCellId(setAs) {
   cellId = setAs
-}
-
-export function getZomeApi() {
-  return zomeApi;
-}
-
-export function setZomeApi(setAs) {
-  zomeApi = setAs
 }
