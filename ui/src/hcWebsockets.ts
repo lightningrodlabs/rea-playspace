@@ -1,6 +1,7 @@
 
 import { HolochainClient } from '@holochain-open-dev/cell-client'
 import { AdminWebsocket, AgentPubKey, AppSignal, AppSignalCb, AppWebsocket, CellId } from '@holochain/client'
+import { sign } from 'crypto'
 import ZomeApi from './api/zomeApi'
 import getDataStore from './data/DataStore'
 import { APP_PORT, ADMIN_PORT } from './holochainConf'
@@ -20,8 +21,9 @@ let zomeApi: ZomeApi
 
 const signalCb: AppSignalCb =  async (signal: AppSignal) => {
   console.log('signal', signal);
-  const store = getDataStore();
-  await store.fetchFromSignal(signal.data.payload.path);
+  // const store = getDataStore();
+  alert(`Got message with payload ${signal.data.payload}`);
+  //await store.fetchFromSignal(signal.data.payload.path);
   // trigger UI to update in Home.tsx
 }
 

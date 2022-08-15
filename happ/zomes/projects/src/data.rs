@@ -1,4 +1,4 @@
-use hdk::prelude::*;
+use hdk::prelude::{*};
 use holo_hash::{ActionHashB64, EntryHashB64};
 
 // returned after successful write to DHT
@@ -20,6 +20,13 @@ pub struct ThingInput {
 pub struct Content {
     pub name: String,
     pub data: String,
+}
+
+// Remote call input
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Payload {
+    pub path: String,
+    pub agent_pub_key: AgentPubKey
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]

@@ -7,6 +7,14 @@ export type HeaderProps = {};
 
 const Header: React.FC<HeaderProps> = () => {
 
+  const signalCall = async (): Promise<void> => {
+    const zomeApi = getZomeApi();
+    try {
+      await zomeApi.signal_call('path');
+    } catch (e) { 
+      console.error(e)
+    }
+  }
 
   return (
     <div className="header">

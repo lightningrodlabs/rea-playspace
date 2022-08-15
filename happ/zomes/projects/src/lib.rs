@@ -2,6 +2,7 @@ mod test;
 mod data;
 mod tree_clean;
 
+//use hc_zome_profiles_types::Profile;
 use hdk::{prelude::*, hash_path::path::Component};
 use holo_hash::{EntryHashB64, ActionHashB64};
 use tracing::{info};
@@ -9,79 +10,75 @@ use data::*;
 use tree_clean::{mark_tree, reindex_tree, prune_tree};
 use projects_core::{EntryTypes, LinkTypes, Thing};
 
-
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub struct Payload {
-//     path: String,
-//     agent_pubkey: AgentPubKeyB64
-// }
-
-// #[hdk_extern]
-// pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-//     let mut functions = GrantedFunctions::new();
-//     functions.insert((zome_info()?.name, "remote_update_for_ui".into()));
-//     let grant = ZomeCallCapGrant {
-//         access: CapAccess::Unrestricted,
-//         functions,
-//         tag: "".into(),
-//     };
-//     create_cap_grant(grant)?;
-//     Ok(InitCallbackResult::Pass)
-// }
+#[hdk_extern]
+pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    let mut functions = GrantedFunctions::new();
+    functions.insert((ZomeName::new("projects"), FunctionName::new("remote_update_for_ui")));
+    let grant = ZomeCallCapGrant {
+        access: CapAccess::Unrestricted,
+        functions,
+        tag: "".into(),
+    };
+    create_cap_grant(grant.into())?;
+    debug!("Init success");
+    Ok(InitCallbackResult::Pass)
+}
 
 // /**
 //  *  The UI will call this function when a change has been made when a CRUD operation has occured resulting to a change in UI state
 //  */
-// #[hdk_extern]
-// pub fn ui_updated(input_payload: String) -> ExternResult<()> {
-//     debug!("ui_updated called with payload: {}", input_payload.clone());
-    
-//     // get vec of all profiles
-//     let player_response = call(
-//         CallTargetCell::Local,
-//         "profiles".into(), 
-//         "get_all_profiles".into(), 
-//         None, 
-//         ())?;
-    
-//    let extern_players =  match player_response {
-//         ZomeCallResponse::Ok(content) => Ok(content),
-//         _ => Err(WasmError::Guest("Response is not agents".into())),
-//     }?;
+#[hdk_extern]
+pub fn ui_updated(path: String) -> ExternResult<()> {  
+  // get vec of all profiles
+  let response: ZomeCallResponse = call(
+      CallTargetCell::Local,
+      ZomeName::new("profiles"), 
+      FunctionName::new("get_all_profiles"), 
+      None, 
+      ()
+  )?;
 
-//     let players:Vec<AgentProfile> = extern_players.decode()?;
+  let records: Vec<Record> =  match response {
+    ZomeCallResponse::Ok(content)=> Ok(content),
+    _ => Err(wasm_error!(WasmErrorInner::Guest("Network, Unauthorized, or Countersigning error".into())))
+  }?.decode::<Vec<Record>>().unwrap();
 
-//     // Send a signal to all other agents
-//     let this_agent_pub_key = agent_info()?.agent_initial_pubkey.into();
-//     let others: Vec<AgentProfile> = players.into_iter().filter(|x| x.agent_pub_key != this_agent_pub_key).collect();
+  let mut all_agent_pub_keys: Vec<AgentPubKey> = Vec::new();
+  for record in records {
+    all_agent_pub_keys.push(record.signed_action.action().author().to_owned());
+  }
 
-//     for other in others {
-//         let payload = Payload {
-//             path: input_payload.clone(),
-//             agent_pubkey: other.clone().agent_pub_key
-//         };
-    
-//         debug!("signaling agent: {:?}", other);
-//         call_remote(
-//             other.agent_pub_key.into(),
-//             "ping".into(),
-//             "remote_update_for_ui".into(),
-//             None,
-//             payload.clone()
-//         )?;
-//         debug!("Called remote_update_for_ui with payload {:?}", payload);
-//     }
+  // Send a signal to all other agents
+  let this_agent_pub_key: AgentPubKey = agent_info()?.agent_initial_pubkey;
+  let other_agent_pub_keys: Vec<AgentPubKey> = all_agent_pub_keys.into_iter().filter(|x| *x != this_agent_pub_key).collect();
 
-//     Ok(())
-// }
+  for other in other_agent_pub_keys {
+    let payload = Payload {
+        path: path.clone(),
+        agent_pub_key: other.clone()
+    };
+    debug!("Called agent {:?}", other.clone());
+
+    call_remote(
+        other,
+        ZomeName::new("projects"),
+        FunctionName::new("remote_update_for_ui"),
+        None,
+        payload.clone()
+    )?;
+    debug!("Called remote_update_for_ui with payload {:?}", payload);
+  }
+
+  Ok(())
+}
 
 // // agents call this function in other cells. emit_signal will be handled by a signalCallback in frontend
-// #[hdk_extern]
-// pub fn remote_update_for_ui(payload: Payload)  -> ExternResult<()> {
-//     emit_signal(payload.clone())?;
-//     debug!("External Call Recieved: update_for_ui with payload: {:?}", payload);
-//     Ok(())
-// }
+#[hdk_extern]
+pub fn remote_update_for_ui(payload: Payload)  -> ExternResult<()> {
+    emit_signal(payload.clone())?;
+    debug!("External Call Recieved: update_for_ui with payload: {:?}", payload);
+    Ok(())
+}
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AddOutput> {

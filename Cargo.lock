@@ -1034,6 +1034,7 @@ version = "0.0.1"
 dependencies = [
  "chrono",
  "derive_more",
+ "hc_zome_profiles_types",
  "hdk",
  "paste",
  "projects_core",

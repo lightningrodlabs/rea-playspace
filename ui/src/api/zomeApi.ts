@@ -22,10 +22,9 @@ export default class ZomeApi {
     return;
   }
 
-  public async signal_call (path: String): Promise<void> {
-    console.log('Home of a future signal call');
+  public async signal_call (path: string): Promise<void> {
     Promise.resolve();
-    //await this.client.callZome(getCellId(), 'ping', 'ui_updated', path);
+    await this.client.callZome(getCellId(), 'projects', 'ui_updated', 'path');
     return;
   }
 }
