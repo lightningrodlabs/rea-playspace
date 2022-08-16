@@ -109,8 +109,8 @@ export class EconomicEvent implements EconomicEventShape {
 export class Fulfillment implements FulfillmentShape {
   id: string;
   created: Date;
-  resourceQuantity?: MeasurementShape;
-  effortQuantity?: MeasurementShape;
+  resourceQuantity?: Measurement;
+  effortQuantity?: Measurement;
   fulfills: string;           // Commitment ID
   fulfilledBy: string;        // EconomicEvent ID
 
