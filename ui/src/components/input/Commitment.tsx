@@ -47,9 +47,19 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
     {action, provider, receiver, inputOf, outputOf, resourceQuantity, effortQuantity, note, due, finished, atLocation}, setState
   ] = useState({ ...initialState });
 
+  const [resourceQuanityVisible, setResourceQuanityVisible] = useState<boolean>(false);
+  const [effortQuanityVisible, setEffortQuanityVisible] = useState<boolean>(false);
+  const [resourceAndEffortQuanityVisible, setResourceAndEffortQuanityVisible] = useState<boolean>(false);
+
   useEffect(() => {
     setState(prevState => ({ ...prevState, ...commitmentState }));
   }, [commitmentState]);
+
+  useEffect(() => {
+    action === 'use' ? setResourceAndEffortQuanityVisible(true) : setResourceAndEffortQuanityVisible(false);
+    action === 'work' ? setEffortQuanityVisible(true) : setEffortQuanityVisible(false);
+    action !== 'use' && action !== 'work' ? setResourceQuanityVisible(true) : setResourceQuanityVisible(false);
+  },[action]);
 
   const parsers = {
     'due': (value: string) => new Date(Date.parse(value))
@@ -58,12 +68,31 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
   const onSlChange = slChangeConstructor<CommitmentShape>(name, onChange, setState, parsers);
 
   const toggleFinished = () => {
+    
     setState(prevState => {
-      const state = { ...prevState, finished: !prevState['finished'] };
+      let state = { ...prevState, finished: !prevState['finished'] };
+      if (action === 'work') {
+        state = { ...state, effortQuantity: prevState['effortQuantity'] = null };
+      }
+      if (action !== 'work' && action !== 'use') {
+        state = { ...state, resourceQuantity: prevState['resourceQuanity'] = null };
+      }
       deferOnChange(name, state, onChange);
       return state;
     });
   }
+
+  const ResourceQuantity = <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />;
+
+  const EffortQuanity = <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />;
+
+  const ResourceAndEffortQuanity =
+      <>
+        <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
+        <br />
+        <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      </>;
+
 
   return (
     <>
@@ -84,9 +113,9 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       {inputOrOutputOf(inputOf as string, outputOf as string)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
-      <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
-      <br />
-      <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      {resourceAndEffortQuanityVisible && ResourceAndEffortQuanity}
+      {effortQuanityVisible && EffortQuanity}
+      {resourceQuanityVisible && ResourceQuantity}
       <br />
       <SlInput label="Due" type="datetime-local" value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
