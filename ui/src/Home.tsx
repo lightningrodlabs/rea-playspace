@@ -11,13 +11,11 @@ interface Props {
 const Home: React.FC<Props> = ({setEdit}) => {
   const [resourceSpecifications, setResourceSpecifications] = useState<ResourceSpecification[]>([]);
   const [processSpecifications, setProcessSpecifications] = useState<ProcessSpecification[]>([]);
-  const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(()=>{
     const store = getDataStore();
     setResourceSpecifications(store.getResourceSpecifications());
     setProcessSpecifications(store.getProcessSpecifications());
-    setAgents(store.getAgents());
   }, []);
 
   function updateDisplayState(id: string, type: string): void {
@@ -27,9 +25,6 @@ const Home: React.FC<Props> = ({setEdit}) => {
       if (type === 'processSpecification') {
         setProcessSpecifications(processSpecifications.filter(process => process.id !== id));
       }
-      if (type === 'agent') {
-        setAgents(agents.filter(agent => agent.id !== id));
-      }
   }
 
   return(
@@ -37,7 +32,6 @@ const Home: React.FC<Props> = ({setEdit}) => {
       <Pallet
         resourceSpecifications={resourceSpecifications}
         processSpecifications={processSpecifications}
-        agents={agents}
         updateDisplayState={updateDisplayState}
         setEdit={setEdit}
       />

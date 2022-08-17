@@ -61,7 +61,7 @@ const AgentView: React.FC<NewAgentProps> = () => {
     e.preventDefault()
     const store = getDataStore();
 
-    const ag: Agent =  new Agent({name, note});
+    const ag: Agent =  new Agent({name, image, primaryLocation, note});
 
     if (id) {
       ag.id = id;
@@ -70,14 +70,14 @@ const AgentView: React.FC<NewAgentProps> = () => {
       store.set(ag);
     }
     clearState();
-    navigate('/');
+    navigate('/agents');
   }
 
   return (
     <>
       <MainPanelHeader>
         <h2>New Agent</h2>
-        <Link to="/">
+        <Link to="/agents">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>

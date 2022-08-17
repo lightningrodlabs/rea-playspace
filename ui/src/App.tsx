@@ -16,6 +16,7 @@ import ProcessSpecificationView from "./components/layout/create/ProcessSpecific
 import AgentView from "./components/layout/create/AgentView";
 import EventLedger from "./components/layout/EventLedger";
 import { ProfilesStore } from "@holochain-open-dev/profiles";
+import Agents from "./components/layout/Agents";
 
 Modal.setAppElement("#root");
 
@@ -85,6 +86,10 @@ const App: React.FC<Props> = () => {
                     path="/agents/edit">
                     <Route path=":id" element={<AgentView />} />
                   </Route>
+                  <Route
+                    path="/agents"
+                    element={<Agents />} 
+                  />
                   <Route
                     path="/resources/new"
                     element={<ResourceSpecificationView />}
