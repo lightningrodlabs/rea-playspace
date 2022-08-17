@@ -50,6 +50,7 @@ const Agents: React.FC<Props> = () => {
             <SlIconButton name="plus-square-fill" label="Settings" />
           </Link>
         </div>
+        <p>(double click to edit agents)</p>
       </div>
       <div style={{display: 'flex', flexDirection:'column'}}>
         <RenderAgents />
