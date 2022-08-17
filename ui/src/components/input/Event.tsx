@@ -47,9 +47,28 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
     {id, action, provider, receiver, inputOf, outputOf, resourceConformsTo, resourceQuantity, effortQuantity, note, hasPointInTime, atLocation, toLocation}, setState
   ] = useState({...initialState});
 
+  const [resourceQuanityVisible, setResourceQuanityVisible] = useState<boolean>(false);
+  const [effortQuanityVisible, setEffortQuanityVisible] = useState<boolean>(false);
+  const [resourceAndEffortQuanityVisible, setResourceAndEffortQuanityVisible] = useState<boolean>(false);
+
   useEffect(() => {
-    setState(prevState => ({ ...prevState, ...eventState }));
+    setState(prevState => {
+      let state = {  ...prevState, ...eventState };
+      if (action === 'work') {
+        state = { ...state, effortQuantity: prevState['effortQuantity'] = null };
+      }
+      if (action !== 'work' && action !== 'use') {
+        state = { ...state, resourceQuantity: prevState['resourceQuanity'] = null };
+      }
+      return state;
+    });
   }, [eventState]);
+
+  useEffect(() => {
+    action === 'use' ? setResourceAndEffortQuanityVisible(true) : setResourceAndEffortQuanityVisible(false);
+    action === 'work' ? setEffortQuanityVisible(true) : setEffortQuanityVisible(false);
+    action !== 'use' && action !== 'work' ? setResourceQuanityVisible(true) : setResourceQuanityVisible(false);
+  },[action]);
 
   const parsers = {
     'hasPointInTime': (value: string) => new Date(Date.parse(value))
@@ -60,6 +79,17 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
   function disabled(f: string): boolean {
     return 0 <= readonlyFields.findIndex((v) => v == f);
   }
+
+  const ResourceQuantity = <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />;
+
+  const EffortQuanity = <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />;
+
+  const ResourceAndEffortQuanity =
+      <>
+        <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
+        <br />
+        <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      </>;
 
   return (
     <>
@@ -78,9 +108,9 @@ const EventInput: React.FC<Props> = ({eventState, readonlyFields, conformingReso
       {inputOrOutputOf(inputOf as string, outputOf as string)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
-      <MeasurementInput disableUnit={disabled('resourceQuantityUnit')} label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />
-      <br />
-      <MeasurementInput disableUnit={disabled('effortQuantityUnit')} label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />
+      {resourceAndEffortQuanityVisible && ResourceAndEffortQuanity}
+      {effortQuanityVisible && EffortQuanity}
+      {resourceQuanityVisible && ResourceQuantity}
       <br />
       <SlInput label="Datetime" type="datetime-local" value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
