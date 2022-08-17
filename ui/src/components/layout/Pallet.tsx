@@ -1,6 +1,6 @@
 import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { getLastPart, PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
@@ -10,7 +10,6 @@ import { Process } from '../../data/models/Valueflows/Plan';
 interface Props {
   resourceSpecifications: Array<ResourceSpecification>,
   processSpecifications: Array<ProcessSpecification>,
-  agents: Array<Agent>,
   updateDisplayState: (id: string, type: string) => void,
   setEdit: (entity: any) => void
 }
@@ -18,9 +17,7 @@ interface Props {
 const Pallet: React.FC<Props> = ({
   resourceSpecifications,
   processSpecifications,
-  agents,
-  updateDisplayState,
-  setEdit
+  updateDisplayState
 }) => {
 
   const [open, setOpen] = useState(false);
@@ -166,16 +163,6 @@ const Pallet: React.FC<Props> = ({
         </h2>
       </div>
       {renderNodes(processSpecifications, 'processSpecification')}
-      <br/>
-      <div className='category-styles'>
-        <h2>
-          <Link to="/agents/new">
-            <SlIconButton name="plus-square-fill"   label="Settings" />
-          </Link>
-          Agents
-        </h2>
-      </div>
-      {renderAgents(agents, 'agent')}
       <br/>
     </aside>
   )

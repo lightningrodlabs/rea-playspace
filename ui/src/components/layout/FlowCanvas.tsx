@@ -19,7 +19,6 @@ import ReactFlow, {
   NodeChange,
   EdgeChange
 } from 'react-flow-renderer';
-import AgentModal from '../modals/AgentModal';
 import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
