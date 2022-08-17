@@ -48,30 +48,14 @@ const AgentView: React.FC<NewAgentProps> = () => {
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handleAddAgentFromProfile = async (e: CustomEvent) => {
-    console.log('handleAddAgent: ', e);
-    // const agentPubKey = e.detail.agentPubKey;
-    // const agentReadable = await profilesStore.fetchAgentProfile(agentPubKey);
-    // let agent;
-    // agentReadable.subscribe(ag => {
-    //   agent = ag;
-    // });
-    // await store.fetchAgents();
-    // const agent2 = store.getAgent(agentPubKey);
-    // if (agent2) {
-    //   alert('Agent already exists.');
-    //   return;
-    // }
-    // const ag: Agent = new Agent({
-    //   id: e.detail.agentPubKey, 
-    //   name: agent,
-    //   note: note
-    // });
-    // store.set(ag);
-    // store.fetchAgents();
-    clearState();
-    navigate('/');
-  }
+  /**
+   * TODO: ListProfiles is causing the UI to freeze and crash.
+   *
+   */
+  // const handleAddAgentFromProfile = async (e: CustomEvent) => {
+  //   clearState();
+  //   navigate('/');
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -98,7 +82,7 @@ const AgentView: React.FC<NewAgentProps> = () => {
         </Link>
       </MainPanelHeader>
       <section style={{"display": "flex"}}>
-        <SlCard className="new-agent-card">
+        <SlCard className="agent-view-card scrollable-view">
         <form onSubmit={handleSubmit}>
           <br />
           <br />
@@ -145,14 +129,14 @@ const AgentView: React.FC<NewAgentProps> = () => {
         </form>
         </SlCard>
       
-        <SlCard className="new-agent-card">
-          {/* <ListProfiles
-              onagentselected={(e:CustomEvent) => handleAddAgentFromProfile(e)}
-            ></ListProfiles> */}
-            <p>Placeholder for AgentList</p>
+        {/* <SlCard className="new-agent-card">
+          <ListProfiles
+              onagentselected={(e:CustomEvent) => handleAddAgentFromProfile(e)}>
+          </ListProfiles>
+          <p>Placeholder for AgentList</p>
           <form onSubmit={handleSubmit}>
           </form>
-        </SlCard>
+        </SlCard> */}
       </section>
     </>
   );
