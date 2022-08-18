@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import getDataStore from "../../data/DataStore";
-import { SlCard } from '@shoelace-style/shoelace/dist/react';
-import { EconomicEvent } from "../../data/models/Valueflows/Observation";
 import { EconomicEventShape } from "../../types/valueflows";
-import EventLedgerTableRow from "../modals/EventLedgerTableRow";
+import EventLedgerTableRow from "./EventLedgerTableRow";
 
 export type EventLedgerProps = {};
 

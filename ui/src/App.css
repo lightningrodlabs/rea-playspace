@@ -53,6 +53,11 @@
   justify-content: space-between;
 }
 
+.menu-item:hover {
+  cursor: pointer;
+}
+
+
 .resource-list {
   width: 100%;
 }

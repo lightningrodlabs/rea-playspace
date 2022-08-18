@@ -20,10 +20,11 @@ import {
 import { DataStoreBase } from "./DataStoreBase";
 import { Root } from "./models/Application/Root";
 import { APP_ID } from "../holochainConf";
-import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
 import { InstalledCell } from "@holochain/client";
 import { CellClient } from "@holochain-open-dev/cell-client";
 import { EconomicEvent } from "./models/Valueflows/Observation";
+import { AgentShape } from "../types/valueflows";
 
 let dataStorePromise: Promise<DataStore>;
 let dataStore: DataStore;
@@ -184,8 +185,8 @@ export class DataStore extends DataStoreBase {
     return Object.values(this.root.agent);
   }
 
-  public async fetchAgents() {
-    return await this.fetchAll(Agent.getPrefix());
+  public async fetchAgents(): Promise<Array<Agent>> {
+    return await this.fetchAll(Agent.getPrefix()) as Array<Agent>;
   }
 
   // Plan helpers
