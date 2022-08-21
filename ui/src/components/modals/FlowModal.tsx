@@ -373,7 +373,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
             <div>
               <div className='form-heading'>
                 Events
-                <SlTooltip content="Actual resource flows, planed or unplanned.">
+                <SlTooltip content="Actual resource flows, planned or unplanned.">
                   <SlIconButton name="info-circle" label="Commitment info." />
                 </SlTooltip>
               </div>
