@@ -18,6 +18,7 @@ import AgentView from "./components/layout/create/AgentView";
 import EventLedger from "./components/layout/EventLedger";
 import { ProfilesStore } from "@holochain-open-dev/profiles";
 import Agents from "./components/layout/Agents";
+import ResourceLedger from "./components/layout/ResourceLedger";
 
 Modal.setAppElement("#root");
 
@@ -108,6 +109,10 @@ const App: React.FC<Props> = () => {
                   <Route
                     path="/events"
                     element={<EventLedger />}
+                  />
+                  <Route
+                    path="/resources"
+                    element={<ResourceLedger />}
                   />
                 </Routes>
               </div>

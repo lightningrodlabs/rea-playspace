@@ -54,17 +54,32 @@ export interface ProcessSpecificationShape extends HasIdDate {
 
 export type InputOutput = 'input' | 'output' | 'both' | 'na';
 
-export type ResourceEffect = 'decrement' | 'decrementIncrement' | 'increment' | 'update' | 'remove' | 'noEffect';
+export type AccountingEffect = 'decrement' | 'decrementIncrement' | 'increment';
+
+export type OnHandEffect = AccountingEffect;
+
+export type LocationEffect = 'new' | 'update' | 'updateTo';
+
+export type ContainedEffect = 'update' | 'remove';
+
+export type AccountableEffect = 'new' | 'updateTo';
+
+export type StageEffect = 'stage';
+
+export type StateEffect = 'update' | 'updateTo';
 
 export interface ActionShape {
   id: ActionKey;
   label: string;
   inputOutput?: InputOutput;
-  resourceEffect?: ResourceEffect;
-  onhandEffect?: ResourceEffect;
+  accountingEffect?: AccountingEffect;
+  onhandEffect?: OnHandEffect;
   pairsWith?: string;
-  locationEffect?: string;
-  containedEffect?: string;
+  locationEffect?: LocationEffect;
+  containedEffect?: ContainedEffect;
+  accountableEffect?: AccountableEffect;
+  stageEffect?: StageEffect;
+  stateEffect?: StateEffect;
   comment?: string;
 }
 
@@ -100,13 +115,13 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
 }
 
 // Observation
-export interface EconomicResourceShape {
+export interface EconomicResourceShape extends HasIdDate {
   name: string;
   conformsTo: string;         // ResourceSpecification
   primaryAccountable: string; // Agent ID of the accountable party
-  trackingIndentifier: string;
-  onhandQuantity: number;
-  accountingQuantity?: number;
+  trackingIndentifier?: string;
+  onhandQuantity?: MeasurementShape;
+  accountingQuantity?: MeasurementShape;
   currentLocation?: GeoDataShape;
   note?: string;
   classifiedAs?: string;
@@ -125,6 +140,7 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
   atLocation?: GeoDataShape;
   toLocation?: GeoDataShape;
   state?: string;
+  resourceInventoriedAs?: string | EconomicResourceShape;
   toResourceInventoriedAs?: string | EconomicResourceShape; // EconomicResource ID that the transfer will be inventoried as.
   inputOf?: string | ProcessShape;
   outputOf?: string | ProcessShape;
