@@ -10,6 +10,7 @@ import {
   Plan
 } from "./models/Valueflows/Plan";
 import {
+  EconomicResource,
   Fulfillment
 } from "./models/Valueflows/Observation";
 import {
@@ -100,6 +101,24 @@ export class DataStore extends YatiTreeStore {
 
   public async fetchResourceSpecifications() {
     return await this.fetchAll(ResourceSpecification.getPrefix());
+  }
+
+  // Economic Resource helpers
+
+  public getEconomicResource(id: string): EconomicResource {
+    return this.root.economicResource[id];
+  }
+
+  public async fetchEconomicResource(id: string) {
+    return await this.fetch(EconomicResource.getPath(id));
+  }
+
+  public getEconomicResources(): Array<EconomicResource> {
+    return Object.values(this.root.economicResource);
+  }
+
+  public async fetchAllEconomicResources(): Promise<Array<EconomicResource>> {
+    return (await this.fetchAll(EconomicResource.getPrefix())) as Array<EconomicResource>;
   }
 
   // Economic Event helpers

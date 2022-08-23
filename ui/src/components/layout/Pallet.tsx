@@ -7,8 +7,8 @@ import getDataStore from '../../data/DataStore';
 import { DisplayNode } from '../../data/models/Application/Display';
 import { Process } from '../../data/models/Valueflows/Plan';
 import { ModelType } from '../../data/models/ModelConstructors';
-import { usePath } from '../../data/YatiReactHook';
 import { ProcessSpecification, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
+import { usePath } from '../../data/YatiReactHook';
 interface Props {
   setEdit: (entity: any) => void
 }
