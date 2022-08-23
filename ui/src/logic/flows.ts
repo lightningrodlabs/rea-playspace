@@ -191,6 +191,18 @@ export const getEventDefaultsFromEvent = (event: EconomicEvent): FlowShape => {
   return init;
 }
 
+export const getAllowedActions = (flow: FlowShape, actions: Action[]): Action[] => {
+  let allowedActions = [];
+  if(Object.hasOwn(flow, 'inputOf')) {
+    allowedActions = actions.filter((action) => (action.inputOutput === 'input' || action.inputOutput === 'both'));
+  } else if (Object.hasOwn(flow, 'outputOf')) {
+    allowedActions = actions.filter((action) => (action.inputOutput === 'output' || action.inputOutput === 'both'));
+  } else {
+    allowedActions = actions.filter((action) => action.inputOutput === 'na');
+  }
+  return allowedActions;
+}
+
 /**
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
@@ -285,7 +297,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
   }
 
   /**
-   * Conditionals are arranged to contruct the string in order.
+   * Conditionals are arranged to construct the string in order.
    *
    * work: action N unit by provider [due date]
    * cite: action [resource name] by provider

@@ -12,8 +12,8 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
   conformsTo: string;         // ResourceSpecification
   primaryAccountable: string; // Agent ID of the accountable party
   trackingIndentifier: string;
-  onhandQuantity: number;
-  accountingQuantity?: number;
+  onhandQuantity?: Measurement;
+  accountingQuantity?: Measurement;
   currentLocation?: GeoDataShape;
   note?: string;
   classifiedAs?: string;
@@ -28,7 +28,12 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
     assignFields<EconomicResourceShape, EconomicResource>(init, this);
     this.id = this.id ? this.id : Guid.raw();
     this.created = this.created ? new Date(this.created) : new Date();
+    this.accountingQuantity = init.accountingQuantity ? new Measurement(init.accountingQuantity) : new Measurement();
+    this.onhandQuantity = init.onhandQuantity ? new Measurement(init.onhandQuantity) : new Measurement();
     this.currentLocation = (this.currentLocation && this.currentLocation != null) ? new GeoData(this.currentLocation) : null;
+    this.stage = this.stage ? this.stage : null;
+    this.state = this.state ? this.state : null;
+    this.containedIn = this.containedIn ? this.containedIn : null;
     this.note = init.note ? init.note : null;
   }
 
@@ -40,8 +45,21 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
     return `${EconomicResource.getPrefix()}.${id}`;
   }
 
+  static getSytheticKey(r: EconomicResourceShape) {
+    const loc = r.currentLocation ? `-${r.currentLocation}`: '';
+    const stage = r.stage ? `-${r.stage}` : '';
+    const state = r.state ? `-${r.state}` : '';
+    const containedIn = r.containedIn ? `-${r.containedIn}` : '';
+    return `${r.primaryAccountable}${loc}${stage}${state}${containedIn}`;
+  }
+
   get path(): string {
     return EconomicResource.getPath(this.id);
+  }
+
+  // may need to include containedIn at some point
+  get syntheticKey(): string {
+    return EconomicResource.getSytheticKey(this);
   }
 
   public toJSON(): EconomicResourceShape {
@@ -55,15 +73,15 @@ export class EconomicEvent implements EconomicEventShape {
   action: ActionKey;
   provider: string;                 // Agent ID
   receiver: string;                 // Agent ID
-  resourceInventoriedAs?: string;   // EconomicResource ID
-  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
+  resourceInventoriedAs?: EconomicResourceShape | string;   // EconomicResource ID
+  toResourceInventoriedAs?: EconomicResourceShape | string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
   inputOf?: string;                 // Process ID
   outputOf?: string;                // Process ID
   atLocation?: GeoDataShape;        // Source Location
   toLocation?: GeoDataShape;        // Destination Location
   resourceConformsTo?: string;      // ResourceSprecification ID
-  resourceQuantity?: MeasurementShape;
-  effortQuantity?: MeasurementShape;
+  resourceQuantity?: Measurement;
+  effortQuantity?: Measurement;
   resourceClassifiedAs?: string;    // General classification or grouping
   note?: string;
   image?: string;
@@ -83,8 +101,8 @@ export class EconomicEvent implements EconomicEventShape {
     this.hasPointInTime = init.hasPointInTime ? new Date(init.hasPointInTime) : null;
     this.hasBegining = init.hasBegining ? new Date(init.hasBegining) : null;
     this.hasEnd = init.hasEnd ? new Date(init.hasEnd) : null;
-    this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): null;
-    this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): null;
+    this.resourceQuantity = (init.resourceQuantity && init.resourceQuantity != null) ? new Measurement(init.resourceQuantity): new Measurement();
+    this.effortQuantity = (init.effortQuantity && init.effortQuantity != null) ? new Measurement(init.effortQuantity): new Measurement();
     this.atLocation = (this.atLocation && init.atLocation != null) ? new GeoData(this.atLocation) : null;
     this.toLocation = (this.toLocation && init.toLocation != null) ? new GeoData(this.toLocation) : null;
   }

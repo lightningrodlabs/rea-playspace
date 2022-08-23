@@ -7,11 +7,17 @@ import {
   ProcessSpecificationShape,
   ActionShape,
   InputOutput,
-  ResourceEffect,
   UnitShape,
   MeasurementShape,
   GeoDataShape,
-  GeoPointShape
+  GeoPointShape,
+  AccountingEffect,
+  OnHandEffect,
+  LocationEffect,
+  ContainedEffect,
+  AccountableEffect,
+  StageEffect,
+  StateEffect
 } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../utils';
 
@@ -315,7 +321,7 @@ export type ActionKey = 'accept'
                       | 'combine'
                       | 'consume'
                       | 'cite'
-                      | 'deliver-service'
+                      | 'deliverService'
                       | 'dropoff'
                       | 'lower'
                       | 'modify'
@@ -324,9 +330,9 @@ export type ActionKey = 'accept'
                       | 'produce'
                       | 'raise'
                       | 'separate'
-                      | 'transfer-all-rights'
+                      | 'transferAllRights'
                       | 'transfer'
-                      | 'transfer-custody'
+                      | 'transferCustody'
                       | 'use'
                       | 'work';
 
@@ -350,11 +356,15 @@ export class Action implements PathedData, ActionShape {
   id: ActionKey;
   label: string;
   inputOutput: InputOutput;
-  resourceEffect?: ResourceEffect;
-  onhandEffect?: ResourceEffect;
+  accountingEffect?: AccountingEffect;
+  onhandEffect?: OnHandEffect;
   pairsWith?: string;
-  locationEffect?: string;
-  containedEffect?: string;
+  locationEffect?: LocationEffect;
+  containedEffect?: ContainedEffect;
+  accountableEffect?: AccountableEffect;
+  stageEffect?: StageEffect;
+  stateEffect?: StateEffect;
+  comment?: string;
 
   constructor(init: ActionShape) {
     assignFields<ActionShape, Action>(init, this);
@@ -385,6 +395,7 @@ export const Actions: Record<ActionKey, Action> = {
     id: 'use',
     label: 'Use',
     inputOutput: 'input',
+    stateEffect: 'update',
     comment: "For example a tool used in process; after the process, the tool still exists."
   }),
   'work': new Action({
@@ -398,6 +409,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Accept',
     inputOutput: 'input',
     onhandEffect: 'decrement',
+    stateEffect: 'update',
     pairsWith: 'modify',
     comment: "In processes like repair or modification or testing, the same resource will appear in the output."
   }),
@@ -406,6 +418,8 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Modify',
     inputOutput: 'output',
     onhandEffect: 'increment',
+    stateEffect: 'update',
+    stageEffect: 'stage',
     pairsWith: 'accept',
     comment: "In processes like repair or modification, the same resource will appear in the input."
   }),
@@ -414,36 +428,48 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Consume',
     inputOutput: 'input',
     onhandEffect: 'decrement',
-    resourceEffect: 'decrement',
+    accountingEffect: 'decrement',
+    stateEffect: 'update',
     comment: "For example an ingredient or component composed into the output, after the process the ingredient is gone."
   }),
   'produce': new Action({
     id: 'produce',
     label: 'Produce',
     inputOutput: 'output',
-    comment: ""
+    accountingEffect: 'increment',
+    onhandEffect: 'increment',
+    locationEffect: 'new',
+    accountableEffect: 'new',
+    stageEffect: 'stage',
+    stateEffect: 'update',
+    comment: "New resource was created in that process or an existing stock resource was added to."
   }),
   'cite': new Action({
     id: 'cite',
     label: 'Cite',
     inputOutput: 'input',
+    stateEffect: 'update',
     comment: "For example a design file, neither used nor consumed, the file remains available at all times."
   }),
   'lower': new Action({
     id: 'lower',
     label: 'Lower',
     onhandEffect: 'decrement',
-    resourceEffect: 'decrement',
+    accountingEffect: 'decrement',
+    accountableEffect: 'new',
+    stateEffect: 'update',
     comment: "Adjusts a quantity down based on a beginning balance or inventory count."
   }),
   'raise': new Action({
     id: 'raise',
     label: 'Raise',
     onhandEffect: 'increment',
-    resourceEffect: 'increment',
+    accountingEffect: 'increment',
+    accountableEffect: 'new',
+    stateEffect: 'update',
     comment: "Adjusts a quantity up based on a beginning balance or inventory count."
   }),
-  'deliver-service': new Action({
+  'deliverService': new Action({
     id: 'deliverService',
     label: 'Deliver Service',
     inputOutput: 'both',
@@ -454,26 +480,36 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Dropoff',
     inputOutput: 'output',
     pairsWith: 'pickup',
+    locationEffect: 'update',
+    stageEffect: 'stage',
+    stateEffect: 'update',
     comment: "Transported resource or person leaves the process; the same resource or person appeared in the input."
   }),
   'pickup': new Action({
     id: 'pickup',
     label: 'Pickup',
     inputOutput: 'input',
+    locationEffect: 'update',
+    stateEffect: 'update',
     comment: "Transported resource or person enters the process; the same resource will appear in the output."
   }),
   'move': new Action({
     id: 'move',
     label: 'Move',
     inputOutput: 'na',
-    locationEffect: 'update',
+    accountingEffect: 'decrementIncrement',
+    onhandEffect: 'decrementIncrement',
+    locationEffect: 'updateTo',
+    stateEffect: 'updateTo',
     comment: "Change location and possibly identifier, if location is part of the identification, of a resource with no change of agent rights or possession."
   }),
-  'transfer-all-rights': new Action({
+  'transferAllRights': new Action({
     id: 'transferAllRights',
     label: 'Transfer all rights',
     inputOutput: 'na',
-    resourceEffect: 'decrementIncrement',
+    accountingEffect: 'decrementIncrement',
+    accountableEffect: 'updateTo',
+    stateEffect: 'updateTo',
     comment: "Give full (in the human realm) rights and responsibilities to another agent, without transferring physical custody."
   }),
   'transfer': new Action({
@@ -481,16 +517,19 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Transfer',
     inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
-    resourceEffect: 'decrementIncrement',
+    accountingEffect: 'decrementIncrement',
     locationEffect: 'update',
+    accountableEffect: 'updateTo',
+    stateEffect: 'updateTo',
     comment: "Give full rights and responsibilities plus physical custody."
   }),
-  'transfer-custody': new Action({
+  'transferCustody': new Action({
     id: 'transferCustody',
     label: 'Transfer custody',
     inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
-    locationEffect: 'update',
+    locationEffect: 'updateTo',
+    stateEffect: 'updateTo',
     comment: "Give physical custody and control of a resource, without full accounting or ownership rights."
   }),
   'combine': new Action({
@@ -499,6 +538,7 @@ export const Actions: Record<ActionKey, Action> = {
     inputOutput: 'input',
     onhandEffect: 'decrement',
     containedEffect: 'update',
+    stateEffect: 'update',
     pairsWith: 'separate',
     comment: "A resource is combined with other resources into a container resource."
   }),
@@ -508,6 +548,8 @@ export const Actions: Record<ActionKey, Action> = {
     inputOutput: 'output',
     onhandEffect: 'increment',
     containedEffect: 'remove',
+    stageEffect: 'stage',
+    stateEffect: 'update',
     pairsWith: 'combine',
     comment: "A resource is removed from a container resource."
   })

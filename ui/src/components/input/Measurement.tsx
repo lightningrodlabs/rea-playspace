@@ -26,7 +26,7 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
     if (value != null && value.hasNumericalValue && value.hasUnit && value.hasUnit != '') {
       setState(value);
     }
-  }, [value]);
+  }, []);
 
   const parsers = {
     'hasNumericalValue': (value: string) => parseFloat(value)
