@@ -1,8 +1,8 @@
 import { Guid } from "guid-typescript";
 import { XYPosition, Node } from 'react-flow-renderer';
-import { PathedData, getAlmostLastPart } from "../PathedData";
+import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { assignFields, fieldsToJSON } from '../../../utils';
+import { assignFields, fieldsToJSON } from '../../utils';
 
 export interface DisplayNodeShape {
   id?: string;

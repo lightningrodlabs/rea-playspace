@@ -20,7 +20,7 @@ import {
   FulfillmentShape
 } from "../../types/valueflows";
 import {
-  Root
+  Root, RootShape
 } from "./Application/Root";
 import {
   Agent,
@@ -44,11 +44,13 @@ import {
   DisplayEdge,
   DisplayEdgeShape
 } from "./Application/Display";
+import { PathedData } from "./PathedData";
 
 /**
  * Map from a parent path slug to a function that transforms the object into the corresponding class
  */
-export const ObjectTransformations = {
+export const ModelBuilder = {
+  'root' : (object: Object) => new Root(object as RootShape),
   'agent': (object: Object) => new Agent(object as AgentShape),
   'resourceSpecification': (object: Object) => new ResourceSpecification(object as ResourceSpecificationShape),
   'processSpecification': (object: Object) => new ProcessSpecification(object as ProcessSpecificationShape),
@@ -64,6 +66,11 @@ export const ObjectTransformations = {
 };
 
 /**
+ * Create enum of all the possible model types
+ */
+export type ModelType = keyof typeof ModelBuilder;
+
+/**
  * Maps of strings to actual Model classes.
  *
  * Used to map to object types used in the functions below, but can also be used
@@ -77,7 +84,7 @@ export const ObjectTransformations = {
  * This takes the type we stored and uses it to deserialize the data back into the
  * correct model automatically.
  */
-export const ObjectTypeMap = {
+export const ModelConstructorMap = {
   'root': Root,
   'agent': Agent,
   'resourceSpecification': ResourceSpecification,
@@ -111,9 +118,44 @@ export function objectEntriesToMap<T>(obj: Record<string, T>): Map<string, T> {
  */
 export function transformEntriesToMap(tempRoot: Object) {
   const newRoot: Root = new Root();
-  for (let [placeholder, type] of Object.entries(ObjectTypeMap)) {
+  for (let [placeholder, type] of Object.entries(ModelConstructorMap)) {
     if (tempRoot.hasOwnProperty(placeholder)) {
       newRoot[placeholder] = objectEntriesToMap<typeof type>(tempRoot[placeholder]);
     }
   }
+}
+
+/**
+ * Constructs a model from PPJO given it's type and name
+ * The name is only required to determine the root
+ */
+ export function constructFromObj(type: string, name: string, data: {}): PathedData {
+  let PDO: PathedData = null;
+  if (type && type != "") {
+    // In some cases, the type is 'root', but it's just the index, don't make a Root object
+    if (type in ModelBuilder && (type != 'root' || name == 'root')) {
+      PDO = ModelBuilder[type](data);
+    } else {
+      PDO = {} as PathedData;
+    }
+  } else {
+    if (name == 'root') {
+      PDO = ModelBuilder['root'](data);
+    }
+  }
+  return PDO;
+}
+
+/**
+ * Constructs a model from JSON given it's type and name
+ * The name is only required to determine the root
+ */
+export function constructFromJSON(type: string, name: string, data: string): PathedData {
+  let PDO: PathedData = null
+  if (data != "") {
+    PDO = constructFromObj(type, name, JSON.parse(data));
+  } else {
+    PDO = {} as PathedData;
+  }
+  return PDO;
 }

@@ -1,29 +1,35 @@
 import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { getLastPart, PathedData } from "../../data/models/PathedData";
 import PalletNode from '../PalletNode';
 import getDataStore from '../../data/DataStore';
 import { DisplayNode } from '../../data/models/Application/Display';
 import { Process } from '../../data/models/Valueflows/Plan';
+import { ModelType } from '../../data/models/ModelConstructors';
+import { usePath } from '../../data/YatiReactHook';
+import { ProcessSpecification, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
 interface Props {
-  resourceSpecifications: Array<ResourceSpecification>,
-  processSpecifications: Array<ProcessSpecification>,
-  updateDisplayState: (id: string, type: string) => void,
   setEdit: (entity: any) => void
 }
 
-const Pallet: React.FC<Props> = ({
-  resourceSpecifications,
-  processSpecifications,
-  updateDisplayState
-}) => {
-
+const Pallet: React.FC<Props> = () => {
+  const resourceSpecifications = usePath('root.resourceSpecification', getDataStore());
+  const processSpecifications = usePath('root.processSpecification', getDataStore());
+  const [resourceList, setResourceList] = useState<ResourceSpecification[]>([]);
+  const [processList, setProcessList] = useState<ProcessSpecification[]>([]);
   const [open, setOpen] = useState(false);
   const [dependentCount, setDependentCount] = useState<number>();
 
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    setResourceList(Object.values(resourceSpecifications));
+  }, [resourceSpecifications]);
+
+  useEffect(()=>{
+    setProcessList(Object.values(processSpecifications));
+  }, [processSpecifications]);
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
@@ -39,13 +45,12 @@ const Pallet: React.FC<Props> = ({
     return `Cannot delete as it is has ${dependentCount} dependent nodes.`;
   }
 
-  function pickStyle(type: string) {
+  function pickStyle(type: ModelType) {
     if (type === 'resourceSpecification') return 'resource-specification-pallet-node';
     if (type === 'processSpecification') return 'process-specification-pallet-node';
-    if (type === 'agent') return 'agent-pallet-node';
   }
 
-  function renderNodes(list, type) {
+  function renderNodes(list, type: ModelType) {
     if (list.length > 0) {
       return (list.map((item: any) => (
         <div
@@ -68,25 +73,7 @@ const Pallet: React.FC<Props> = ({
     return (<><br></br></>);
   }
 
-  function renderAgents(list: Array<any>, type: string) {
-    if (list.length > 0) {
-      return (list.map((item: any) => (
-        <div
-        key={item.id}
-        className={'pallet-node ' + pickStyle(type)}>
-          <PalletNode
-            thing={item}
-            onClick={palletNodeDeleteHandler}
-            onDoubleClick={palletNodeEditHandler}
-            type={type}
-          />
-        </div>
-      )));
-    }
-    return (<></>);
-  }
-
-  function palletNodeEditHandler(event, id: string, type: string) {
+  function palletNodeEditHandler(event, id: string, type: ModelType) {
     event.preventDefault();
     if (event.detail === 2) {
       switch (type) {
@@ -96,14 +83,11 @@ const Pallet: React.FC<Props> = ({
         case 'processSpecification':
           navigate(`/processes/edit/${id}`);
           break;
-        case 'agent':
-          navigate(`/agents/edit/${id}`);
-          break;
       }
     }
   }
 
-  function palletNodeDeleteHandler(event, id: string, type: string) {
+  function palletNodeDeleteHandler(event, id: string, type: ModelType) {
     const store = getDataStore();
     if (event.altKey) {
       // check to see if it is in use
@@ -129,8 +113,6 @@ const Pallet: React.FC<Props> = ({
 
       if (matchedNodes.length === 0) {
         store.delete(store.lookUpPath(id));
-        updateDisplayState(id, type);
-
       } else {
         setDependentCount(matchedNodes.length);
         setOpen(true);
@@ -152,7 +134,7 @@ const Pallet: React.FC<Props> = ({
         Resource Specifications
       </h2>
       </div>
-      {renderNodes(resourceSpecifications, 'resourceSpecification')}
+      {renderNodes(resourceList, 'resourceSpecification')}
       <br/>
       <div className='category-styles'>
         <h2>
@@ -162,7 +144,7 @@ const Pallet: React.FC<Props> = ({
           Process Specifications
         </h2>
       </div>
-      {renderNodes(processSpecifications, 'processSpecification')}
+      {renderNodes(processList, 'processSpecification')}
       <br/>
     </aside>
   )

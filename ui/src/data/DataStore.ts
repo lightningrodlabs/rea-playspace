@@ -1,11 +1,10 @@
-import ZomeApi from "../api/zomeApi";
-import {  getHolochainClient, setAgentPubKey, setCellId, setZomeApi } from '../hcWebsockets';
 import {
   Action,
   Agent,
   ProcessSpecification,
   ResourceSpecification,
-  Unit
+  Unit,
+  Actions
 } from "./models/Valueflows/Knowledge";
 import {
   Plan
@@ -17,112 +16,50 @@ import {
   DisplayNode,
   DisplayEdge
 } from "./models/Application/Display";
-import { DataStoreBase } from "./DataStoreBase";
+import { YatiTreeStore, DataProvider } from "./YatiTreeStore";
 import { Root } from "./models/Application/Root";
-import { APP_ID } from "../holochainConf";
-import { ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
-import { InstalledCell } from "@holochain/client";
-import { CellClient } from "@holochain-open-dev/cell-client";
 import { EconomicEvent } from "./models/Valueflows/Observation";
-import { AgentShape } from "../types/valueflows";
+import { PathedData } from "./models/PathedData";
 
-let dataStorePromise: Promise<DataStore>;
-let dataStore: DataStore;
-let profilesStore: ProfilesStore;
-let myProfileReadable;
+export class DataStore extends YatiTreeStore {
 
-export function getMyProfileReadable() {
-  return myProfileReadable;
-}
-
-/**
- * Initialize Holochain WS connection, set up Zome API client and DataStore singletons.
- *
- * By the time this promise resolves, any call to `getDataStore` is gauranteed to
- * have a reference to our singleton
- */
- export async function initConnection(): Promise<DataStore> {
-  dataStorePromise = new Promise(async (res) => {
-
-    const client = await getHolochainClient();
-    // console.log('client: ', client);
-    const appInfo = await client.appWebsocket.appInfo({
-      installed_app_id: APP_ID
-    });
-    //console.log('app_info: ', appInfo);
-    const cell = appInfo.cell_data[0];
-    const [_dnaHash, agentPubKey] = cell.cell_id;
-    const zomeApi = new ZomeApi(client);
-    //console.log('zomeApi: ', zomeApi);
-    setAgentPubKey(agentPubKey);
-    setCellId(cell.cell_id);
-    setZomeApi(zomeApi);
-
-    dataStore = new DataStore();
-    //console.log('dataStore: ', dataStore);
-    await dataStore.fetchOrCreateRoot();
-    //console.log('dataStore promise: resolved');
-
-    profilesStore = await connectProfiles();
-    myProfileReadable = await profilesStore.fetchMyProfile();
-
-    res(dataStore);
-  });
-  return dataStorePromise;
-}
-
-async function connectProfiles(): Promise<ProfilesStore> {
-  const client = await getHolochainClient();
-  const appInfo = await client.appWebsocket.appInfo({
-    installed_app_id: APP_ID
-  });
-  const cell: InstalledCell = appInfo.cell_data[0];
-  const profilesService = new ProfilesService(new CellClient(client, cell));
-  return new ProfilesStore(profilesService, {
-    avatarMode: "avatar-optional",
-  });
-}
-
-export function getProfilesStore() {
-  return profilesStore;
-}
-
-/**
- * Fetches DataStore
- */
-export default function getDataStore(): DataStore {
-  return dataStore;
-}
-
-export class DataStore extends DataStoreBase {
-
-  constructor() {
-    super();
+  constructor(providers?: Record<string, DataProvider>) {
+    super(providers);
   }
 
   // Root helpers
 
+  public createDefaultRoot() {
+    // if it doesn't, create it and a placeholder plan
+    console.info('root does not exist. creating...');
+    const plan = new Plan({
+      name: 'Default Plan Name'
+    });
+    this.root = new Root({planId: plan.id})
+    this.set(this.root);
+    this.set(plan);
+    // Need to index tree starting with the root
+    this.pathIndex.indexTree({
+      root: this.root,
+      path: ''
+    } as PathedData);
+  }
+
   /**
-   * Checks to see if we have anything in our DHT and chain, if not sets it up.
+   * Checks to see if we have anything in our DataProvider,
+   * if not sets up defaults for the app.
    */
-  public override async fetchOrCreateRoot(): Promise<any> {
+  public async fetchOrCreateRoot(): Promise<any> {
     // check if root object exists
-    const result = await this.zomeApi.get_thing('root');
-    console.log('fetchOrCreate res: ', result);
-    if (result.length === 0) {
-      // if it doesn't, create it and a placeholder plan
-      console.log('root does not exist. creating...');
-      const plan = new Plan({
-        name: 'Default Plan Name'
-      });
-      this.root = new Root({planId: plan.id})
-      this.put(this.root);
-      this.set(plan);
-    } else  {
-      console.log('hydrateFromZome: ', );
-      // We have the data, lets hydrate it
-      this.hydrateFromZome(result);
-      console.log(this.pathIndex);
+    try {
+      const root = await this.fetch('root');
+      if (root instanceof Root) {
+        this.root = root;
+      } else {
+        this.createDefaultRoot();
+      }
+    } catch (e) {
+      this.createDefaultRoot();
     }
   }
 
@@ -233,8 +170,11 @@ export class DataStore extends DataStoreBase {
   }
 
   // Commitment helpers
+  /**
+   * XXX: this.root.action return children that have all fields set to {}
+   */
   public getActions(): Action[] {
-    return Object.values(this.root.action);
+    return Object.values(Actions);
   }
 
   public getUnits(): Unit[] {
@@ -243,3 +183,11 @@ export class DataStore extends DataStoreBase {
 
 }
 
+const dataStore = new DataStore();
+
+/**
+ * Fetches DataStore
+ */
+ export default function getDataStore(): DataStore {
+  return dataStore;
+}
