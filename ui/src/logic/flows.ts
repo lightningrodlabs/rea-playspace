@@ -4,7 +4,7 @@ import { Edge, MarkerType, Node } from "react-flow-renderer";
 import { DateToUiString } from "../components/util";
 import getDataStore from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
-import { ObjectTypeMap } from "../data/models/ObjectTransformations";
+import { ModelConstructorMap } from "../data/models/ModelConstructors";
 import { getAlmostLastPart } from "../data/models/PathedData";
 import { Action, Agent, isInSet, isTransfer, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
 import { EconomicEvent } from "../data/models/Valueflows/Observation";
@@ -20,7 +20,7 @@ export const getDisplayNodeBy = (id: string): any => {
   const store = getDataStore();
   const displayNode: DisplayNode = store.getById(id);
   const vfType = getAlmostLastPart(displayNode.vfPath);
-  const T = ObjectTypeMap[vfType];
+  const T = ModelConstructorMap[vfType];
   const vfNode: typeof T = store.getCursor(displayNode.vfPath);
 
   return {
@@ -200,7 +200,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
 
   // default action, for debugging
   let action = new Action({
-    id: 'na',
+    id: null,
     label: 'blank action',
     inputOutput: 'na',
     comment: "This indicates there's no action selected."
@@ -255,7 +255,6 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
    * Get the flow's resourceQuantity as a string
    */
   function effortQuantity(flow: FlowShape, show?: boolean): string {
-    console.log(flow)
     if (
       flow.effortQuantity != null
       && typeof flow.effortQuantity == 'object'
@@ -400,7 +399,7 @@ function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
       const commitmentLabel = getLabelForFlow(commitment, resource, provider, receiver, actions, units)
       flowLabels.push(`Commitment: ${commitmentLabel}`);
     } else {
-      console.log('No commitment for label.')
+      console.warn('No commitment for label.')
     }
 
     // Summarize events into a single event
@@ -413,7 +412,7 @@ function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
       const eventLabel = getLabelForFlow(summaryEvent, resource, provider, receiver, actions, units)
       flowLabels.push(`Events: ${eventLabel}`);
     } else {
-      console.log('No events for label.');
+      console.warn('No events for label.');
     }
 
     if (flowLabels.length > 0) {

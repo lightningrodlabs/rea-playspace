@@ -1,9 +1,10 @@
+import { ModelType } from "../data/models/ModelConstructors";
 
 export type PalletNodeProps = {
   thing: any;
-  type: string;
-  onClick: (event: any, id: string, type: string) => void;
-  onDoubleClick: (event: any, id: string, type: string) => void;
+  type: ModelType;
+  onClick: (event: any, id: string, type: ModelType) => void;
+  onDoubleClick: (event: any, id: string, type: ModelType) => void;
 };
 
 const PalletNode: React.FC<PalletNodeProps> = ({thing, onClick, onDoubleClick, type}) => {

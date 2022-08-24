@@ -13,7 +13,7 @@ import {
   GeoDataShape,
   GeoPointShape
 } from "../../../types/valueflows";
-import { assignFields, toJSON } from '../../../utils';
+import { assignFields, toJSON } from '../../utils';
 
 // Knowledge Classes
 
@@ -109,6 +109,11 @@ export class Measurement implements MeasurementShape {
     id: 'piece',
     name: 'piece',
     symbol: ''
+  }),
+  'one': new Unit({
+    id: 'one',
+    name: 'each',
+    symbol: 'ea'
   }),
   'day': new Unit({
     id: 'day',
@@ -329,7 +334,7 @@ export const isInSet = (set: string[], action: string): boolean => {
   return set.findIndex((t) => action == t) > -1;
 }
 
-export const isTransfer = (action: string):boolean => {
+export const isTransfer = (action: ActionKey):boolean => {
   return isInSet([
     'transfer',
     'transfer-all-rights',
@@ -375,7 +380,7 @@ export class Action implements PathedData, ActionShape {
 /**
  * These are the canonical Action definitions. These are intended to be extensible.
  */
-export const Actions = {
+export const Actions: Record<ActionKey, Action> = {
   'use': new Action({
     id: 'use',
     label: 'Use',
