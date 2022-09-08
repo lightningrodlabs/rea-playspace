@@ -20,7 +20,7 @@
 export function assignFields<T extends Object, U extends Object>(unfiltered: T, context: U) {
   const fields = Reflect.ownKeys(unfiltered);
   fields.forEach((key) => {
-    if (unfiltered[key] != undefined && unfiltered[key] != '') {
+    if (unfiltered[key] != undefined && (unfiltered[key] != '')) {
       context[key] = unfiltered[key];
     }
   });
