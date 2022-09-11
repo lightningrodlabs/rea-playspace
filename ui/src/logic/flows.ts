@@ -99,7 +99,7 @@ export const flowDefaults = {
       resourceConformsTo: resource.id,
       provider: process.inScopeOf,
       receiver: null,
-      action: 'use',
+      action: 'produce',
       outputOf: process.id
     };
   },
