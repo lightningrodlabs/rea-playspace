@@ -158,7 +158,7 @@ export class Measurement implements MeasurementShape {
   'mile-USSurvey': new Unit({
     id: 'mile-USSurvey',
     name: 'mile (US survey)',
-    symbol: ''
+    symbol: 'mi'
   }),
   'acre-USSurvey': new Unit({
     id: 'acre-USSurvey',
