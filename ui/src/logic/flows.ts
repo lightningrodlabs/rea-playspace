@@ -276,6 +276,14 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
     return '';
   }
 
+  function getName(obj: {}): string {
+    if (obj && Object.hasOwn(obj, 'name')) {
+      return obj['name'];
+    } else {
+      return 'Missing Name';
+    }
+  }
+
   /**
    * Conditionals are arranged to contruct the string in order.
    *
@@ -288,19 +296,23 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
    * outputs: action N unit [resource name] for receiver [due date]
    */
 
+  const resourceName = getName(resource);
+  const providerName = getName(provider);
+  const receiverName = getName(receiver);
+
   // Work
   if (action.id == 'work') {
-    return `${action.label}${effortQuantity(flow)}by ${provider.name}${dateString(flow)}`;
+    return `${action.label}${effortQuantity(flow)}by ${providerName}${dateString(flow)}`;
   }
 
   // Cite
   if (action.id == 'cite') {
-    return `${action.label} ${resource.name} by ${provider.name}`;
+    return `${action.label} ${resourceName} by ${providerName}`;
   }
 
   // Use
   if (action.id == 'use') {
-    return `${action.label}${resourceQuantity(flow)}${effortQuantity(flow, true)}${resource.name} from ${provider.name}${dateString(flow)}`;
+    return `${action.label}${resourceQuantity(flow)}${effortQuantity(flow, true)}${resourceName} from ${providerName}${dateString(flow)}`;
   }
 
   // Transfer
@@ -309,12 +321,12 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
     && flow.provider
     && flow.receiver
   ) {
-    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name} to ${receiver.name}${dateString(flow)}`;
+    return `${action.label}${resourceQuantity(flow)}${resourceName} from ${providerName} to ${receiverName}${dateString(flow)}`;
   }
 
   // Move, Raise, Lower
   if (isInSet(['move', 'raise', 'lower'], action.id)) {
-    return `${action.label}${resourceQuantity(flow)}${resource.name} in ${provider.name}`;
+    return `${action.label}${resourceQuantity(flow)}${resourceName} in ${providerName}`;
   }
 
   // Input
@@ -322,7 +334,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
     isInSet(['input', 'both'], action.inputOutput)
     && flow.inputOf && flow.provider
   ) {
-    return `${action.label}${resourceQuantity(flow)}${resource.name} from ${provider.name}${dateString(flow)}`;
+    return `${action.label}${resourceQuantity(flow)}${resourceName} from ${providerName}${dateString(flow)}`;
   }
 
   // Output
@@ -330,7 +342,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
     isInSet(['output', 'both'], action.inputOutput)
     && flow.outputOf && flow.receiver
   ) {
-    return `${action.label}${resourceQuantity(flow)}${resource.name} for ${receiver.name}${dateString(flow)}`;
+    return `${action.label}${resourceQuantity(flow)}${resourceName} for ${receiverName}${dateString(flow)}`;
   }
 
   return label;
