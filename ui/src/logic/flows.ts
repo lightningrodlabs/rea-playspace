@@ -99,7 +99,7 @@ export const flowDefaults = {
       resourceConformsTo: resource.id,
       provider: process.inScopeOf,
       receiver: null,
-      action: 'use',
+      action: 'produce',
       outputOf: process.id
     };
   },
@@ -441,7 +441,7 @@ export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge => {
     sourceHandle: displayEdge.sourceHandle,
     targetHandle: displayEdge.targetHandle,
     label: getLabelForDisplayEdge(displayEdge),
-    labelBgStyle: { fill: '#fff', color: '#fff', fillOpacity: 0.7 },
+    labelBgStyle: { fill: '#F1FFE7', fillOpacity: 0.7 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },

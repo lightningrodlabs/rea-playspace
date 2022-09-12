@@ -1,7 +1,7 @@
 :root {
-  --p-shadow-from-dim-light: rgba(0, 0, 0, 0.2);
-  --p-shadow-from-ambient-light: rgba(23, 24, 24, 0.05);
-  --p-shadow-from-direct-light: rgba(0, 0, 0, 0.15);
+  --p-shadow-from-dim-light: rgba(8, 7, 8, 0.2);
+  --p-shadow-from-ambient-light: rgba(24, 21, 24, 0.05);
+  --p-shadow-from-direct-light: rgba(8, 7, 8, 0.15);
   --p-top-bar-shadow: 0 2px 2px -1px var(--p-shadow-from-direct-light);
   --border: rgba(225, 227, 229, 1);
 }
@@ -11,8 +11,8 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: rgb(246, 246, 247);
-  color: rgb(32, 34, 35);
+  background-color: rgb(255, 255, 255);
+  color: rgb(8, 7, 8);
 }
 
 .header {
@@ -156,32 +156,73 @@
   justify-content: space-between;
 }
 
+/* Common Styles */
+
+/*
+Currently using a color scheme based off the color relations here
+  https://coolors.co/080708-817f75-3d6382-71bffc-da3e65-f1ffe7-f7e594-fdca40-74181f-df2935
+  https://coolors.co/080708-817f75-3d6382-71bffc-da3e65-f1ffe7-f7e594-f2abaf-74181f-df2935
+  https://coolors.co/080708-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-558564-df2935
+  https://coolors.co/080708-157145-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-df2935
+  https://coolors.co/080708-3d6382-71bffc-da3e65-817f75-fc814a-f5f749-0cca4a-fa198b-df2935
+*/
+
+.resource-specification-colors {
+  border-color: #71bffc !important;
+  background: #71bffc;
+}
+
+.resource-specification-selected {
+  border-color: #3D6382 !important;
+}
+
+.process-colors {
+  border-color: #F7E594 !important;
+  background: #F7E594;
+}
+
+.process-shape {
+  border-radius: 10px;
+}
+
+.process-selected {
+  border-color: #817F75 !important;
+}
+
+.react-flow__selection,
+.react-flow__nodesselection-rect {
+  background-color: #817f7560 !important;
+  border-color: #FA198B77 !important;;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #817F75 !important;
+}
+
+.react-flow__arrowhead polyline {
+  stroke: #0CCA4A;
+  fill: #0CCA4A;
+}
+
+.react-flow__edge .react-flow__edge-path {
+  stroke: #0CCA4A !important;
+  stroke-width: 2px;
+}
+
+.react-flow__connection .react-flow__connection-path{
+  stroke: #3D6382;
+  stroke-width: 2px;
+}
+
+
 /* Pallet */
 
 .pallet-node {
-  border: 1px solid;
+  border: 2px solid;
   margin: 9px 7px 9px 7px;
-  border-radius: 10px;
   padding: 4px;
   text-align: center;
   box-shadow: 0.13em 0.13em 0.25em #ccc !important;
-}
-
-.resource-specification-pallet-node {
-  border-color:#79c879;
-  background: lightgreen;
-  border-radius: 0;;
-}
-
-.process-specification-pallet-node {
-  border-color: #deb96f;
-  background: rgb(255, 213, 128);
-}
-
-.agent-pallet-node {
-  border-color: #6eb5cc;
-  background: #98d3e6;
-  border-radius: 80px;
 }
 
 .pallet-styles {
@@ -201,10 +242,10 @@
   font-size: 18px;
 }
 
-/* Nodes */
+/* Canvas Styles */
 
 .canvas-node-base {
-  border: 1px solid;
+  border: 2px solid;
   width: 125px;
   height: 2em;
   box-shadow: 0.13em 0.13em 0.25em #ccc !important;
@@ -241,25 +282,6 @@
 .canvas-node-handle-left {
   left: -4px !important;
 }
-
-.canvas-node-resource-specification {
-  border-color: #79c879;
-  background: lightgreen;
-}
-
-.process-colors {
-  border-color: #deb96f;
-  background: rgb(255, 213, 128);
-}
-
-.canvas-node-process {
-  border-radius: 10px;
-}
-
-.canvas-node-header-process {
-  border-color: orange;
-}
-
 
 /* New Agent */
 .new-agent-card {
