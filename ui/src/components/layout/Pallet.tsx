@@ -46,8 +46,8 @@ const Pallet: React.FC<Props> = () => {
   }
 
   function pickStyle(type: ModelType) {
-    if (type === 'resourceSpecification') return 'resource-specification-pallet-node';
-    if (type === 'processSpecification') return 'process-specification-pallet-node';
+    if (type === 'resourceSpecification') return 'resource-specification-colors';
+    if (type === 'processSpecification') return 'process-colors process-shape';
   }
 
   function renderNodes(list, type: ModelType) {
@@ -124,22 +124,22 @@ const Pallet: React.FC<Props> = () => {
     <aside className='pallet-styles'>
       <SlAlert variant="danger" duration={2000} open={open} closable onSlAfterHide={() => setOpen(false)}>
         <SlIcon slot="icon" name="info-circle" />
-          {errorMessage()}
+        {errorMessage()}
       </SlAlert>
       <div className='category-styles'>
-      <h2>
-        <Link to="/resources/new">
-          <SlIconButton name="plus-square-fill" label="Settings" />
-        </Link>
-        Resource Specifications
-      </h2>
+        <h2>
+          <Link to="/resources/new">
+            <SlIconButton name="plus-square-fill" label="Add resource specification." />
+          </Link>
+          Resource Specifications
+        </h2>
       </div>
       {renderNodes(resourceList, 'resourceSpecification')}
       <br/>
       <div className='category-styles'>
         <h2>
           <Link to="/processes/new">
-          <SlIconButton name="plus-square-fill" label="Settings"/>
+            <SlIconButton name="plus-square-fill" label="Add process specification."/>
           </Link>
           Process Specifications
         </h2>
