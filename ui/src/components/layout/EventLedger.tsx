@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { usePath } from '../../data/YatiReactHook';
 import getDataStore from "../../data/DataStore";
 import { EconomicEventShape } from "../../types/valueflows";
 import EventLedgerTableRow from "./EventLedgerTableRow";
@@ -9,15 +10,11 @@ const EventLedger: React.FC<EventLedgerProps> = ({}) => {
   const [economicEvents, setEconomicEvents] = useState<Array<EconomicEventShape>>([]);
 
   const store = getDataStore();
+  const economicEventObjects = usePath('root.economicEvent', store);
 
   useEffect(()=>{
-    fetchEvents().then();
-  },[]);
-
-  const fetchEvents = async () => {
-    const events = await store.fetchAllEconomicEvents();
-    setEconomicEvents(events);
-  }
+    setEconomicEvents(Object.values(economicEventObjects));
+  }, [economicEventObjects]);
 
   const RenderEvents = (): JSX.Element => {
     if (economicEvents.length === 0) {
