@@ -9,13 +9,15 @@ interface Data {
 }
 
 interface Props {
-  data: Data
+  data: Data,
+  selected: boolean
 }
 
-const ProcessNode: React.FC<Props> = ({data}) => {
+const ProcessNode: React.FC<Props> = ({data, selected}) => {
+  const className = 'canvas-node-base process-colors process-shape' + (selected ? ' process-selected' : '' )
   return (
     <div key={data.id} style={{position:'relative'}}>
-      <div className='canvas-node-base process-colors canvas-node-process'>
+      <div className={className}>
         <div className='canvas-node-body'>
           <Handle
             type="target"

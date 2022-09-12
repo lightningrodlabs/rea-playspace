@@ -8,15 +8,16 @@ interface Data {
 }
 
 interface Props {
-  data: Data
+  data: Data,
+  selected: boolean
 }
 
-const ResourceSpecificationNode: React.FC<Props> = ({data}) => {
-
+const ResourceSpecificationNode: React.FC<Props> = ({data, selected}) => {
+  const className = 'canvas-node-base resource-specification-colors' + (selected ? ' resource-specification-selected' : '' );
   return (
     <>
       <div key={data.id} style={{position:'relative'}}>
-      <div className='canvas-node-base canvas-node-resource-specification'>
+      <div className={className}>
           <div className='canvas-node-body'>
             <Handle
               type="target"

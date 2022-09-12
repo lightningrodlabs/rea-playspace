@@ -11,7 +11,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: rgb(246, 246, 247);
+  background-color: rgb(255, 255, 255);
   color: rgb(32, 34, 35);
 }
 
@@ -156,32 +156,51 @@
   justify-content: space-between;
 }
 
+/* Common Styles */
+
+/*
+ * Currently using a color scheme based off the color relations here
+ *  https://www.colorhexa.com/71bffc
+ */
+
+.resource-specification-colors {
+  border-color: #71bffc !important;
+  background: #71bffc;
+}
+
+.process-colors {
+  border-color: #71fcae !important;
+  background: #71fcae;
+}
+
+.process-shape {
+  border-radius: 10px;
+}
+
+.resource-specification-selected,
+.process-selected {
+  border-color: #fc71bf !important;
+}
+
+.react-flow__selection {
+  background-color: #fcf47177 !important;
+  border-color: #71fcae77 !important;;
+}
+
+.react-flow__nodesselection-rect {
+  background-color: #71fcae77 !important;
+  border-color: #fcf47177 !important;
+}
+
+
 /* Pallet */
 
 .pallet-node {
-  border: 1px solid;
+  border: 2px solid;
   margin: 9px 7px 9px 7px;
-  border-radius: 10px;
   padding: 4px;
   text-align: center;
   box-shadow: 0.13em 0.13em 0.25em #ccc !important;
-}
-
-.resource-specification-pallet-node {
-  border-color:#79c879;
-  background: lightgreen;
-  border-radius: 0;;
-}
-
-.process-specification-pallet-node {
-  border-color: #deb96f;
-  background: rgb(255, 213, 128);
-}
-
-.agent-pallet-node {
-  border-color: #6eb5cc;
-  background: #98d3e6;
-  border-radius: 80px;
 }
 
 .pallet-styles {
@@ -201,10 +220,10 @@
   font-size: 18px;
 }
 
-/* Nodes */
+/* Canvas Styles */
 
 .canvas-node-base {
-  border: 1px solid;
+  border: 2px solid;
   width: 125px;
   height: 2em;
   box-shadow: 0.13em 0.13em 0.25em #ccc !important;
@@ -241,25 +260,6 @@
 .canvas-node-handle-left {
   left: -4px !important;
 }
-
-.canvas-node-resource-specification {
-  border-color: #79c879;
-  background: lightgreen;
-}
-
-.process-colors {
-  border-color: #deb96f;
-  background: rgb(255, 213, 128);
-}
-
-.canvas-node-process {
-  border-radius: 10px;
-}
-
-.canvas-node-header-process {
-  border-color: orange;
-}
-
 
 /* New Agent */
 .new-agent-card {
