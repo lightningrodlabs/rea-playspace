@@ -1,7 +1,7 @@
 :root {
-  --p-shadow-from-dim-light: rgba(0, 0, 0, 0.2);
-  --p-shadow-from-ambient-light: rgba(23, 24, 24, 0.05);
-  --p-shadow-from-direct-light: rgba(0, 0, 0, 0.15);
+  --p-shadow-from-dim-light: rgba(8, 7, 8, 0.2);
+  --p-shadow-from-ambient-light: rgba(24, 21, 24, 0.05);
+  --p-shadow-from-direct-light: rgba(8, 7, 8, 0.15);
   --p-top-bar-shadow: 0 2px 2px -1px var(--p-shadow-from-direct-light);
   --border: rgba(225, 227, 229, 1);
 }
@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   background-color: rgb(255, 255, 255);
-  color: rgb(32, 34, 35);
+  color: rgb(8, 7, 8);
 }
 
 .header {
@@ -159,37 +159,62 @@
 /* Common Styles */
 
 /*
- * Currently using a color scheme based off the color relations here
- *  https://www.colorhexa.com/71bffc
- */
+Currently using a color scheme based off the color relations here
+  https://coolors.co/080708-817f75-3d6382-71bffc-da3e65-f1ffe7-f7e594-fdca40-74181f-df2935
+  https://coolors.co/080708-817f75-3d6382-71bffc-da3e65-f1ffe7-f7e594-f2abaf-74181f-df2935
+  https://coolors.co/080708-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-558564-df2935
+  https://coolors.co/080708-157145-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-df2935
+*/
 
 .resource-specification-colors {
   border-color: #71bffc !important;
   background: #71bffc;
 }
 
+.resource-specification-selected {
+  border-color: #3D6382 !important;
+}
+
 .process-colors {
-  border-color: #71fcae !important;
-  background: #71fcae;
+  border-color: #F7E594 !important;
+  background: #F7E594;
 }
 
 .process-shape {
   border-radius: 10px;
 }
 
-.resource-specification-selected,
 .process-selected {
-  border-color: #fc71bf !important;
+  border-color: #817F75 !important;
 }
 
 .react-flow__selection {
-  background-color: #fcf47177 !important;
-  border-color: #71fcae77 !important;;
+  background-color: #817f7560 !important;
+  border-color: #FDCA4077 !important;;
 }
 
 .react-flow__nodesselection-rect {
-  background-color: #71fcae77 !important;
-  border-color: #fcf47177 !important;
+  background-color: #FDCA4060 !important;
+  border-color: #817F7577 !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #080708 !important;
+}
+
+.react-flow__arrowhead polyline {
+  stroke: #157145;
+  fill: #157145;
+}
+
+.react-flow__edge .react-flow__edge-path {
+  stroke: #157145 !important;
+  stroke-width: 2px;
+}
+
+.react-flow__connection .react-flow__connection-path{
+  stroke:#080708;
+  stroke-width: 2px;
 }
 
 

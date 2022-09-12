@@ -573,11 +573,11 @@ const FlowCanvas: React.FC<Props> = () => {
             <MiniMap 
               nodeStrokeColor={(n) => {
                 if (n.type === 'resourceSpecification') return '#71bffc';
-                if (n.type === 'process') return '#71fcae';
+                if (n.type === 'process') return '#F7E594';
               }}
               nodeColor={(n) => {
                 if (n.type === 'resourceSpecification') return '#71bffc';
-                if (n.type === 'process') return '#71fcae';
+                if (n.type === 'process') return '#F7E594';
               }}/>
             <Controls />
             <Background color="#aaa" gap={16} />
