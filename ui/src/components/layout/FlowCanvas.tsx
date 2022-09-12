@@ -461,15 +461,17 @@ const FlowCanvas: React.FC<Props> = () => {
     edges.forEach((edge) => {
       const edgeId = edge.data.id;
       const edgeToDelete = store.getById(edgeId);
-      const edgePath: string = edgeToDelete.path;
-      if (Array.isArray(edgeToDelete.vfPath)) {
-        edgeToDelete.vfPath.forEach((flow: string) => store.delete(flow))
-      } else {
-        const vfPath: string = edgeToDelete.vfPath;
-        store.delete(vfPath);
+      // Do we have an actual edge?
+      if (edgeToDelete) {
+        const edgePath: string = edgeToDelete.path;
+        if (Array.isArray(edgeToDelete.vfPath)) {
+          edgeToDelete.vfPath.forEach((flow: string) => store.delete(flow))
+        } else {
+          const vfPath: string = edgeToDelete.vfPath;
+          store.delete(vfPath);
+        }
+        store.delete(edgePath);
       }
-
-      store.delete(edgePath);
     });
   }
 
