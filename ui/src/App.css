@@ -164,6 +164,7 @@ Currently using a color scheme based off the color relations here
   https://coolors.co/080708-817f75-3d6382-71bffc-da3e65-f1ffe7-f7e594-f2abaf-74181f-df2935
   https://coolors.co/080708-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-558564-df2935
   https://coolors.co/080708-157145-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-df2935
+  https://coolors.co/080708-3d6382-71bffc-da3e65-817f75-fc814a-f5f749-0cca4a-fa198b-df2935
 */
 
 .resource-specification-colors {
@@ -188,32 +189,28 @@ Currently using a color scheme based off the color relations here
   border-color: #817F75 !important;
 }
 
-.react-flow__selection {
-  background-color: #817f7560 !important;
-  border-color: #FDCA4077 !important;;
-}
-
+.react-flow__selection,
 .react-flow__nodesselection-rect {
-  background-color: #FDCA4060 !important;
-  border-color: #817F7577 !important;
+  background-color: #817f7560 !important;
+  border-color: #FA198B77 !important;;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #080708 !important;
+  stroke: #817F75 !important;
 }
 
 .react-flow__arrowhead polyline {
-  stroke: #157145;
-  fill: #157145;
+  stroke: #0CCA4A;
+  fill: #0CCA4A;
 }
 
 .react-flow__edge .react-flow__edge-path {
-  stroke: #157145 !important;
+  stroke: #0CCA4A !important;
   stroke-width: 2px;
 }
 
 .react-flow__connection .react-flow__connection-path{
-  stroke:#080708;
+  stroke: #3D6382;
   stroke-width: 2px;
 }
 
