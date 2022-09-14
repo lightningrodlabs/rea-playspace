@@ -2,7 +2,7 @@ import ZomeApi from "./DataProviders/holochain/api/zomeApi";
 import { getHolochainClient, setAgentPubKey, setCellId } from '../hcWebsockets';
 import { ProjectProvider } from "./DataProviders/holochain/project";
 import { APP_ID } from "../holochainConf";
-import { ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
 import { AppSignal, AppSignalCb, InstalledCell } from "@holochain/client";
 import { CellClient } from "@holochain-open-dev/cell-client";
 import { LocalstoreProvider } from "./DataProviders/local/localstore";
@@ -10,13 +10,15 @@ import getDataStore, { DataStore } from "./DataStore";
 import { SignalMessage } from "./models/Application/SignalMessage";
 import { getAlmostLastPart, getLastPart, PathedData } from "./models/PathedData";
 import { constructFromObj } from "./models/ModelConstructors";
+import { wrapReadable } from "./hooks/wrapReadable";
+import { SyncExternalStoreApi } from "./hooks/useStore";
 
 let dataStorePromise: Promise<DataStore>;
 let profilesStore: ProfilesStore;
-let myProfileReadable;
+let wrappedProfileReadable;
 
-export function getMyProfileReadable() {
-  return myProfileReadable;
+export function getWrappedProfileReadable(): SyncExternalStoreApi<Profile> {
+  return wrappedProfileReadable;
 }
 /**
  * Initialize Holochain WS connection, set up Zome API client and DataStore singletons.
@@ -44,7 +46,8 @@ export async function initConnection(): Promise<DataStore> {
     await dataStore.fetchOrCreateRoot();
 
     profilesStore = await connectProfiles();
-    myProfileReadable = await profilesStore.fetchMyProfile();
+    const myProfileReadable = await profilesStore.fetchMyProfile();
+    wrappedProfileReadable = wrapReadable(myProfileReadable);
     res(dataStore);
   });
   return dataStorePromise;
