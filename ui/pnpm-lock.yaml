@@ -27,6 +27,7 @@ specifiers:
   react-refresh: 0.10.0
   react-refresh-typescript: ^2.0.4
   react-router-dom: ^6.3.0
+  svelte: ^3.0.0
   terser: 4.4.2
   typescript: ^4.6.3
   use-sync-external-store: ^1.2.0
@@ -64,6 +65,7 @@ devDependencies:
   prettier: 2.2.1
   react-refresh: 0.10.0
   react-refresh-typescript: 2.0.4_aa63bb2d090c9dc34d16843ed02a3ce9
+  svelte: 3.49.0
   terser: 4.4.2
   typescript: 4.6.3
   vite: 2.9.1
@@ -3067,7 +3069,6 @@ packages:
   /svelte/3.49.0:
     resolution: {integrity: sha512-+lmjic1pApJWDfPCpUUTc1m8azDqYCG1JN9YEngrx/hUyIcFJo6VZhj0A1Ai0wqoHcEIuQy+e9tk+4uDgdtsFA==}
     engines: {node: '>= 8'}
-    dev: false
 
   /terser/4.4.2:
     resolution: {integrity: sha512-Uufrsvhj9O1ikwgITGsZ5EZS6qPokUOkCegS7fYOdGTv+OA90vndUbU6PEjr5ePqHfNUbGyMO7xyIZv2MhsALQ==}
