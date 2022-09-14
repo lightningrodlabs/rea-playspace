@@ -11,8 +11,9 @@ import { getAlmostLastPart, getLastPart, getParentPath, PathedData } from "./mod
 import { Root } from "./models/Application/Root";
 import { HasIdDate } from "../types/valueflows";
 import { assignFields, getPath, traverseTree } from "./utils";
-import { constructFromObj, ModelBuilder, ModelConstructorMap } from "./models/ModelConstructors";
+import { constructFromObj, ModelBuilder } from "./models/ModelConstructors";
 import { LocalstoreProvider } from "./DataProviders/local/localstore";
+import { SyncExternalStoreApi } from "./hooks/useStore";
 
 /**
  * Data provider interface
@@ -32,14 +33,6 @@ export type YatiCb = () => void;
  * Snapshots
  */
 export type YatiSnapshot = { root: Root };
-
-/**
- * API Singletons created for ease of interaction with React
- */
-export type YatiReactApi = {
-  subscribe: (cb: YatiCb ) => YatiCb;
-  getSnapshot: () => YatiSnapshot;
-};
 
 /**
  * Path index store and helper functions
@@ -116,13 +109,12 @@ export class YatiSubscriberList extends Map<string, Array<YatiCb>> {
 /**
  * Main tree class - a data store should extend this class.
  */
-export class YatiTreeStore {
+export class YatiTreeStore implements SyncExternalStoreApi<YatiSnapshot> {
 
   protected root: Root;
   protected providers: Record<string, DataProvider>;
   protected pathIndex: YatiTreeIndex;
   public subscribers: YatiSubscriberList;
-  protected reactAPI: YatiReactApi;
   protected snapshot: YatiSnapshot;
 
   constructor(providers?: Record<string, DataProvider>) {
@@ -165,8 +157,10 @@ export class YatiTreeStore {
    * around regexes is overkill. Does it make sense to subscribe to a synthesized
    * array of 'root.plan.*.process.*'? I'm leanning towards no, but this could be
    * powerful.
+   *
+   * Defining the function this way ensures `this` is properly defined.
    */
-  public subscribe(callback: YatiCb, path?: string): YatiCb {
+  public subscribe = (callback: YatiCb, path?: string): YatiCb => {
     return this.subscribers.subscribe(callback, path);
   }
 
@@ -213,29 +207,15 @@ export class YatiTreeStore {
   /**
    * This returns the one and only snapshot. This is for React to be able to have
    * referential equality between objects that haven't changed.
+   *
+   * Defining the function this way ensures `this` is properly defined.
    */
-  public getSnapshot(): YatiSnapshot {
+  public getSnapshot = (): YatiSnapshot => {
     if (this.snapshot) {
       return this.snapshot;
     } else {
       this.snapshot = this.createSnapshot();
       return this.snapshot;
-    }
-  }
-
-  /**
-   * This returns the React API convenience singleton.
-   */
-  public getReactApi(): YatiReactApi {
-    if (this.reactAPI) {
-      return this.reactAPI;
-    } else {
-      const self = this;
-      this.reactAPI = {
-        subscribe: (cb: YatiCb) => self.subscribe(cb, 'root'),
-        getSnapshot: () => self.getSnapshot()
-      }
-      return this.reactAPI;
     }
   }
 
@@ -376,30 +356,42 @@ export class YatiTreeStore {
    * Stores the whole tree
    */
   public async saveLocalTree() {
-    const localstore = this.providers['localstore'] as LocalstoreProvider;
-    localstore.saveTree(this);
+    try {
+      const localstore = this.providers['localstore'] as LocalstoreProvider;
+      localstore.saveTree(this);
+    } catch (e) {
+      console.error(`Received error: ${e}\nPlease make sure a localstore provider is loaded.`)
+    }
   }
 
   /**
    * Throw away the tree stored in local store
    */
   public deleteLocalTree() {
-    const localstore = this.providers['localstore'] as LocalstoreProvider;
-    localstore.deleteTree();
+    try {
+      const localstore = this.providers['localstore'] as LocalstoreProvider;
+      localstore.deleteTree();
+    } catch (e) {
+      console.error(`Received error: ${e}\nPlease make sure a localstore provider is loaded.`)
+    }
   }
 
   /**
    * Fetches the version of the tree stored in the local store
    */
   public fetchLocalTree() {
-    const localstore = this.providers['localstore'];
-    localstore.fetch('root').then((root) => {
-      this.root = root as Root;
-      this.pathIndex.indexTree({
-        root: this.root,
-        path: ''
-      } as PathedData);
-    });
+    try {
+      const localstore = this.providers['localstore'];
+      localstore.fetch('root').then((root) => {
+        this.root = root as Root;
+        this.pathIndex.indexTree({
+          root: this.root,
+          path: ''
+        } as PathedData);
+      });
+    } catch (e) {
+      console.error(`Received error: ${e}\nPlease make sure a localstore provider is loaded.`)
+    }
   }
 
   /**
@@ -412,7 +404,7 @@ export class YatiTreeStore {
       '',
       (path, obj: PathedData) => {
         if (obj.id) {
-          this.set(obj);
+          self.set(obj);
         }
       },
       (path, obj) => {}
