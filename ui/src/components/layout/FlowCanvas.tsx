@@ -63,7 +63,9 @@ const FlowCanvas: React.FC<Props> = () => {
   const [type, setType] = useState<string>();
   const [processState, setProcessState] = useState<ProcessShape>();
   const [source, setSource] = useState<string>();
+  const [sourceHandle, setSourceHandle] = useState<string>();
   const [target, setTarget] = useState<string>();
+  const [targetHandle, setTargetHandle] = useState<string>();
   const [selectedDisplayEdge, setSelectedDisplayEdge] = useState<string>();
   const [selectedDisplayNode, setSelectedDisplayNode] = useState<string>();
   const [currentPosition, setCurrentPosition] = useState<XYPosition>();
@@ -329,7 +331,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * This is called each time a connection is made between two nodes.
    */
   const onConnect = (params: Connection) => {
-    const {source, target} = params;
+    const {source, sourceHandle, target, targetHandle} = params;
 
     // Grab vfTypes and vfNodes off the DisplayNodes
     const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
@@ -339,7 +341,9 @@ const FlowCanvas: React.FC<Props> = () => {
     if (validateFlow(sourceVfType, targetVfType)) {
       setType('flow');
       setSource(source);
+      setSourceHandle(sourceHandle);
       setTarget(target);
+      setTargetHandle(targetHandle);
       openModal();
     }
   };
@@ -353,7 +357,9 @@ const FlowCanvas: React.FC<Props> = () => {
       // Add the edge
       const edge = new DisplayEdge({
         source,
+        sourceHandle,
         target,
+        targetHandle,
         vfPath: flows.map((flow) => flow.path),
         planId: store.getCurrentPlanId()
       } as DisplayEdgeShape);
@@ -362,7 +368,9 @@ const FlowCanvas: React.FC<Props> = () => {
     }
     setType(null);
     setSource(null);
+    setSourceHandle(null);
     setTarget(null);
+    setTargetHandle(null);
   }
 
   /**
@@ -373,7 +381,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * I do not like this. -JB
    */
   const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
-    const {source, target} = newConnection;
+    const {source, sourceHandle, target, targetHandle} = newConnection;
 
     // Grab vfTypes and vfNodes off the DisplayNodes
     const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
@@ -407,7 +415,9 @@ const FlowCanvas: React.FC<Props> = () => {
       // Show the flow modal
       setSelectedDisplayEdge(vfEdge.id);
       setSource(source);
+      setSourceHandle(sourceHandle);
       setTarget(target);
+      setTargetHandle(targetHandle);
       setType('updateFlow');
       openModal();
     }
@@ -420,7 +430,9 @@ const FlowCanvas: React.FC<Props> = () => {
     const vfEdge = store.getById(edge.data.id) as DisplayEdge;
     setSelectedDisplayEdge(vfEdge.id);
     setSource(vfEdge.source);
+    setSourceHandle(vfEdge.sourceHandle);
     setTarget(vfEdge.target);
+    setTarget(vfEdge.targetHandle);
     setType('updateFlow');
     openModal();
   }
@@ -445,7 +457,9 @@ const FlowCanvas: React.FC<Props> = () => {
     setSelectedDisplayEdge(null);
     setType(null);
     setSource(null);
+    setSourceHandle(null);
     setTarget(null);
+    setTargetHandle(null);
   }
 
   /**
