@@ -57,7 +57,6 @@
   cursor: pointer;
 }
 
-
 .resource-list {
   width: 100%;
 }
@@ -141,12 +140,10 @@
   flex-direction: row;
   align-items: center;
 }
-
 .resource-list-resource-quantity {
   width: 60px;
   margin-right: var(--sl-spacing-small);
 }
-
 .resource-select-menu-item {
   width: 100%;
 }
@@ -156,7 +153,35 @@
   justify-content: space-between;
 }
 
-/* Common Styles */
+/* Pallet */
+.pallet-node {
+  border: 2px solid;
+  margin: 9px 7px 9px 7px;
+  padding: 4px;
+  text-align: center;
+  box-shadow: 0.13em 0.13em 0.25em #ccc !important;
+}
+.pallet-styles {
+  flex-basis: 15%;
+  overflow-y: scroll;
+  max-height: 89vh;
+}
+.category-styles {
+  background: #eaeaea;
+  padding: 5px;
+}
+.category-styles h2 {
+  padding: 0em;
+  margin: 0em;
+  font-size: 18px;
+}
+
+/* Canvas Style */
+.rea-flow-canvas {
+  border: #eaeaea 2px solid;
+  height: 89vh !important;
+  width: auto !important;
+}
 
 /*
 Currently using a color scheme based off the color relations here
@@ -165,122 +190,212 @@ Currently using a color scheme based off the color relations here
   https://coolors.co/080708-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-558564-df2935
   https://coolors.co/080708-157145-3d6382-71bffc-817f75-f7e594-f1ffe7-f2abaf-da3e65-df2935
   https://coolors.co/080708-3d6382-71bffc-da3e65-817f75-fc814a-f5f749-0cca4a-fa198b-df2935
+A potentially useful brown for the pallet: #823200
 */
 
+/* Common Styles */
+/* used for the canvas and canvas nodes */
 .resource-specification-colors {
   border-color: #71bffc !important;
   background: #71bffc;
 }
-
-.resource-specification-selected {
-  border-color: #3D6382 !important;
-}
-
 .process-colors {
   border-color: #F7E594 !important;
   background: #F7E594;
 }
-
 .process-shape {
   border-radius: 10px;
 }
-
+.resource-specification-selected,
 .process-selected {
   border-color: #817F75 !important;
 }
 
+/* Canvas Node Styles */
+.canvas-node-base {
+  display: table;
+  border: 2px solid;
+  width: 150px;
+  height: 40px;
+  box-shadow: 0.13em 0.13em 0.25em rgba(0, 0, 0, 0.332) !important;
+}
+.canvas-node-body {
+  padding-left: 1em;
+  padding-right: 1em;
+  display: table-cell !important;
+  font-size: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+.canvas-node-header-base {
+  border-bottom-width: 1px; 
+  border-bottom-style: solid;
+}
+
+/* Node Handle Styles */
+.canvas-node-handle-base {
+  width: 8px !important;
+  height: 8px !important;
+  border-width: 0px !important;
+  position: absolute !important;
+  border-radius: 0% !important;
+}
+.canvas-node-handle-base.source {
+  box-shadow: 0.13em 0.13em 0.25em rgba(0, 0, 0, 0.332) !important;
+}
+.react-flow__node-resourceSpecification .canvas-node-handle-base.source {
+  border-radius: 100% !important;
+  background-color: #5D97C7 !important;
+  border-color: #5D97C7 !important;
+}
+.react-flow__node-process .canvas-node-handle-base.source {
+  border-radius: 100% !important;
+  background-color: #FDCA40 !important;
+  border-color: #FDCA40 !important;
+}
+.react-flow__node-resourceSpecification .canvas-node-handle-base.target {
+  background-color: #71c0fc00 !important;
+  border-color: #71c0fc00 !important;
+}/*3D6382*/
+.react-flow__node-resourceSpecification .canvas-node-handle-left.target {
+  /* <svg><polyline stroke="#3D6382" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#3D6382" points="0,0 5,4 0,8 0,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%235D97C7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%235D97C7' points='0,0 5,4 0,8 0,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-resourceSpecification .canvas-node-handle-top.target {
+  /* <svg><polyline stroke="#3D6382" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#3D6382" points="0,0 8,0 4,5 0,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%235D97C7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%235D97C7' points='0,0 8,0 4,5 0,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-resourceSpecification .canvas-node-handle-right.target {
+  /* <svg><polyline stroke="#3D6382" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#3D6382" points="8,0 3,4 8,8 8,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%235D97C7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%235D97C7' points='8,0 3,4 8,8 8,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-resourceSpecification .canvas-node-handle-bottom.target {
+  /* <svg><polyline stroke="#3D6382" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#3D6382" points="0,8 8,8 4,3 0,8"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%235D97C7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%235D97C7' points='0,8 8,8 4,3 0,8'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-process .canvas-node-handle-base.target {
+  background-color: #71c0fc00 !important;
+  border-color: #71c0fc00 !important;
+}
+.react-flow__node-process .canvas-node-handle-left.target {
+  /* <svg><polyline stroke="#74181F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#74181F" points="0,0 5,4 0,8 0,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%23FDCA40' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%23FDCA40' points='0,0 5,4 0,8 0,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-process .canvas-node-handle-top.target {
+  /* <svg><polyline stroke="#74181F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#74181F" points="0,0 8,0 4,5 0,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%23FDCA40' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%23FDCA40' points='0,0 8,0 4,5 0,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-process .canvas-node-handle-right.target {
+  /* <svg><polyline stroke="#74181F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#74181F" points="8,0 3,4 8,8 8,0"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%23FDCA40' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%23FDCA40' points='8,0 3,4 8,8 8,0'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.react-flow__node-process .canvas-node-handle-bottom.target {
+  /* <svg><polyline stroke="#74181F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" fill="#74181F" points="0,8 8,8 4,3 0,8"></polyline></svg> */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline stroke='%23FDCA40' stroke-linecap='round' stroke-linejoin='round' stroke-width='1' fill='%23FDCA40' points='0,8 8,8 4,3 0,8'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+/* Node Handle Positioning */
+.canvas-node-handle-right {
+  right: -2px !important;
+}
+.canvas-node-handle-left {
+  left: -2px !important;
+}
+.canvas-node-handle-top {
+  top: -2px !important;
+}
+.canvas-node-handle-bottom {
+  bottom: -2px !important;
+}
+.canvas-node-handle-right.target,
+.canvas-node-handle-left.source {
+  top: 14px !important;
+}
+.canvas-node-handle-right.source,
+.canvas-node-handle-left.target {
+  top: 30px !important;
+}
+.canvas-node-handle-right.target {
+  right: 0px !important;
+}
+.canvas-node-handle-left.target {
+  left: 0px !important;
+}
+.canvas-node-handle-top.target,
+.canvas-node-handle-bottom.source {
+  left: 40px !important;
+}
+.canvas-node-handle-top.source,
+.canvas-node-handle-bottom.target {
+  left: 110px !important;
+}
+.canvas-node-handle-top.target {
+  top: 0px !important;
+}
+.canvas-node-handle-bottom.target {
+  bottom: 0px !important;
+}
+.canvas-node-handle-right.target,
+.canvas-node-handle-left.target,
+.canvas-node-handle-top.target,
+.canvas-node-handle-bottom.target {
+  margin: 0;
+  padding: 0;
+}
+.canvas-node-handle-right.target svg,
+.canvas-node-handle-left.target svg,
+.canvas-node-handle-top.target svg,
+.canvas-node-handle-bottom.target svg {
+  margin: 0;
+  padding: 0;
+  width: 8px;
+  height: 8px;
+}
+
+/* Canvas Arrow Styles */
 .react-flow__selection,
 .react-flow__nodesselection-rect {
   background-color: #817f7560 !important;
   border-color: #FA198B77 !important;;
 }
-
 .react-flow__edge.selected .react-flow__edge-path {
   stroke: #817F75 !important;
 }
-
 .react-flow__arrowhead polyline {
   stroke: #0CCA4A;
   fill: #0CCA4A;
 }
-
 .react-flow__edge .react-flow__edge-path {
   stroke: #0CCA4A !important;
   stroke-width: 2px;
 }
-
 .react-flow__connection .react-flow__connection-path{
   stroke: #3D6382;
   stroke-width: 2px;
-}
-
-
-/* Pallet */
-
-.pallet-node {
-  border: 2px solid;
-  margin: 9px 7px 9px 7px;
-  padding: 4px;
-  text-align: center;
-  box-shadow: 0.13em 0.13em 0.25em #ccc !important;
-}
-
-.pallet-styles {
-  flex-basis: 15%;
-  overflow-y: scroll;
-  max-height: 89vh;
-}
-
-.category-styles {
-  background: #eaeaea;
-  padding: 5px;
-}
-
-.category-styles h2 {
-  padding: 0em;
-  margin: 0em;
-  font-size: 18px;
-}
-
-/* Canvas Styles */
-
-.canvas-node-base {
-  border: 2px solid;
-  width: 125px;
-  height: 2em;
-  box-shadow: 0.13em 0.13em 0.25em #ccc !important;
-}
-
-.canvas-node-body {
-  font-size: 10px;
-  padding-left: 12px; 
-  padding-right: 12px;
-  text-align: center;
-}
-
-.canvas-node-header-base {
-  border-bottom-width: 1px; 
-  border-bottom-style: solid;
-  font-size: 10px;
-  padding-left: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-.canvas-node-handle-base {
-  width: 8px !important;
-  height: 8px !important; 
-  background-color: #d1e0ea !important;
-  border: #a7a7a7 solid 1px !important;
-  position: absolute !important;
-}
-
-.canvas-node-handle-right {
-  right: -4px !important;
-}
-
-.canvas-node-handle-left {
-  left: -4px !important;
 }
 
 /* New Agent */
@@ -288,23 +403,14 @@ Currently using a color scheme based off the color relations here
   display: block;
   flex-basis: 100%;
 }
-
 .new-agent-card:last-child {
   margin-left: 40px;
 }
-
 .rf-provider-container {
   flex-basis: 85%;
 }
 
-.rea-flow-canvas {
-  border: #eaeaea 2px solid;
-  height: 89vh !important;
-  width: auto !important;
-}
-
 /* pi-hacker-button */
-
 .pi-hacker-row {
   margin-top: 1vh;
   display: flex;
@@ -313,14 +419,12 @@ Currently using a color scheme based off the color relations here
   width: 100vw;
   text-align: right;
 }
-
 .pi-hacker-spacer {
   display: flex;
   flex-direction: column;
   width: 98vw;
   text-align: right;
 }
-
 .pi-hacker-button {
   color: #aaa;
   display: flex;
@@ -333,7 +437,6 @@ Currently using a color scheme based off the color relations here
 }
 
 /* profile-prompt */
-
 .profile-prompt {
   display: flex;
   align-items: center;
@@ -341,32 +444,27 @@ Currently using a color scheme based off the color relations here
 }
 
 /* modal styling */
-
 .modal-close {
   position: absolute;
   top: 0px;
   right: 0px;
   left: auto;
 }
-
 .modal-title {
   font-size: 1.33em;
   font-weight: bolder;
   margin-top: 0em;
   margin-bottom: 0.66em;
 }
-
 .modal-form {
   height: 100%;
   position: 'relative';
 }
 
 /* form controls */
-
 .scrollable-view {
   overflow-y: scroll;
 }
-
 .form-heading {
   display: inline-flex;
   line-height: 2em;
@@ -374,24 +472,20 @@ Currently using a color scheme based off the color relations here
   vertical-align: middle;
   padding-bottom: 0.33em;
 }
-
 .measurementInput {
   display: flex;
   flex-direction: row;
 }
-
 .measurementInput .measurementValue {
   display: flex;
   flex-direction: column;
   width: 48%;
 }
-
 .measurementInput .measurementSpacer {
   display: flex;
   flex-direction: column;
   width: 4%;
 }
-
 .measurementInput .measurementUnit {
   display: flex;
   flex-direction: column;
@@ -400,19 +494,16 @@ Currently using a color scheme based off the color relations here
 }
 
 /* Slide-panel */
-
 .panel-container {
   display: block;
   overflow-x: hidden;
   width: 100%;
 }
-
 .panel-slider {
   display: flex;
   flex-direction: row;
   width: 200%;
 }
-
 .panel-slider .panel {
   z-index: 2000;
   display: flex;
@@ -420,12 +511,10 @@ Currently using a color scheme based off the color relations here
   width: 50%;
   background-color: white;
 }
-
 .panel-slider .open {
   margin-left: -50%;
   transition: margin 400ms ease-in-out;
 }
-
 .panel-slider .close {
   margin-left: 0%;
 }
