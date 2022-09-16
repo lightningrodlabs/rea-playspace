@@ -444,7 +444,7 @@ export const Actions: Record<ActionKey, Action> = {
     comment: "Adjusts a quantity up based on a beginning balance or inventory count."
   }),
   'deliver-service': new Action({
-    id: 'deliver-service',
+    id: 'deliverService',
     label: 'Deliver Service',
     inputOutput: 'both',
     comment: "New service produced and delivered (a service implies that an agent actively receives the service)."
@@ -470,7 +470,7 @@ export const Actions: Record<ActionKey, Action> = {
     comment: "Change location and possibly identifier, if location is part of the identification, of a resource with no change of agent rights or possession."
   }),
   'transfer-all-rights': new Action({
-    id: 'transfer-all-rights',
+    id: 'transferAllRights',
     label: 'Transfer all rights',
     inputOutput: 'na',
     resourceEffect: 'decrementIncrement',
@@ -486,7 +486,7 @@ export const Actions: Record<ActionKey, Action> = {
     comment: "Give full rights and responsibilities plus physical custody."
   }),
   'transfer-custody': new Action({
-    id: 'transfer-custody',
+    id: 'transferCustody',
     label: 'Transfer custody',
     inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
