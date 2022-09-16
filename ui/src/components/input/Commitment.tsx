@@ -67,21 +67,6 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
 
   const onSlChange = slChangeConstructor<CommitmentShape>(name, onChange, setState, parsers);
 
-  const toggleFinished = () => {
-    
-    setState(prevState => {
-      let state = { ...prevState, finished: !prevState['finished'] };
-      if (action === 'work') {
-        state = { ...state, effortQuantity: prevState['effortQuantity'] = null };
-      }
-      if (action !== 'work' && action !== 'use') {
-        state = { ...state, resourceQuantity: prevState['resourceQuanity'] = null };
-      }
-      deferOnChange(name, state, onChange);
-      return state;
-    });
-  }
-
   const ResourceQuantity = <MeasurementInput label="Resource" value={resourceQuantity} defaultUnit={conformingResource.defaultUnitOfResource} name='resourceQuantity' onChange={onSlChange} units={units} />;
 
   const EffortQuanity = <MeasurementInput label="Effort" value={effortQuantity} defaultUnit={conformingResource.defaultUnitOfEffort} name='effortQuantity' onChange={onSlChange} units={units} />;
@@ -107,9 +92,6 @@ const CommitmentInput: React.FC<Props> = ({commitmentState, conformingResource, 
       <SlSelect placeholder="Select reciever" label="Receiver" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} clearable required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
-      <br />
-        <SlButton onClick={toggleFinished} variant="primary">{finished ? "Unfinish" : "Finish"}</SlButton>
-      <br/>
       {inputOrOutputOf(inputOf as string, outputOf as string)}
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
       <br />
