@@ -18,7 +18,9 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreWithSelectorExp
  * API Singletons created for ease of interaction with React
  */
 export interface SyncExternalStoreApi<Snapshot> {
+  // takes a callback function and returns an unsubscribe function
   subscribe: (_: () => void) => () => void;
+  // returns the current snapshot of the data
   getSnapshot: () => Snapshot;
 };
 
@@ -33,8 +35,8 @@ export function useStore<Snapshot>(
 ): Snapshot {
   const state = useSyncExternalStore<Snapshot>(
     store.subscribe,
-    store.getSnapshot,
-    store.getSnapshot
+    store.getSnapshot,  // Client side data snapshot
+    store.getSnapshot   // Server side data snapshot
   )
   useDebugValue(state);
   return state;
@@ -53,9 +55,9 @@ export function useStoreWithSelector<Snapshot, Selection>(
 ): Selection {
   const state = useSyncExternalStoreWithSelector<Snapshot>(
     store.subscribe,
-    store.getSnapshot,
-    store.getSnapshot,
-    selector
+    store.getSnapshot,  // Client side data snapshot
+    store.getSnapshot,  // Server side data snapshot
+    selector            // function traverses the structure to get to the wanted data
   )
   useDebugValue(state);
   return state;
