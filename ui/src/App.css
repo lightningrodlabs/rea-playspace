@@ -493,6 +493,42 @@ A potentially useful brown for the pallet: #823200
   align-content: flex-end;
 }
 
+.commitment-with-finish {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.commitment-with-finish sl-button.commitment-button {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+}
+
+.commitment-with-finish sl-button.commitment-button.finished {
+  text-decoration: line-through;
+}
+
+.commitment-with-finish .commitment-checkbox-space {
+  display: flex;
+  flex-direction: column;
+  width: 2%;
+}
+
+.commitment-with-finish .commitment-checkbox {
+  display: flex;
+  flex-direction: column;
+  width: 5%;
+  margin-top: 0.66em;
+}
+
+.commitment-with-finish .commitment-finish-info {
+  display: flex;
+  flex-direction: column;
+  width: 3%;
+  margin-top: 0.66em;
+}
+
 /* Slide-panel */
 .panel-container {
   display: block;
