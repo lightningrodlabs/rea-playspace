@@ -432,7 +432,7 @@ const FlowCanvas: React.FC<Props> = () => {
     setSource(vfEdge.source);
     setSourceHandle(vfEdge.sourceHandle);
     setTarget(vfEdge.target);
-    setTarget(vfEdge.targetHandle);
+    setTargetHandle(vfEdge.targetHandle);
     setType('updateFlow');
     openModal();
   }
