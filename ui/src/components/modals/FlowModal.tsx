@@ -1,5 +1,5 @@
-import { SlButton, SlButtonGroup, SlDivider, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
-import React, { useEffect, useState } from 'react';
+import { SlButton, SlButtonGroup, SlCheckbox, SlDivider, SlIcon, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PathedData } from '../../data/models/PathedData';
 import { Action, ActionKey, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
 import { CommitmentShape, EconomicEventShape, FlowShape } from '../../types/valueflows';
@@ -29,6 +29,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const [agents, setAgents] = useState<Array<Agent>>([]);
   const [actions, setActions] = useState<Array<Action>>([]);
   const [units, setUnits] = useState<Array<Unit>>([]);
+  const commitmentFinishedRef = useRef(null);
 
   // store updates to flows until saving or discarding
   let commitmentUpdates: CommitmentShape = null;
@@ -175,19 +176,36 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     eventUpdates = null;
   };
 
+  const handleCommitmentFinished = () => {
+    setEditCommitment((current) => {
+      return new Commitment({...current, finished: commitmentFinishedRef.current.checked});
+    })
+  }
+
   /**
    * A component of sorts to either show a button to add a commitment or a button
    * to edit a commitment.
    */
   const commitmentEditOrCreate = () => {
     if (editCommitment) {
+      const commitmentClass = ('commitment-button' + (editCommitment.finished ? ' finished' : ''));
       const label = getLabelForFlow(editCommitment, getResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
       return <>
-        <SlButton variant="default" onClick={() => setCommitmentOpen(true)}>{label}</SlButton>
+        <SlButton className={commitmentClass} variant="default" onClick={() => setCommitmentOpen(true)}>{label}</SlButton>
+        <span className='commitment-checkbox-space'></span>
+        <SlCheckbox disabled={false} checked={editCommitment.finished} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
+        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
+          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
+        </SlTooltip>
       </>;
     } else {
       return <>
-        <SlButton variant="primary" onClick={() => setCommitmentOpen(true)}>Create Commitment</SlButton>
+        <SlButton className='commitment-button' variant="primary" onClick={() => setCommitmentOpen(true)}>Create Commitment</SlButton>
+        <span className='commitment-checkbox-space'></span>
+        <SlCheckbox disabled={true} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
+        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
+          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
+        </SlTooltip>
       </>;
     }
   };
@@ -364,19 +382,21 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
             <div>
               <div className='form-heading'>
                 <span>Commitment</span>
-                <SlTooltip content="Planned resource flows.">
-                  <SlIconButton name="info-circle" label="Commitment info." />
+                <SlTooltip content="Committed resource flow.">
+                  <SlIconButton name="info-circle" />
                 </SlTooltip>
               </div>
             </div>
-            {commitmentEditOrCreate()}
+            <div className="commitment-with-finish">
+              {commitmentEditOrCreate()}
+            </div>
             <br />
             <br />
             <div>
               <div className='form-heading'>
                 Events
                 <SlTooltip content="Actual resource flows, planned or unplanned.">
-                  <SlIconButton name="info-circle" label="Commitment info." />
+                  <SlIconButton name="info-circle" />
                 </SlTooltip>
               </div>
             </div>
