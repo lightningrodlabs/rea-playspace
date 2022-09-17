@@ -5,7 +5,7 @@
 
 The REA Playspace is a graphical interface that lets people play with the concepts behind [Valueflows](https://www.valueflo.ws/).
 
-![](./docs/assets/pic-pie-2.png)
+![](./docs/assets/demo_flow.png)
 
 ## Installing
 1) Download and install the latest [Holochain Launcher](https://github.com/holochain/launcher/releases/tag/v0.5.1).
