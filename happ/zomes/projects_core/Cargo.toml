@@ -11,6 +11,6 @@ name = "projects_core"
 [dependencies]
 serde = "1"
 derive_more = "0"
-hdk = {version = "0.0.147", features = ["encoding"]}
-hdi = {version = "0.0.19"}
+hdk = {version = "0.0.152", features = ["encoding"]}
+hdi = {version = "0.1.2"}
 
