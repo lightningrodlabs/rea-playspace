@@ -1,5 +1,5 @@
 [package]
-edition = "2018"
+edition = "2021"
 name = "projects"
 version = "0.0.1"
 
@@ -8,12 +8,11 @@ crate-type = ["cdylib", "rlib"]
 name = "projects"
 
 [dependencies]
-hdk = {version = "0.0.147", features = ["encoding"]}
+hdk = {version = "0.0.152", features = ["encoding"]}
 projects_core = { path = "../projects_core" }
 chrono = { version = "0.4.22", default-features = false, features = ["clock", "std", "oldtime", "serde"], optional = true }
 derive_more = "0"
 serde = "*"
 paste = "*"
 tracing = "0.1.26"
-hc_zome_profiles_types = { git = "https://github.com/holochain-open-dev/profiles", rev = "for-hdk-v0.0.142", package = "hc_zome_profiles_types" }
 
