@@ -2,7 +2,6 @@ mod test;
 mod data;
 mod tree_clean;
 
-//use hc_zome_profiles_types::Profile;
 use hdk::{prelude::*, hash_path::path::Component};
 use holo_hash::{EntryHashB64, ActionHashB64};
 use tracing::{info};
