@@ -85,7 +85,7 @@ const EventInput: React.FC<Props> = ({
     setState(prevState => {
       return {...prevState, ...eventState };
     });
-  }, [eventState]);
+  }, []);
 
   useEffect(() => {
     setActions(getAllowedActions(eventState, Object.values(actionMap)));
@@ -111,7 +111,10 @@ const EventInput: React.FC<Props> = ({
    * EconomicResources up to and including what would potentially get created in the Event form.
    */
   useEffect(() => {
-    const resources = applyActionResourceEffect([], [...Object.values(economicEvents), new EconomicEvent(eventState)]);
+    const resources = applyActionResourceEffect([], [...Object.values(economicEvents)]);
+    console.log(resources)
+    const thisEventChanges = applyActionResourceEffect(resources, [new EconomicEvent(eventState)]);
+    console.log(thisEventChanges)
     setEconomicResourcesPotential(resources);
   }, [eventState, economicResources, economicEvents]);
 
@@ -153,25 +156,29 @@ const EventInput: React.FC<Props> = ({
   return (
     <>
       {inputOrOutputOf(inputOf as string, outputOf as string)}
-      <SlSelect disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
-        {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
-      </SlSelect>
-      <br />
-      <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
+      <div className='form-row'>
+        <SlSelect className='half-form-width' disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
+          {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
+        </SlSelect>
+        <div className='field-spacer'></div>
+        <SlInput className='half-form-width' disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
+      </div>
       <br />
       {resourceQuantityVisible && ResourceQuantity}
       {resourceQuantityVisible && effortQuantityVisible && <><br /></>}
       {effortQuantityVisible && EffortQuantity}
       <br />
-      <SlSelect disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
+      <div className='form-row'>
+      <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
-      <br />
-      <SlSelect disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
+      <div className='field-spacer'></div>
+      <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
+      </div>
       <br />
-      <SlInput label="Datetime" type="datetime-local" value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput className='half-form-width' label="Datetime" type="datetime-local" value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
       <SlTextarea
         label='Note'
