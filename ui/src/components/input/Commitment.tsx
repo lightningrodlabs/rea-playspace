@@ -78,7 +78,7 @@ const CommitmentInput: React.FC<Props> = ({
     setState(prevState => {
       return {...prevState, ...commitmentState };
     });
-  }, [commitmentState]);
+  }, []);
 
   useEffect(() => {
     setActions(getAllowedActions(commitmentState, Object.values(actionMap)));
@@ -126,24 +126,29 @@ const CommitmentInput: React.FC<Props> = ({
   return (
     <>
       {inputOrOutputOf(inputOf as string, outputOf as string)}
-      <SlSelect disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
-        {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
-      </SlSelect>
+      <div className='form-row'>
+        <SlSelect className='half-form-width' disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
+          {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
+        </SlSelect>
+        <div className='field-spacer'></div>
+        <SlInput className='half-form-width' disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
+      </div>
       <br />
-      <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
-      <br />
-      {resourceQuantityVisible && <> {ResourceQuantity} <br/> </>}
+      {resourceQuantityVisible && ResourceQuantity}
+      {resourceQuantityVisible && effortQuantityVisible && <><br /></>}
       {effortQuantityVisible && EffortQuantity}
       <br />
-      <SlSelect disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
+      <div className='form-row'>
+      <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
-      <br />
-      <SlSelect disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
+      <div className='field-spacer'></div>
+      <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
         {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
+      </div>
       <br />
-      <SlInput label="Due" type="datetime-local" value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
+      <SlInput className='half-form-width' label="Due" type="datetime-local" value={due ? DateToInputValueString(due as Date): ''} name="due" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
       <SlTextarea
         label='Note'
