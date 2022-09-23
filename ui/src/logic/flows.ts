@@ -77,6 +77,54 @@ export const getCommitmentAndEvents = (vfPath: string[] | string): {commitment: 
   return {commitment, events};
 }
 
+
+/**
+ * Hydrate the resource from the key
+ */
+export const getResource = (flow: FlowShape) => {
+  const store  = getDataStore();
+  if (flow && flow.resourceConformsTo) {
+    return store.getById(flow.resourceConformsTo as string);
+  }
+  return null;
+}
+
+/**
+ * Hydrate the provider from the key
+ */
+export const getProvider = (flow: FlowShape) => {
+  const store = getDataStore();
+  if (flow && flow.provider) {
+    return store.getById(flow.provider as string);
+  }
+  return null;
+};
+
+/**
+ * Hydrate the recevier from the key
+ */
+export const getReceiver = (flow: FlowShape) => {
+  const store = getDataStore();
+  if (flow && flow.receiver) {
+    return store.getById(flow.receiver as string);
+  }
+  return null;
+};
+
+/**
+ * Hydrate the conforming resource from the key, or the defaults
+ */
+export const getConformingResource = (flow: FlowShape, initial?: FlowShape) => {
+  const store = getDataStore();
+  if (flow && flow.resourceConformsTo) {
+    return store.getById(flow.resourceConformsTo as string);
+  } else if (initial && initial.resourceConformsTo) {
+    return store.getById(initial.resourceConformsTo as string);
+  } else {
+    return null;
+  }
+};
+
 /**
  * Returns a set of sensible defaults for a flow
  */
