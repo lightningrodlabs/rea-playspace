@@ -7,10 +7,22 @@ import { Commitment } from '../../data/models/Valueflows/Plan';
 import { EconomicEvent, EconomicResource } from '../../data/models/Valueflows/Observation';
 import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
-import { flowDefaults, getEventDefaultsFromCommitment, getEventDefaultsFromEvent, getCommitmentAndEvents, getDisplayNodeBy, getLabelForFlow } from '../../logic/flows';
+import EconomicResourceInput from '../input/EconomicResource';
+import {
+  flowDefaults,
+  getEventDefaultsFromCommitment,
+  getEventDefaultsFromEvent,
+  getCommitmentAndEvents,
+  getDisplayNodeBy,
+  getLabelForFlow,
+  getConformingResource,
+  getProvider,
+  getReceiver,
+  getResource
+} from '../../logic/flows';
 import getDataStore from '../../data/DataStore';
 import { objectsDiff } from '../../data/utils';
-import EconomicResourceInput from '../input/EconomicResource';
+
 
 /**
  * XXX: This is a mess we really need to break each component out into its own
@@ -29,27 +41,40 @@ interface Props {
 }
 
 const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterward}) => {
-  const [commitmentOpen, setCommitmentOpen] = useState(false);
-  const [eventOpen, setEventOpen] = useState(false);
 
-  const [editCommitment, setEditCommitment] = useState<Commitment>();
-  const [editEvents, setEditEvents] = useState<Array<EconomicEvent>>([]);
-
-  const [initial, setInitial] = useState<FlowShape>();
   const [actions, setActions] = useState<Array<Action>>([]);
   const [units, setUnits] = useState<Array<Unit>>([]);
+
+  // React ref to the underlying checkbox in the UI
   const commitmentFinishedRef = useRef(null);
 
-  // store updates to flows until saving or discarding
-  const [workingCommitment, setWorkingCommitment] = useState<CommitmentShape>();
-  const [workingEvent, setWorkingEvent] = useState<EconomicEventShape>();
+  // do we have any side bar panels open?
+  const [commitmentOpen, setCommitmentOpen] = useState(false);
+  const [eventOpen, setEventOpen] = useState(false);
+  const [resourceOpen, setResourceOpen] = useState(false);
+
+  // The initial flow shape used to initialize the first commitment
+  const [initial, setInitial] = useState<FlowShape>();
+
+  // The current state of the data, cloned because we merge changes into this before saving
+  const [editCommitment, setEditCommitment] = useState<Commitment>(null);
+  const [editEvents, setEditEvents] = useState<Array<EconomicEvent>>([]);
+  const [editResource, setEditResource] = useState<EconomicResource>(null);
+
+  // The current form data until saving or discarding,
+  // saving overwrites the corresponding edit* object.
+  const [workingCommitment, setWorkingCommitment] = useState<CommitmentShape>(null);
+  const [workingEvent, setWorkingEvent] = useState<EconomicEventShape>(null);
+  const [workingResource, setWorkingResource] = useState<EconomicResource>(null);
 
   // close the commitment and resource panels
   const resetState = () => {
     setCommitmentOpen(false);
     setEventOpen(false);
+    setResourceOpen(false);
     setWorkingCommitment(null);
     setWorkingEvent(null);
+    setWorkingResource(null);
   }
 
   // Set up the initial state
@@ -65,6 +90,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     setInitial(initialState);
 
     if (vfPath) {
+      // This clones the events, just to be sure that we don't edit any of the original values
       const {commitment, events} = getCommitmentAndEvents(vfPath);
       setEditCommitment(commitment);
       setEditEvents(events);
@@ -75,77 +101,21 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     return () => {console.log('flowModal unmount')}
   }, []);
 
-  // Pick an event to edit, but make a clone so edits don't propagate through the app.
-  const pickEvent = (event: EconomicEvent) => {
-    setWorkingEvent(event);
-  };
-
-  /**
-   * Hydrate the resource from the key
-   */
-  const getResource = (flow: FlowShape) => {
-    const store  = getDataStore();
-    if (flow && flow.resourceConformsTo) {
-      return store.getById(flow.resourceConformsTo as string);
-    }
-    return null;
-  }
-
-  /**
-   * Hydrate the provider from the key
-   */
-  const getProvider = (flow: FlowShape) => {
-    const store = getDataStore();
-    if (flow && flow.provider) {
-      return store.getById(flow.provider as string);
-    }
-    return null;
-  };
-
-  /**
-   * Hydrate the recevier from the key
-   */
-  const getReceiver = (flow: FlowShape) => {
-    const store = getDataStore();
-    if (flow && flow.receiver) {
-      return store.getById(flow.receiver as string);
-    }
-    return null;
-  };
-
-  /**
-   * Hydrate the conforming resource from the key, or the defaults
-   */
-  const getConformingResource = (flow: FlowShape) => {
-    const store = getDataStore();
-    if (flow && flow.resourceConformsTo) {
-      return store.getById(flow.resourceConformsTo as string);
-    } else if (initial && initial.resourceConformsTo) {
-      return store.getById(initial.resourceConformsTo as string);
-    } else {
-      return null;
-    }
-  };
+  // === COMMITMENT FORM ===
 
   /**
    * When the commitment changes, update it.
+   *
+   * This is passed in as the onChange callback
    */
   const handleCommitmentChange = (e: any) => {
     setWorkingCommitment(new Commitment(e.target.value));
   }
 
   /**
-   * When the current event changes, update it.
-   */
-   const handleEventChange = (e: any) => {
-    console.log('event: ', e.target.value);
-    setWorkingEvent(new EconomicEvent(e.target.value));
-  }
-
-  /**
    * Store the commitment so we can save it later
    */
-  const handleCommitmentSubmit = () => {
+   const handleCommitmentSubmit = () => {
     const commitment = new Commitment(workingCommitment);
     setEditCommitment(commitment);
     setCommitmentOpen(false);
@@ -153,6 +123,57 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     // Clean up
     setWorkingCommitment(null);
   };
+
+  /**
+   * Form for commitment
+   */
+  const commitmentForm = () => {
+    if (commitmentOpen) {
+      let state = {...initial} as CommitmentShape;
+
+      // If moving around the panels, such as creating a new Commitment or
+      // EconomicResource, use the working state.
+      if (workingCommitment) {
+        state = {...initial, ...workingCommitment};
+      }
+
+      /**
+       * If editing a commitment, merge initial state with exisiting data
+       */
+      if (editCommitment) {
+        state = {...initial, ...editCommitment}
+      }
+
+      return <>
+        <SlIconButton onClick={resetState} name="chevron-left" label="Cancel. Go Back."></SlIconButton>
+        <h4 className='panel-heading'>Commitment</h4>
+        <CommitmentInput
+          commitmentState={state}
+          conformingResource={getConformingResource(state, initial)}
+          name='commitment'
+          onChange={handleCommitmentChange}
+        ></CommitmentInput>
+        <SlDivider></SlDivider>
+        <SlButtonGroup slot="footer">
+          <SlButton onClick={handleCommitmentSubmit} variant="primary">{editCommitment?.id? 'Update' : 'Create'}</SlButton>
+          <SlButton onClick={resetState} variant="default">Cancel</SlButton>
+        </SlButtonGroup>
+      </>;
+    } else {
+      return <></>;
+    }
+  };
+
+  // === EVENT FORM ===
+
+  /**
+   * When the current event changes, update it.
+   *
+   * This is passed in as the onChange callback
+   */
+   const handleEventChange = (e: any) => {
+    setWorkingEvent(new EconomicEvent(e.target.value));
+  }
 
   /**
    * Store the event so we can save it later
@@ -177,88 +198,6 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     // Clean up
     setWorkingEvent(null);
     setWorkingEvent(null);
-  };
-
-  const handleCommitmentFinished = () => {
-    setEditCommitment((current) => {
-      return new Commitment({...current, finished: commitmentFinishedRef.current.checked});
-    })
-  }
-
-  const handleCommitmentOpen = () => {
-    setCommitmentOpen(true);
-  }
-
-  const handleEventOpen = () => {
-    setEventOpen(true);
-  }
-
-  /**
-   * A component of sorts to either show a button to add a commitment or a button
-   * to edit a commitment.
-   */
-  const commitmentEditOrCreate = () => {
-    if (editCommitment) {
-      const commitmentClass = ('commitment-button' + (editCommitment.finished ? ' finished' : ''));
-      const label = getLabelForFlow(editCommitment, getResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
-      return <>
-        <SlButton className={commitmentClass} variant="default" onClick={handleCommitmentOpen}>{label}</SlButton>
-        <span className='commitment-checkbox-space'></span>
-        <SlCheckbox disabled={false} checked={editCommitment.finished} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
-        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
-          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
-        </SlTooltip>
-      </>;
-    } else {
-      return <>
-        <SlButton className='commitment-button' variant="primary" onClick={handleCommitmentOpen}>Create Commitment</SlButton>
-        <span className='commitment-checkbox-space'></span>
-        <SlCheckbox disabled={true} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
-        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
-          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
-        </SlTooltip>
-      </>;
-    }
-  };
-
-  /**
-   * Form for commitment
-   */
-  const commitmentForm = () => {
-    if (commitmentOpen) {
-      let state = {} as CommitmentShape;
-
-      /**
-       * If editing a commitment, merge initial state with exisiting data
-       */
-      if (editCommitment) {
-        state = {...initial, ...editCommitment}
-      }
-
-      // If moving around the panels, such as creating a new Commitment or
-      // EconomicResource, use the working state.
-      if (workingCommitment) {
-        state = {...initial, ...workingCommitment};
-      }
-
-      return <>
-        <SlIconButton onClick={resetState} name="chevron-left" label="Cancel. Go Back."></SlIconButton>
-        <h4 className='panel-heading'>Commitment</h4>
-        <CommitmentInput
-          commitmentState={state}
-          conformingResource={getConformingResource(state)}
-          name='commitment'
-          onChange={handleCommitmentChange}
-        ></CommitmentInput>
-        <SlDivider></SlDivider>
-        <SlButtonGroup slot="footer">
-          <SlButton onClick={handleCommitmentSubmit} variant="primary">{editCommitment?.id? 'Update' : 'Create'}</SlButton>
-          <SlButton onClick={resetState} variant="default">Cancel</SlButton>
-        </SlButtonGroup>
-      </>;
-    } else {
-      return <></>;
-    }
   };
 
   /**
@@ -304,7 +243,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         <EventInput
           eventState={eventState}
           readonlyFields={readonlyFields}
-          conformingResource={getConformingResource(eventState)}
+          conformingResource={getConformingResource(eventState, initial)}
           name='event'
           onChange={handleEventChange}
         ></EventInput>
@@ -319,6 +258,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     }
   };
 
+  // === RESOURCE FORM ===
   /**
   * Form for economic resource if a new Resource is to be created
   */
@@ -334,6 +274,70 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   //     ></EconomicResourceInput>
   //   </>;
   // };
+
+  // === TOP LEVEL MODAL INNARDS ===
+
+  // This modifies the editCommitment directly because this is not in the Commitment form
+  const handleCommitmentFinished = () => {
+    setEditCommitment((current) => {
+      return new Commitment({...current, finished: commitmentFinishedRef.current.checked});
+    })
+  }
+
+  /**
+   * Determines if the event or commitment panel should be open or closed, returns the appropriate class
+   */
+   const panelState = () => {
+    return (commitmentOpen || eventOpen || resourceOpen) ? ' open' : ' close';
+  }
+
+  const handleCommitmentOpen = () => setCommitmentOpen(true)
+
+  const handleEventOpen = () => setEventOpen(true);
+
+  /**
+   * A component of sorts to either show a button to add a commitment or a button
+   * to edit a commitment.
+   */
+  const commitmentEditOrCreate = () => {
+    if (editCommitment) {
+      const commitmentClass = ('commitment-button' + (editCommitment.finished ? ' finished' : ''));
+      const label = getLabelForFlow(editCommitment, getResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
+      return <>
+        <SlButton className={commitmentClass} variant="default" onClick={handleCommitmentOpen}>{label}</SlButton>
+        <span className='commitment-checkbox-space'></span>
+        <SlCheckbox disabled={false} checked={editCommitment.finished} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
+        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
+          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
+        </SlTooltip>
+      </>;
+    } else {
+      return <>
+        <SlButton className='commitment-button' variant="primary" onClick={handleCommitmentOpen}>Create Commitment</SlButton>
+        <span className='commitment-checkbox-space'></span>
+        <SlCheckbox disabled={true} className='commitment-checkbox' onSlChange={handleCommitmentFinished} ref={commitmentFinishedRef}></SlCheckbox>
+        <SlTooltip content='Click this checkbox to put the commitment into a finished state.'>
+          <SlIcon className='commitment-finish-info' name='info-circle'></SlIcon>
+        </SlTooltip>
+      </>;
+    }
+  };
+
+  // Pick an event to edit, but make a clone so edits don't propagate through the app.
+  const pickEvent = (event: EconomicEvent) => {
+    setWorkingEvent(event);
+  };
+
+  /**
+   * Returns an event handler for the button. This is a hack, should use a form-
+   * wide event listener and should inspect the key of the object clicked.
+   */
+  const makeEventClickHandler = (event: EconomicEvent): (()=>void) => {
+    return () => {
+      pickEvent(event);
+      setEventOpen(true);
+    }
+  };
 
   /**
    * Pass the array of objects back
@@ -388,24 +392,6 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
       }
     }
     if (afterward) afterward(items);
-  };
-
-  /**
-   * Determines if the event or commitment panel should be open or closed, returns the appropriate class
-   */
-  const panelState = () => {
-    return (commitmentOpen || eventOpen) ? ' open' : ' close';
-  }
-
-  /**
-   * Returns an event handler for the button. This is a hack, should use a form-
-   * wide event listener and should inspect the key of the object clicked.
-   */
-  const makeEventClickHandler = (event: EconomicEvent): (()=>void) => {
-    return () => {
-      pickEvent(event);
-      setEventOpen(true);
-    }
   };
 
   return (
