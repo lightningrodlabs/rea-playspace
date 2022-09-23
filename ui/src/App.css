@@ -472,19 +472,32 @@ A potentially useful brown for the pallet: #823200
   vertical-align: middle;
   padding-bottom: 0.33em;
 }
-.measurementInput {
+
+.form-row,
+.measurementInput,
+.commitment-with-finish {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
-.measurementInput .measurementValue {
-  display: flex;
-  flex-direction: column;
-  width: 48%;
-}
+.form-row .field-spacer,
 .measurementInput .measurementSpacer {
   display: flex;
   flex-direction: column;
   width: 4%;
+}
+.half-form-width {
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+  align-content: flex-end;
+}
+
+
+.measurementInput .measurementValue {
+  display: flex;
+  flex-direction: column;
+  width: 48%;
 }
 .measurementInput .measurementUnit {
   display: flex;
@@ -493,35 +506,25 @@ A potentially useful brown for the pallet: #823200
   align-content: flex-end;
 }
 
-.commitment-with-finish {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
 .commitment-with-finish sl-button.commitment-button {
   display: flex;
   flex-direction: column;
   width: 90%;
 }
-
 .commitment-with-finish sl-button.commitment-button.finished {
   text-decoration: line-through;
 }
-
 .commitment-with-finish .commitment-checkbox-space {
   display: flex;
   flex-direction: column;
   width: 2%;
 }
-
 .commitment-with-finish .commitment-checkbox {
   display: flex;
   flex-direction: column;
   width: 5%;
   margin-top: 0.66em;
 }
-
 .commitment-with-finish .commitment-finish-info {
   display: flex;
   flex-direction: column;
