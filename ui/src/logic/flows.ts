@@ -262,6 +262,8 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
   let action = new Action({
     id: null,
     label: 'blank action',
+    eventQuantity: null,
+    createResource: null,
     inputOutput: 'na',
     comment: "This indicates there's no action selected."
   });

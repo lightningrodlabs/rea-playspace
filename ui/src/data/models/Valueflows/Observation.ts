@@ -67,14 +67,16 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
   }
 }
 
+export type EconomicResources = EconomicResource[];
+
 export class EconomicEvent implements EconomicEventShape {
   id: string;
   created: Date;
   action: ActionKey;
   provider: string;                 // Agent ID
   receiver: string;                 // Agent ID
-  resourceInventoriedAs?: EconomicResourceShape | string;   // EconomicResource ID
-  toResourceInventoriedAs?: EconomicResourceShape | string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
+  resourceInventoriedAs?: string;   // EconomicResource ID
+  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
   inputOf?: string;                 // Process ID
   outputOf?: string;                // Process ID
   atLocation?: GeoDataShape;        // Source Location
@@ -123,6 +125,8 @@ export class EconomicEvent implements EconomicEventShape {
     return toJSON<EconomicEventShape, EconomicEvent>(this);
   }
 }
+
+export type EconomicEvents = EconomicEvent[];
 
 export class Fulfillment implements FulfillmentShape {
   id: string;

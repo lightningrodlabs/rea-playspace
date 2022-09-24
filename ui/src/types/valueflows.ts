@@ -1,6 +1,6 @@
 // Building Blocks
 
-import { ActionKey } from "../data/models/Valueflows/Knowledge";
+import { HasAction } from "../data/models/Valueflows/Knowledge";
 
 export interface HasIdDate {
   id?: string;
@@ -17,16 +17,12 @@ export interface HasTime {
 export interface ReaBase {
   provider: string | AgentShape;                              // Agent ID or object
   receiver: string | AgentShape;                              // Agent ID or object
-  resourceInventoriedAs?: string | EconomicResourceShape;     // EconomicResource ID or object
-  resourceConformsTo?: string | ResourceSpecificationShape;   // ResourceSprecification ID or object
+  resourceInventoriedAs?: string;     // EconomicResource ID or object
+  resourceConformsTo?: string;   // ResourceSprecification ID or object
   resourceQuantity?: MeasurementShape;
   effortQuantity?: MeasurementShape;
   resourceClassifiedAs?: string;                              // General classification or grouping
   inScopeOf?: string;
-}
-
-export interface HasAction {
-  action: ActionKey | ActionShape;
 }
 
 // Knowledge
@@ -50,37 +46,6 @@ export interface ResourceSpecificationShape extends HasIdDate {
 export interface ProcessSpecificationShape extends HasIdDate {
   name: string,
   note?: string
-}
-
-export type InputOutput = 'input' | 'output' | 'both' | 'na';
-
-export type AccountingEffect = 'decrement' | 'decrementIncrement' | 'increment';
-
-export type OnHandEffect = AccountingEffect;
-
-export type LocationEffect = 'new' | 'update' | 'updateTo';
-
-export type ContainedEffect = 'update' | 'remove';
-
-export type AccountableEffect = 'new' | 'updateTo';
-
-export type StageEffect = 'stage';
-
-export type StateEffect = 'update' | 'updateTo';
-
-export interface ActionShape {
-  id: ActionKey;
-  label: string;
-  inputOutput?: InputOutput;
-  accountingEffect?: AccountingEffect;
-  onhandEffect?: OnHandEffect;
-  pairsWith?: string;
-  locationEffect?: LocationEffect;
-  containedEffect?: ContainedEffect;
-  accountableEffect?: AccountableEffect;
-  stageEffect?: StageEffect;
-  stateEffect?: StateEffect;
-  comment?: string;
 }
 
 // Plan
@@ -140,8 +105,8 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
   atLocation?: GeoDataShape;
   toLocation?: GeoDataShape;
   state?: string;
-  resourceInventoriedAs?: string | EconomicResourceShape;
-  toResourceInventoriedAs?: string | EconomicResourceShape; // EconomicResource ID that the transfer will be inventoried as.
+  resourceInventoriedAs?: string;
+  toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as.
   inputOf?: string | ProcessShape;
   outputOf?: string | ProcessShape;
 }

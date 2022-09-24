@@ -8,7 +8,7 @@ import { EconomicEvent, EconomicResource } from '../../data/models/Valueflows/Ob
 import { usePath } from '../../data/YatiReactHook';
 import getDataStore from '../../data/DataStore';
 import { getAllowedActions } from '../../logic/flows';
-import { applyActionResourceEffect } from '../../logic/accounting';
+import { simulateAccounting } from '../../logic/accounting';
 import { Action, Agent, Unit } from '../../data/models/Valueflows/Knowledge';
 
 interface Props {
@@ -103,7 +103,7 @@ const EventInput: React.FC<Props> = ({
    * EconomicResources up to but not including the Event form.
    */
   useEffect(()=> {
-    const resources = applyActionResourceEffect(Object.values(economicResourcesRaw), Object.values(economicEvents));
+    const resources = simulateAccounting(Object.values(economicResourcesRaw), Object.values(economicEvents));
     setEconomicResources(resources);
   }, [economicEvents, economicResourcesRaw]);
 
@@ -111,9 +111,9 @@ const EventInput: React.FC<Props> = ({
    * EconomicResources up to and including what would potentially get created in the Event form.
    */
   useEffect(() => {
-    const resources = applyActionResourceEffect([], [...Object.values(economicEvents)]);
+    const resources = simulateAccounting([], [...Object.values(economicEvents)]);
     console.log(resources)
-    const thisEventChanges = applyActionResourceEffect(resources, [new EconomicEvent(eventState)]);
+    const thisEventChanges = simulateAccounting(resources, [new EconomicEvent(eventState)]);
     console.log(thisEventChanges)
     setEconomicResourcesPotential(resources);
   }, [eventState, economicResources, economicEvents]);

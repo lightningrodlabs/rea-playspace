@@ -1,15 +1,16 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { useState } from "react";
-import { Agent, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
+import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { EconomicResource } from "../../data/models/Valueflows/Observation";
 
 export type Props = {
   economicResource: EconomicResource
   agents: Record<string, Agent>
   resourceSpecifications: Record<string, ResourceSpecification>
+  processSpecifications: Record<string, ProcessSpecification>
 };
 
-const ResourceLedgerTableRow: React.FC<Props> = ({economicResource, agents, resourceSpecifications}) => {
+const ResourceLedgerTableRow: React.FC<Props> = ({economicResource, agents, resourceSpecifications, processSpecifications}) => {
   const [
     { 
       id,
@@ -34,7 +35,8 @@ const ResourceLedgerTableRow: React.FC<Props> = ({economicResource, agents, reso
 
   const assembleCardText = () => {
     let body: string = '';
-    body += (`Name: ${name}. `);
+    const stageLabel = stage ? ` (${processSpecifications[stage]?.name})` : '';
+    body += (`Name: ${name}${stageLabel}. `);
     if (primaryAccountable) {
       body += (`Primary Accountable: ${agents[primaryAccountable].name}. `);
     }
