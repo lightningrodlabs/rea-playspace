@@ -5,19 +5,10 @@ import {
   AgentShape,
   ResourceSpecificationShape,
   ProcessSpecificationShape,
-  ActionShape,
-  InputOutput,
   UnitShape,
   MeasurementShape,
   GeoDataShape,
-  GeoPointShape,
-  AccountingEffect,
-  OnHandEffect,
-  LocationEffect,
-  ContainedEffect,
-  AccountableEffect,
-  StageEffect,
-  StateEffect
+  GeoPointShape
 } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../utils';
 
@@ -317,6 +308,30 @@ export class ProcessSpecification implements ProcessSpecificationShape, PathedDa
 // We could organize these as `root.actions.${id}`
 // then they could be a part of the standard pathed data system
 
+export type EventQuantity = 'resource' | 'effort' | 'both';
+
+export type InputOutput = 'input' | 'output' | 'both' | 'na';
+
+export type PairsWith = 'dropoff' | 'pickup' | 'modify' | 'accept' | 'separate' | 'combine';
+
+export type CreateResource = 'optional' | 'optionalTo';
+
+export type AccountingEffect = 'decrement' | 'decrementIncrement' | 'increment';
+
+export type OnHandEffect = AccountingEffect;
+
+export type QuantityEffect = AccountingEffect | OnHandEffect;
+
+export type LocationEffect = 'new' | 'update' | 'updateTo';
+
+export type ContainedEffect = 'update' | 'remove';
+
+export type AccountableEffect = 'new' | 'updateTo';
+
+export type StageEffect = 'stage';
+
+export type StateEffect = 'update' | 'updateTo';
+
 export type ActionKey = 'accept'
                       | 'combine'
                       | 'consume'
@@ -347,6 +362,27 @@ export const isTransfer = (action: ActionKey):boolean => {
     'transfer-custody'], action);
 }
 
+export interface ActionShape {
+  id: ActionKey;
+  label: string;
+  eventQuantity: EventQuantity;
+  inputOutput?: InputOutput;
+  pairsWith?: PairsWith;
+  createResource?: CreateResource;
+  accountingEffect?: AccountingEffect;
+  onhandEffect?: OnHandEffect;
+  locationEffect?: LocationEffect;
+  containedEffect?: ContainedEffect;
+  accountableEffect?: AccountableEffect;
+  stageEffect?: StageEffect;
+  stateEffect?: StateEffect;
+  comment?: string;
+}
+
+export interface HasAction {
+  action: ActionKey | ActionShape;
+}
+
 /**
  * Action determines which rules are applied to the flows through the various
  * objects: Intent, Commitment, Fulfillment, & Claim. These rules are responsible
@@ -355,10 +391,11 @@ export const isTransfer = (action: ActionKey):boolean => {
 export class Action implements PathedData, ActionShape {
   id: ActionKey;
   label: string;
+  eventQuantity: EventQuantity;
   inputOutput: InputOutput;
   accountingEffect?: AccountingEffect;
   onhandEffect?: OnHandEffect;
-  pairsWith?: string;
+  pairsWith?: PairsWith;
   locationEffect?: LocationEffect;
   containedEffect?: ContainedEffect;
   accountableEffect?: AccountableEffect;
@@ -394,6 +431,7 @@ export const Actions: Record<ActionKey, Action> = {
   'use': new Action({
     id: 'use',
     label: 'Use',
+    eventQuantity: 'both',
     inputOutput: 'input',
     stateEffect: 'update',
     comment: "For example a tool used in process; after the process, the tool still exists."
@@ -401,12 +439,14 @@ export const Actions: Record<ActionKey, Action> = {
   'work': new Action({
     id: 'work',
     label: 'Work',
+    eventQuantity: 'effort',
     inputOutput: 'input',
     comment: "Labor power applied to a process."
   }),
   'accept': new Action({
     id: 'accept',
     label: 'Accept',
+    eventQuantity: 'resource',
     inputOutput: 'input',
     onhandEffect: 'decrement',
     stateEffect: 'update',
@@ -416,6 +456,7 @@ export const Actions: Record<ActionKey, Action> = {
   'modify': new Action({
     id: 'modify',
     label: 'Modify',
+    eventQuantity: 'resource',
     inputOutput: 'output',
     onhandEffect: 'increment',
     stateEffect: 'update',
@@ -426,6 +467,7 @@ export const Actions: Record<ActionKey, Action> = {
   'consume': new Action({
     id: 'consume',
     label: 'Consume',
+    eventQuantity: 'resource',
     inputOutput: 'input',
     onhandEffect: 'decrement',
     accountingEffect: 'decrement',
@@ -435,6 +477,7 @@ export const Actions: Record<ActionKey, Action> = {
   'produce': new Action({
     id: 'produce',
     label: 'Produce',
+    eventQuantity: 'resource',
     inputOutput: 'output',
     accountingEffect: 'increment',
     onhandEffect: 'increment',
@@ -447,6 +490,7 @@ export const Actions: Record<ActionKey, Action> = {
   'cite': new Action({
     id: 'cite',
     label: 'Cite',
+    eventQuantity: 'resource',
     inputOutput: 'input',
     stateEffect: 'update',
     comment: "For example a design file, neither used nor consumed, the file remains available at all times."
@@ -454,6 +498,7 @@ export const Actions: Record<ActionKey, Action> = {
   'lower': new Action({
     id: 'lower',
     label: 'Lower',
+    eventQuantity: 'resource',
     onhandEffect: 'decrement',
     accountingEffect: 'decrement',
     accountableEffect: 'new',
@@ -463,6 +508,7 @@ export const Actions: Record<ActionKey, Action> = {
   'raise': new Action({
     id: 'raise',
     label: 'Raise',
+    eventQuantity: 'resource',
     onhandEffect: 'increment',
     accountingEffect: 'increment',
     accountableEffect: 'new',
@@ -472,12 +518,14 @@ export const Actions: Record<ActionKey, Action> = {
   'deliverService': new Action({
     id: 'deliverService',
     label: 'Deliver Service',
+    eventQuantity: 'resource',
     inputOutput: 'both',
     comment: "New service produced and delivered (a service implies that an agent actively receives the service)."
   }),
   'dropoff': new Action({
     id: 'dropoff',
     label: 'Dropoff',
+    eventQuantity: 'resource',
     inputOutput: 'output',
     pairsWith: 'pickup',
     locationEffect: 'update',
@@ -488,6 +536,7 @@ export const Actions: Record<ActionKey, Action> = {
   'pickup': new Action({
     id: 'pickup',
     label: 'Pickup',
+    eventQuantity: 'resource',
     inputOutput: 'input',
     locationEffect: 'update',
     stateEffect: 'update',
@@ -496,6 +545,7 @@ export const Actions: Record<ActionKey, Action> = {
   'move': new Action({
     id: 'move',
     label: 'Move',
+    eventQuantity: 'resource',
     inputOutput: 'na',
     accountingEffect: 'decrementIncrement',
     onhandEffect: 'decrementIncrement',
@@ -506,6 +556,7 @@ export const Actions: Record<ActionKey, Action> = {
   'transferAllRights': new Action({
     id: 'transferAllRights',
     label: 'Transfer all rights',
+    eventQuantity: 'resource',
     inputOutput: 'na',
     accountingEffect: 'decrementIncrement',
     accountableEffect: 'updateTo',
@@ -515,6 +566,7 @@ export const Actions: Record<ActionKey, Action> = {
   'transfer': new Action({
     id: 'transfer',
     label: 'Transfer',
+    eventQuantity: 'resource',
     inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
     accountingEffect: 'decrementIncrement',
@@ -526,6 +578,7 @@ export const Actions: Record<ActionKey, Action> = {
   'transferCustody': new Action({
     id: 'transferCustody',
     label: 'Transfer custody',
+    eventQuantity: 'resource',
     inputOutput: 'na',
     onhandEffect: 'decrementIncrement',
     locationEffect: 'updateTo',
@@ -535,6 +588,7 @@ export const Actions: Record<ActionKey, Action> = {
   'combine': new Action({
     id: 'combine',
     label: 'Combine',
+    eventQuantity: 'resource',
     inputOutput: 'input',
     onhandEffect: 'decrement',
     containedEffect: 'update',
@@ -545,6 +599,7 @@ export const Actions: Record<ActionKey, Action> = {
   'separate': new Action({
     id: 'separate',
     label: 'Separate',
+    eventQuantity: 'resource',
     inputOutput: 'output',
     onhandEffect: 'increment',
     containedEffect: 'remove',

@@ -2,10 +2,10 @@ import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import getDataStore from "../../data/DataStore";
-import { Agent, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
+import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
 import { EconomicResource } from "../../data/models/Valueflows/Observation";
 import { usePath } from "../../data/YatiReactHook";
-import { applyActionResourceEffect } from "../../logic/accounting";
+import { simulateAccounting } from "../../logic/accounting";
 import ResourceLedgerTableRow from "./ResourceLedgerTableRow";
 
 export type ResourceLedgerProps = {};
@@ -16,11 +16,12 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
   const store = getDataStore();
   const economicResources = usePath(`root.economicResource`, store);
   const economicEvents = usePath(`root.economicEvent`, store);
-  const agents = usePath('root.agent', store);
-  const resourceSpecifications = usePath('root.resourceSpecification', store);
+  const agents: Record<string, Agent> = usePath('root.agent', store);
+  const resourceSpecifications: Record<string, ResourceSpecification> = usePath('root.resourceSpecification', store);
+  const processSpecifications: Record<string, ProcessSpecification> = usePath('root.processSpecification', store);
 
   useEffect(() => {
-    setEconomicResourcesList(Object.values(applyActionResourceEffect(Object.values(economicResources), Object.values(economicEvents))));
+    setEconomicResourcesList(Object.values(simulateAccounting(Object.values(economicResources), Object.values(economicEvents))));
   }, [economicEvents, economicResources]);
 
   const RenderResources = (): JSX.Element => {
@@ -35,8 +36,9 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
         return(
         <ResourceLedgerTableRow
         key={econResource.id} economicResource={econResource}
-        agents={(agents as unknown) as Record<string, Agent>}
-        resourceSpecifications={(resourceSpecifications as unknown) as Record<string, ResourceSpecification>} />)
+        agents={agents}
+        resourceSpecifications={resourceSpecifications}
+        processSpecifications={processSpecifications} />)
       });
 
       return (
