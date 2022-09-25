@@ -1,5 +1,5 @@
 import getDataStore from "../data/DataStore";
-import { QuantityEffect, ResourceSpecification } from "../data/models/Valueflows/Knowledge";
+import { Action, QuantityEffect, ResourceSpecification } from "../data/models/Valueflows/Knowledge";
 import { Process } from "../data/models/Valueflows/Plan";
 import { EconomicEvent, EconomicEvents, EconomicResource, EconomicResources } from "../data/models/Valueflows/Observation";
 import { EconomicResourceShape } from "../types/valueflows";
@@ -28,6 +28,8 @@ const quantityEffects: QuantityEffectMethods = {
   }
 }
 
+type ProcessIndex = Record<string, Process>;
+
 /**
  * This applies the full set of adjustments specified by an EconomicEvent to a
  * pair of EconomicResources: [resourceInventoriedAs, toResourceInventoriedAs],
@@ -36,12 +38,7 @@ const quantityEffects: QuantityEffectMethods = {
  * This is broken up this way, so this code doesn't need to focus on fetching any
  * data, but rather acts directly upon the objects provided.
  */
-export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
-  const store = getDataStore();
-
-  // get the action for the current economic event
-  const action = store.getActions().find((action) => action.id == event.action as string);
-
+export function applyEvent(event: EconomicEvent, action: Action, resources: ResourcePair, processes: ProcessIndex) {
   // Note: corresponds with [ resourceInventoriedAs, toResourceInventoriedAs ]
   const [resource, toResource] = resources;
 
@@ -84,7 +81,6 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
   // Adjust stage
   if (action.stageEffect) {
     if (action.stageEffect === 'stage') {
-      const processes: Record<string, Process> = store.getCursor(`root.plan.${store.getCurrentPlanId()}.process`);
       const processSpecificationId = processes[event.outputOf].basedOn;
       resource.stage = processSpecificationId;
     }
@@ -201,6 +197,7 @@ export function createResourceAndToResourceShapes(resourceSpecifications: Resour
 export function simulateAccounting(economicResources: EconomicResources, economicEvents: EconomicEvents): EconomicResources {
   const store = getDataStore();
   const resourceSpecifications: ResourceSpecificationIndex = store.getCursor('root.resourceSpecification');
+  const processes: Record<string, Process> = store.getCursor(`root.plan.${store.getCurrentPlanId()}.process`);
   const [economicResourceIndex, economicResourcePools] = createResourcePools(resourceSpecifications, economicResources);
 
   // Sort events by time of creation, but topological ordering is preferable
@@ -249,11 +246,23 @@ export function simulateAccounting(economicResources: EconomicResources, economi
       outputOf
     } = event;
 
+    // get the action for the current economic event
+    const action = store.getActions().find((action) => action.id == event.action as string);
+
+    // Create simluation data
     const [economicResourceShape, toEconomicResourceShape] = createResourceAndToResourceShapes(resourceSpecifications, event);
     const synthKey = EconomicResource.getSytheticKey(economicResourceShape);
     const toSynthKey = EconomicResource.getSytheticKey(toEconomicResourceShape);
 
-    // Either grab the resource corresponding to the [resourceInventoriedAs, toResourceInventoriedAs] pair, or generate new ones.
+    /**
+     * Either grab the resource corresponding to the [resourceInventoriedAs,
+     * toResourceInventoriedAs] pair, or generate new ones.
+     * XXX: Is this correct? In real accounting, we would fail if there we no
+     * resource id, we should technically validate these based on
+     * action.createResource
+     *
+     * See: https://github.com/lightningrodlabs/rea-playspace/issues/84#issuecomment-1257156262
+     */
     let resource = economicResourceIndex[resourceId] ? economicResourceIndex[resourceId] : new EconomicResource(economicResourceShape);
     let toResource = economicResourceIndex[toResourceId] ? economicResourceIndex[toResourceId] : new EconomicResource(toEconomicResourceShape);
 
@@ -278,7 +287,7 @@ export function simulateAccounting(economicResources: EconomicResources, economi
     }
     if (!Object.hasOwn(economicResourceIndex, toResource.id)) economicResourceIndex[toResource.id] = toResource
 
-    applyEvent(event, [resource, toResource]);
+    applyEvent(event, action, [resource, toResource], processes);
   });
 
   // Return the modified objects from the index
