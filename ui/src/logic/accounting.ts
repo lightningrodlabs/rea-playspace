@@ -4,18 +4,22 @@ import { Process } from "../data/models/Valueflows/Plan";
 import { EconomicEvent, EconomicEvents, EconomicResource, EconomicResources } from "../data/models/Valueflows/Observation";
 import { EconomicResourceShape } from "../types/valueflows";
 
-type ResourcePair = [EconomicResource, EconomicResource];
-type ResourceSpecifications = Record<string, ResourceSpecification>;
-type SyntheticKey = string;
-type ResourcePool = Record<SyntheticKey, EconomicResource>;
-type ConformsTo = string;
-type ResourcePools = Record<ConformsTo, ResourcePool>;
+//// SINGLE EVENT ACCOUNTING ////////////////////////////////////////////////////
 
-const quantityEffects: Record<QuantityEffect, (field: 'accountingQuantity' | 'onhandQuantity', resource: EconomicResource, toResource: EconomicResource, event: EconomicEvent) => void> = {
-  'decrement': (field, resource, toResource, event) => {
+type ResourcePair = [EconomicResource, EconomicResource];
+type QuantityEffectMethod = (field: 'accountingQuantity' | 'onhandQuantity', resource: EconomicResource, toResource: EconomicResource, event: EconomicEvent) => void;
+type QuantityEffectMethods = Record<QuantityEffect, QuantityEffectMethod>;
+
+/**
+ * This takes care of the adjustments made to the values of the resources.
+ * This mutates the values in place, so clone before passing in to avoid carrying
+ * out accidental mutations to the current store state.
+ */
+const quantityEffects: QuantityEffectMethods = {
+  'decrement': (field, resource, _, event) => {
     resource[field].hasNumericalValue -= event.resourceQuantity.hasNumericalValue;
   },
-  'increment': (field, resource, toResource, event) => {
+  'increment': (field, resource, _, event) => {
     resource[field].hasNumericalValue += event.resourceQuantity.hasNumericalValue;
   },
   'decrementIncrement': (field, resource, toResource, event) => {
@@ -24,6 +28,14 @@ const quantityEffects: Record<QuantityEffect, (field: 'accountingQuantity' | 'on
   }
 }
 
+/**
+ * This applies the full set of adjustments specified by an EconomicEvent to a
+ * pair of EconomicResources: [resourceInventoriedAs, toResourceInventoriedAs],
+ * which correspond to the EconomicResources specified by the EconomicEvent.
+ *
+ * This is broken up this way, so this code doesn't need to focus on fetching any
+ * data, but rather acts directly upon the objects provided.
+ */
 export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
   const store = getDataStore();
 
@@ -33,28 +45,23 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
   // Note: corresponds with [ resourceInventoriedAs, toResourceInventoriedAs ]
   const [resource, toResource] = resources;
 
+  // Adjust accounting quantities
   if (action.accountingEffect) {
     quantityEffects[action.accountingEffect]('accountingQuantity', resource, toResource, event);
   }
 
+  // Adjust onhand quantities
   if (action.onhandEffect) {
-    quantityEffects[action.accountingEffect]('onhandQuantity', resource, toResource, event);
+    quantityEffects[action.onhandEffect]('onhandQuantity', resource, toResource, event);
   }
 
+  // Adjust the location
   if (action.locationEffect) {
-    switch (action.locationEffect) {
-      case 'new':
-        resource.currentLocation = event.atLocation;
-        break;
-      case 'update':
-        resource.currentLocation = event.atLocation;
-        break;
-      case 'updateTo':
-        toResource.currentLocation = event.atLocation;
-        break;
-    }
+    if (action.locationEffect === 'new' || action.locationEffect === 'update') resource.currentLocation = event.atLocation;
+    if (action.locationEffect === 'updateTo') toResource.currentLocation = event.atLocation;
   }
 
+  // Adjust containedIn
   if (action.containedEffect) {
     if (action.containedEffect === 'update') {
       resource.containedIn = event.toResourceInventoriedAs;
@@ -64,6 +71,7 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
     }
   }
 
+  // Adjust primary accountable
   if (action.accountableEffect) {
     if (action.accountableEffect === 'new') {
       resource.primaryAccountable = event.receiver;
@@ -73,6 +81,7 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
     }
   }
 
+  // Adjust stage
   if (action.stageEffect) {
     if (action.stageEffect === 'stage') {
       const processes: Record<string, Process> = store.getCursor(`root.plan.${store.getCurrentPlanId()}.process`);
@@ -81,6 +90,7 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
     }
   }
 
+  // Adjust state
   if (action.stateEffect) {
     if (action.stateEffect === 'update') {
       resource.state = event.state;
@@ -91,18 +101,33 @@ export function applyEvent(event: EconomicEvent, resources: ResourcePair) {
   }
 }
 
+//// MULTIPLE EVENT ACCOUNTING //////////////////////////////////////////////////
+
+type ResourceSpecificationIndex = Record<string, ResourceSpecification>;
+type EconomicResourceIndex = Record<string, EconomicResource>;
+type EconomicResourcePools = Record<string, EconomicResource>;
+type ConformsTo = string;
+type EconomicResourceIndicesByResourceSpecification = Record<ConformsTo, EconomicResourcePools>;
+
 /**
- * We sort the set of EconomicResource[] into groupings by ResourceSpecification (conformsTo).
- * Each of these groupings is a EconomicResource pool (called resourcePool below).
- * Then we index by EconomicResource.syntheticKey (which is our own proprietary extension).
- * These Record structs indexed by ResourceSpecification are the pools of EconomicResources (called resourcePools below).
+ * This function sorts things so we can find things in linear time when we
+ * actually start doing the accounting process.
  *
- * An EconomicEvent acts on a pool of EconomicResources. Each pool conforms to a certain ResourceSpecification.
- * Essentially, an EconomicEvent takes a pool of EconomicResources and returns a new pool of EconomicResources.
- * In this instance, we're just modifying objects in place.
+ * We create two indices in one pass of the list of resources passed in:
+ * - resourcePools: an two dimensional index grouped by conformsTo then grouped
+ *   by synthetcKey, with an array of EconomicResources who's synthicKeys all
+ *   collide.
+ * - resourceIndex: each EconomicResource is indexed by id
+ *
+ * Additionally, we clone each of the objects so the accounting algorithm can
+ * modify the cloned objects in place.
  */
-export function createResourcePools(resourceSpecifications: ResourceSpecifications, economicResources: EconomicResources): ResourcePools {
-  const resourcePools: ResourcePools = {};
+export function createResourcePools(
+  resourceSpecifications: ResourceSpecificationIndex,
+  economicResources: EconomicResources
+): [EconomicResourceIndex, EconomicResourceIndicesByResourceSpecification] {
+  const resourcePools: EconomicResourceIndicesByResourceSpecification = {};
+  const resourceIndex: EconomicResourceIndex = {};
 
   // Initialize all resource pools from resource specifications
   Object.values(resourceSpecifications).forEach((spec) => {
@@ -112,20 +137,22 @@ export function createResourcePools(resourceSpecifications: ResourceSpecificatio
   });
 
   // populate the resourcePools with clones of original data
-  economicResources.forEach((resource)=>{
+  economicResources.forEach((resource) => {
     const resourceConformsTo = resource.conformsTo;
-    const sKey = resource.syntheticKey;
-    resourcePools[resourceConformsTo][sKey] = new EconomicResource(resource);
+    const clonedResource = new EconomicResource(resource);
+    resourceIndex[resource.id] = clonedResource;
+    if (!Object.hasOwn(resourcePools[resourceConformsTo], resource.syntheticKey)) {
+      resourcePools[resourceConformsTo][resource.syntheticKey] = clonedResource;
+    }
   });
-
-  return resourcePools;
+  return [resourceIndex, resourcePools];
 }
 
 /**
  * This creates very bland generic versions of [resourceInventoriedAs, toResourceInventoriedAs]
- * for simulations of events without user input.
+ * for simulations of events without full user input.
  */
-export function createResourceAndToResourceShapes(resourceSpecifications: ResourceSpecifications, economicEvent: EconomicEvent) {
+export function createResourceAndToResourceShapes(resourceSpecifications: ResourceSpecificationIndex, economicEvent: EconomicEvent) {
   const {
     resourceInventoriedAs,
     toResourceInventoriedAs,
@@ -161,31 +188,44 @@ export function createResourceAndToResourceShapes(resourceSpecifications: Resour
 
 /**
  * This function does accounting given a set of EconomicEvents and a set of EconomicResources.
+ *
+ * Real accounting would be done by applying the effect of the last created EconomicEvent to
+ * the pair of EconomicResources specified in the EconomicEvent. Since we have no way of ensuring
+ * we haven't applied the accounting twice, we are reckoning from the begining of history in the
+ * playspace. For now, this is fine since no one has billions of EconomicEvents yet. However,
+ * it means we still need to implement a way of tracking which events have been applied. This
+ * can be accomplished in many way. One way is by querying the backend to see what it's state
+ * is, or by just storing the point in time from which the user started editing and only doing
+ * the the reckoning from that point forward.
  */
 export function simulateAccounting(economicResources: EconomicResources, economicEvents: EconomicEvents): EconomicResources {
   const store = getDataStore();
-  const resourceSpecifications: ResourceSpecifications = store.getCursor('root.resourceSpecification');
-  const resourcePools: ResourcePools = createResourcePools(resourceSpecifications, economicResources);
+  const resourceSpecifications: ResourceSpecificationIndex = store.getCursor('root.resourceSpecification');
+  const [economicResourceIndex, economicResourcePools] = createResourcePools(resourceSpecifications, economicResources);
 
   // Sort events by time of creation, but topological ordering is preferable
   const sortedEvents = economicEvents.sort((a, b) => +a.created - +b.created);
 
   // Iterate over events creating simulated resources
   sortedEvents.forEach(event => {
-    const {
-      resourceConformsTo: conformsTo,
-      resourceInventoriedAs: resourceId,
-      toResourceInventoriedAs: toResourceId,
-      state, // try with the state, then without the state
-      inputOf,
-      outputOf
-    } = event;
 
     /**
-     * Let's ignore this for now in a simulation,
-     * we have to traverse the graph to get the correct answers for this.
-     * In real life, the operator (user) will select the resource with the
-     * correct state.
+     * An EconomicEvent acts on a pool of EconomicResources. Each pool conforms
+     * to a certain ResourceSpecification. Essentially, an EconomicEvent takes a
+     * pool of EconomicResources and returns a new pool of EconomicResources.
+     *
+     * When a pair of [resourceInventoriedAs, toResourceInventoriedAs] are speci-
+     * -fied in the EconomicEvent, they should be used to override the simulation.
+     *
+     * If they are not present, we just simulate the presence of the resources by
+     * creating a sytheticKey from the information provided in the event. This is
+     * not perfect, but it does allow us to get accurate accounting from a list
+     * of incompletely filled out events. I'm using this as a potential sanity
+     * check for the event forms.
+     *
+     * There a few issues immediately visible. For one, we don't know what state
+     * the input should be in. We also don't know what stage the input will be
+     * in, but we have all the information to figure it out:
      *
      * +---------+              +-----------+              +---------+
      * | Event 1 |      =>      | Process 1 |      =>      | Event 2 |
@@ -194,36 +234,53 @@ export function simulateAccounting(economicResources: EconomicResources, economi
      *
      * resource with
      * possible stage form p0   basedOn            =>      resourceInventoriedAs.stage
+     *
+     * Let's ignore this for now in a simulation, since we'll have to traverse
+     * the graph to get the correct answers for this. In real life, the operator
+     * (user) will select the resource with the correct stage and state.
      */
 
-    const [economicResourceShape, toEconomicResourceShape] = createResourceAndToResourceShapes(resourceSpecifications, event);
+    const {
+      resourceConformsTo: conformsTo,
+      resourceInventoriedAs: resourceId,
+      toResourceInventoriedAs: toResourceId,
+      state,
+      inputOf,
+      outputOf
+    } = event;
 
+    const [economicResourceShape, toEconomicResourceShape] = createResourceAndToResourceShapes(resourceSpecifications, event);
     const synthKey = EconomicResource.getSytheticKey(economicResourceShape);
     const toSynthKey = EconomicResource.getSytheticKey(toEconomicResourceShape);
 
-    // Synthesize
-    if (!Object.hasOwn(resourcePools[conformsTo], synthKey)){
-      resourcePools[conformsTo][synthKey] = new EconomicResource(economicResourceShape);
-    }
-    if (!Object.hasOwn(resourcePools[conformsTo], toSynthKey)) {
-      resourcePools[conformsTo][toSynthKey] = new EconomicResource(toEconomicResourceShape);
-    }
+    // Either grab the resource corresponding to the [resourceInventoriedAs, toResourceInventoriedAs] pair, or generate new ones.
+    let resource = economicResourceIndex[resourceId] ? economicResourceIndex[resourceId] : new EconomicResource(economicResourceShape);
+    let toResource = economicResourceIndex[toResourceId] ? economicResourceIndex[toResourceId] : new EconomicResource(toEconomicResourceShape);
 
-    // Debug
-    if (resourcePools[conformsTo][synthKey].id != resourceId) {
-      console.log(`toResourceInventoriedAs mismatch, provided: ${resourceId}; computed: ${resourcePools[conformsTo][synthKey].id}`)
+    if (!Object.hasOwn(economicResourcePools[conformsTo], synthKey)) {
+      economicResourcePools[conformsTo][synthKey] = resource;
+    } else {
+      if (economicResourcePools[conformsTo][synthKey].id === resource.id) {
+        console.info(`EconomicResource ${resource.id} already in resource pool.`);
+      } else {
+        console.warn(`Conflict between ${resource.id} and ${economicResourcePools[conformsTo][synthKey].id}.`);
+      }
     }
-    if (resourcePools[conformsTo][toSynthKey].id != toResourceId) {
-      console.log(`toResourceInventoriedAs mismatch, provided: ${toResourceId}; computed: ${resourcePools[conformsTo][toSynthKey].id}`)
+    if (!Object.hasOwn(economicResourceIndex, resource.id)) economicResourceIndex[resource.id] = resource
+    if (!Object.hasOwn(economicResourcePools[conformsTo], toSynthKey)) {
+      economicResourcePools[conformsTo][toSynthKey] = toResource;
+    } else {
+      if (economicResourcePools[conformsTo][toSynthKey].id === toResource.id) {
+        console.info(`EconomicResource ${toResource.id} already in resource pool.`);
+      } else {
+        console.warn(`Conflict between ${toResource.id} and ${economicResourcePools[conformsTo][toSynthKey].id}.`);
+      }
     }
+    if (!Object.hasOwn(economicResourceIndex, toResource.id)) economicResourceIndex[toResource.id] = toResource
 
-    applyEvent(event, [resourcePools[conformsTo][synthKey], resourcePools[conformsTo][toSynthKey]])
+    applyEvent(event, [resource, toResource]);
   });
 
-  let simulatedResources: EconomicResources = [];
-  for (let conformsTo in resourcePools) {
-    const resources = Object.values(resourcePools[conformsTo]);
-    simulatedResources = simulatedResources.concat(resources.filter((resource) => resource.accountingQuantity.hasNumericalValue != 0));
-  }
-  return simulatedResources;
+  // Return the modified objects from the index
+  return Object.values(economicResourceIndex).filter((resource) => resource.accountingQuantity.hasNumericalValue != 0);
 }
