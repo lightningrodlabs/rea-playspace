@@ -380,7 +380,7 @@ export interface ActionShape {
 }
 
 export interface HasAction {
-  action: ActionKey | ActionShape;
+  action: ActionKey;
 }
 
 /**
@@ -393,6 +393,7 @@ export class Action implements PathedData, ActionShape {
   label: string;
   eventQuantity: EventQuantity;
   inputOutput: InputOutput;
+  createResource?: CreateResource;
   accountingEffect?: AccountingEffect;
   onhandEffect?: OnHandEffect;
   pairsWith?: PairsWith;
@@ -417,6 +418,11 @@ export class Action implements PathedData, ActionShape {
 
   get path(): string {
     return Action.getPath(this.id);
+  }
+
+  get hasIncrementDecrement(): boolean {
+    return (this.accountingEffect && this.accountingEffect === 'decrementIncrement') ||
+           (this.onhandEffect && this.onhandEffect === 'decrementIncrement')
   }
 
   public toJSON(): ActionShape {
@@ -479,6 +485,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Produce',
     eventQuantity: 'resource',
     inputOutput: 'output',
+    createResource: 'optional',
     accountingEffect: 'increment',
     onhandEffect: 'increment',
     locationEffect: 'new',
@@ -499,6 +506,7 @@ export const Actions: Record<ActionKey, Action> = {
     id: 'lower',
     label: 'Lower',
     eventQuantity: 'resource',
+    createResource: 'optional',
     onhandEffect: 'decrement',
     accountingEffect: 'decrement',
     accountableEffect: 'new',
@@ -509,6 +517,7 @@ export const Actions: Record<ActionKey, Action> = {
     id: 'raise',
     label: 'Raise',
     eventQuantity: 'resource',
+    createResource: 'optional',
     onhandEffect: 'increment',
     accountingEffect: 'increment',
     accountableEffect: 'new',
@@ -547,6 +556,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Move',
     eventQuantity: 'resource',
     inputOutput: 'na',
+    createResource: 'optionalTo',
     accountingEffect: 'decrementIncrement',
     onhandEffect: 'decrementIncrement',
     locationEffect: 'updateTo',
@@ -558,6 +568,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Transfer all rights',
     eventQuantity: 'resource',
     inputOutput: 'na',
+    createResource: 'optionalTo',
     accountingEffect: 'decrementIncrement',
     accountableEffect: 'updateTo',
     stateEffect: 'updateTo',
@@ -568,6 +579,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Transfer',
     eventQuantity: 'resource',
     inputOutput: 'na',
+    createResource: 'optionalTo',
     onhandEffect: 'decrementIncrement',
     accountingEffect: 'decrementIncrement',
     locationEffect: 'update',
@@ -580,6 +592,7 @@ export const Actions: Record<ActionKey, Action> = {
     label: 'Transfer custody',
     eventQuantity: 'resource',
     inputOutput: 'na',
+    createResource: 'optionalTo',
     onhandEffect: 'decrementIncrement',
     locationEffect: 'updateTo',
     stateEffect: 'updateTo',

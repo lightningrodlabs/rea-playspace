@@ -83,8 +83,8 @@ export interface CommitmentShape extends HasIdDate, HasTime, HasAction, ReaBase 
 export interface EconomicResourceShape extends HasIdDate {
   name: string;
   conformsTo: string;         // ResourceSpecification
-  primaryAccountable: string; // Agent ID of the accountable party
-  trackingIndentifier?: string;
+  primaryAccountable?: string; // Agent ID of the accountable party
+  trackingIdentifier?: string;
   onhandQuantity?: MeasurementShape;
   accountingQuantity?: MeasurementShape;
   currentLocation?: GeoDataShape;
@@ -107,6 +107,7 @@ export interface EconomicEventShape extends HasIdDate, HasTime, HasAction, ReaBa
   state?: string;
   resourceInventoriedAs?: string;
   toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as.
+  newInventoriedResource?: EconomicResourceShape; // For compatibililty with hREA, used to pass the parameters for a new EconomicResource in one request
   inputOf?: string | ProcessShape;
   outputOf?: string | ProcessShape;
 }

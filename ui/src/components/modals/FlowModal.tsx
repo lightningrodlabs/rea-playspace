@@ -2,12 +2,11 @@ import { SlButton, SlButtonGroup, SlCheckbox, SlDivider, SlIcon, SlIconButton, S
 import React, { useEffect, useState, useRef } from 'react';
 import { PathedData } from '../../data/models/PathedData';
 import { Action, ActionKey, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
-import { CommitmentShape, EconomicEventShape, FlowShape } from '../../types/valueflows';
+import { CommitmentShape, EconomicEventShape, EconomicResourceShape, FlowShape } from '../../types/valueflows';
 import { Commitment } from '../../data/models/Valueflows/Plan';
 import { EconomicEvent, EconomicResource } from '../../data/models/Valueflows/Observation';
 import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
-import EconomicResourceInput from '../input/EconomicResource';
 import {
   flowDefaults,
   getEventDefaultsFromCommitment,
@@ -258,23 +257,6 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     }
   };
 
-  // === RESOURCE FORM ===
-  /**
-  * Form for economic resource if a new Resource is to be created
-  */
-  // const economicResourceForm = () => {
-  //   return <>
-  //     <SlIconButton onClick={resetResourceState} name="chevron-left" label="Cancel. Go Back."></SlIconButton>
-  //     <h4 className='panel-heading'>Economic Resource</h4>
-  //     <EconomicResourceInput
-  //       conformingResource={getConformingResource(editCommitment)}
-  //       resetResourceState={resetResourceState}
-  //       afterHandleResourceSubmit={afterHandleResourceSubmit}
-  //       agents={agents}
-  //     ></EconomicResourceInput>
-  //   </>;
-  // };
-
   // === TOP LEVEL MODAL INNARDS ===
 
   // This modifies the editCommitment directly because this is not in the Commitment form
@@ -381,6 +363,18 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
       ) {
         // If it was changed
         if (objectsDiff(store.getCursor(event.path), event)) {
+          if (event.newInventoriedResource) {
+            console.log(event.newInventoriedResource);
+            const newInventoriedResource = store.upsert<EconomicResourceShape, EconomicResource>(event.newInventoriedResource, EconomicResource);
+            // need to figure out which field we're putting the new object on from action.createResource
+            const action = actions.find((act) => act.id === event.action);
+            if (action.createResource === 'optional') {
+              event.resourceInventoriedAs = newInventoriedResource.id;
+            } else if (action.createResource === 'optionalTo') {
+              event.toResourceInventoriedAs = newInventoriedResource.id;
+            }
+            delete event.newInventoriedResource;
+          }
           // Store the object
           const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(event, EconomicEvent);
           // Ensure it gets passed back to the DisplayEdge

@@ -17,14 +17,14 @@ type QuantityEffectMethods = Record<QuantityEffect, QuantityEffectMethod>;
  */
 const quantityEffects: QuantityEffectMethods = {
   'decrement': (field, resource, _, event) => {
-    resource[field].hasNumericalValue -= event.resourceQuantity.hasNumericalValue;
+    resource !== null && (resource[field].hasNumericalValue -= event.resourceQuantity.hasNumericalValue);
   },
   'increment': (field, resource, _, event) => {
-    resource[field].hasNumericalValue += event.resourceQuantity.hasNumericalValue;
+    resource !== null && (resource[field].hasNumericalValue += event.resourceQuantity.hasNumericalValue);
   },
   'decrementIncrement': (field, resource, toResource, event) => {
-    resource && (resource[field].hasNumericalValue -= event.resourceQuantity.hasNumericalValue);
-    toResource && (toResource[field].hasNumericalValue += event.resourceQuantity.hasNumericalValue);
+    resource !== null && (resource[field].hasNumericalValue -= event.resourceQuantity.hasNumericalValue);
+    toResource !== null && (toResource[field].hasNumericalValue += event.resourceQuantity.hasNumericalValue);
   }
 }
 
@@ -43,23 +43,27 @@ export function applyEvent(event: EconomicEvent, action: Action, resources: Reso
   const [resource, toResource] = resources;
 
   // Adjust accounting quantities
-  if (action.accountingEffect) {
+  if (event.resourceQuantity && action.accountingEffect) {
     quantityEffects[action.accountingEffect]('accountingQuantity', resource, toResource, event);
   }
 
   // Adjust onhand quantities
-  if (action.onhandEffect) {
+  if (event.resourceQuantity && action.onhandEffect) {
     quantityEffects[action.onhandEffect]('onhandQuantity', resource, toResource, event);
   }
 
   // Adjust the location
-  if (action.locationEffect) {
-    if (action.locationEffect === 'new' || action.locationEffect === 'update') resource.currentLocation = event.atLocation;
-    if (action.locationEffect === 'updateTo') toResource.currentLocation = event.atLocation;
+  if (event.toLocation && action.locationEffect) {
+    if (resource !== null && action.locationEffect === 'new' || action.locationEffect === 'update') {
+      resource.currentLocation = event.toLocation;
+    }
+    if (toResource !== null && action.locationEffect === 'updateTo') {
+      toResource.currentLocation = event.toLocation;
+    }
   }
 
   // Adjust containedIn
-  if (action.containedEffect) {
+  if (resource !== null && action.containedEffect) {
     if (action.containedEffect === 'update') {
       resource.containedIn = event.toResourceInventoriedAs;
     }
@@ -69,29 +73,26 @@ export function applyEvent(event: EconomicEvent, action: Action, resources: Reso
   }
 
   // Adjust primary accountable
-  if (action.accountableEffect) {
-    if (action.accountableEffect === 'new') {
+  if (event.receiver && action.accountableEffect) {
+    if (resource !== null && action.accountableEffect === 'new') {
       resource.primaryAccountable = event.receiver;
     }
-    if (action.accountableEffect === 'updateTo') {
+    if (toResource !== null && action.accountableEffect === 'updateTo') {
       toResource.primaryAccountable = event.receiver;
     }
   }
 
   // Adjust stage
-  if (action.stageEffect) {
-    if (action.stageEffect === 'stage') {
-      const processSpecificationId = processes[event.outputOf].basedOn;
-      resource.stage = processSpecificationId;
-    }
+  if (resource !== null && event.outputOf && action.stageEffect && action.stageEffect === 'stage') {
+      resource.stage = processes[event.outputOf].basedOn;
   }
 
   // Adjust state
-  if (action.stateEffect) {
-    if (action.stateEffect === 'update') {
+  if (event.state && action.stateEffect) {
+    if (resource !== null && action.stateEffect === 'update') {
       resource.state = event.state;
     }
-    if (action.stateEffect === 'updateTo') {
+    if (toResource !== null && action.stateEffect === 'updateTo') {
       toResource.state = event.state;
     }
   }
@@ -201,7 +202,7 @@ export function simulateAccounting(economicResources: EconomicResources, economi
   const [economicResourceIndex, economicResourcePools] = createResourcePools(resourceSpecifications, economicResources);
 
   // Sort events by time of creation, but topological ordering is preferable
-  const sortedEvents = economicEvents.sort((a, b) => +a.created - +b.created);
+  const sortedEvents = economicEvents.sort((a, b) => +b.created - +a.created);
 
   // Iterate over events creating simulated resources
   sortedEvents.forEach(event => {
@@ -235,6 +236,16 @@ export function simulateAccounting(economicResources: EconomicResources, economi
      * Let's ignore this for now in a simulation, since we'll have to traverse
      * the graph to get the correct answers for this. In real life, the operator
      * (user) will select the resource with the correct stage and state.
+     *
+     * /-------------------------\        /---------------------------\        /-------------------------\
+     * | Resource A              |        | EconomicEvent             |        | Resource B              |
+     * +-------------------------+        +---------------------------+        +-------------------------+
+     * | conformsTo: R           |        | resourceConformsTo: R     |        | conformsTo: R           |
+     * | currentLocation: AT     |        | atLocation: AT            |        | currentLocation: TO     |
+     * | primaryAccountable: PRO |        | toLocation: TO            |        | primaryAccountable: REC |
+     * \-------------------------/        | provider: PRO             |        \-------------------------/
+     *                                    | receiver: REC             |
+     *                                    \---------------------------/
      */
 
     const {
@@ -255,37 +266,43 @@ export function simulateAccounting(economicResources: EconomicResources, economi
     const toSynthKey = EconomicResource.getSytheticKey(toEconomicResourceShape);
 
     /**
-     * Either grab the resource corresponding to the [resourceInventoriedAs,
-     * toResourceInventoriedAs] pair, or generate new ones.
-     * XXX: Is this correct? In real accounting, we would fail if there we no
-     * resource id, we should technically validate these based on
-     * action.createResource
+     * We should only create a resource when Action.createResource allows us to
+     * AND when the resource does not occur in a resource pool.
      *
      * See: https://github.com/lightningrodlabs/rea-playspace/issues/84#issuecomment-1257156262
      */
-    let resource = economicResourceIndex[resourceId] ? economicResourceIndex[resourceId] : new EconomicResource(economicResourceShape);
-    let toResource = economicResourceIndex[toResourceId] ? economicResourceIndex[toResourceId] : new EconomicResource(toEconomicResourceShape);
 
-    if (!Object.hasOwn(economicResourcePools[conformsTo], synthKey)) {
-      economicResourcePools[conformsTo][synthKey] = resource;
-    } else {
-      if (economicResourcePools[conformsTo][synthKey].id === resource.id) {
-        console.info(`EconomicResource ${resource.id} already in resource pool.`);
+    const newResource = (action.createResource && action.createResource == 'optional' && resourceId == null && toResourceId == null) ?
+      new EconomicResource(economicResourceShape) : null;
+    const newToResource = (action.createResource && action.createResource == 'optionalTo') ?
+      new EconomicResource(toEconomicResourceShape) : null;
+    const resource = economicResourceIndex[resourceId] ? economicResourceIndex[resourceId] : newResource;
+    const toResource = economicResourceIndex[toResourceId] ? economicResourceIndex[toResourceId] : newToResource;
+
+    if(resource !==null) {
+      if (!Object.hasOwn(economicResourcePools[conformsTo], synthKey)) {
+        economicResourcePools[conformsTo][synthKey] = resource;
       } else {
-        console.warn(`Conflict between ${resource.id} and ${economicResourcePools[conformsTo][synthKey].id}.`);
+        if (economicResourcePools[conformsTo][synthKey].id === resource.id) {
+          console.info(`EconomicResource ${resource.id} already in resource pool.`);
+        } else {
+          console.warn(`Conflict between ${resource.id} and ${economicResourcePools[conformsTo][synthKey].id}.`);
+        }
       }
+      if (!Object.hasOwn(economicResourceIndex, resource.id)) economicResourceIndex[resource.id] = resource;
     }
-    if (!Object.hasOwn(economicResourceIndex, resource.id)) economicResourceIndex[resource.id] = resource
-    if (!Object.hasOwn(economicResourcePools[conformsTo], toSynthKey)) {
-      economicResourcePools[conformsTo][toSynthKey] = toResource;
-    } else {
-      if (economicResourcePools[conformsTo][toSynthKey].id === toResource.id) {
-        console.info(`EconomicResource ${toResource.id} already in resource pool.`);
+    if (toResource !== null) {
+      if (!Object.hasOwn(economicResourcePools[conformsTo], toSynthKey)) {
+        economicResourcePools[conformsTo][toSynthKey] = toResource;
       } else {
-        console.warn(`Conflict between ${toResource.id} and ${economicResourcePools[conformsTo][toSynthKey].id}.`);
+        if (economicResourcePools[conformsTo][toSynthKey].id === toResource.id) {
+          console.info(`EconomicResource ${toResource.id} already in resource pool.`);
+        } else {
+          console.warn(`Conflict between ${toResource.id} and ${economicResourcePools[conformsTo][toSynthKey].id}.`);
+        }
       }
+      if (!Object.hasOwn(economicResourceIndex, toResource.id)) economicResourceIndex[toResource.id] = toResource;
     }
-    if (!Object.hasOwn(economicResourceIndex, toResource.id)) economicResourceIndex[toResource.id] = toResource
 
     applyEvent(event, action, [resource, toResource], processes);
   });

@@ -15,7 +15,7 @@ const initialState: EconomicResourceShape = {
   name: '',
   conformsTo: '',        // ResourceSpecification
   primaryAccountable: '', // Agent ID of the accountable party
-  trackingIndentifier: '', // GUID?
+  trackingIdentifier: '', // GUID?
   currentLocation: null,
   note: '',
   classifiedAs: '',
@@ -29,11 +29,11 @@ const initialState: EconomicResourceShape = {
 
 const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResource, agents, name: fieldName, onChange }) => {
   const [
-    {name, conformsTo, primaryAccountable, trackingIndentifier, currentLocation, note, classifiedAs, image, unitOfEffort, state, stage, containedIn, lot}, setState
+    {name, conformsTo, primaryAccountable, trackingIdentifier, currentLocation, note, classifiedAs, image, unitOfEffort, state, stage, containedIn, lot}, setState
   ] = useState({ ...initialState });
 
   useEffect(()=>{
-    setState(prevState => ({ ...prevState, resourceState }));
+    setState(prevState => ({ ...prevState, ...resourceState, conformsTo: conformingResource.id }));
   },[]);
 
   const onSlChange = slChangeConstructor<EconomicResourceShape>(fieldName, onChange, setState);
@@ -44,7 +44,7 @@ const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResou
       <br />
       <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name} onSlInput={onSlChange}></SlInput>
       <br/ >
-      <SlInput label="Tracking Identifier" name="trackingIdentifier" value={trackingIndentifier} onSlInput={onSlChange}></SlInput>
+      <SlInput label="Tracking Identifier" name="trackingIdentifier" value={trackingIdentifier} onSlInput={onSlChange}></SlInput>
       <br/ >
       <SlSelect placeholder="Select Primary Accountable" label="Primary Accountable" name='primaryAccountable' value={primaryAccountable ? primaryAccountable as string : null} onSlChange={onSlChange} clearable required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
@@ -59,6 +59,7 @@ const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResou
         name='note'
         // @ts-ignore
         value={note}
+        onSlInput={onSlChange}
       ></SlTextarea>
     </>
   );
