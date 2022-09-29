@@ -1,7 +1,7 @@
 import { Guid } from "guid-typescript";
 import { PathedData } from "../PathedData";
 import { NamedData } from "../NamedData";
-import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape, MeasurementShape } from "../../../types/valueflows";
+import { GeoDataShape, EconomicResourceShape, EconomicEventShape, FulfillmentShape } from "../../../types/valueflows";
 import { assignFields, toJSON } from '../../utils';
 import { ActionKey, GeoData, Measurement } from "./Knowledge";
 
@@ -11,7 +11,7 @@ export class EconomicResource implements EconomicResourceShape, PathedData, Name
   name: string;
   conformsTo: string;         // ResourceSpecification
   primaryAccountable: string; // Agent ID of the accountable party
-  trackingIndentifier: string;
+  trackingIdentifier: string;
   onhandQuantity?: Measurement;
   accountingQuantity?: Measurement;
   currentLocation?: GeoDataShape;
@@ -77,6 +77,7 @@ export class EconomicEvent implements EconomicEventShape {
   receiver: string;                 // Agent ID
   resourceInventoriedAs?: string;   // EconomicResource ID
   toResourceInventoriedAs?: string; // EconomicResource ID that the transfer will be inventoried as on the receiving side.
+  newInventoriedResource?: EconomicResourceShape;
   inputOf?: string;                 // Process ID
   outputOf?: string;                // Process ID
   atLocation?: GeoDataShape;        // Source Location

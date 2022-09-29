@@ -18,7 +18,7 @@ const ResourceLedgerTableRow: React.FC<Props> = ({economicResource, agents, reso
       name,
       conformsTo,      // ResourceSpecification
       primaryAccountable, // Agent ID of the accountable party
-      trackingIndentifier,
+      trackingIdentifier: trackingIndentifier,
       onhandQuantity,
       accountingQuantity,
       currentLocation,

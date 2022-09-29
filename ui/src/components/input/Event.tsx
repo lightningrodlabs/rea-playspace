@@ -1,4 +1,4 @@
-import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlDivider, SlInput, SlMenuItem, SlSelect, SlSwitch, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { EconomicEventShape, ResourceSpecificationShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
@@ -9,7 +9,8 @@ import { usePath } from '../../data/YatiReactHook';
 import getDataStore from '../../data/DataStore';
 import { getAllowedActions } from '../../logic/flows';
 import { simulateAccounting } from '../../logic/accounting';
-import { Action, Agent, Unit } from '../../data/models/Valueflows/Knowledge';
+import { Action, EventQuantity, Agent, Unit, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
+import EconomicResourceInput from './EconomicResource';
 
 interface Props {
   eventState: EconomicEventShape;
@@ -26,8 +27,9 @@ const initialState: EconomicEventShape = {
   receiver: '',               // Needed: Agent ID
   inputOf: '',                // Process ID
   outputOf: '',               // Process ID
-  resourceInventoriedAs: '',  // EconomicResource ID,  not yet implemented, but will be soon
-  toResourceInventoriedAs: '',// EconomicResource ID,  not yet implemented, but will be soon
+  resourceInventoriedAs: '',  // EconomicResource ID
+  toResourceInventoriedAs: '',// EconomicResource ID
+  newInventoriedResource: null,
   resourceConformsTo: '',     // ResourceSpecification ID
   resourceQuantity: null,     // Need to have one of these (either resourceQuantity or effortQuantity) that match the ResourceSpecification.
   effortQuantity: null,
@@ -53,6 +55,10 @@ const EventInput: React.FC<Props> = ({
 }) => {
   const [
     {
+      resourceConformsTo,
+      resourceInventoriedAs,
+      toResourceInventoriedAs,
+      newInventoriedResource,
       action,
       provider,
       receiver,
@@ -65,62 +71,82 @@ const EventInput: React.FC<Props> = ({
     }, setState
   ] = useState({...initialState});
 
-  const [resourceQuantityVisible, setresourceQuantityVisible] = useState<boolean>(false);
+  const [resourceQuantityVisible, setResourceQuantityVisible] = useState<boolean>(false);
   const [effortQuantityVisible, setEffortQuantityVisible] = useState<boolean>(false);
   const [units, setUnits] = useState<Unit[]>([]);
   const [actions, setActions] = useState<Action[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [economicResources, setEconomicResources] = useState<Array<EconomicResource>>([]);
-  // All existing resources plus one that would be created from the current Event form
-  const [economicResourcesPotential, setEconomicResourcesPotential] = useState<Array<EconomicResource>>([]);
+
+  // EconomicResource Selection and Creation Management code
+  type ResourceOption = 'neither' | 'resource' | 'toResource' | 'both';
+  const [resourceVisibility, setResourceVisibility] = useState<ResourceOption>('resource');
+  const [canCreate, setCanCreate] = useState<ResourceOption>('neither');
+  const [selectableEconomicResources, setSelectableEconomicResources] = useState<Array<EconomicResource>>([]);
 
   const store = getDataStore();
-  const actionMap = usePath('root.action', store);
-  const unitMap = usePath('root.unit', store);
-  const agentMap = usePath('root.agent', store);
-  const economicResourcesRaw = usePath(`root.economicResource`, store);
-  const economicEvents = usePath(`root.economicEvent`, store);
+  const actionMap: Record<EventQuantity, Action> = usePath('root.action', store);
+  const unitMap: Record<string, Unit> = usePath('root.unit', store);
+  const agentMap: Record<string, Agent> = usePath('root.agent', store);
+  const resourceSpecificationMap: Record<string, ResourceSpecification> = usePath('root.resourceSpecification', store);
+  const economicResourcesRaw: Record<string, EconomicResource> = usePath(`root.economicResource`, store);
+  const economicEvents: Record<string, EconomicEvent> = usePath(`root.economicEvent`, store);
+
+  const quantityVisibilityMethods: Record<EventQuantity, () => void> = {
+    'resource': () => {
+      setResourceQuantityVisible(true);
+      setEffortQuantityVisible(false);
+    },
+    'effort': () => {
+      setResourceQuantityVisible(false);
+      setEffortQuantityVisible(true);
+    },
+    'both': () => {
+      setResourceQuantityVisible(true);
+      setEffortQuantityVisible(true);
+    }
+  }
 
   useEffect(() => {
     setState(prevState => {
       return {...prevState, ...eventState };
     });
+    const resources = Object.values(economicResourcesRaw).filter((x) => x.conformsTo == conformingResource.id);
+    setSelectableEconomicResources(resources);
+    setActions(getAllowedActions(eventState, Object.values(actionMap)));
+    setAgents(Object.values(agentMap));
+    setUnits(Object.values(unitMap));
   }, []);
 
   useEffect(() => {
-    setActions(getAllowedActions(eventState, Object.values(actionMap)));
-  }, [actionMap]);
+    // Set the visibility of the different Measurement input controls
+    const currentAction: Action = actionMap[action];
+    quantityVisibilityMethods[currentAction.eventQuantity]();
 
-  useEffect(() => {
-    setAgents(Object.values(agentMap));
-  }, [agentMap]);
+    // We might want to use a separate type for the following two sections:
 
-  useEffect(() => {
-    setUnits(Object.values(unitMap));
-  }, [unitMap]);
+    // This sets the visibility of the button to add an EconomicResource
+    // It can only be one of 'resource', 'toResource', or 'neither'
+    if (Object.hasOwn(currentAction, 'createResource')) {
+      if (currentAction.createResource === 'optional') {
+        setCanCreate('resource')
+      } else if (currentAction.createResource === 'optionalTo') {
+        setCanCreate('toResource');
+      } else {
+        setCanCreate('neither');
+      }
+    }
 
-  /**
-   * EconomicResources up to but not including the Event form.
-   */
-  useEffect(()=> {
-    const resources = simulateAccounting(Object.values(economicResourcesRaw), Object.values(economicEvents));
-    setEconomicResources(resources);
-  }, [economicEvents, economicResourcesRaw]);
-
-  /**
-   * EconomicResources up to and including what would potentially get created in the Event form.
-   */
-  useEffect(() => {
-    const resources = simulateAccounting([], [...Object.values(economicEvents)]);
-    console.log(resources)
-    const thisEventChanges = simulateAccounting(resources, [new EconomicEvent(eventState)]);
-    console.log(thisEventChanges)
-    setEconomicResourcesPotential(resources);
-  }, [eventState, economicResources, economicEvents]);
-
-  useEffect(() => {
-    action === 'work' || action === 'use' ? setEffortQuantityVisible(true) : setEffortQuantityVisible(false);
-    action !== 'work' ? setresourceQuantityVisible(true) : setresourceQuantityVisible(false);
+    // This sets the visibility of the EconomicResource selection visibility
+    // It can only be 'resource', 'both', or 'neither'
+    // The only times wont to show neither is if there are no {*}Effect fields
+    // on the Action, such is the case for 'work' and 'deliverService'.
+    if (currentAction.hasIncrementDecrement) {
+      setResourceVisibility('both');
+    } else if (currentAction.id === 'work' || currentAction.id === 'deliverService' ) {
+      setResourceVisibility('neither');
+    } else {
+      setResourceVisibility('resource');
+    }
   }, [action]);
 
   function disabled(f: string): boolean {
@@ -128,7 +154,19 @@ const EventInput: React.FC<Props> = ({
   }
 
   const parsers = {
-    'hasPointInTime': (value: string) => new Date(Date.parse(value))
+    'hasPointInTime': (value: string) => new Date(Date.parse(value)),
+    'resourceInventoriedAs': (value: string) => {
+      if (value === 'new') {
+        console.log('Selecting new provider side resource.')
+      }
+      return value;
+    },
+    'toResourceInventoriedAs': (value: string) => {
+      if (value === 'new') {
+        console.log('Selecting new receiver side resource.')
+      }
+      return value;
+    }
   }
 
   const onSlChange = slChangeConstructor<EconomicEventShape>(name, onChange, setState, parsers);
@@ -149,9 +187,65 @@ const EventInput: React.FC<Props> = ({
     onChange={onSlChange}
     units={units} />;
 
-  const showNewResourceDialogue = (): boolean => {
-    return economicResourcesPotential.length > economicResources.length;
+  const ResourceSelectionForm = () => {
+    if (resourceVisibility === 'neither') {
+      return <></>
+    } else if (resourceVisibility === 'resource') {
+      return <>
+        <div className='form-row'>
+          <SlSelect required onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
+            {canCreate == 'resource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            {canCreate == 'resource' && <SlDivider />}
+            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+          </SlSelect>
+        </div>
+      </>;
+    } else if (resourceVisibility === 'toResource') {
+      return <>
+        <div className='form-row'>
+          <SlSelect required onSlChange={onSlChange} name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
+            {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            {canCreate == 'toResource' && <SlDivider />}
+            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+          </SlSelect>
+        </div>
+      </>
+    } else if (resourceVisibility === 'both') {
+      return <>
+        <p>One or both of the following need to be filled in. The first field indicates what is being transfered from the provider. The second field indicates how it is represented in the receiver's system.</p>
+        <div className='form-row'>
+          <SlSelect onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='How does the provider inventory this item?'>
+            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+          </SlSelect>
+        </div>
+        <br />
+        <div className='form-row'>
+          <SlSelect onSlChange={onSlChange} required name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='How does the receiver inventory this item? '>
+            {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            {canCreate == 'toResource' && <SlDivider />}
+            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+          </SlSelect>
+        </div>
+      </>
+    }
   }
+
+  const ResourceForm = <>
+    <br />
+    <SlCard>
+      <div>
+        <b>Create Resource</b>
+      </div>
+      <br />
+      <EconomicResourceInput
+        name='newInventoriedResource'
+        conformingResource={resourceSpecificationMap[resourceConformsTo]}
+        resourceState={newInventoriedResource}
+        agents={agents}
+        onChange={onSlChange}
+      ></EconomicResourceInput>
+    </SlCard>
+  </>;
 
   return (
     <>
@@ -169,14 +263,17 @@ const EventInput: React.FC<Props> = ({
       {effortQuantityVisible && EffortQuantity}
       <br />
       <div className='form-row'>
-      <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
-        {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
-      </SlSelect>
-      <div className='field-spacer'></div>
-      <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
-        {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
-      </SlSelect>
+        <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
+          {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        </SlSelect>
+        <div className='field-spacer'></div>
+        <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
+          {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        </SlSelect>
       </div>
+      <br />
+      <ResourceSelectionForm></ResourceSelectionForm>
+      {(resourceInventoriedAs === 'new' || toResourceInventoriedAs === 'new') && ResourceForm}
       <br />
       <SlInput className='half-form-width' label="Datetime" type="datetime-local" value={hasPointInTime ? DateToInputValueString(hasPointInTime as Date): ''} name="hasPointInTime" onSlChange={onSlChange} onSlInput={onSlChange}></SlInput>
       <br />
@@ -187,7 +284,6 @@ const EventInput: React.FC<Props> = ({
         onSlInput={onSlChange}
         value={note}
       ></SlTextarea>
-      {showNewResourceDialogue()}
     </>
   );
 };
