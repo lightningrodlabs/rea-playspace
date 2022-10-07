@@ -7,6 +7,10 @@ The REA Playspace is a graphical interface that lets people play with the concep
 
 ![](./docs/assets/demo_flow.png)
 
+To speed up ones understanding of the concpepts behind [Valueflows](https://www.valueflo.ws/), below is the same graphical interface with annotations where the final output resource is Tacos.
+
+![](./docs/assets/demo_flow_with_annotations.png)
+
 ## Installing
 1) Download and install the latest [Holochain Launcher](https://github.com/holochain/launcher/releases/tag/v0.5.1).
 
