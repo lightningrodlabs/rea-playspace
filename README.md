@@ -28,7 +28,7 @@ To speed up ones understanding of the concpepts behind [Valueflows](https://www.
 6. In advanced settings, add a "Network Seed" that you can share with others to make sure your playspace data stays private. You may think of this as a password to your playspace data.<br/><img width="587" alt="Screen Shot 2022-10-23 at 21 12 40" src="https://user-images.githubusercontent.com/102320/197435310-c572aec1-0de7-4db7-a919-0b3a8a715445.png">
 7. Click "INSTALL APP". <br/><img width="159" alt="Screen Shot 2022-10-23 at 21 15 45" src="https://user-images.githubusercontent.com/102320/197435619-44e970c1-4abb-4380-ab2c-341692316d6b.png">
 8. If you're the first peson to start up the playspace with this network seed, then go ahead and open the app by clicking "OPEN".<br/><img width="616" alt="Screen Shot 2022-10-23 at 21 17 02" src="https://user-images.githubusercontent.com/102320/197435750-31b9e891-6cbc-4ed3-916a-91641204fb7e.png">
-9. If you're not the first person, it's best to wait a day with the Holochain Launcher running to make sure you have sync'ed the data over from the first person to create the network (the network with the specific network seed you're using). This is due to issue #172. 
+9. If you're not the first person, it's best to wait a day with the Holochain Launcher running to make sure you have sync'ed the data over from the first person to create the network (the network with the specific network seed you're using). This is due to issue ["We need to allow people to select a plan or create a new one #172"](https://github.com/lightningrodlabs/rea-playspace/issues/172).
 
 ### Notes
 
