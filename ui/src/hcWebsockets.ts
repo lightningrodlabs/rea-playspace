@@ -1,5 +1,5 @@
 import { HolochainClient } from '@holochain-open-dev/cell-client';
-import { AdminWebsocket, AgentPubKey, AppSignal, AppSignalCb, AppWebsocket, CellId } from '@holochain/client';
+import { AdminWebsocket, AgentPubKey, AppWebsocket, CellId } from '@holochain/client';
 import { APP_PORT, ADMIN_PORT } from './holochainConf';
 import { sleep100 } from './utils';
 

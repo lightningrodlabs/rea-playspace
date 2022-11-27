@@ -1,6 +1,6 @@
 import { SlCard, SlInput, SlRadio, SlRadioGroup } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { GeoDataShape } from '../../types/valueflows';
+import { GeoDataShape } from 'valueflows-models';
 import { slChangeConstructor } from '../util';
 
 interface Props {
@@ -69,13 +69,13 @@ const LocationInput: React.FC<Props> = ({label, name, value, onChange, disabled}
         <SlCard>
           <label>{`${label}`}</label>
           <SlRadioGroup label="Select a Location type">
-            <SlRadio disabled={disabled} name="option" value="1" onClick={setAddress} checked={type == 'address'}>
+            <SlRadio disabled={disabled} id="option" value="1" onClick={setAddress} checked={type == 'address'}>
               Address
             </SlRadio>
-            <SlRadio disabled={disabled} name="option" value="2" onClick={setNamedLocation} checked={type == 'named'}>
+            <SlRadio disabled={disabled} id="option" value="2" onClick={setNamedLocation} checked={type == 'named'}>
               Named Location
             </SlRadio>
-            <SlRadio disabled={disabled} name="option" value="3" onClick={setPoint} checked={type == 'point'}>
+            <SlRadio disabled={disabled} id="option" value="3" onClick={setPoint} checked={type == 'point'}>
               Lat/Long
             </SlRadio>
           </SlRadioGroup>

@@ -1,13 +1,12 @@
 import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { CommitmentShape, ResourceSpecificationShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';
 import { inputOrOutputOf } from './shared';
-import { usePath } from '../../data/YatiReactHook';
-import { Action, Agent, Unit } from '../../data/models/Valueflows/Knowledge';
+import { usePath } from 'yaati';
+import { CommitmentShape, ResourceSpecificationShape, Action, Agent, Unit } from "valueflows-models";
 import { getAllowedActions } from '../../logic/flows';
-import getDataStore from '../../data/DataStore';
+import { getDataStore } from '../../data/DataStore';
 
 interface Props {
   commitmentState: CommitmentShape;

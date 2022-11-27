@@ -33,8 +33,10 @@ jobs:
     - name: Prepare Nix environment
       run: nix-shell --command "echo Completed"
     - name: Install deps
-      run: nix-shell --command "pnpm run install-deps"
+      run: nix-shell --command "pnpm install"
     - name: Build happ
       run: nix-shell --command "pnpm run hc:happ-pack"
+    - name: Build ui deps
+      run: nix-shell --command "pnpm build"
     - name: Run all tests
-      run: nix-shell --command "pnpm run test"
+      run: nix-shell --command "pnpm test"

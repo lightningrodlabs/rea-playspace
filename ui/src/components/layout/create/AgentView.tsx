@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
-import { Agent } from "../../../data/models/Valueflows/Knowledge";
+import { AgentShape, Agent } from "valueflows-models";
 import { useNavigate } from "react-router-dom";
-import getDataStore from "../../../data/DataStore";
-import { ListProfiles, MyProfile } from "../../../elements";
-import { AgentShape } from "../../../types/valueflows";
+import { getDataStore } from "../../../data/DataStore";
+import { ListProfiles, MyProfile } from "../../ProfileComponents";
+import { Pathed, PathFunctor } from "data-providers";
 
 export type NewAgentProps = {
 }
@@ -29,7 +29,7 @@ const AgentView: React.FC<NewAgentProps> = () => {
 
   useEffect(() => {
     if (id) {
-      const obj = store.getById(id);
+      const obj = store.getById<Agent>(id);
       setState({
         name: obj.name ? obj.name : '',
         image: obj.image ? obj.image : '',
@@ -61,14 +61,10 @@ const AgentView: React.FC<NewAgentProps> = () => {
     e.preventDefault()
     const store = getDataStore();
 
-    const ag: Agent =  new Agent({name, image, primaryLocation, note});
+    const ag: Agent = new Agent({id, name, image, primaryLocation, note});
+    const pa = PathFunctor(ag, `root.agent.${ag.id}`);
+    store.upsert(pa, Agent);
 
-    if (id) {
-      ag.id = id;
-      store.upsert<AgentShape, Agent>(ag, Agent);
-    } else {
-      store.set(ag);
-    }
     clearState();
     navigate('/agents');
   }

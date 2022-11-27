@@ -1,8 +1,15 @@
-import getDataStore from "../data/DataStore";
-import { Action, QuantityEffect, ResourceSpecification } from "../data/models/Valueflows/Knowledge";
-import { Process } from "../data/models/Valueflows/Plan";
-import { EconomicEvent, EconomicEvents, EconomicResource, EconomicResources } from "../data/models/Valueflows/Observation";
-import { EconomicResourceShape } from "../types/valueflows";
+import { getDataStore } from "../data/DataStore";
+import {
+  Action,
+  QuantityEffect,
+  ResourceSpecification,
+  Process,
+  EconomicEvent,
+  EconomicEvents,
+  EconomicResourceShape,
+  EconomicResource,
+  EconomicResources
+} from "valueflows-models";
 
 //// SINGLE EVENT ACCOUNTING ////////////////////////////////////////////////////
 
@@ -83,7 +90,7 @@ export function applyEvent(event: EconomicEvent, action: Action, resources: Reso
   }
 
   // Adjust stage
-  if (resource !== null && event.outputOf && action.stageEffect && action.stageEffect === 'stage') {
+  if (resource !== null && event.outputOf && action.stageEffect && action.stageEffect === 'stage' && processes[event.outputOf].basedOn) {
       resource.stage = processes[event.outputOf].basedOn;
   }
 

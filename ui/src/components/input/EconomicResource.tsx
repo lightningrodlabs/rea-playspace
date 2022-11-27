@@ -1,6 +1,6 @@
 import { SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { useEffect, useState } from "react";
-import { AgentShape, EconomicResourceShape, ResourceSpecificationShape } from "../../types/valueflows";
+import { AgentShape, EconomicResourceShape, ResourceSpecificationShape } from "valueflows-models";
 import { slChangeConstructor } from '../util';
 
 interface Props {

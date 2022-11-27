@@ -1,10 +1,8 @@
 import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
 import React, { FormEvent, useEffect, useState } from 'react';
-import getDataStore from '../../data/DataStore';
-import { PathedData } from '../../data/models/PathedData';
-import { ProcessSpecification } from '../../data/models/Valueflows/Knowledge';
-import { Process } from "../../data/models/Valueflows/Plan";
-import { AgentShape, ProcessShape } from '../../types/valueflows';
+import { getDataStore } from '../../data/DataStore';
+import { Pathed, PathFunctor } from "data-providers";
+import { AgentShape, ProcessSpecification, ProcessShape, Process } from 'valueflows-models';
 
 const initialState: ProcessShape = {
   id: '',
@@ -25,7 +23,7 @@ const initialState: ProcessShape = {
 interface Props {
   processState: ProcessShape;
   closeModal: () => void;
-  afterward: (item: PathedData) => void;
+  afterward: (item: Pathed<Process>) => void;
 }
 
 const ProcessModal: React.FC<Props> = ({
@@ -39,11 +37,11 @@ const ProcessModal: React.FC<Props> = ({
   const [agents, setAgents] = useState<AgentShape[]>([]);
 
   useEffect(()=>{
-    let processSpec: ProcessSpecification = getDataStore().getById(basedOn);
+    const store = getDataStore();
+    let processSpec: ProcessSpecification = store.getById<ProcessSpecification>(basedOn);
     if (processSpec.note != null) {
       setState(prevState => ({ ...prevState, note:processSpec.note}));
     }
-    const store = getDataStore();
     setAgents(store.getAgents());
   },[]);
 
@@ -64,8 +62,10 @@ const ProcessModal: React.FC<Props> = ({
     e.preventDefault()
 
     const processUpdates = { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf };
+    const process = new Process(processUpdates);
+    const pathed = PathFunctor(process, `root.plan.${processUpdates.plannedWithin}.process.${process.id}`);
     const store = getDataStore();
-    const newProcess = store.upsert<ProcessShape, Process>(processUpdates, Process);
+    const newProcess = store.upsert<Process>(pathed, Process);
     if (afterward) afterward(newProcess);
 
     clearState();

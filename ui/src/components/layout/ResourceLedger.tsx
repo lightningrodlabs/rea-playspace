@@ -1,10 +1,14 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import getDataStore from "../../data/DataStore";
-import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
-import { EconomicResource } from "../../data/models/Valueflows/Observation";
-import { usePath } from "../../data/YatiReactHook";
+import { getDataStore } from "../../data/DataStore";
+import {
+  Agent,
+  ProcessSpecification,
+  ResourceSpecification,
+  EconomicResource
+} from "valueflows-models";
+import { usePath } from "yaati";
 import { simulateAccounting } from "../../logic/accounting";
 import ResourceLedgerTableRow from "./ResourceLedgerTableRow";
 

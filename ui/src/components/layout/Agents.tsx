@@ -1,25 +1,25 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import getDataStore from "../../data/DataStore";
-import { AgentShape } from "../../types/valueflows";
+import { getDataStore } from "../../data/DataStore";
+import { Agent, AgentShape } from "valueflows-models";
 import AgentTableRow from "./AgentTableRow";
+import { usePath } from "Yaati";
+import { Pathed } from "data-providers";
+import { Root } from "../../data/models/Application/Root";
 
 export type Props = {};
 
 const Agents: React.FC<Props> = () => {
-  const [agents, setAgents] = useState<Array<AgentShape>>([]);
-
   const store = getDataStore();
+  const agentRecords = usePath<'root', Root, Pathed<Agent>>('root.agent', store)
+  const [agents, setAgents] = useState<Array<Pathed<Agent>>>([]);
+
+  
 
   useEffect(()=>{
-    fetchAgents().then();
-  },[]);
-
-  const fetchAgents = async () => {
-    const agents = await store.getAgents();
-    setAgents(agents);
-  }
+    setAgents(Object.values(agentRecords));
+  },[agentRecords]);
 
   const RenderAgents = (): JSX.Element => {
     if (agents.length === 0) {

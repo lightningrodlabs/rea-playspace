@@ -1,4 +1,4 @@
-import { ModelType } from "../data/models/ModelConstructors";
+import { ModelType } from "../data/models/Application";
 
 export type PalletNodeProps = {
   thing: any;

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ResourceSpecification } from "../../../data/models/Valueflows/Knowledge";
+import { ResourceSpecificationShape, UnitShape, ResourceSpecification } from "valueflows-models";
 import MainPanelHeader from "../MainPanelHeader";
-import getDataStore from "../../../data/DataStore";
-import { ResourceSpecificationShape, UnitShape } from "../../../types/valueflows";
+import { getDataStore } from "../../../data/DataStore";
 import { DisplayNode, DisplayNodeShape } from "../../../data/models/Application/Display";
+import { PathFunctor } from "data-providers";
 
 export type ResourceSpecificationProps = {
 }
@@ -36,7 +36,7 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
     const store = getDataStore();
     setUnits(store.getUnits());
     if (id) {
-      const obj = store.getById(id);
+      const obj = store.getById<ResourceSpecification>(id);
       setState({
         name: obj.name ? obj.name : '',
         image: obj.image ? obj.image : '',
@@ -55,15 +55,19 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
   };
 
   const updateDependants = (): void => {
-    const displayNodes = store.getDisplayNodes(store.getCurrentPlanId());
-    displayNodes.forEach(ele => {
-      if (ele.type === 'resourceSpecification') {
-        if (ele.name === oldName) {
-          ele.name = name;
+    try {
+      const displayNodes = store.getDisplayNodes(store.getCurrentPlanId());
+      displayNodes.forEach(ele => {
+        if (ele.type === 'resourceSpecification') {
+          if (ele.name === oldName) {
+            ele.name = name;
+          }
         }
-      }
-      store.upsert<DisplayNodeShape, DisplayNode>(ele, DisplayNode);
-    });
+        store.upsert<DisplayNode>(ele, DisplayNode);
+      });
+    } catch (e) {
+      console.info('no displaynodes');
+    }
   }
 
   /**
@@ -79,13 +83,11 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const rs =  new ResourceSpecification({name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
+    const rs = new ResourceSpecification({id, name, image, resourceClassifiedAs, defaultUnitOfResource, defaultUnitOfEffort, note});
+    const prs  = PathFunctor(rs, `root.resourceSpecification.${rs.id}`);
+    store.upsert<ResourceSpecification>(prs, ResourceSpecification);
     if (id) {
-      rs.id = id;
-      store.upsert<ResourceSpecificationShape, ResourceSpecification>(rs, ResourceSpecification);
       updateDependants();
-    } else {
-      store.set(rs);
     }
     clearState();
     navigate('/');

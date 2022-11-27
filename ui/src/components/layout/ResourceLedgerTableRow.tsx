@@ -1,7 +1,12 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { useState } from "react";
-import { Agent, ProcessSpecification, ResourceSpecification } from "../../data/models/Valueflows/Knowledge";
-import { EconomicResource } from "../../data/models/Valueflows/Observation";
+import {
+  Agent,
+  ProcessSpecification,
+  ResourceSpecification,
+  EconomicResource
+} from "valueflows-models";
+
 
 export type Props = {
   economicResource: EconomicResource

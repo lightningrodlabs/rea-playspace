@@ -8,14 +8,15 @@
   },
   "private": true,
   "workspaces": [
+    "store-adaptors",
+    "yaati",
+    "data-providers",
+    "valueflows-models",
     "ui",
     "tests"
   ],
   "scripts": {
-    "// ## INSTALL ##":     "",
-    "install-deps":         "pnpm run tests-install && pnpm run web-install && cd tests && pnpm install",
-    "tests-install":        "cd tests && pnpm install",
-    "web-install":          "cd ui && pnpm install",
+    "build": "cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/store-adaptors && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd -",
 
     "// ## HOLOCHAIN ##":   "",
     "hc:redo":              "pnpm run hc:happ-pack && pnpm run hc:run",
@@ -34,7 +35,7 @@
     "web-zip":              "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
 
     "// ## TEST ##":        "",
-    "test":                 "cd tests && pnpm test"
+    "test":                 "bash scripts/happ-test.sh"
   },
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
   "license": "CAL-1.0"

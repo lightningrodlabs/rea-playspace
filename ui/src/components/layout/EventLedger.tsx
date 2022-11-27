@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { usePath } from '../../data/YatiReactHook';
-import getDataStore from "../../data/DataStore";
-import { EconomicEventShape } from "../../types/valueflows";
+import { usePath } from 'yaati';
+import { getDataStore } from "../../data/DataStore";
+import { EconomicEventShape } from "valueflows-models";
 import EventLedgerTableRow from "./EventLedgerTableRow";
 
 export type EventLedgerProps = {};

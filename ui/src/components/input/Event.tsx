@@ -1,15 +1,23 @@
 import { SlCard, SlDivider, SlInput, SlMenuItem, SlSelect, SlSwitch, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { EconomicEventShape, ResourceSpecificationShape } from '../../types/valueflows';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';
 import { inputOrOutputOf } from './shared';
-import { EconomicEvent, EconomicResource } from '../../data/models/Valueflows/Observation';
-import { usePath } from '../../data/YatiReactHook';
-import getDataStore from '../../data/DataStore';
+import {
+  EconomicEventShape,
+  EconomicEvent,
+  ResourceSpecificationShape,
+  ResourceSpecification,
+  EconomicResource,
+  Action,
+  EventQuantity,
+  Agent,
+  Unit
+} from 'valueflows-models';
+import { usePath } from 'yaati';
+import { getDataStore } from '../../data/DataStore';
 import { getAllowedActions } from '../../logic/flows';
 import { simulateAccounting } from '../../logic/accounting';
-import { Action, EventQuantity, Agent, Unit, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
 import EconomicResourceInput from './EconomicResource';
 
 interface Props {
