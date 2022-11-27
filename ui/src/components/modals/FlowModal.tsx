@@ -1,10 +1,20 @@
 import { SlButton, SlButtonGroup, SlCheckbox, SlDivider, SlIcon, SlIconButton, SlTooltip } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState, useRef } from 'react';
-import { PathedData } from '../../data/models/PathedData';
-import { Action, ActionKey, Agent, isTransfer, Unit } from '../../data/models/Valueflows/Knowledge';
-import { CommitmentShape, EconomicEventShape, EconomicResourceShape, FlowShape } from '../../types/valueflows';
-import { Commitment } from '../../data/models/Valueflows/Plan';
-import { EconomicEvent, EconomicResource } from '../../data/models/Valueflows/Observation';
+import { Pathed, PathFunctor } from 'data-providers';
+import {
+  Action,
+  ActionKey,
+  Agent,
+  isTransfer,
+  Unit,
+  CommitmentShape,
+  Commitment,
+  EconomicEventShape,
+  EconomicEvent,
+  EconomicResourceShape,
+  EconomicResource,
+  Flow
+} from 'valueflows-models';
 import CommitmentInput from '../input/Commitment';
 import EventInput from '../input/Event';
 import {
@@ -19,8 +29,8 @@ import {
   getReceiver,
   getResource
 } from '../../logic/flows';
-import getDataStore from '../../data/DataStore';
-import { objectsDiff } from '../../data/utils';
+import { getDataStore } from '../../data/DataStore';
+import { objectsDiff } from 'typed-object-tweezers';
 
 
 /**
@@ -36,13 +46,13 @@ interface Props {
   source: string;
   target: string;
   closeModal: () => void;
-  afterward?: (items: PathedData[]) => void;
+  afterward?: (items: Pathed<Flow>[]) => void;
 }
 
 const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterward}) => {
 
-  const [actions, setActions] = useState<Array<Action>>([]);
-  const [units, setUnits] = useState<Array<Unit>>([]);
+  const [actions, setActions] = useState<Array<Pathed<Action>>>([]);
+  const [units, setUnits] = useState<Array<Pathed<Unit>>>([]);
 
   // React ref to the underlying checkbox in the UI
   const commitmentFinishedRef = useRef(null);
@@ -53,18 +63,18 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const [resourceOpen, setResourceOpen] = useState(false);
 
   // The initial flow shape used to initialize the first commitment
-  const [initial, setInitial] = useState<FlowShape>();
+  const [initial, setInitial] = useState<Flow>();
 
   // The current state of the data, cloned because we merge changes into this before saving
-  const [editCommitment, setEditCommitment] = useState<Commitment>(null);
-  const [editEvents, setEditEvents] = useState<Array<EconomicEvent>>([]);
-  const [editResource, setEditResource] = useState<EconomicResource>(null);
+  const [editCommitment, setEditCommitment] = useState<Pathed<Commitment>>(null);
+  const [editEvents, setEditEvents] = useState<Array<Pathed<EconomicEvent>>>([]);
+  const [editResource, setEditResource] = useState<Pathed<EconomicResource>>(null);
 
   // The current form data until saving or discarding,
   // saving overwrites the corresponding edit* object.
   const [workingCommitment, setWorkingCommitment] = useState<CommitmentShape>(null);
   const [workingEvent, setWorkingEvent] = useState<EconomicEventShape>(null);
-  const [workingResource, setWorkingResource] = useState<EconomicResource>(null);
+  const [workingResource, setWorkingResource] = useState<Pathed<EconomicResource>>(null);
 
   // close the commitment and resource panels
   const resetState = () => {
@@ -138,6 +148,8 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
 
       /**
        * If editing a commitment, merge initial state with exisiting data
+       * 
+       * XXX: this might not give it a unique ID
        */
       if (editCommitment) {
         state = {...initial, ...editCommitment}
@@ -180,7 +192,9 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    */
   const handleEventSubmit = () => {
     setEventOpen(false);
-    const newEvent = new EconomicEvent(workingEvent);
+    const wronglyPathedEvent = new EconomicEvent(workingEvent);
+    const path = `root.economicEvent.${wronglyPathedEvent.id}`;
+    const newEvent = PathFunctor(wronglyPathedEvent, path);
     console.log('newEvent: ', newEvent);
     setEditEvents((prevEvents) => {
       const eventIndex = editEvents.findIndex((event) => newEvent.id === event.id);
@@ -206,7 +220,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     let eventState = {...initial, ...workingEvent};
     const readonlyFields = [];
 
-    function disableFields(flow: FlowShape) {
+    function disableFields(flow: Flow) {
       if (
         flow.action && flow.action != null
         && !isTransfer(flow.action as ActionKey)) {
@@ -284,7 +298,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
   const commitmentEditOrCreate = () => {
     if (editCommitment) {
       const commitmentClass = ('commitment-button' + (editCommitment.finished ? ' finished' : ''));
-      const label = getLabelForFlow(editCommitment, getResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
+      const label = getLabelForFlow(editCommitment, getConformingResource(editCommitment), getProvider(editCommitment), getReceiver(editCommitment), actions, units);
       return <>
         <SlButton className={commitmentClass} variant="default" onClick={handleCommitmentOpen}>{label}</SlButton>
         <span className='commitment-checkbox-space'></span>
@@ -331,60 +345,85 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
    *      change. Might not be a big problem.
    */
   const handleSubmit = () => {
+    console.log('on submit')
     closeModal();
     const store = getDataStore();
 
     // Init array of changed items
-    const items: PathedData[] = [];
+    const items: Pathed<Flow>[] = [];
 
     // Check for the Commitment
     if (
       editCommitment
       && editCommitment !== null
     ) {
-      // If it was changed
-      if (objectsDiff(store.getCursor(editCommitment.path), editCommitment)) {
-        // Store the object
-        const newCommitment: Commitment = store.upsert<CommitmentShape, Commitment>(editCommitment, Commitment);
+      if (editCommitment.path) {
+        // If it was changed
+        if (objectsDiff(store.getCursor(editCommitment.path), editCommitment)) {
+          // Store the object
+          const newCommitment: Commitment = store.upsert<Commitment>(editCommitment, Commitment);
+          // Ensure it gets passed back to the DisplayEdge
+          items.push(newCommitment);
+        } else {
+          // It hasn't changed, ensure the original gets passed back to the DisplayEdge
+          items.push(editCommitment);
+        }
+      } else {
+        // Give the object a path and store it
+        const path = `root.plan.${store.getCurrentPlanId()}.commitment.${editCommitment.id}`;
+        const pathedEditCommitment = PathFunctor(editCommitment, path)
+        const newCommitment: Commitment = store.upsert<Commitment>(pathedEditCommitment, Commitment);
         // Ensure it gets passed back to the DisplayEdge
         items.push(newCommitment);
-      } else {
-        // It hasn't changed, ensure the original gets passed back to the DisplayEdge
-        items.push(editCommitment);
       }
     }
 
     // Cycle through Events
     for(let event of editEvents) {
       // Check for the Event
-      if (
-        event
-        && event !== null
-      ) {
-        // If it was changed
-        if (objectsDiff(store.getCursor(event.path), event)) {
-          if (event.newInventoriedResource) {
-            console.log(event.newInventoriedResource);
-            const newInventoriedResource = store.upsert<EconomicResourceShape, EconomicResource>(event.newInventoriedResource, EconomicResource);
-            // need to figure out which field we're putting the new object on from action.createResource
-            const action = actions.find((act) => act.id === event.action);
-            if (action.createResource === 'optional') {
-              event.resourceInventoriedAs = newInventoriedResource.id;
-            } else if (action.createResource === 'optionalTo') {
-              event.toResourceInventoriedAs = newInventoriedResource.id;
-            }
-            delete event.newInventoriedResource;
+      if (event && event !== null) {
+        console.log('have an event')
+        // If we have a new inventoried resource, let's save it
+        if (event.newInventoriedResource) {
+          console.log(event.newInventoriedResource);
+          const res = new EconomicResource(event.newInventoriedResource);
+          const pr = PathFunctor(res, `root.economicResource.${res.id}`);
+          const newInventoriedResource = store.upsert<EconomicResource>(pr, EconomicResource);
+          // need to figure out which field we're putting the new object on from action.createResource
+          const action = actions.find((act) => act.id === event.action);
+          if (action.createResource === 'optional') {
+            event.resourceInventoriedAs = newInventoriedResource.id;
+          } else if (action.createResource === 'optionalTo') {
+            event.toResourceInventoriedAs = newInventoriedResource.id;
           }
-          // Store the object
-          const newEvent = store.upsert<EconomicEventShape, EconomicEvent>(event, EconomicEvent);
+          delete event.newInventoriedResource;
+        }
+
+        if (event.path) {
+          console.log(`have path ${event.path}`)
+          // If it was changed
+          if (objectsDiff(store.getCursor(event.path), event)) {
+            console.log('diff');
+            const newEvent = store.upsert<EconomicEvent>(event, EconomicEvent);
+            // Ensure it gets passed back to the DisplayEdge
+            items.push(newEvent);
+          } else {
+            // It hasn't changed, ensure the original gets passed back to the DisplayEdge
+            items.push(event);
+          }
+        } else {
+          // Give the object a path and store the object
+          const path = `root.economicEvent.${event.id}`
+          const pathedEvent = PathFunctor(event, event.path ? event.path : path);
+          const newEvent = store.upsert<EconomicEvent>(pathedEvent, EconomicEvent);
+          console.log('new event')
+          console.log(newEvent)
           // Ensure it gets passed back to the DisplayEdge
           items.push(newEvent);
-        } else {
-          // It hasn't changed, ensure the original gets passed back to the DisplayEdge
-          items.push(event);
         }
       }
     }
+    console.log(items);
     if (afterward) afterward(items);
   };
 

@@ -2,14 +2,24 @@
 
 import { Edge, MarkerType, Node } from "react-flow-renderer";
 import { DateToUiString } from "../components/util";
-import getDataStore from "../data/DataStore";
+import { getDataStore } from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
-import { ModelConstructorMap } from "../data/models/ModelConstructors";
-import { getAlmostLastPart } from "../data/models/PathedData";
-import { Action, Agent, isInSet, isTransfer, ResourceSpecification, Unit } from "../data/models/Valueflows/Knowledge";
-import { EconomicEvent } from "../data/models/Valueflows/Observation";
-import { Commitment, Process } from "../data/models/Valueflows/Plan";
-import { FlowShape, MeasurementShape } from "../types/valueflows";
+import { ModelKinds } from "../data/models/Application";
+import { getAlmostLastPart } from "typed-object-tweezers";
+import {
+  Action,
+  Agent,
+  isInSet,
+  isTransfer,
+  ResourceSpecification,
+  Unit,
+  EconomicEvent,
+  Commitment,
+  Process,
+  Flow,
+  MeasurementShape,
+  FlowShape
+} from "valueflows-models";
 
 /**
  * Given an ID, it returns the DisplayNode, it's associated Valueflows object and type.
@@ -20,7 +30,7 @@ export const getDisplayNodeBy = (id: string): any => {
   const store = getDataStore();
   const displayNode: DisplayNode = store.getById(id);
   const vfType = getAlmostLastPart(displayNode.vfPath);
-  const T = ModelConstructorMap[vfType];
+  const T = ModelKinds[vfType];
   const vfNode: typeof T = store.getCursor(displayNode.vfPath);
 
   return {
@@ -33,7 +43,7 @@ export const getDisplayNodeBy = (id: string): any => {
 /**
  * Returns the first flow associated with the edge, always returns the commitment if present
  */
-export const getFirstCommitmentOrEvent = (displayEdge: DisplayEdge): FlowShape => {
+export const getFirstCommitmentOrEvent = (displayEdge: DisplayEdge): Flow => {
   const store = getDataStore();
   let path: string;
   if (Array.isArray(displayEdge.vfPath)) {
@@ -81,10 +91,10 @@ export const getCommitmentAndEvents = (vfPath: string[] | string): {commitment: 
 /**
  * Hydrate the resource from the key
  */
-export const getResource = (flow: FlowShape) => {
+export const getResource = (flow: Flow) => {
   const store  = getDataStore();
   if (flow && flow.resourceConformsTo) {
-    return store.getById(flow.resourceConformsTo as string);
+    return store.getById<ResourceSpecification>(flow.resourceConformsTo as string);
   }
   return null;
 }
@@ -92,10 +102,10 @@ export const getResource = (flow: FlowShape) => {
 /**
  * Hydrate the provider from the key
  */
-export const getProvider = (flow: FlowShape) => {
+export const getProvider = (flow: Flow) => {
   const store = getDataStore();
   if (flow && flow.provider) {
-    return store.getById(flow.provider as string);
+    return store.getById<Agent>(flow.provider as string);
   }
   return null;
 };
@@ -103,10 +113,10 @@ export const getProvider = (flow: FlowShape) => {
 /**
  * Hydrate the recevier from the key
  */
-export const getReceiver = (flow: FlowShape) => {
+export const getReceiver = (flow: Flow) => {
   const store = getDataStore();
   if (flow && flow.receiver) {
-    return store.getById(flow.receiver as string);
+    return store.getById<Agent>(flow.receiver as string);
   }
   return null;
 };
@@ -114,12 +124,12 @@ export const getReceiver = (flow: FlowShape) => {
 /**
  * Hydrate the conforming resource from the key, or the defaults
  */
-export const getConformingResource = (flow: FlowShape, initial?: FlowShape) => {
+export const getConformingResource = (flow: FlowShape, initial?: FlowShape): ResourceSpecification => {
   const store = getDataStore();
   if (flow && flow.resourceConformsTo) {
-    return store.getById(flow.resourceConformsTo as string);
+    return store.getById<ResourceSpecification>(flow.resourceConformsTo);
   } else if (initial && initial.resourceConformsTo) {
-    return store.getById(initial.resourceConformsTo as string);
+    return store.getById<ResourceSpecification>(initial.resourceConformsTo);
   } else {
     return null;
   }
@@ -172,7 +182,7 @@ export const flowDefaults = {
  */
 export const flowUpdates = {
   // This is an input
-  'resourceSpecification-process': (flow: FlowShape, resource: ResourceSpecification, process: Process): FlowShape => {
+  'resourceSpecification-process': (flow: Flow, resource: ResourceSpecification, process: Process): FlowShape => {
     const clone = {...flow};
     clone.resourceConformsTo = resource.id;
     clone.receiver = process.inScopeOf;
@@ -180,7 +190,7 @@ export const flowUpdates = {
     return clone;
   },
   // this is an output
-  'process-resourceSpecification': (flow: FlowShape, process: Process, resource: ResourceSpecification): FlowShape => {
+  'process-resourceSpecification': (flow: Flow, process: Process, resource: ResourceSpecification): FlowShape => {
     const clone = {...flow};
     clone.resourceConformsTo = resource.id;
     clone.provider = process.inScopeOf;
@@ -188,7 +198,7 @@ export const flowUpdates = {
     return clone;
   },
   // This is a transfer, set up the flow between the agents. User must select a resourceSpecification.
-  'resourceSpecification-resourceSpecification': (flow: FlowShape, source: ResourceSpecification, target: ResourceSpecification): FlowShape => {
+  'resourceSpecification-resourceSpecification': (flow: Flow, source: ResourceSpecification, target: ResourceSpecification): FlowShape => {
     const clone = {...flow};
     clone.resourceConformsTo = source.id;
     clone.action = flow.action as string in ['transfer', 'transfer-all-rights', 'transfer-custody'] ? flow.action : 'transfer';
@@ -254,7 +264,7 @@ export const getAllowedActions = (flow: FlowShape, actions: Action[]): Action[] 
 /**
  * Returns a label for a flow (a Commitment or EconomicEvent)
  */
-export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
+export const getLabelForFlow = (flow: Flow, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
   // default label
   let label = "Reticualting splines...";
 
@@ -301,7 +311,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
   /**
    * Get the flow's resourceQuantity as a string
    */
-  function resourceQuantity(flow: FlowShape): string {
+  function resourceQuantity(flow: Flow): string {
     if (
       flow.resourceQuantity != null
       && typeof flow.resourceQuantity == 'object'
@@ -316,7 +326,7 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
   /**
    * Get the flow's resourceQuantity as a string
    */
-  function effortQuantity(flow: FlowShape, show?: boolean): string {
+  function effortQuantity(flow: Flow, show?: boolean): string {
     if (
       flow.effortQuantity != null
       && typeof flow.effortQuantity == 'object'
@@ -328,8 +338,11 @@ export const getLabelForFlow = (flow: FlowShape, resource: ResourceSpecification
     return '';
   }
 
-  function dateString(flow: FlowShape):string {
-    if (flow.due) {
+  /**
+   * XXX: this actually seems fishy
+   */
+  function dateString(flow: Flow):string {
+    if (flow instanceof Commitment && flow.due) {
       return ` ${DateToUiString(flow.due as Date)}`;
     }
     if (flow.hasPointInTime) {
@@ -467,9 +480,9 @@ function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
 
     // Generate label for the commitment
     if (commitment && commitment != null) {
-      const provider = store.getById(commitment.provider as string);
-      const receiver = store.getById(commitment.receiver as string);
-      const resource = store.getById(commitment.resourceConformsTo);
+      const provider = store.getById<Agent>(commitment.provider);
+      const receiver = store.getById<Agent>(commitment.receiver);
+      const resource = store.getById<ResourceSpecification>(commitment.resourceConformsTo);
       const commitmentLabel = getLabelForFlow(commitment, resource, provider, receiver, actions, units)
       flowLabels.push(`Commitment: ${commitmentLabel}`);
     } else {
@@ -480,9 +493,9 @@ function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
     if (events.length > 0) {
       // Generate label for the summarized event
       const summaryEvent = summarizeEvents(events);
-      const provider = store.getById(summaryEvent.provider as string);
-      const receiver = store.getById(summaryEvent.receiver as string);
-      const resource = store.getById(summaryEvent.resourceConformsTo);
+      const provider = store.getById<Agent>(summaryEvent.provider);
+      const receiver = store.getById<Agent>(summaryEvent.receiver);
+      const resource = store.getById<ResourceSpecification>(summaryEvent.resourceConformsTo);
       const eventLabel = getLabelForFlow(summaryEvent, resource, provider, receiver, actions, units)
       flowLabels.push(`Events: ${eventLabel}`);
     } else {
@@ -528,11 +541,11 @@ export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge => {
 export const displayNodeToNode = (displayNode: DisplayNode): Node => {
   const store = getDataStore();
   const {id, name, type, vfPath, position} = displayNode;
-  const vfObject = store.getCursor(vfPath);
+  const vfObject = store.getCursor<Flow>(vfPath);
 
   let agent = null;
   if (Object.hasOwn(vfObject,'inScopeOf')) {
-    agent = store.getById(vfObject.inScopeOf).name;
+    agent = store.getById<Agent>(vfObject.inScopeOf).name;
   }
 
   return {

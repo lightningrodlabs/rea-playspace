@@ -1,8 +1,6 @@
 import { Guid } from "guid-typescript";
 import { XYPosition, Node } from 'react-flow-renderer';
-import { PathedData } from "../PathedData";
-import { NamedData } from "../NamedData";
-import { assignFields, fieldsToJSON } from '../../utils';
+import { assignFields, fieldsToJSON } from 'typed-object-tweezers';
 
 export interface DisplayNodeShape {
   id?: string;
@@ -23,14 +21,27 @@ export interface DisplayEdgeShape {
   data?: any;
 }
 
+export class Position implements XYPosition {
+  x: number;
+  y: number;
+
+  constructor(init: XYPosition) {
+    assignFields<XYPosition, Position>(init, this);
+  }
+
+  public toJSON() {
+    return fieldsToJSON(this, ['x', 'y']);
+  }
+}
+
 /**
  * This represents a node in React Flows. It corresponds to a few different
  * Valueflows objects.
  */
-export class DisplayNode implements Node, PathedData, NamedData {
+export class DisplayNode implements Node {
   id: string;
   name: string;
-  position: XYPosition;
+  position: Position;
   vfPath: string;
   planId: string;
   type?: string;
@@ -39,18 +50,6 @@ export class DisplayNode implements Node, PathedData, NamedData {
   constructor(init: DisplayNodeShape) {
     assignFields<DisplayNodeShape, DisplayNode>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-  }
-
-  static getPrefix(planId: string): string {
-    return `root.plan.${planId}.displayNode`;
-  }
-
-  static getPath(planId: string, id: string): string {
-    return `${DisplayNode.getPrefix(planId)}.${id}`;
-  }
-
-  get path(): string {
-    return DisplayNode.getPath(this.planId, this.id);
   }
 
   public toJSON() {
@@ -71,7 +70,7 @@ export class DisplayNode implements Node, PathedData, NamedData {
  * This means we need to transform back and forth between the objects to maintain
  * consistency in both layers.
  */
-export class DisplayEdge implements DisplayEdgeShape, PathedData {
+export class DisplayEdge implements DisplayEdgeShape {
   id: string;
   source: string;
   target: string;
@@ -83,18 +82,6 @@ export class DisplayEdge implements DisplayEdgeShape, PathedData {
   constructor(init: DisplayEdgeShape) {
     assignFields<DisplayEdgeShape, DisplayEdge>(init, this);
     this.id = this.id ? this.id : Guid.raw();
-  }
-
-  static getPrefix(planId: string): string {
-    return `root.plan.${planId}.displayEdge`;
-  }
-
-  static getPath(planId: string, id: string): string {
-    return `${DisplayEdge.getPrefix(planId)}.${id}`;
-  }
-
-  get path(): string {
-    return DisplayEdge.getPath(this.planId, this.id);
   }
 
   public toJSON() {

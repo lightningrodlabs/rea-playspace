@@ -23,17 +23,16 @@ import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceModal from '../modals/ResourceModal';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
-import getDataStore from "../../data/DataStore";
+import { getDataStore } from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
-import { DisplayEdge, DisplayEdgeShape, DisplayNode } from "../../data/models/Application/Display";
+import { DisplayEdge, DisplayEdgeShape, DisplayNode, Position } from "../../data/models/Application/Display";
 import ProcessNode from '../nodes/ProcessNode';
-import { getAlmostLastPart, getLastPart, PathedData } from '../../data/models/PathedData';
-import { NamedData } from '../../data/models/NamedData';
-import { Process } from '../../data/models/Valueflows/Plan';
-import { FlowShape, ProcessShape } from '../../types/valueflows';
+import { Pathed, PathFunctor } from 'data-providers';
+import { Flow, ProcessShape, Process, ResourceSpecification, Commitment, EconomicEvent} from 'valueflows-models';
 import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
-import { assignFields } from '../../data/utils';
-import { usePath } from '../../data/YatiReactHook';
+import { getAlmostLastPart, getLastPart, assignFields } from 'typed-object-tweezers';
+import { usePath } from 'yaati';
+import { Root } from '../../data/models/Application/Root';
 
 interface Props {};
 
@@ -43,10 +42,10 @@ const FlowCanvas: React.FC<Props> = () => {
 
   // STATE MANAGEMENT
 
-  const displayNodes = usePath(`root.plan.${store.getCurrentPlanId()}.displayNode`, store);
-  const displayEdges = usePath(`root.plan.${store.getCurrentPlanId()}.displayEdge`, store);
-  const [nodes, setNodes] = useNodesState(Object.values(displayNodes).map((node: DisplayNode) => displayNodeToNode(node)));
-  const [edges, setEdges] = useEdgesState(Object.values(displayEdges).map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
+  const displayNodes = usePath<'root', Root, DisplayNode>(`root.plan.${store.getCurrentPlanId()}.displayNode`, store);
+  const displayEdges = usePath<'root', Root, DisplayEdge>(`root.plan.${store.getCurrentPlanId()}.displayEdge`, store);
+  const [nodes, setNodes] = useNodesState([]);
+  const [edges, setEdges] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   /**
    * we should probably add a more sophisticated state machine for this since we have:
@@ -113,11 +112,15 @@ const FlowCanvas: React.FC<Props> = () => {
    * These use effect calls are not firing when there's a remote update. I'm not sure why.
    */
   useEffect(() => {
-    setNodes(Object.values(displayNodes).map((node: DisplayNode) => displayNodeToNode(node)));
+    if (displayNodes) {
+      setNodes(Object.values(displayNodes).map((node: DisplayNode) => displayNodeToNode(node)));
+    }
   }, [displayNodes]);
 
   useEffect(() => {
-    setEdges(Object.values(displayEdges).map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
+    if (displayEdges) {
+      setEdges(Object.values(displayEdges).map((edge: DisplayEdge) => displayEdgeToEdge(edge)));
+    }
   }, [displayEdges]);
 
   // NODE HANDLERS
@@ -160,7 +163,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
           // Get the type and the item
           const type = getAlmostLastPart(path);
-          const item = store.getCursor(path);
+          const item: Pathed<ResourceSpecification | Process> = store.getCursor(path);
 
           /**
            * Choose the action that will happen based on the object type.
@@ -169,13 +172,15 @@ const FlowCanvas: React.FC<Props> = () => {
           switch (type) {
             case 'processSpecification':
               // Set the state, then open the dialog
+              const process: ProcessShape = {
+                name: item.name,
+                basedOn: item.id,
+                plannedWithin: store.getCurrentPlanId()
+              } as ProcessShape;
+              console.log(process);
               setCurrentPosition(position);
               setType(type);
-              setProcessState({
-                name: item.name,
-                basedOn: getLastPart(path),
-                plannedWithin: store.getCurrentPlanId()
-              } as ProcessShape);
+              setProcessState(process);
               openModal();
               break;
             default:
@@ -194,7 +199,7 @@ const FlowCanvas: React.FC<Props> = () => {
    *
    * vfPath refers to the Valueflows object.
    */
-   const handleAddNode = (item: PathedData & NamedData, position?: XYPosition) => {
+   const handleAddNode = (item: Pathed<ResourceSpecification | Process>, position?: XYPosition) => {
     // Item is from the form entered in the modal
     // and has already been stored on the DHT by this point
 
@@ -206,16 +211,18 @@ const FlowCanvas: React.FC<Props> = () => {
       type: getAlmostLastPart(item.path),
       position: position ? position : currentPosition
     });
+    const pathedNode = PathFunctor(newNode, `root.plan.${newNode.planId}.displayNode.${newNode.id}`);
+    console.log(pathedNode);
 
     // reset state
     setType(null);
     setCurrentPosition(undefined);
 
     // Add to local state to render new node on canvas
-    setNodes((nds) => nds.concat(displayNodeToNode(newNode)));
+    setNodes((nds) => nds.concat(displayNodeToNode(pathedNode)));
 
     // Persist to DHT
-    store.set(newNode);
+    store.set(pathedNode);
   }
 
   /**
@@ -240,6 +247,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const displayNode: DisplayNode = store.getById(selectedDisplayNode);
     displayNode.name = process.name;
     const newNode = new DisplayNode(displayNode);
+    const pathedNode = PathFunctor(newNode, `root.plan.${newNode.planId}.displayNode.${newNode.id}`);
 
     setProcessState(null);
     setSelectedDisplayNode(null);
@@ -260,11 +268,11 @@ const FlowCanvas: React.FC<Props> = () => {
      */
     setNodes((ns) => {
       const nsNew = ns.filter((node) => node.id !== displayNode.id);
-      nsNew.push(displayNodeToNode(newNode));
+      nsNew.push(displayNodeToNode(pathedNode));
       return nsNew;
     });
 
-    store.set(newNode);
+    store.set(pathedNode);
   }
 
 
@@ -286,8 +294,8 @@ const FlowCanvas: React.FC<Props> = () => {
        * Then persist to DHT.
        */
       const planId = store.getCurrentPlanId();
-      const nodeToUpdate = store.getCursor(DisplayNode.getPath(planId, change.id));
-      nodeToUpdate.position = {...position as XYPosition};
+      const nodeToUpdate = store.getCursor<Pathed<DisplayNode>>(`root.plan.${planId}.displayNode.${change.id}`);
+      nodeToUpdate.position = new Position(position);
 
       resetPosition();
 
@@ -306,11 +314,12 @@ const FlowCanvas: React.FC<Props> = () => {
    */
    const onRemoveNodes = (nodes: Node[]) => {
     nodes.forEach((node) => {
-      const nodeToDelete = store.getById(node.id);
+      const nodeToDelete = store.getById<Pathed<DisplayNode>>(node.id);
       const nodePath: string = nodeToDelete.path;
       const vfPath: string = nodeToDelete.vfPath;
       const vfType = getAlmostLastPart(vfPath);
 
+      // Hmm, this should kick of a rerender with a new snapshot
       store.delete(nodePath);
       // We don't want to delete the `Agents` or `ResourceSpecifications`
       (vfType == 'process') ? store.delete(vfPath) : Promise.resolve();
@@ -322,7 +331,7 @@ const FlowCanvas: React.FC<Props> = () => {
    */
   const onRemoveNode = (change: NodeRemoveChange) => {
     // Run the same validation check as above before running this
-    setNodes((nds) => applyNodeChanges([change], nds))
+    //setNodes((nds) => applyNodeChanges([change], nds))
   }
 
   // EDGE HANDLERS
@@ -351,11 +360,11 @@ const FlowCanvas: React.FC<Props> = () => {
  /**
    * Adds a DisplayEdge and React Flow Edge corresponding to a set of flows
    */
-  const afterAddFlow = (flows: PathedData[]) => {
+  const afterAddFlow = (flows: Pathed<Commitment | EconomicEvent>[]) => {
     // Only add the edge if we have a set of flows
     if (flows.length > 0) {
       // Add the edge
-      const edge = new DisplayEdge({
+      const newEdge = new DisplayEdge({
         source,
         sourceHandle,
         target,
@@ -363,8 +372,8 @@ const FlowCanvas: React.FC<Props> = () => {
         vfPath: flows.map((flow) => flow.path),
         planId: store.getCurrentPlanId()
       } as DisplayEdgeShape);
-      setEdges((eds) => eds.concat(displayEdgeToEdge(edge)));
-      store.set(edge);
+      const pathedEdge = PathFunctor(newEdge, `root.plan.${newEdge.planId}.displayEdge.${newEdge.id}`);
+      store.set(pathedEdge);
     }
     setType(null);
     setSource(null);
@@ -399,10 +408,10 @@ const FlowCanvas: React.FC<Props> = () => {
       vfEdge.targetHandle = newConnection.targetHandle;
 
       // Update each flow to point to the correct new objects
-      const updatedFlows: PathedData[] = vfEdge.vfPath.map((path: string) => {
-        const vfFlow = store.getCursor(path);
+      const updatedFlows: Pathed<Flow>[] = vfEdge.vfPath.map((path: string) => {
+        const vfFlow: Pathed<Flow> = store.getCursor(path);
         const updates = flowUpdates[`${sourceVfType}-${targetVfType}`](vfFlow, sourceVfNode, targetVfNode);
-        assignFields<FlowShape, FlowShape>(updates, vfFlow);
+        assignFields<Flow, Flow>(updates, vfFlow);
         return vfFlow;
       })
 
@@ -442,7 +451,7 @@ const FlowCanvas: React.FC<Props> = () => {
    *
    * TIL: The comment in `afterProcessEdit` should apply here, too.
    */
-  const afterFlowEdit = (items: PathedData[]) => {
+  const afterFlowEdit = (items: Pathed<Commitment | EconomicEvent>[]) => {
     const displayEdge: DisplayEdge = store.getById(selectedDisplayEdge) as DisplayEdge;
     displayEdge.vfPath = items.map((item) => item.path);
     store.set(displayEdge);
@@ -474,7 +483,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const onRemoveEdges = (edges: Edge[]) => {
     edges.forEach((edge) => {
       const edgeId = edge.data.id;
-      const edgeToDelete = store.getById(edgeId);
+      const edgeToDelete = store.getById<Pathed<DisplayEdge>>(edgeId);
       // Do we have an actual edge?
       if (edgeToDelete) {
         const edgePath: string = edgeToDelete.path;
@@ -547,15 +556,15 @@ const FlowCanvas: React.FC<Props> = () => {
   const selectModalComponent = () => {
     switch (type) {
       case 'processSpecification':
-        return <ProcessModal processState={{...processState}} closeModal={closeModal} afterward={handleAddNode}/>;
+        return <ProcessModal processState={processState} closeModal={closeModal} afterward={handleAddNode}/>;
       case 'updateProcess':
-        return <ProcessModal processState={{...processState}} closeModal={closeModal} afterward={afterProcessEdit}/>;
+        return <ProcessModal processState={processState} closeModal={closeModal} afterward={afterProcessEdit}/>;
       case 'resourceSpecification':
         return <ResourceModal />;
       case 'flow':
         return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddFlow} />;
       case 'updateFlow':
-        return <FlowModal vfPath={store.getById(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterFlowEdit}/>;
+        return <FlowModal vfPath={store.getById<Pathed<DisplayEdge>>(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterFlowEdit}/>;
       default:
         return <></>
     }

@@ -1,10 +1,11 @@
 import { SlAvatar, SlCard } from "@shoelace-style/shoelace/dist/react";
+import { Pathed } from "data-providers";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AgentShape } from "../../types/valueflows";
+import { Agent, AgentShape } from "valueflows-models";
 
 export type Props = {
-  agent: AgentShape
+  agent: Pathed<Agent>
 };
 
 const AgentTableRow: React.FC<Props> = ({agent}) => {

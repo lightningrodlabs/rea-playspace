@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../MainPanelHeader";
-import { ProcessSpecification } from "../../../data/models/Valueflows/Knowledge";
+import {ProcessSpecificationShape, ProcessSpecification } from "valueflows-models";
 import { useNavigate } from "react-router-dom";
-import getDataStore from "../../../data/DataStore";
-import { ProcessSpecificationShape } from "../../../types/valueflows";
+import { getDataStore } from "../../../data/DataStore";
+import { PathFunctor } from "data-providers";
 
 export type NewProcessSpecificationProps = {}
 
@@ -29,7 +29,7 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
   useEffect(() => {
     if (id) {
       const store = getDataStore();
-      const obj = store.getById(id);
+      const obj = store.getById<ProcessSpecification>(id);
       setState({
         name: obj.name ? obj.name : '',
         note: obj.note ? obj.note : ''
@@ -46,11 +46,9 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
     e.preventDefault()
     const store = getDataStore();
 
-    const rs =  new ProcessSpecification({name, note});
-    if (id) {
-      rs.id = id;
-    }
-    store.upsert<ProcessSpecificationShape, ProcessSpecification>(rs, ProcessSpecification);
+    const rs =  new ProcessSpecification({id, name, note});
+    const pr = PathFunctor(rs, `root.processSpecification.${rs.id}`);
+    store.upsert(pr, ProcessSpecification);
 
     clearState();
     navigate('/');

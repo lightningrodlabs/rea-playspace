@@ -1,41 +1,47 @@
 import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getLastPart, PathedData } from "../../data/models/PathedData";
+import { Pathed } from "data-providers";
+import { getLastPart } from "typed-object-tweezers";
 import PalletNode from '../PalletNode';
-import getDataStore from '../../data/DataStore';
+import { getDataStore } from '../../data/DataStore';
 import { DisplayNode } from '../../data/models/Application/Display';
-import { Process } from '../../data/models/Valueflows/Plan';
-import { ModelType } from '../../data/models/ModelConstructors';
-import { ProcessSpecification, ResourceSpecification } from '../../data/models/Valueflows/Knowledge';
-import { usePath } from '../../data/YatiReactHook';
+import { Process, ProcessSpecification, ResourceSpecification } from 'valueflows-models';
+import { ModelType } from '../../data/models/Application';
+import { Root } from '../../data/models/Application/Root';
+import { usePath } from 'yaati';
+
 interface Props {
   setEdit: (entity: any) => void
 }
 
 const Pallet: React.FC<Props> = () => {
-  const resourceSpecifications = usePath('root.resourceSpecification', getDataStore());
-  const processSpecifications = usePath('root.processSpecification', getDataStore());
-  const [resourceList, setResourceList] = useState<ResourceSpecification[]>([]);
-  const [processList, setProcessList] = useState<ProcessSpecification[]>([]);
+  const resourceSpecifications = usePath<'root', Root, Pathed<ResourceSpecification>>('root.resourceSpecification', getDataStore());
+  const processSpecifications = usePath<'root', Root, Pathed<ProcessSpecification>>('root.processSpecification', getDataStore());
+  const [resourceList, setResourceList] = useState<Pathed<ResourceSpecification>[]>([]);
+  const [processList, setProcessList] = useState<Pathed<ProcessSpecification>[]>([]);
   const [open, setOpen] = useState(false);
   const [dependentCount, setDependentCount] = useState<number>();
 
   const navigate = useNavigate();
 
   useEffect(()=>{
-    setResourceList(Object.values(resourceSpecifications));
+    if (resourceSpecifications) {
+      setResourceList(Object.values(resourceSpecifications));
+    }
   }, [resourceSpecifications]);
 
   useEffect(()=>{
-    setProcessList(Object.values(processSpecifications));
+    if (processSpecifications) {
+      setProcessList(Object.values(processSpecifications));
+    }
   }, [processSpecifications]);
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
    * path in it. We'll use that to get a cursor to the object.
    */
-  const onDragStart = (event:DragEvent, item: PathedData) => {
+  const onDragStart = (event:DragEvent, item: Pathed<any>) => {
     const data = { path: item.path };
     event.dataTransfer!.setData('application/reactflow', JSON.stringify(data));
     event.dataTransfer!.effectAllowed = 'move';
@@ -50,7 +56,7 @@ const Pallet: React.FC<Props> = () => {
     if (type === 'processSpecification') return 'process-colors process-shape';
   }
 
-  function renderNodes(list, type: ModelType) {
+  function renderNodes(list: Pathed<ResourceSpecification>[] | Pathed<ProcessSpecification>[], type: ModelType) {
     if (list.length > 0) {
       return (list.map((item: any) => (
         <div
@@ -91,8 +97,8 @@ const Pallet: React.FC<Props> = () => {
     const store = getDataStore();
     if (event.altKey) {
       // check to see if it is in use
-      let displayNodes: DisplayNode[] = store.getDisplayNodes(store.getCurrentPlanId());
-      let matchedNodes: DisplayNode[] = [];
+      let displayNodes: Pathed<DisplayNode>[] = store.getDisplayNodes(store.getCurrentPlanId());
+      let matchedNodes: Pathed<DisplayNode>[] = [];
       displayNodes.forEach((node, index) => {
         // resource specs
         let referenceId = '';
@@ -112,7 +118,8 @@ const Pallet: React.FC<Props> = () => {
       });
 
       if (matchedNodes.length === 0) {
-        store.delete(store.lookUpPath(id));
+        const path = store.lookUpPath(id);
+        store.delete(path);
       } else {
         setDependentCount(matchedNodes.length);
         setOpen(true);

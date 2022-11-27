@@ -1,7 +1,6 @@
 import { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { Measurement } from '../../data/models/Valueflows/Knowledge';
-import { MeasurementShape, UnitShape } from '../../types/valueflows';
+import {  MeasurementShape, UnitShape, Measurement } from 'valueflows-models';
 import { slChangeConstructor } from '../util';
 
 interface Props {

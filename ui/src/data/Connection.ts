@@ -1,17 +1,13 @@
-import ZomeApi from "./DataProviders/holochain/api/zomeApi";
-import { getHolochainClient, setAgentPubKey, setCellId } from '../hcWebsockets';
-import { ProjectProvider } from "./DataProviders/holochain/project";
 import { APP_ID } from "../holochainConf";
-import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { getHolochainClient, setAgentPubKey, setCellId } from '../hcWebsockets';
 import { AppSignal, AppSignalCb, InstalledCell } from "@holochain/client";
 import { CellClient } from "@holochain-open-dev/cell-client";
-import { LocalstoreProvider } from "./DataProviders/local/localstore";
-import getDataStore, { DataStore } from "./DataStore";
-import { SignalMessage } from "./models/Application/SignalMessage";
-import { getAlmostLastPart, getLastPart, PathedData } from "./models/PathedData";
-import { constructFromObj } from "./models/ModelConstructors";
-import { wrapReadable } from "./hooks/wrapReadable";
-import { SyncExternalStoreApi } from "./hooks/useStore";
+import { Profile, ProfilesService, ProfilesStore } from "@holochain-open-dev/profiles";
+import { getDataStore, DataStore } from "./DataStore";
+import { buildModel, Pathed, WithPath } from "data-providers";
+import { wrapReadable, SyncExternalStoreApi } from "store-adaptors";
+import { ZomeApi, SignalMessage, LocalstoreProvider, ProjectProvider } from "data-providers";
+import { ModelTree, ModelKinds } from "./models/Application";
 
 let dataStorePromise: Promise<DataStore>;
 let profilesStore: ProfilesStore;
@@ -39,10 +35,10 @@ export async function initConnection(): Promise<DataStore> {
     setAgentPubKey(agentPubKey);
     setCellId(cell.cell_id);
 
-    const zomeApi = new ZomeApi(client);
+    const zomeApi = new ZomeApi(client, cell.cell_id);
     const dataStore = getDataStore();
-    dataStore.addProvider('project', new ProjectProvider(zomeApi));
-    dataStore.addProvider('localstore', new LocalstoreProvider());
+    dataStore.addProvider('project', new ProjectProvider(ModelTree, ModelKinds, zomeApi));
+    dataStore.addProvider('localstore', new LocalstoreProvider(ModelTree, ModelKinds));
     await dataStore.fetchOrCreateRoot();
 
     profilesStore = await connectProfiles();
@@ -73,10 +69,8 @@ const signalCb: AppSignalCb = async (signal: AppSignal) => {
     case 'put':
       if (signalMessage.data) {
         const path = signalMessage.path;
-        const type = getAlmostLastPart(path);
-        const name = getLastPart(path);
-        let PDO: PathedData = constructFromObj(type, name, signalMessage.data);
-        store.setLocal(PDO);
+        let PDO = buildModel<{}, { id: string }>(ModelTree, ModelKinds, path, signalMessage.data);
+        store.setLocal(PDO as Pathed<{ id: string }>);
       }
       break;
     case 'delete':

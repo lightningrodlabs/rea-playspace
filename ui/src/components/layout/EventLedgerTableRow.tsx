@@ -1,8 +1,19 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
-import getDataStore from "../../data/DataStore";
-import { Action, Unit } from "../../data/models/Valueflows/Knowledge";
-import { ActionShape, AgentShape, EconomicEventShape, ProcessShape, ResourceSpecificationShape } from "../../types/valueflows";
+import { getDataStore } from "../../data/DataStore";
+import {
+  ActionShape,
+  AgentShape,
+  EconomicEventShape,
+  ProcessShape,
+  ResourceSpecificationShape,
+  Action,
+  Unit,
+  Agent,
+  ResourceSpecification,
+  Process
+} from "valueflows-models";
+
 
 export type Props = {
   economicEvent: EconomicEventShape
@@ -25,87 +36,55 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
   ] = useState<EconomicEventShape>(economicEvent);
 
   const dataStore = getDataStore();
+  const actions: Action[] = dataStore.getActions();
+  const units: Unit[] = dataStore.getUnits();
 
-  useEffect(()=>{
-    getNamesForId();
-  },[]);
-  
-  const getNamesForId = (): void => {
-    
-    const stateCopy = { 
+  const getHydratedState = () => {
+    return {
       id,
       created,
-      action,
-      provider, 
-      receiver, 
-      resourceConformsTo,
-      resourceQuantity,
-      effortQuantity,
-      inputOf, 
-      outputOf
+      action: (action && action != undefined) ? actions.find((a) => a.id == action) : undefined,
+      provider: (provider && provider != undefined) ? dataStore.getById<Agent>(provider) : undefined,
+      receiver: (receiver && receiver != undefined) ? dataStore.getById<Agent>(receiver) : undefined,
+      resourceConformsTo: (resourceConformsTo && resourceConformsTo != undefined) ? dataStore.getById<ResourceSpecification>(resourceConformsTo) : undefined,
+      resourceQuantity: {
+        hasNumericalValue: (resourceQuantity && resourceQuantity != undefined  && resourceQuantity.hasUnit && resourceQuantity.hasNumericalValue != undefined) ? resourceQuantity.hasNumericalValue: undefined,
+        hasUnit: (resourceQuantity && resourceQuantity != undefined && resourceQuantity.hasUnit && resourceQuantity.hasUnit != undefined) ? units.find((unit) => unit.id == resourceQuantity.hasUnit) : undefined,
+      },
+      effortQuantity: {
+        hasNumericalValue: (effortQuantity && effortQuantity != undefined  && effortQuantity.hasUnit && effortQuantity.hasNumericalValue != undefined) ? effortQuantity.hasNumericalValue: undefined,
+        hasUnit: (effortQuantity && effortQuantity != undefined && effortQuantity.hasUnit && effortQuantity.hasUnit != undefined) ? units.find((unit) => unit.id == effortQuantity.hasUnit) : undefined,
+      },
+      inputOf: (inputOf && inputOf != undefined) ? dataStore.getById<Process>(inputOf) : undefined,
+      outputOf: (outputOf && outputOf != undefined) ? dataStore.getById<Process>(outputOf) : undefined
     };
-    
-    const actions: Action[] = dataStore.getActions();
-    // Get the action
-
-    if (action && action != undefined) {
-      stateCopy.action = actions.find((a) => a.id == action);
-    }
-
-    if (provider && provider != undefined) {
-      stateCopy.provider = dataStore.getById(provider as string);
-    }
-
-    if (receiver && receiver != undefined) {
-      stateCopy.receiver = dataStore.getById(receiver as string);
-    } 
-
-    if (resourceConformsTo && resourceConformsTo != undefined) {
-      stateCopy.resourceConformsTo = dataStore.getById(resourceConformsTo as string);
-    }
-
-    if (inputOf && inputOf != undefined) {
-      stateCopy.inputOf = dataStore.getById(inputOf as string);
-    } 
-
-    if (outputOf && outputOf != undefined) {
-      stateCopy.outputOf = dataStore.getById(outputOf as string);
-    }
-
-    setState(stateCopy);
   }
 
   const assembleCard = () => {
     let resourceQuantityUnit: Unit, effortQuantityUnit: Unit;
-    const units = dataStore.getUnits();
-    if (resourceQuantity && resourceQuantity != undefined && resourceQuantity.hasUnit && resourceQuantity.hasUnit != undefined) {
-      resourceQuantityUnit = units.find((unit) => unit.id == resourceQuantity.hasUnit);
-    }
-
-    if (effortQuantity && effortQuantity != undefined && effortQuantity.hasUnit && effortQuantity.hasUnit != undefined) {
-      effortQuantityUnit = units.find((unit) => unit.id == effortQuantity.hasUnit);
-    }
+    const hydrated = getHydratedState();
+    
     let body: string = '';
     body += (`Date: ${new Date(created).toISOString().split('T')[0]} `);
-    if (resourceQuantity && resourceQuantity.hasNumericalValue) {
-      body += (`, ${(action as ActionShape).label}: `);
-      body += (`${resourceQuantity.hasNumericalValue} ${resourceQuantityUnit.name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
+    if (hydrated.resourceQuantity && hydrated.resourceQuantity.hasNumericalValue) {
+      body += (`, ${(hydrated.action).label}: `);
+      body += (`${hydrated.resourceQuantity.hasNumericalValue} ${hydrated.resourceQuantity.hasUnit.name} of ${(hydrated.resourceConformsTo).name}`);
     }
     if (effortQuantity && effortQuantity.hasNumericalValue) {
-      body += (`, ${(action as ActionShape).label}: `);
-      body += (`${effortQuantity.hasNumericalValue} ${effortQuantityUnit.name} of ${(resourceConformsTo as ResourceSpecificationShape).name}`);
+      body += (`, ${(hydrated.action).label}: `);
+      body += (`${hydrated.effortQuantity.hasNumericalValue} ${effortQuantityUnit.name} of ${(hydrated.resourceConformsTo).name}`);
     }
     if (provider) {
-      body += (`, Provider: ${(provider as AgentShape).name}`);
+      body += (`, Provider: ${(hydrated.provider).name}`);
     }
     if (receiver) {
-      body += (`, Receiver: ${(receiver as AgentShape).name}`);
+      body += (`, Receiver: ${(hydrated.receiver).name}`);
     }
     if (inputOf) {
-      body += (`, Input Of: ${(inputOf as ProcessShape).name}`);
+      body += (`, Input Of: ${(hydrated.inputOf).name}`);
     }
     if (outputOf) {
-      body += (`, Output Of: ${(outputOf as ProcessShape).name}`);
+      body += (`, Output Of: ${(hydrated.outputOf).name}`);
     }
     return body;
   }

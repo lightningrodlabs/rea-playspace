@@ -6,12 +6,12 @@ import "./App.css";
 import Header from "./components/layout/Header";
 import Home from "./Home";
 import Pi from "./components/layout/Pi";
-import getDataStore from "./data/DataStore";
+import { getDataStore } from "./data/DataStore";
 import { getProfilesStore } from "./data/Connection";
 import Modal from "react-modal"
 import ProfilePrompt from "./components/ProfilePrompt";
-import { ProfilesContext } from "./elements";
-import { ResourceSpecificationShape } from "./types/valueflows";
+import { ProfilesContext } from "./components/ProfileComponents";
+import { ResourceSpecificationShape } from "valueflows-models";
 import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
 import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
 import AgentView from "./components/layout/create/AgentView";
@@ -41,7 +41,7 @@ const App: React.FC<Props> = () => {
     setRsEdit(resourceSpec);
   }
 
-  function piHandler(event) {
+  async function piHandler(event) {
     const store = getDataStore();
     // Either 'shift' + 'meta' + 'alt' or 'shift' + 'ctrl' + 'alt' deletes the local root
     if (event.shiftKey && ((event.metaKey && event.altKey) || (event.ctrlKey && event.altKey))) {
@@ -51,7 +51,9 @@ const App: React.FC<Props> = () => {
     } else if (event.shiftKey && (event.metaKey || event.ctrlKey || event.altKey)) {
       setIsModalOpen(true);
       console.info('Should hydrate...');
-      store.fetchLocalTree();
+      // Oh look, store.fetchLocalTree is async...
+      await store.fetchLocalTree();
+      console.log(store.createSnapshot());
       store.saveInMemoryTree();
       setTimeout(() => setIsModalOpen(false), 1500);
     // Save to the local root if 'shift' if pressed
