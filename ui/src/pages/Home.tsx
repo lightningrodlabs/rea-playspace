@@ -1,6 +1,6 @@
 import React from "react";
-import FlowCanvas from "./components/layout/FlowCanvas";
-import Pallet from "./components/layout/Pallet";
+import FlowCanvas from "../components/layout/FlowCanvas";
+import Pallet from "../components/layout/Pallet";
 
 interface Props {
   setEdit: (entity: any) => void;

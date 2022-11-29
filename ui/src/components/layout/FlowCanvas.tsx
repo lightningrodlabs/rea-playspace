@@ -21,7 +21,6 @@ import ReactFlow, {
 } from 'react-flow-renderer';
 import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
-import ResourceModal from '../modals/ResourceModal';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
 import { getDataStore } from "../../data/DataStore";
 import ModalContainer from '../modals/ModalContainer';
@@ -30,7 +29,7 @@ import ProcessNode from '../nodes/ProcessNode';
 import { Pathed, PathFunctor } from 'data-providers';
 import { Flow, ProcessShape, Process, ResourceSpecification, Commitment, EconomicEvent} from 'valueflows-models';
 import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
-import { getAlmostLastPart, getLastPart, assignFields } from 'typed-object-tweezers';
+import { getAlmostLastPart, assignFields } from 'typed-object-tweezers';
 import { usePath } from 'yaati';
 import { Root } from '../../data/models/Application/Root';
 
@@ -559,8 +558,6 @@ const FlowCanvas: React.FC<Props> = () => {
         return <ProcessModal processState={processState} closeModal={closeModal} afterward={handleAddNode}/>;
       case 'updateProcess':
         return <ProcessModal processState={processState} closeModal={closeModal} afterward={afterProcessEdit}/>;
-      case 'resourceSpecification':
-        return <ResourceModal />;
       case 'flow':
         return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddFlow} />;
       case 'updateFlow':

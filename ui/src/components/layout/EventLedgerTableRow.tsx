@@ -2,11 +2,7 @@ import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
 import { getDataStore } from "../../data/DataStore";
 import {
-  ActionShape,
-  AgentShape,
   EconomicEventShape,
-  ProcessShape,
-  ResourceSpecificationShape,
   Action,
   Unit,
   Agent,
@@ -61,7 +57,6 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
   }
 
   const assembleCard = () => {
-    let resourceQuantityUnit: Unit, effortQuantityUnit: Unit;
     const hydrated = getHydratedState();
     
     let body: string = '';
@@ -72,7 +67,7 @@ const EventLedgerTableRow: React.FC<Props> = ({economicEvent}) => {
     }
     if (effortQuantity && effortQuantity.hasNumericalValue) {
       body += (`, ${(hydrated.action).label}: `);
-      body += (`${hydrated.effortQuantity.hasNumericalValue} ${effortQuantityUnit.name} of ${(hydrated.resourceConformsTo).name}`);
+      body += (`${hydrated.effortQuantity.hasNumericalValue} ${hydrated.effortQuantity.hasUnit.name} of ${(hydrated.resourceConformsTo).name}`);
     }
     if (provider) {
       body += (`, Provider: ${(hydrated.provider).name}`);

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Pathed } from "data-providers";
 import { getLastPart } from "typed-object-tweezers";
-import PalletNode from '../PalletNode';
+import PalletNode from '../nodes/PalletNode';
 import { getDataStore } from '../../data/DataStore';
 import { DisplayNode } from '../../data/models/Application/Display';
 import { Process, ProcessSpecification, ResourceSpecification } from 'valueflows-models';

@@ -4,7 +4,7 @@ import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
-import Home from "./Home";
+import Home from "./pages/Home";
 import Pi from "./components/layout/Pi";
 import { getDataStore } from "./data/DataStore";
 import { getProfilesStore } from "./data/Connection";
@@ -12,13 +12,13 @@ import Modal from "react-modal"
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./components/ProfileComponents";
 import { ResourceSpecificationShape } from "valueflows-models";
-import ResourceSpecificationView from "./components/layout/create/ResourceSpecificationView";
-import ProcessSpecificationView from "./components/layout/create/ProcessSpecificationView";
-import AgentView from "./components/layout/create/AgentView";
-import EventLedger from "./components/layout/EventLedger";
+import ResourceSpecificationView from "./pages/create/ResourceSpecificationView";
+import ProcessSpecificationView from "./pages/create/ProcessSpecificationView";
+import AgentView from "./pages/create/AgentView";
+import EventLedger from "./pages/EventLedger";
 import { ProfilesStore } from "@holochain-open-dev/profiles";
-import Agents from "./components/layout/Agents";
-import ResourceLedger from "./components/layout/ResourceLedger";
+import Agents from "./pages/Agents";
+import ResourceLedger from "./pages/ResourceLedger";
 
 Modal.setAppElement("#root");
 

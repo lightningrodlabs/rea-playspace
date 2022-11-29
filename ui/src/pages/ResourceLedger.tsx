@@ -1,7 +1,7 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getDataStore } from "../../data/DataStore";
+import { getDataStore } from "../data/DataStore";
 import {
   Agent,
   ProcessSpecification,
@@ -9,8 +9,8 @@ import {
   EconomicResource
 } from "valueflows-models";
 import { usePath } from "yaati";
-import { simulateAccounting } from "../../logic/accounting";
-import ResourceLedgerTableRow from "./ResourceLedgerTableRow";
+import { simulateAccounting } from "../logic/accounting";
+import ResourceLedgerTableRow from "../components/layout/ResourceLedgerTableRow";
 
 export type ResourceLedgerProps = {};
 
