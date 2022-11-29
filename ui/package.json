@@ -24,6 +24,7 @@
     "vite": "^2.9.0"
   },
   "dependencies": {
+    "guid-typescript": "^1.0.9",
     "@holochain-open-dev/cell-client": "0.7.3",
     "@holochain/client": "^0.8.0",
     "@holochain-open-dev/profiles": "0.5.3",
@@ -33,7 +34,6 @@
     "@scoped-elements/material-web": "0.0.19",
     "@shoelace-style/shoelace": "^2.0.0-beta.76",
     "blob-to-buffer": "^1.2.9",
-    "guid-typescript": "^1.0.9",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-flow-renderer": "^10.3.14",

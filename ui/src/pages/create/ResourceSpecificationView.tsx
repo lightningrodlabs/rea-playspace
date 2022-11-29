@@ -3,9 +3,9 @@ import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@sh
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { ResourceSpecificationShape, UnitShape, ResourceSpecification } from "valueflows-models";
-import MainPanelHeader from "../MainPanelHeader";
-import { getDataStore } from "../../../data/DataStore";
-import { DisplayNode, DisplayNodeShape } from "../../../data/models/Application/Display";
+import MainPanelHeader from "../../components/layout/MainPanelHeader";
+import { getDataStore } from "../../data/DataStore";
+import { DisplayNode } from "../../data/models/Application/Display";
 import { PathFunctor } from "data-providers";
 
 export type ResourceSpecificationProps = {

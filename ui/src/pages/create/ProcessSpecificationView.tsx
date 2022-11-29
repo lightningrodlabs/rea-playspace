@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link, useParams } from "react-router-dom";
-import MainPanelHeader from "../MainPanelHeader";
-import {ProcessSpecificationShape, ProcessSpecification } from "valueflows-models";
+import MainPanelHeader from "../../components/layout/MainPanelHeader";
+import { ProcessSpecification } from "valueflows-models";
 import { useNavigate } from "react-router-dom";
-import { getDataStore } from "../../../data/DataStore";
+import { getDataStore } from "../../data/DataStore";
 import { PathFunctor } from "data-providers";
 
 export type NewProcessSpecificationProps = {}

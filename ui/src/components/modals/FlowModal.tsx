@@ -4,14 +4,12 @@ import { Pathed, PathFunctor } from 'data-providers';
 import {
   Action,
   ActionKey,
-  Agent,
   isTransfer,
   Unit,
   CommitmentShape,
   Commitment,
   EconomicEventShape,
   EconomicEvent,
-  EconomicResourceShape,
   EconomicResource,
   Flow
 } from 'valueflows-models';

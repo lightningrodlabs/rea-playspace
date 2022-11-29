@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
 import { Link, useParams } from "react-router-dom";
-import MainPanelHeader from "../MainPanelHeader";
-import { AgentShape, Agent } from "valueflows-models";
+import MainPanelHeader from "../../components/layout/MainPanelHeader";
+import { Agent } from "valueflows-models";
 import { useNavigate } from "react-router-dom";
-import { getDataStore } from "../../../data/DataStore";
-import { ListProfiles, MyProfile } from "../../ProfileComponents";
-import { Pathed, PathFunctor } from "data-providers";
+import { getDataStore } from "../../data/DataStore";
+import { ListProfiles, MyProfile } from "../../components/ProfileComponents";
+import { PathFunctor } from "data-providers";
 
 export type NewAgentProps = {
 }
