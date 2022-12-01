@@ -12,7 +12,7 @@ pub struct Thing {
 #[unit_enum(UnitEntryTypes)]
 pub enum EntryTypes {
     #[entry_def(required_validations = 5)]
-    Thing(Thing), 
+    Thing(Thing),
 }
 
 #[hdk_link_types]
