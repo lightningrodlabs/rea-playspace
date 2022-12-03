@@ -293,7 +293,8 @@ const FlowCanvas: React.FC<Props> = () => {
        * Then persist to DHT.
        */
       const planId = store.getCurrentPlanId();
-      const nodeToUpdate = store.getCursor<Pathed<DisplayNode>>(`root.plan.${planId}.displayNode.${change.id}`);
+      const path = `root.plan.${planId}.displayNode.${change.id}`;
+      const nodeToUpdate = store.getCursor<Pathed<DisplayNode>>(path);
       nodeToUpdate.position = new Position(position);
 
       resetPosition();
