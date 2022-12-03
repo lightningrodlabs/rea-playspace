@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -7,7 +7,6 @@ import Header from "./components/layout/Header";
 import Home from "./pages/Home";
 import Pi from "./components/layout/Pi";
 import { getDataStore } from "./data/DataStore";
-import { getProfilesStore } from "./data/Connection";
 import Modal from "react-modal"
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./components/ProfileComponents";
@@ -16,9 +15,9 @@ import ResourceSpecificationView from "./pages/create/ResourceSpecificationView"
 import ProcessSpecificationView from "./pages/create/ProcessSpecificationView";
 import AgentView from "./pages/create/AgentView";
 import EventLedger from "./pages/EventLedger";
-import { ProfilesStore } from "@holochain-open-dev/profiles";
 import Agents from "./pages/Agents";
 import ResourceLedger from "./pages/ResourceLedger";
+import { AppStateStore } from './index';
 
 Modal.setAppElement("#root");
 
@@ -26,16 +25,13 @@ setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
 );
 
-interface Props {}
+interface Props {
+  appStore: AppStateStore
+}
 
-const App: React.FC<Props> = () => {
+const App: React.FC<Props> = ({appStore}) => {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [rsEdit, setRsEdit] = useState<ResourceSpecificationShape>();
-  const [profilesStore, setProfilesStore] = useState<ProfilesStore>();
-
-  useEffect(()=>{
-    setProfilesStore(getProfilesStore());
-  },[]);
 
   function handleSetRsEdit(resourceSpec: ResourceSpecificationShape) {
     setRsEdit(resourceSpec);
@@ -142,13 +138,11 @@ const App: React.FC<Props> = () => {
         </BrowserRouter>
     );
   }
-  if (!profilesStore) {
-    return <span>Loading.......</span>;
-  }
+
   return (
     <div>
-      <ProfilesContext store={profilesStore}>
-          <ProfilePrompt>
+      <ProfilesContext store={appStore.profileStore}>
+          <ProfilePrompt wrappedProfileReadable={appStore.wrappedProfileReadable}>
             <Main />
           </ProfilePrompt>
       </ProfilesContext>

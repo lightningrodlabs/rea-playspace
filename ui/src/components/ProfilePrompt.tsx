@@ -2,13 +2,12 @@ import { FC } from "react";
 import { CreateProfile } from "./ProfileComponents";
 import { Profile } from "@holochain-open-dev/profiles";
 import { useStore } from "store-adaptors";
-import { getWrappedProfileReadable } from "../data/Connection";
 
 interface Props {
+  wrappedProfileReadable
 }
 
-const ProfilePrompt: FC<Props> = ({children}) => {
-  const wrappedProfileReadable = getWrappedProfileReadable();
+const ProfilePrompt: FC<Props> = ({wrappedProfileReadable, children}) => {
   const profile = useStore<Profile>(wrappedProfileReadable);
 
   const RenderPrompt = () => {
