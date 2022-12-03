@@ -32,7 +32,7 @@ import {
 
 import { Pathed, TreeDefinition } from "data-providers";
 
-class ExtendedPlan extends Plan {
+export class ExtendedPlan extends Plan {
   displayNode: Record<string, Pathed<DisplayNode>>;
   displayEdge: Record<string, Pathed<DisplayEdge>>;
 

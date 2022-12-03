@@ -200,25 +200,25 @@ pub fn get_path(path: TypedPath) -> ExternResult<Option<Thing>> {
     .flatten()
     .collect::<Vec<Link>>();
 
-  if links.len() == 0 {
-    return Ok(None);
+  match links.into_iter().max_by(|x, y| x.timestamp.cmp(&y.timestamp)) {
+    None => Ok(None),
+    Some(link) => {
+      let record_result = try_get_record(link.target.into(), GetOptions::latest());
+
+      match record_result {
+        Ok(record) => {
+          let thing: Thing = record
+            .entry()
+            .to_app_option()
+            .map_err(|err| wasm_error!(WasmErrorInner::Guest(err.into())))?
+            .ok_or(wasm_error!(WasmErrorInner::Guest(format!("Could not deserialize {}", record.action_address()))))?;
+          Ok(Some(thing))
+        },
+        Err(e) => Err(e)
+      }
+    }
   }
 
-  let link = links[0].clone();
-
-  let record_result = try_get_record(link.target.into(), GetOptions::latest());
-
-  match record_result {
-    Ok(record) => {
-      let thing: Thing = record
-        .entry()
-        .to_app_option()
-        .map_err(|err| wasm_error!(WasmErrorInner::Guest(err.into())))?
-        .ok_or(wasm_error!(WasmErrorInner::Guest(format!("Could not deserialize {}", record.action_address()))))?;
-      Ok(Some(thing))
-    },
-    Err(e) => Err(e)
-  }
 }
 
 /// Attempts to get an record at the entry_hash and returns it

@@ -9,6 +9,9 @@ import {
   DisplayNode,
   DisplayEdge
 } from "./models/Application/Display";
+import {
+  ExtendedPlan
+} from "./models/Application";
 import { Root } from "./models/Application/Root";
 import { LocalstoreProvider, Pathed, PathFunctor, TreeDefinition } from "data-providers";
 import { IndexedTreeWithProviders, TreeState } from "Yaati";
@@ -34,10 +37,10 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   public createDefaultRoot() {
     // if it doesn't, create it and a placeholder plan
     console.info('root does not exist. creating...');
-    const plan = new Plan({
+    const plan = new ExtendedPlan({
       name: 'Default Plan Name'
     });
-    const PathedPlan: Pathed<Plan> = PathFunctor(plan, `root.plan.${plan.id}`);
+    const PathedPlan: Pathed<ExtendedPlan> = PathFunctor(plan, `root.plan.${plan.id}`);
     const root = new Root({
       planId: plan.id
     });
