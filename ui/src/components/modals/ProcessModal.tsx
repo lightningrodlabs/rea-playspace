@@ -54,16 +54,28 @@ const ProcessModal: React.FC<Props> = ({
     setState(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const toggleFinished = () => {
-    setState(prevState => ({ ...prevState, finished: !prevState['finished'] }));
-  }
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const processUpdates = { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf };
     const process = new Process(processUpdates);
     const pathed = PathFunctor(process, `root.plan.${processUpdates.plannedWithin}.process.${process.id}`);
+    const store = getDataStore();
+    const newProcess = store.upsert<Process>(pathed, Process);
+    if (afterward) afterward(newProcess);
+
+    clearState();
+    closeModal();
+  }
+
+
+  const toggleFinished = (e: any) => {
+    e.preventDefault()
+
+    const processUpdates = { id, basedOn, plannedWithin, name, finished, note, classifiedAs, inScopeOf };
+    const process = new Process(processUpdates);
+    const pathed = PathFunctor(process, `root.plan.${processUpdates.plannedWithin}.process.${process.id}`);
+    pathed.finished = !pathed.finished;
     const store = getDataStore();
     const newProcess = store.upsert<Process>(pathed, Process);
     if (afterward) afterward(newProcess);
@@ -96,8 +108,6 @@ const ProcessModal: React.FC<Props> = ({
           {agents.map((agent) => (<SlMenuItem key={`agent_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
         </SlSelect>
         <br />
-        <SlButton onClick={toggleFinished} variant="primary">{finished ? "Unfinish" : "Finish"}</SlButton>
-        <br />
         <SlTextarea
           label='Note'
           name='note'
@@ -106,7 +116,7 @@ const ProcessModal: React.FC<Props> = ({
           value={note}
         />
         <br />
-        <SlButton type="submit" variant="primary">{id? 'Update' : 'Create'}</SlButton>
+        <SlButton type="submit" variant="primary">{id? 'Update' : 'Create'}</SlButton> <SlButton onClick={toggleFinished} variant="primary">{finished == true ? "Mark as Unfinished" : "Mark as Finished"}</SlButton>
       </form>
     </>
   );
