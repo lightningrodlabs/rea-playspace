@@ -63,7 +63,7 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
         this.createDefaultRoot();
       }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
       this.createDefaultRoot();
     }
   }
