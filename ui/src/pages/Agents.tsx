@@ -1,12 +1,12 @@
-import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
+import { SlAvatar, SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
 import { Agent } from "valueflows-models";
-import AgentTableRow from "../components/layout/AgentTableRow";
 import { usePath } from "Yaati";
 import { Pathed } from "data-providers";
 import { Root } from "../data/models/Application/Root";
+import Table from "../components/layout/Table";
 
 export type Props = {};
 
@@ -19,6 +19,27 @@ const Agents: React.FC<Props> = () => {
     setAgents(Object.values(agentRecords));
   },[agentRecords]);
 
+  const fieldDescriptors = {
+    'action': "",
+    'image': "",
+    'name': "Name",
+    'primaryLocation': "Primary Location",
+    'notes': "Notes"
+  }
+  const synthetic = {
+    'action': (data: Pathed<Agent>) => [`/agents/edit/${data.id}`]
+  }
+  const decorators = {
+    'action': (data: any) => <><Link to={data[0]}>Edit</Link></>,
+    'image': (data: any) => {
+      return (<>
+        <span style={{paddingRight: "10px"}}>
+          <SlAvatar image={data} ></SlAvatar>
+        </span>
+      </>);
+    }
+  }
+
   const RenderAgents = (): JSX.Element => {
     if (agents.length === 0) {
       return(
@@ -27,14 +48,13 @@ const Agents: React.FC<Props> = () => {
         </>
       );
     } else {
-      const eventRows: JSX.Element[] = agents.map(agent => {
-        return(<AgentTableRow key={agent.id} agent={agent} />)
-      });
-
       return (
-        <>
-          {eventRows}
-        </>
+        <Table
+          datas={agents}
+          fieldDescriptors={fieldDescriptors}
+          syntheticFields={synthetic}
+          fieldDecorators={decorators}>
+        </Table>
       );
     }
   }
@@ -48,7 +68,6 @@ const Agents: React.FC<Props> = () => {
             <SlIconButton name="plus-square-fill" label="Settings" />
           </Link>
         </div>
-        <p>(double click to edit agents)</p>
       </div>
       <div style={{display: 'flex', flexDirection:'column'}}>
         <RenderAgents />
