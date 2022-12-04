@@ -16,6 +16,7 @@ import ProcessSpecificationView from "./pages/create/ProcessSpecificationView";
 import AgentView from "./pages/create/AgentView";
 import EventLedger from "./pages/EventLedger";
 import Agents from "./pages/Agents";
+import ResourceSpecifications from "./pages/ResourceSpecifications";
 import ResourceLedger from "./pages/ResourceLedger";
 import { AppStateStore } from './index';
 
@@ -89,11 +90,15 @@ const App: React.FC<Props> = ({appStore}) => {
                     element={<Agents />} 
                   />
                   <Route
-                    path="/resources/new"
+                    path="/resource-specifications"
+                    element={<ResourceSpecifications />}
+                  />
+                  <Route
+                    path="/resource-specifications/new"
                     element={<ResourceSpecificationView />}
                   />
                   <Route
-                    path="/resources/edit">
+                    path="/resource-specifications/edit">
                     <Route path=":id" element={<ResourceSpecificationView />} />
                   </Route>
                   <Route

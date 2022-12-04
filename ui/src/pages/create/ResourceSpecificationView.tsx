@@ -56,15 +56,18 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
 
   const updateDependants = (): void => {
     try {
-      const displayNodes = store.getDisplayNodes(store.getCurrentPlanId());
-      displayNodes.forEach(ele => {
-        if (ele.type === 'resourceSpecification') {
-          if (ele.name === oldName) {
-            ele.name = name;
+      const plans = Object.keys(store.getCursor('root.plan'));
+      for (let planId in plans) {
+        const displayNodes = store.getDisplayNodes(planId);
+        displayNodes.forEach(ele => {
+          if (ele.type === 'resourceSpecification') {
+            if (ele.name === oldName) {
+              ele.name = name;
+            }
           }
-        }
-        store.upsert<DisplayNode>(ele, DisplayNode);
-      });
+          store.upsert<DisplayNode>(ele, DisplayNode);
+        });
+      }
     } catch (e) {
       console.info('no displaynodes');
     }
@@ -90,14 +93,14 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
       updateDependants();
     }
     clearState();
-    navigate('/');
+    navigate('/resource-specifications');
   }
 
   return (
     <>
       <MainPanelHeader>
         <h2>New Resource Specification</h2>
-        <Link to="/">
+        <Link to="/resource-specifications">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
       </MainPanelHeader>
