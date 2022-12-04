@@ -69,10 +69,18 @@ const AgentView: React.FC<NewAgentProps> = () => {
     navigate('/agents');
   }
 
+  function header() {
+    if (id) {
+      return <>Edit Agent</>
+    } else {
+      return <>New Agent</>
+    }
+  }
+
   return (
     <>
       <MainPanelHeader>
-        <h2>New Agent</h2>
+        <h2>{header()}</h2>
         <Link to="/agents">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
