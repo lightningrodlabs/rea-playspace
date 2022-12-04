@@ -28,9 +28,6 @@ const Header: React.FC<HeaderProps> = () => {
             <h2 className={'menu-item'} onClick={()=>handleNavigate("")}>Flow</h2>
           </li>
           <li>
-            <h2 className={'menu-item'} onClick={()=>handleNavigate("agents")}>Agents</h2>
-          </li>
-          <li>
             <h2 className={'menu-item'} onClick={()=>handleNavigate("resource-specifications")}>Resource Specifications</h2>
           </li>
           <li>
