@@ -1,4 +1,4 @@
-import { SlCard, SlDivider, SlInput, SlMenuItem, SlSelect, SlSwitch, SlTextarea } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlDivider, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';
@@ -17,7 +17,6 @@ import {
 import { usePath } from 'yaati';
 import { getDataStore } from '../../data/DataStore';
 import { getAllowedActions } from '../../logic/flows';
-import { simulateAccounting } from '../../logic/accounting';
 import EconomicResourceInput from './EconomicResource';
 
 interface Props {
@@ -97,7 +96,6 @@ const EventInput: React.FC<Props> = ({
   const agentMap: Record<string, Agent> = usePath('root.agent', store);
   const resourceSpecificationMap: Record<string, ResourceSpecification> = usePath('root.resourceSpecification', store);
   const economicResourcesRaw: Record<string, EconomicResource> = usePath(`root.economicResource`, store);
-  const economicEvents: Record<string, EconomicEvent> = usePath(`root.economicEvent`, store);
 
   const quantityVisibilityMethods: Record<EventQuantity, () => void> = {
     'resource': () => {

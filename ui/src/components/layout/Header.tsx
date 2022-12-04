@@ -36,6 +36,9 @@ const Header: React.FC<HeaderProps> = () => {
           <li>
             <h2 className={'menu-item'} onClick={()=>handleNavigate("agents")}>Agents</h2>
           </li>
+          <li>
+            <h2 className={'menu-item'} onClick={()=>handleNavigate("events")}>Events</h2>
+          </li>
         </menu>
         <SlButton slot="footer" variant="primary" onClick={() => setOpen(false)}>
           Close
