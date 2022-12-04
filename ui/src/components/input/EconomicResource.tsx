@@ -52,8 +52,8 @@ const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResou
       <br />
       <SlInput disabled label="Stage" name="stage" value={stage}></SlInput>
       <br />
-      <SlInput disabled label="State" name="state" value={state}></SlInput>
-      <br />
+      {/* <SlInput disabled label="State" name="state" value={state}></SlInput>
+      <br /> */}
       <SlTextarea
         label='Note'
         name='note'
