@@ -25,19 +25,19 @@ const Header: React.FC<HeaderProps> = () => {
       <SlDrawer label="Menu" open={open} placement="start" onSlAfterHide={() => setOpen(false)}>
         <menu style={{listStyleType: "none"}}>
           <li>
-            <h2 className={'menu-item'} onClick={()=>handleNavigate("")}>Flow</h2>
+            <h2 className={'menu-item'} onClick={()=>handleNavigate("")}>Home</h2>
           </li>
           <li>
             <h2 className={'menu-item'} onClick={()=>handleNavigate("resource-specifications")}>Resource Specifications</h2>
           </li>
           <li>
-            <h2 className={'menu-item'} onClick={()=>handleNavigate("resources")}>Resources</h2>
-          </li>
-          <li>
-            <h2 className={'menu-item'} onClick={()=>handleNavigate("agents")}>Agents</h2>
+            <h2 className={'menu-item'} onClick={()=>handleNavigate("plans")}>Plans</h2>
           </li>
           <li>
             <h2 className={'menu-item'} onClick={()=>handleNavigate("events")}>Events</h2>
+          </li>
+          <li>
+            <h2 className={'menu-item'} onClick={()=>handleNavigate("resources")}>Resources</h2>
           </li>
         </menu>
         <SlButton slot="footer" variant="primary" onClick={() => setOpen(false)}>

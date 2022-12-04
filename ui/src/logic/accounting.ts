@@ -107,11 +107,11 @@ export function applyEvent(event: EconomicEvent, action: Action, resources: Reso
 
 //// MULTIPLE EVENT ACCOUNTING //////////////////////////////////////////////////
 
-type ResourceSpecificationIndex = Record<string, ResourceSpecification>;
-type EconomicResourceIndex = Record<string, EconomicResource>;
-type EconomicResourcePools = Record<string, EconomicResource>;
-type ConformsTo = string;
-type EconomicResourceIndicesByResourceSpecification = Record<ConformsTo, EconomicResourcePools>;
+export type ResourceSpecificationIndex = Record<string, ResourceSpecification>;
+export type EconomicResourceIndex = Record<string, EconomicResource>;
+export type EconomicResourcePools = Record<string, EconomicResource>;
+export type ConformsTo = string;
+export type EconomicResourceIndicesByResourceSpecification = Record<ConformsTo, EconomicResourcePools>;
 
 /**
  * This function sorts things so we can find things in linear time when we
@@ -202,10 +202,13 @@ export function createResourceAndToResourceShapes(resourceSpecifications: Resour
  * is, or by just storing the point in time from which the user started editing and only doing
  * the the reckoning from that point forward.
  */
-export function simulateAccounting(economicResources: EconomicResources, economicEvents: EconomicEvents): EconomicResources {
-  const store = getDataStore();
-  const resourceSpecifications: ResourceSpecificationIndex = store.getCursor('root.resourceSpecification');
-  const processes: Record<string, Process> = store.getCursor(`root.plan.${store.getCurrentPlanId()}.process`);
+export function simulateAccounting(
+  resourceSpecifications: ResourceSpecificationIndex,
+  economicResources: EconomicResources,
+  processes: Record<string, Process>,
+  economicEvents: EconomicEvents,
+  actions: Array<Action>
+): EconomicResources {
   const [economicResourceIndex, economicResourcePools] = createResourcePools(resourceSpecifications, economicResources);
 
   // Sort events by time of creation, but topological ordering is preferable
@@ -265,7 +268,7 @@ export function simulateAccounting(economicResources: EconomicResources, economi
     } = event;
 
     // get the action for the current economic event
-    const action = store.getActions().find((action) => action.id == event.action as string);
+    const action = actions.find((action) => action.id == event.action as string);
 
     // Create simluation data
     const [economicResourceShape, toEconomicResourceShape] = createResourceAndToResourceShapes(resourceSpecifications, event);

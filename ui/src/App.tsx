@@ -4,16 +4,19 @@ import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
-import Home from "./pages/Home";
 import Pi from "./components/layout/Pi";
 import { getDataStore } from "./data/DataStore";
 import Modal from "react-modal"
 import ProfilePrompt from "./components/ProfilePrompt";
 import { ProfilesContext } from "./components/ProfileComponents";
 import { ResourceSpecificationShape } from "valueflows-models";
+import Home from './pages/Home';
 import ResourceSpecificationView from "./pages/create/ResourceSpecificationView";
 import ProcessSpecificationView from "./pages/create/ProcessSpecificationView";
 import AgentView from "./pages/create/AgentView";
+import Plans from "./pages/Plans";
+import PlanView from "./pages/create/PlanView";
+import EditPlan from "./pages/PlanEdit";
 import EventLedger from "./pages/EventLedger";
 import Agents from "./pages/Agents";
 import ResourceSpecifications from "./pages/ResourceSpecifications";
@@ -75,7 +78,7 @@ const App: React.FC<Props> = ({appStore}) => {
                 <Routes>
                   <Route
                     path="/"
-                    element={<Home setEdit={handleSetRsEdit}/>}>
+                    element={<Home />}>
                   </Route>
                   <Route
                     path="/agents/new"
@@ -108,6 +111,22 @@ const App: React.FC<Props> = ({appStore}) => {
                   <Route
                     path="/processes/edit">
                     <Route path=":id" element={<ProcessSpecificationView />} />
+                  </Route>
+                  <Route
+                    path="/plans"
+                    element={<Plans />}
+                  />
+                  <Route
+                    path="/plans/new"
+                    element={<PlanView />}
+                  />
+                  <Route
+                    path="/plans/update">
+                    <Route path=":id" element={<PlanView/>} />
+                  </Route>
+                  <Route
+                    path="/plans/edit">
+                    <Route path=":id" element={<EditPlan setEdit={handleSetRsEdit}/>} />
                   </Route>
                   <Route
                     path="/events"

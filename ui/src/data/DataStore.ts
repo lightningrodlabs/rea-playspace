@@ -37,16 +37,9 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   public createDefaultRoot() {
     // if it doesn't, create it and a placeholder plan
     console.info('root does not exist. creating...');
-    const plan = new ExtendedPlan({
-      name: 'Default Plan Name'
-    });
-    const PathedPlan: Pathed<ExtendedPlan> = PathFunctor(plan, `root.plan.${plan.id}`);
-    const root = new Root({
-      planId: plan.id
-    });
+    const root = new Root();
     const PathedRoot: Pathed<Root> = PathFunctor(root, 'root');
     this.set(PathedRoot);
-    this.set(PathedPlan);
     // Need to index tree starting with the root
     this.pathIndex.indexTree(this.treeState);
   }

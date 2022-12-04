@@ -32,6 +32,7 @@ import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as valid
 import { getAlmostLastPart, assignFields } from 'typed-object-tweezers';
 import { usePath } from 'yaati';
 import { Root } from '../../data/models/Application/Root';
+import { useParams } from 'react-router-dom';
 
 interface Props {};
 
@@ -39,10 +40,12 @@ const FlowCanvas: React.FC<Props> = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const store = getDataStore();
 
+  let { id: planId } = useParams();
+
   // STATE MANAGEMENT
 
-  const displayNodes = usePath<'root', Root, DisplayNode>(`root.plan.${store.getCurrentPlanId()}.displayNode`, store);
-  const displayEdges = usePath<'root', Root, DisplayEdge>(`root.plan.${store.getCurrentPlanId()}.displayEdge`, store);
+  const displayNodes = usePath<'root', Root, DisplayNode>(`root.plan.${planId}.displayNode`, store);
+  const displayEdges = usePath<'root', Root, DisplayEdge>(`root.plan.${planId}.displayEdge`, store);
   const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
@@ -174,7 +177,7 @@ const FlowCanvas: React.FC<Props> = () => {
               const process: ProcessShape = {
                 name: item.name,
                 basedOn: item.id,
-                plannedWithin: store.getCurrentPlanId()
+                plannedWithin: planId
               } as ProcessShape;
               console.log(process);
               setCurrentPosition(position);
@@ -206,7 +209,7 @@ const FlowCanvas: React.FC<Props> = () => {
     const newNode = new DisplayNode({
       name: item.name,
       vfPath: item.path,
-      planId: store.getCurrentPlanId(),
+      planId,
       type: getAlmostLastPart(item.path),
       position: position ? position : currentPosition
     });
@@ -292,7 +295,6 @@ const FlowCanvas: React.FC<Props> = () => {
        * and set that to the DisplayNode.position property.
        * Then persist to DHT.
        */
-      const planId = store.getCurrentPlanId();
       const path = `root.plan.${planId}.displayNode.${change.id}`;
       const nodeToUpdate = store.getCursor<Pathed<DisplayNode>>(path);
       nodeToUpdate.position = new Position(position);
@@ -370,7 +372,7 @@ const FlowCanvas: React.FC<Props> = () => {
         target,
         targetHandle,
         vfPath: flows.map((flow) => flow.path),
-        planId: store.getCurrentPlanId()
+        planId
       } as DisplayEdgeShape);
       const pathedEdge = PathFunctor(newEdge, `root.plan.${newEdge.planId}.displayEdge.${newEdge.id}`);
       store.set(pathedEdge);
@@ -560,9 +562,9 @@ const FlowCanvas: React.FC<Props> = () => {
       case 'updateProcess':
         return <ProcessModal processState={processState} closeModal={closeModal} afterward={afterProcessEdit}/>;
       case 'flow':
-        return <FlowModal source={source} target={target} closeModal={closeModal} afterward={afterAddFlow} />;
+        return <FlowModal source={source} target={target} planId={planId} closeModal={closeModal} afterward={afterAddFlow} />;
       case 'updateFlow':
-        return <FlowModal vfPath={store.getById<Pathed<DisplayEdge>>(selectedDisplayEdge).vfPath} source={source} target={target} closeModal={closeModal} afterward={afterFlowEdit}/>;
+        return <FlowModal vfPath={store.getById<Pathed<DisplayEdge>>(selectedDisplayEdge).vfPath} source={source} target={target} planId={planId} closeModal={closeModal} afterward={afterFlowEdit}/>;
       default:
         return <></>
     }

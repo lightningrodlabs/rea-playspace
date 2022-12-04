@@ -1,6 +1,6 @@
 import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Pathed } from "data-providers";
 import { getLastPart } from "typed-object-tweezers";
 import PalletNode from '../nodes/PalletNode';
@@ -36,6 +36,8 @@ const Pallet: React.FC<Props> = () => {
       setProcessList(Object.values(processSpecifications));
     }
   }, [processSpecifications]);
+
+  let { id: planId } = useParams();
 
   /**
    * When we drag an item from here to the FlowCanvas, create an object with a
@@ -84,7 +86,7 @@ const Pallet: React.FC<Props> = () => {
     if (event.detail === 2) {
       switch (type) {
         case 'resourceSpecification':
-          navigate(`/resources/edit/${id}`);
+          navigate(`/resource-specifications/edit/${id}`);
           break;
         case 'processSpecification':
           navigate(`/processes/edit/${id}`);
@@ -97,7 +99,7 @@ const Pallet: React.FC<Props> = () => {
     const store = getDataStore();
     if (event.altKey) {
       // check to see if it is in use
-      let displayNodes: Pathed<DisplayNode>[] = store.getDisplayNodes(store.getCurrentPlanId());
+      let displayNodes: Pathed<DisplayNode>[] = store.getDisplayNodes(planId);
       let matchedNodes: Pathed<DisplayNode>[] = [];
       displayNodes.forEach((node, index) => {
         // resource specs

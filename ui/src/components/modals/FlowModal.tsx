@@ -43,11 +43,12 @@ interface Props {
   vfPath?: string[];
   source: string;
   target: string;
+  planId: string,
   closeModal: () => void;
   afterward?: (items: Pathed<Flow>[]) => void;
 }
 
-const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterward}) => {
+const FlowModal: React.FC<Props> = ({vfPath, source, target, planId, closeModal, afterward}) => {
 
   const [actions, setActions] = useState<Array<Pathed<Action>>>([]);
   const [units, setUnits] = useState<Array<Pathed<Unit>>>([]);
@@ -93,7 +94,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
     // Grab vfTypes and vfNodes off the DisplayNodes
     const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
     const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
-    const initialState = flowDefaults[`${sourceVfType}-${targetVfType}`](store.getCurrentPlanId(), sourceVfNode, targetVfNode);
+    const initialState = flowDefaults[`${sourceVfType}-${targetVfType}`](planId, sourceVfNode, targetVfNode);
     setInitial(initialState);
 
     if (vfPath) {
@@ -368,7 +369,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, closeModal, afterwa
         }
       } else {
         // Give the object a path and store it
-        const path = `root.plan.${store.getCurrentPlanId()}.commitment.${editCommitment.id}`;
+        const path = `root.plan.${planId}.commitment.${editCommitment.id}`;
         const pathedEditCommitment = PathFunctor(editCommitment, path)
         const newCommitment: Commitment = store.upsert<Commitment>(pathedEditCommitment, Commitment);
         // Ensure it gets passed back to the DisplayEdge
