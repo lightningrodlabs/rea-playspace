@@ -1,16 +1,16 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
 import {
   Agent,
   ProcessSpecification,
   ResourceSpecification,
-  EconomicResource
+  EconomicResource,
+  Process
 } from "valueflows-models";
 import { usePath } from "yaati";
-import { simulateAccounting } from "../logic/accounting";
-import ResourceLedgerTableRow from "../components/layout/ResourceLedgerTableRow";
+import { ResourceSpecificationIndex, simulateAccounting } from "../logic/accounting";
+import Table from "../components/layout/Table";
 
 export type ResourceLedgerProps = {};
 
@@ -25,8 +25,39 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
   const processSpecifications: Record<string, ProcessSpecification> = usePath('root.processSpecification', store);
 
   useEffect(() => {
-    setEconomicResourcesList(Object.values(simulateAccounting(Object.values(economicResources), Object.values(economicEvents))));
+    const resourceSpecifications: ResourceSpecificationIndex = store.getCursor('root.resourceSpecification');
+    // merge processes from all plans
+    const processes: Record<string, Process> = {};
+    const plans = Object.keys(store.getCursor('root.plan'));
+    plans.forEach((planId) => {
+      const currProcessRecords = store.getCursor(`root.plan.${planId}.process`);
+      if (currProcessRecords) {
+        for (let key in currProcessRecords) {
+          console.log(key)
+          plans[key] = currProcessRecords[key];
+        }
+      }
+    });
+
+    const economicResourceValues = Object.values(economicResources);
+    const economicEventValues = Object.values(economicEvents);
+
+    setEconomicResourcesList(
+      Object.values(
+        simulateAccounting(
+          resourceSpecifications,
+          economicResourceValues,
+          processes,
+          economicEventValues,
+          store.getActions()
+        )
+      )
+    );
   }, [economicEvents, economicResources]);
+
+  const fieldDescriptors = {
+    'name': "Name"
+  }
 
   const RenderResources = (): JSX.Element => {
     if (economicResourcesList.length === 0) {
@@ -36,19 +67,11 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
         </>
       );
     } else {
-      const ResourceRows: JSX.Element[] = economicResourcesList.map(econResource => {
-        return(
-        <ResourceLedgerTableRow
-        key={econResource.id} economicResource={econResource}
-        agents={agents}
-        resourceSpecifications={resourceSpecifications}
-        processSpecifications={processSpecifications} />)
-      });
-
       return (
-        <>
-          {ResourceRows}
-        </>
+        <Table
+          datas={economicResourcesList}
+          fieldDescriptors={fieldDescriptors}>
+        </Table>
       );
     }
   }
