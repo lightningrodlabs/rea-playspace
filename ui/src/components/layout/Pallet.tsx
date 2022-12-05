@@ -89,7 +89,7 @@ const Pallet: React.FC<Props> = () => {
           navigate(`/resource-specifications/edit/${id}`);
           break;
         case 'processSpecification':
-          navigate(`/processes/edit/${id}`);
+          navigate(`/process-specifications/edit/${id}`);
           break;
       }
     }
@@ -137,7 +137,7 @@ const Pallet: React.FC<Props> = () => {
       </SlAlert>
       <div className='category-styles'>
         <h2>
-          <Link to="/resources/new">
+          <Link to="/resource-specifications/new">
             <SlIconButton name="plus-square-fill" label="Add resource specification." />
           </Link>
           Resource Specifications
@@ -147,7 +147,7 @@ const Pallet: React.FC<Props> = () => {
       <br/>
       <div className='category-styles'>
         <h2>
-          <Link to="/processes/new">
+          <Link to="/process-specifications/new">
             <SlIconButton name="plus-square-fill" label="Add process specification."/>
           </Link>
           Process Specifications
