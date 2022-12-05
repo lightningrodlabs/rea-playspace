@@ -22,6 +22,7 @@ import Agents from "./pages/Agents";
 import ResourceSpecifications from "./pages/ResourceSpecifications";
 import ResourceLedger from "./pages/ResourceLedger";
 import { AppStateStore } from './index';
+import ProcessSpecifications from "./pages/ProcessSpecifications";
 
 Modal.setAppElement("#root");
 
@@ -105,11 +106,15 @@ const App: React.FC<Props> = ({appStore}) => {
                     <Route path=":id" element={<ResourceSpecificationView />} />
                   </Route>
                   <Route
-                    path="/processes/new"
+                    path="/process-specifications"
+                    element={<ProcessSpecifications />}
+                  />
+                  <Route
+                    path="/process-specifications/new"
                     element={<ProcessSpecificationView />}
                   />
                   <Route
-                    path="/processes/edit">
+                    path="/process-specifications/edit">
                     <Route path=":id" element={<ProcessSpecificationView />} />
                   </Route>
                   <Route

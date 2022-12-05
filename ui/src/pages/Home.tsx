@@ -57,7 +57,7 @@ const Home: React.FC<HomeProps> = () => {
         <h1>Welcome to the REA Playspace</h1>
       </MainPanelHeader>
       <p>
-        To get started, you should create some <Link to={"agents"}>Agents</Link>, <Link to={"resource-specifications"}>ResourceSpecifications</Link>.
+        To get started, you should create some <Link to={"agents"}>Agents</Link>, <Link to={"resource-specifications"}>Resource Specifications</Link>, <Link to={"process-specifications"}>Process Specifications</Link>.
         After you have those basic necessities, make a <Link to={"plans"}>Plan</Link> or two.
       </p>
       <hr />
