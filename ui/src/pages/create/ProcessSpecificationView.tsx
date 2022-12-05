@@ -51,13 +51,21 @@ const NewProcessSpecification: React.FC<NewProcessSpecificationProps> = () => {
     store.upsert(pr, ProcessSpecification);
 
     clearState();
-    navigate('/');
+    navigate('/process-specifications');
+  }
+
+  function header() {
+    if (id) {
+      return <>Edit Process Specification</>
+    } else {
+      return <>New Process Specification</>
+    }
   }
 
   return (
     <>
       <MainPanelHeader>
-        <h2>New Process Specification</h2>
+        <h2>{header()}</h2>
         <Link to="/">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>

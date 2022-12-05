@@ -96,10 +96,18 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
     navigate('/resource-specifications');
   }
 
+  function header() {
+    if (id) {
+      return <>Edit Resource Specification</>
+    } else {
+      return <>New Resource Specification</>
+    }
+  }
+
   return (
     <>
       <MainPanelHeader>
-        <h2>New Resource Specification</h2>
+        <h2>{header()}</h2>
         <Link to="/resource-specifications">
           <SlButton variant="warning">Cancel</SlButton>
         </Link>
