@@ -1,11 +1,9 @@
 import path from 'node:path';
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts';
 
 module.exports = defineConfig({
   plugins: [
-    react(),
     dts({
       insertTypesEntry: true,
     })
@@ -16,15 +14,6 @@ module.exports = defineConfig({
       name: 'data-providers',
       formats: ['es', 'umd'],
       fileName: (format) => `data-providers.${format}.js`
-    },
-    rollupOptions: {
-      external: ['react', 'react-dom'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
-    },
+    }
   }
 });
