@@ -1,4 +1,4 @@
-import { SlIconButton } from "@shoelace-style/shoelace/dist/react";
+import { SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
 import React from "react";
 import Modal from "react-modal";
 

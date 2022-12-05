@@ -1,4 +1,4 @@
-import { SlAlert, SlIcon, SlIconButton } from '@shoelace-style/shoelace/dist/react';
+import { SlAlert, SlIcon, SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Pathed } from "data-providers";

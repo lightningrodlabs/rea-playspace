@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react";
+import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { ResourceSpecificationShape, UnitShape, ResourceSpecification } from "valueflows-models";

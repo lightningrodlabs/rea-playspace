@@ -1,4 +1,4 @@
-import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react';
+import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react/index';
 import React, { useEffect, useState } from 'react';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';

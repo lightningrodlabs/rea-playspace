@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react";
+import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
 import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../../components/layout/MainPanelHeader";
 import { Agent } from "valueflows-models";

@@ -27,7 +27,7 @@ import ProcessSpecifications from "./pages/ProcessSpecifications";
 Modal.setAppElement("#root");
 
 setBasePath(
-  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.70/dist/"
+  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.85/dist/"
 );
 
 interface Props {

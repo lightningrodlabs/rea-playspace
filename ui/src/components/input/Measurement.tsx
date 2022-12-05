@@ -1,4 +1,4 @@
-import { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace/dist/react/index';
 import React, { useEffect, useState } from 'react';
 import {  MeasurementShape, UnitShape, Measurement } from 'valueflows-models';
 import { slChangeConstructor } from '../util';

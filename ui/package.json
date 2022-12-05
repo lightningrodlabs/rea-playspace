@@ -15,13 +15,14 @@
     "@types/react-modal": "^3.13.1",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^1.0.7",
+    "@types/eslint": "^8.4.1",
     "eslint": "^8.22.0",
     "prettier": "^2.2.1",
     "react-refresh": "^0.10.0",
     "react-refresh-typescript": "^2.0.4",
     "terser": "4.4.2",
     "typescript": "^4.6.3",
-    "vite": "^2.9.0"
+    "vite": "^2.8.0"
   },
   "dependencies": {
     "guid-typescript": "^1.0.9",
@@ -32,7 +33,7 @@
     "@scoped-elements/shoelace": "0.0.8",
     "lit-svelte-stores": "^0.2.0",
     "@scoped-elements/material-web": "0.0.19",
-    "@shoelace-style/shoelace": "^2.0.0-beta.76",
+    "@shoelace-style/shoelace": "^2.0.0-beta.85",
     "blob-to-buffer": "^1.2.9",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
@@ -45,9 +46,6 @@
     "valueflows-models": "workspace: *",
     "data-providers": "workspace: *",
     "yaati": "workspace: *"
-  },
-  "peerDependencies": {
-    "@types/eslint": "^8.4.1"
   },
   "eslintConfig": {
     "extends": [

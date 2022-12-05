@@ -1,4 +1,4 @@
-import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from '@shoelace-style/shoelace/dist/react';
+import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from "@shoelace-style/shoelace/dist/react/index";
 import React, { FormEvent, useEffect, useState } from 'react';
 import { getDataStore } from '../../data/DataStore';
 import { Pathed, PathFunctor } from "data-providers";
