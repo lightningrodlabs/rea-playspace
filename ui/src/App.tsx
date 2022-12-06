@@ -7,8 +7,6 @@ import Header from "./components/layout/Header";
 import Pi from "./components/layout/Pi";
 import { getDataStore } from "./data/DataStore";
 import Modal from "react-modal"
-import ProfilePrompt from "./components/ProfilePrompt";
-import { ProfilesContext } from "./components/ProfileComponents";
 import { ResourceSpecificationShape } from "valueflows-models";
 import Home from './pages/Home';
 import ResourceSpecificationView from "./pages/create/ResourceSpecificationView";
@@ -170,11 +168,11 @@ const App: React.FC<Props> = ({appStore}) => {
 
   return (
     <div>
-      <ProfilesContext store={appStore.profileStore}>
-          <ProfilePrompt wrappedProfileReadable={appStore.wrappedProfileReadable}>
+      {/* <ProfilesContext store={appStore.profileStore}>
+          <ProfilePrompt wrappedProfileReadable={appStore.wrappedProfileReadable}> */}
             <Main />
-          </ProfilePrompt>
-      </ProfilesContext>
+          {/* </ProfilePrompt>
+      </ProfilesContext> */}
     </div>
   );
 };

@@ -2,21 +2,14 @@ import { StateTransitions, StateMachine } from './StateMachine';
 import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holochain/client';
 import { HolochainClient, CellClient } from '@holochain-open-dev/cell-client';
 import { getDataStore } from './data/DataStore';
-import { ProfilesService, ProfilesStore } from '@holochain-open-dev/profiles';
 import { getHolochainClient } from './hcWebsockets';
 import { APP_ID } from "./holochainConf";
 import { buildModel, LocalstoreProvider, Pathed, ProjectProvider, SignalMessage, ZomeApi } from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';
-import { wrapReadable } from 'store-adaptors';
 import { DataStore } from './data/DataStore'
 import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
-import "@holochain-open-dev/profiles/create-profile";
-import "@holochain-open-dev/profiles/list-profiles";
-import "@holochain-open-dev/profiles/agent-avatar";
-import "@holochain-open-dev/profiles/my-profile";
-import "@holochain-open-dev/profiles/profiles-context";
 
 /*
 
@@ -77,7 +70,7 @@ export type AppStateStore = {
   holochainClient: HolochainClient
   appInfo: InstalledAppInfo
   dataStore: DataStore
-  profileStore: ProfilesStore
+  profileStore: any // ProfilesStore
   wrappedProfileReadable: any
 }
 
@@ -144,14 +137,14 @@ AppMachine.on('connectSignalHandlers', async (state: AppStateStore) => {
 });
 
 AppMachine.on('createProfileStore', async (state: AppStateStore) => {
-  console.log('createProfileStore');
-  const cell: InstalledCell = state.appInfo.cell_data[0];
-  const profilesService = new ProfilesService(new CellClient(state.holochainClient, cell));
-  state.profileStore = new ProfilesStore(profilesService, {
-    avatarMode: "avatar-optional",
-  });
-  const myProfileReadable = await state.profileStore.fetchMyProfile();
-  state.wrappedProfileReadable = wrapReadable(myProfileReadable);
+  console.log('createProfileStore -- NOP');
+  // const cell: InstalledCell = state.appInfo.cell_data[0];
+  // const profilesService = new ProfilesService(new CellClient(state.holochainClient, cell));
+  // state.profileStore = new ProfilesStore(profilesService, {
+  //   avatarMode: "avatar-optional",
+  // });
+  // const myProfileReadable = await state.profileStore.fetchMyProfile();
+  // state.wrappedProfileReadable = wrapReadable(myProfileReadable);
   AppMachine.to('fetchData');
 });
 
