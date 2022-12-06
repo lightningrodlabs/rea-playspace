@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
 import { Action, Agent, EconomicEvent, EconomicResource, Process, ResourceSpecification, Unit } from "valueflows-models";
-import { usePath } from "Yaati";
+import { usePath } from "yaati";
 import { Pathed } from "data-providers";
 import { Root } from "../data/models/Application/Root";
 import Table from "../components/layout/Table";

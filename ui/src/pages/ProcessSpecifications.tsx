@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
 import { ProcessSpecification } from "valueflows-models";
 import Table from "../components/layout/Table";
-import { usePath } from "Yaati";
+import { usePath } from "yaati";
 import { Pathed } from "data-providers";
 import { Root } from "../data/models/Application/Root";
 

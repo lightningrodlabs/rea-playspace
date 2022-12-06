@@ -14,7 +14,7 @@ import {
 } from "./models/Application";
 import { Root } from "./models/Application/Root";
 import { LocalstoreProvider, Pathed, PathFunctor, TreeDefinition } from "data-providers";
-import { IndexedTreeWithProviders, TreeState } from "Yaati";
+import { IndexedTreeWithProviders, TreeState } from "yaati";
 import { ModelTree, ModelKinds } from './models/Application';
 import { BreadthFirstTraversal, Constructor } from "typed-object-tweezers";
 

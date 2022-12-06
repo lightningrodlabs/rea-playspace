@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import MainPanelHeader from "../components/layout/MainPanelHeader";
 import { useNavigate } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
-import { usePath } from "Yaati";
+import { usePath } from "yaati";
 import { Root } from "../data/models/Application/Root";
 import { Pathed } from "data-providers";
 import { Plan } from "valueflows-models";
