@@ -2,21 +2,20 @@
 manifest_version: "1"
 name: reaplayspacedna
 integrity:
-  uid: 00000000-0000-0000-0000-000000000000
+  network_seed: ~
   properties: ~
-  origin_time: 2022-02-11T23:05:19.470323Z
+  origin_time: 1644620719000
   zomes:
     - name: projects_core
+      hash: ~
       bundled: ../../target/wasm32-unknown-unknown/release/projects_core.wasm
+      dependencies: ~
     - name: profiles_core
       bundled: ../../target/wasm32-unknown-unknown/release/profiles_core.wasm
 coordinator:
   zomes:
     - name: projects
+      hash: ~
       bundled: ../../target/wasm32-unknown-unknown/release/projects.wasm
       dependencies:
         - name: projects_core
-    - name: profiles
-      bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
-      dependencies:
-        - name: profiles_core
