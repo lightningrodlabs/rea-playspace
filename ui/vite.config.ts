@@ -15,7 +15,6 @@ export default defineConfig({
     rollupOptions: {
       external: [             
         /^node:.*/,
-        // /^tslib/,
         /^lit-html.*/
       ]
     }

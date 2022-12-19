@@ -168,11 +168,7 @@ const App: React.FC<Props> = ({appStore}) => {
 
   return (
     <div>
-      {/* <ProfilesContext store={appStore.profileStore}>
-          <ProfilePrompt wrappedProfileReadable={appStore.wrappedProfileReadable}> */}
-            <Main />
-          {/* </ProfilePrompt>
-      </ProfilesContext> */}
+      <Main />
     </div>
   );
 };

@@ -5,7 +5,6 @@ import MainPanelHeader from "../../components/layout/MainPanelHeader";
 import { Agent } from "valueflows-models";
 import { useNavigate } from "react-router-dom";
 import { getDataStore } from "../../data/DataStore";
-import { ListProfiles, MyProfile } from "../../components/ProfileComponents";
 import { PathFunctor } from "data-providers";
 
 export type NewAgentProps = {
@@ -47,15 +46,6 @@ const AgentView: React.FC<NewAgentProps> = () => {
     const { name, value } = e.target;
     setState(prevState => ({ ...prevState, [name]: value }));
   };
-
-  /**
-   * TODO: ListProfiles is causing the UI to freeze and crash.
-   *
-   */
-  // const handleAddAgentFromProfile = async (e: CustomEvent) => {
-  //   clearState();
-  //   navigate('/');
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -132,15 +122,6 @@ const AgentView: React.FC<NewAgentProps> = () => {
           </SlButton>
         </form>
         </SlCard>
-      
-        {/* <SlCard className="new-agent-card">
-          <ListProfiles
-              onagentselected={(e:CustomEvent) => handleAddAgentFromProfile(e)}>
-          </ListProfiles>
-          <p>Placeholder for AgentList</p>
-          <form onSubmit={handleSubmit}>
-          </form>
-        </SlCard> */}
       </section>
     </>
   );

@@ -436,13 +436,6 @@ A potentially useful brown for the pallet: #823200
   margin: 0.3em;
 }
 
-/* profile-prompt */
-.profile-prompt {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* modal styling */
 .modal-close {
   position: absolute;

@@ -10,8 +10,6 @@ integrity:
       hash: ~
       bundled: ../../target/wasm32-unknown-unknown/release/projects_core.wasm
       dependencies: ~
-    - name: profiles_core
-      bundled: ../../target/wasm32-unknown-unknown/release/profiles_core.wasm
 coordinator:
   zomes:
     - name: projects

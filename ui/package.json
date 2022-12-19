@@ -44,11 +44,7 @@
     "store-adaptors": "workspace: *",
     "valueflows-models": "workspace: *",
     "data-providers": "workspace: *",
-    "yaati": "workspace: *",
-    "tslib": "^2.0.0"
-  },
-  "peerDependencies": {
-    "tslib": "^2.0.0"
+    "yaati": "workspace: *"
   },
   "eslintConfig": {
     "extends": [

@@ -1,6 +1,6 @@
 import { StateTransitions, StateMachine } from './StateMachine';
 import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holochain/client';
-import { HolochainClient, CellClient } from '@holochain-open-dev/cell-client';
+import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import { getDataStore } from './data/DataStore';
 import { getHolochainClient } from './hcWebsockets';
 import { APP_ID } from "./holochainConf";
@@ -10,7 +10,6 @@ import { DataStore } from './data/DataStore'
 import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
-
 /*
 
 Application State Management
@@ -23,7 +22,6 @@ succession and should be handled by a state machine.
 * Set-up shared Holochain state information (from appInfo)
 * Instantiate the DataStore and DataProviders
 * Connect the signal handlers
-* Instantiate the ProfileStore
 * Fetch the root (or maybe the root.plan?)
 * Display a list of available Plans, if any exist, or allow creating a plan
 * Once a plan is selected or created, show the FlowCanvas UI.
@@ -42,7 +40,6 @@ and Plans that has a completely different screen to begin with.
  | 'setAppInfo'
  | 'createDataStore'
  | 'connectSignalHandlers'
- | 'createProfileStore'
  | 'fetchData'
  | 'loaded'
 
@@ -56,8 +53,7 @@ const AppTransitions: StateTransitions<AppState> = {
  connecting: ['setAppInfo'],
  setAppInfo: ['createDataStore'],
  createDataStore: ['connectSignalHandlers'],
- connectSignalHandlers: ['createProfileStore'],
- createProfileStore: ['fetchData'],
+ connectSignalHandlers: ['fetchData'],
  fetchData: ['loaded'],
  loaded: ['loaded'],
 }
@@ -70,17 +66,13 @@ export type AppStateStore = {
   holochainClient: HolochainClient
   appInfo: InstalledAppInfo
   dataStore: DataStore
-  profileStore: any // ProfilesStore
-  wrappedProfileReadable: any
 }
 
 const initialState: AppStateStore = {
   currentState: 'connecting',
   holochainClient: undefined,
   appInfo: undefined,
-  dataStore: undefined,
-  profileStore: undefined,
-  wrappedProfileReadable: undefined,
+  dataStore: undefined
 }
 
 const AppMachine = new StateMachine<AppState, AppStateStore>(initialState, AppTransitions);
@@ -133,18 +125,6 @@ AppMachine.on('connectSignalHandlers', async (state: AppStateStore) => {
     }
   };
   state.holochainClient.addSignalHandler(signalCb);
-  AppMachine.to('createProfileStore');
-});
-
-AppMachine.on('createProfileStore', async (state: AppStateStore) => {
-  console.log('createProfileStore -- NOP');
-  // const cell: InstalledCell = state.appInfo.cell_data[0];
-  // const profilesService = new ProfilesService(new CellClient(state.holochainClient, cell));
-  // state.profileStore = new ProfilesStore(profilesService, {
-  //   avatarMode: "avatar-optional",
-  // });
-  // const myProfileReadable = await state.profileStore.fetchMyProfile();
-  // state.wrappedProfileReadable = wrapReadable(myProfileReadable);
   AppMachine.to('fetchData');
 });
 
