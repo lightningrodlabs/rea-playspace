@@ -9,7 +9,7 @@
   "author": "",
   "license": "CAL-1.0",
   "dependencies": {
-    "@holochain/client": "^0.8.0",
+    "@holochain/client": "^0.10.2",
     "esm": "^3.2.25",
     "js-base64": "^3.6.1",
     "lodash-es": "^4.17.21",
