@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 importers:
 
-  ../../Library/pnpm/store/v3/tmp/dlx-87690:
+  ../../Library/pnpm/store/v3/tmp/dlx-87911:
     specifiers:
       vite: ^4.0.2
     dependencies:
