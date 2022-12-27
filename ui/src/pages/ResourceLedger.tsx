@@ -35,7 +35,7 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
       if (currProcessRecords) {
         for (let key in currProcessRecords) {
           console.log(key)
-          plans[key] = currProcessRecords[key];
+          processes[key] = currProcessRecords[key];
         }
       }
     });
