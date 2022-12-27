@@ -6,10 +6,11 @@ import {
   ProcessSpecification,
   ResourceSpecification,
   EconomicResource,
-  Process
+  Process,
+  ResourceSpecificationIndex,
+  simulateAccounting
 } from "valueflows-models";
 import { usePath } from "yaati";
-import { ResourceSpecificationIndex, simulateAccounting } from "../logic/accounting";
 import Table from "../components/layout/Table";
 
 export type ResourceLedgerProps = {};

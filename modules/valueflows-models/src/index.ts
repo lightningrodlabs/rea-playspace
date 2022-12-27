@@ -74,3 +74,11 @@ import { EconomicEvent, EconomicEventShape } from "./Observation";
 
 export type FlowShape = CommitmentShape | EconomicEventShape;
 export type Flow = Commitment | EconomicEvent;
+
+export type {
+  ResourceSpecificationIndex
+} from "./Accounting";
+export {
+  applyEvent,
+  simulateAccounting
+} from "./Accounting";

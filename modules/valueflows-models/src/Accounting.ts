@@ -1,4 +1,3 @@
-import { getDataStore } from "../data/DataStore";
 import {
   Action,
   QuantityEffect,
@@ -9,11 +8,12 @@ import {
   EconomicResourceShape,
   EconomicResource,
   EconomicResources
-} from "valueflows-models";
+} from ".";
 
 //// SINGLE EVENT ACCOUNTING ////////////////////////////////////////////////////
 
 type ResourcePair = [EconomicResource, EconomicResource];
+type ProcessDictionary = Record<string, Process>;
 type QuantityEffectMethod = (field: 'accountingQuantity' | 'onhandQuantity', resource: EconomicResource, toResource: EconomicResource, event: EconomicEvent) => void;
 type QuantityEffectMethods = Record<QuantityEffect, QuantityEffectMethod>;
 
@@ -35,8 +35,6 @@ const quantityEffects: QuantityEffectMethods = {
   }
 }
 
-type ProcessIndex = Record<string, Process>;
-
 /**
  * This applies the full set of adjustments specified by an EconomicEvent to a
  * pair of EconomicResources: [resourceInventoriedAs, toResourceInventoriedAs],
@@ -45,7 +43,7 @@ type ProcessIndex = Record<string, Process>;
  * This is broken up this way, so this code doesn't need to focus on fetching any
  * data, but rather acts directly upon the objects provided.
  */
-export function applyEvent(event: EconomicEvent, action: Action, resources: ResourcePair, processes: ProcessIndex) {
+export function applyEvent(event: EconomicEvent, action: Action, resources: ResourcePair, processes: ProcessDictionary) {
   // Note: corresponds with [ resourceInventoriedAs, toResourceInventoriedAs ]
   const [resource, toResource] = resources;
 
@@ -118,8 +116,8 @@ export type EconomicResourceIndicesByResourceSpecification = Record<ConformsTo, 
  * actually start doing the accounting process.
  *
  * We create two indices in one pass of the list of resources passed in:
- * - resourcePools: an two dimensional index grouped by conformsTo then grouped
- *   by synthetcKey, with an array of EconomicResources who's synthicKeys all
+ * - resourcePools: a two dimensional index grouped by conformsTo then grouped
+ *   by syntheticKey, with an array of EconomicResources who's syntheticKeys all
  *   collide.
  * - resourceIndex: each EconomicResource is indexed by id
  *
