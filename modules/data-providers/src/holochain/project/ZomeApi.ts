@@ -25,7 +25,7 @@ export class ZomeApi {
   }
 
   public async signal_call (message: string): Promise<void> {
-    await this.client.callZome(this.cellId, 'projects', 'ui_updated', message);
+    //await this.client.callZome(this.cellId, 'projects', 'ui_updated', message);
     return;
   }
 }
