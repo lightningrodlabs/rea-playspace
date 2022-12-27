@@ -37,7 +37,7 @@
     "data-providers": "workspace:^0.1.0",
     "lodash": "^4.17.21",
     "react": "^16.14.0",
-    "store-adaptors": "workspace:^0.1.0",
+    "react-store-adaptors": "^0.1.0",
     "typed-object-tweezers": "workspace:^0.1.0"
   },
   "devDependencies": {

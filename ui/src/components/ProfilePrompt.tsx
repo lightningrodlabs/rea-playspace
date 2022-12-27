@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { CreateProfile } from "./ProfileComponents";
 import { Profile } from "@holochain-open-dev/profiles";
-import { useStore } from "store-adaptors";
+import { useStore } from "react-store-adaptors";
 
 interface Props {
   wrappedProfileReadable

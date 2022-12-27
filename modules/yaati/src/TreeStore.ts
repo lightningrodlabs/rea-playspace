@@ -21,7 +21,7 @@
  */
 import { SubscriberList } from './SubscriberList';
 import { GetPath, getLastPart, getParentPath } from "typed-object-tweezers";
-import { SyncExternalStoreApi } from "store-adaptors";
+import { SyncExternalStoreApi } from "react-store-adaptors";
 import { Pathed } from "data-providers";
 import { cloneDeep } from 'lodash';
 

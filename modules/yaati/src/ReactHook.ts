@@ -1,4 +1,4 @@
-import { useStoreWithSelector } from 'store-adaptors';
+import { useStoreWithSelector } from 'react-store-adaptors';
 import { TreeState, TreeStore } from './TreeStore';
 import { GetPath } from 'typed-object-tweezers';
 

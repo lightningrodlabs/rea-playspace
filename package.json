@@ -8,7 +8,6 @@
   },
   "private": true,
   "workspaces": [
-    "store-adaptors",
     "yaati",
     "data-providers",
     "valueflows-models",
@@ -16,7 +15,7 @@
     "tests"
   ],
   "scripts": {
-    "build": "cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/store-adaptors && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd -",
+    "build": "cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd -",
 
     "// ## HOLOCHAIN ##":   "",
     "hc:redo":              "pnpm run hc:happ-pack && pnpm run hc:run",

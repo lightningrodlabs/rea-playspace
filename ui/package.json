@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/eslint": "^8.4.1",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.23",
     "@types/react": "^17.0.43",
@@ -15,7 +16,6 @@
     "@types/react-modal": "^3.13.1",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^1.0.7",
-    "@types/eslint": "^8.4.1",
     "eslint": "^8.22.0",
     "prettier": "^2.2.1",
     "react-refresh": "^0.10.0",
@@ -25,25 +25,25 @@
     "vite": "^2.8.0"
   },
   "dependencies": {
-    "guid-typescript": "^1.0.9",
     "@holochain-open-dev/cell-client": "^0.9.1",
     "@holochain/client": "^0.10.2",
     "@lit-labs/react": "1.0.7",
-    "@scoped-elements/shoelace": "0.0.8",
-    "lit-svelte-stores": "^0.2.0",
     "@scoped-elements/material-web": "0.0.19",
+    "@scoped-elements/shoelace": "0.0.8",
     "@shoelace-style/shoelace": "^2.0.0-beta.85",
     "blob-to-buffer": "^1.2.9",
+    "data-providers": "workspace: *",
+    "guid-typescript": "^1.0.9",
+    "lit-svelte-stores": "^0.2.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-flow-renderer": "^10.3.14",
     "react-modal": "^3.14.4",
     "react-router-dom": "^6.3.0",
-    "ws": "^8.5.0",
+    "react-store-adaptors": "^0.1.0",
     "typed-object-tweezers": "workspace: *",
-    "store-adaptors": "workspace: *",
     "valueflows-models": "workspace: *",
-    "data-providers": "workspace: *",
+    "ws": "^8.5.0",
     "yaati": "workspace: *"
   },
   "eslintConfig": {
