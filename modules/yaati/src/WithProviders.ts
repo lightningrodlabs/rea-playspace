@@ -8,14 +8,17 @@ import { TreeState } from "./TreeStore";
  */
 export class IndexedTreeWithProviders<RootKey extends string, R> extends TreeStoreWithIndex<RootKey, R> {
   protected providers: Record<string, DataProvider>;
+  protected defaultProvider: string;
 
   constructor(
     initTreeState: TreeState<RootKey, R>,
     treeDefinition?: TreeDefinition,
-    modelKinds?: Record<string, Constructor>
+    modelKinds?: Record<string, Constructor>,
+    defaultProvider: string = 'localstore'
   ) {
     super(initTreeState, treeDefinition, modelKinds);
     this.providers = {};
+    this.defaultProvider = defaultProvider
   }
 
   /**
@@ -42,7 +45,7 @@ export class IndexedTreeWithProviders<RootKey extends string, R> extends TreeSto
    * basis which provider should be used for each object type.
    */
   public getProvider(path: string) {
-    return this.providers['project'];
+    return this.providers[this.defaultProvider];
   }
 
   /**

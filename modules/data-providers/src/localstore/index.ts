@@ -1,5 +1,5 @@
 import { DataProvider } from "../index";
-import { Constructor, BreadthFirstTraversal, TraversePath, NOP } from "typed-object-tweezers";
+import { Constructor, BreadthFirstTraversal, TraversePath, NOP, getParentPath, GetPath, getLastPart } from "typed-object-tweezers";
 import { WithPath, TreeDefinition, constructTreeAtPath } from "../WithPath";
 
 
@@ -23,7 +23,7 @@ export class LocalstoreProvider implements DataProvider {
    public fetch (path: string): Promise<WithPath> {
     // Outer promise that returns the data
     return new Promise<WithPath>((data_resolve) => {
-      const tree = this.constructTree(this.getTreeIndex(), path);
+      const tree = this.parseTree(this.getTreeIndex(), path);
       data_resolve(tree);
     });
   }
@@ -32,7 +32,12 @@ export class LocalstoreProvider implements DataProvider {
    * Persist a single PathedData object
    */
   public put (item: WithPath) {
-    window.localStorage.setItem(item.path, JSON.stringify(item));
+    const tree = this.parseTree(this.getTreeIndex());
+    const parent = getParentPath(item.path);
+    const itemSlug = getLastPart(item.path);
+    const cursor = GetPath(tree, parent);
+    cursor[itemSlug] = item;
+    this.saveTree(tree);
   }
 
   /**
@@ -46,21 +51,28 @@ export class LocalstoreProvider implements DataProvider {
    * Deletes thing corresponding to the passed path
    */
   public delete (path: string) {
-    window.localStorage.removeItem(path);
+    const tree = this.parseTree(this.getTreeIndex());
+    const parent = getParentPath(path);
+    const itemSlug = getLastPart(path);
+    const cursor = GetPath(tree, parent);
+    delete cursor[itemSlug];
+    this.saveTree(tree);
   }
 
   /**
    * Construct a tree using the local store treeIndex
    */
-  public constructTree (treeIndex: {}, startPath: string = ''): {} {
+  public parseTree (treeIndex: {}, startPath: string = ''): {} {
     const tree = {};
-    BreadthFirstTraversal(treeIndex, startPath, (node, key, path) => {
-      const data = node;
-      const name = key;
+    // Getting the parent path to make sure we start building the tree from the
+    // right place. This make it equivalent to the path traversal in the Project
+    // provider.
+    const parentPath = getParentPath(startPath);
+    BreadthFirstTraversal(treeIndex, parentPath, (node, key, path) => {
       constructTreeAtPath(tree, node, key, path, this.treeDefinition, this.modelKinds);
     });
-    // Return the tree
-    return tree;
+    // Return the tree starting at the path requested
+    return (startPath === '') ? tree : tree[startPath];
   }
 
   /**

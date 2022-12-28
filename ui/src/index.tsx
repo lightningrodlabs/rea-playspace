@@ -3,7 +3,7 @@ import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holoch
 import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import { getDataStore } from './data/DataStore';
 import { getHolochainClient } from './hcWebsockets';
-import { APP_ID } from "./holochainConf";
+import { APP_ID } from "./AppConf";
 import { buildModel, LocalstoreProvider, Pathed, ProjectProvider, SignalMessage, ZomeApi } from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';
 import { DataStore } from './data/DataStore'

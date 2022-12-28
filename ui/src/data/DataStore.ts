@@ -9,14 +9,12 @@ import {
   DisplayNode,
   DisplayEdge
 } from "./models/Application/Display";
-import {
-  ExtendedPlan
-} from "./models/Application";
 import { Root } from "./models/Application/Root";
 import { LocalstoreProvider, Pathed, PathFunctor, TreeDefinition } from "data-providers";
 import { IndexedTreeWithProviders, TreeState } from "yaati";
 import { ModelTree, ModelKinds } from './models/Application';
 import { BreadthFirstTraversal, Constructor } from "typed-object-tweezers";
+import { DEFAULT_DATA_PROVIDER } from "../AppConf";
 
 /**
  * Our lovely data store
@@ -27,9 +25,10 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   constructor(
     initTreeState: TreeState<'root', Root>,
     treeDefinition?: TreeDefinition,
-    modelKinds?: Record<string, Constructor>
+    modelKinds?: Record<string, Constructor>,
+    defaultProvider: string = 'localstore'
   ) {
-    super(initTreeState, treeDefinition, modelKinds)
+    super(initTreeState, treeDefinition, modelKinds, defaultProvider);
   }
 
   // Root helpers
@@ -168,11 +167,11 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   }
 }
 
-const dataStore = new DataStore({} as TreeState<'root', Root>, ModelTree, ModelKinds);
+const dataStore = new DataStore({} as TreeState<'root', Root>, ModelTree, ModelKinds, DEFAULT_DATA_PROVIDER);
 
 /**
  * Fetches DataStore
  */
- export function getDataStore() {
+export function getDataStore() {
   return dataStore;
 }

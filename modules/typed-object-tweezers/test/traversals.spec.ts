@@ -74,8 +74,13 @@ describe('The traversal algorithms', () => {
 
   describe('GetPath', () => {
     it('should return the same object given an empty path', () => {
-      const root = GetPath(tree_test, '');
-      expect(root).toBe(tree_test);
+      const t = GetPath(tree_test, '');
+      expect(t).toBe(tree_test);
+    });
+
+    it('should return the root', () => {
+      const root = GetPath(tree_test, 'root');
+      expect(root).toBe(tree_test.root);
     });
 
     it('should return the correct object given path root.a.3.c.5', () => {
@@ -91,6 +96,14 @@ describe('The traversal algorithms', () => {
         visited.push(key);
       });
       expect(visited).toEqual(['root','a','b','3','1','c','d','5','7']);
+    });
+
+    it('should traverse breadth first starting with path root.a.3', () => {
+      const visited = Array<string>();
+      BreadthFirstTraversal(tree_test, 'root.a.3', (node, key, path) => {
+        visited.push(key);
+      });
+      expect(visited).toEqual(['c','d','5','7']);
     });
   });
 

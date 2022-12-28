@@ -20,7 +20,7 @@
  * These can be mixins
  */
 import { SubscriberList } from './SubscriberList';
-import { GetPath, getLastPart, getParentPath } from "typed-object-tweezers";
+import { GetPath, getLastPart, getParentPath, getPathLength } from "typed-object-tweezers";
 import { SyncExternalStoreApi } from "react-store-adaptors";
 import { Pathed } from "data-providers";
 import { cloneDeep } from 'lodash';
@@ -67,7 +67,7 @@ export class TreeStore<RootKey extends string, R> implements SyncExternalStoreAp
    */
   private dispatch(path: string) {
     let currPath = path;
-    while (currPath.split('').length > 0) {
+    while (getPathLength(currPath) > 0) {
       this.subscribers.dispatch(currPath);
       currPath = getParentPath(currPath);
     }

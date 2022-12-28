@@ -199,7 +199,7 @@ export function constructTreeAtPath(tree: {}, data: {}, name: string, path: stri
 
   const instatiation = buildModel(treeDefinition, modelKinds, path, data);
 
-  if (parentPath) {
+  if (parentPath && parentPath != '') {
     const parent = GetPath(tree, parentPath);
     parent[name] = instatiation;
   } else {

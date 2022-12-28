@@ -193,15 +193,24 @@ export function TraversePath<T = {}, R = {}> (
   noObject: (cursor: T, slug: string) => void
 ): R {
   let cursor: any = init;
+  let pathSlugs: Array<string>;
   if (path != '') {
-    const pathSlugs: Array<string> = path.split('.');
+    try {
+      pathSlugs = path.split('.');
+    } catch(e) {
+      pathSlugs = [path]
+    }
     for (let slug of pathSlugs) {
+      if (cursor === undefined) {
+        noObject(cursor, slug);
+        return {} as R;
+      }
       if (slug in cursor) {
         hasObject(cursor, slug);
         cursor = cursor[slug];
       } else {
         noObject(cursor, slug);
-        cursor = undefined;
+        cursor = {} as R;
       }
     }
   }
@@ -264,7 +273,7 @@ export function BreadthFirstTraversal<T extends {}> (
   do {
     // take the next context off the queue
     const currentContext: BreadthFirstContext = iterationContexts.shift();
-    if (currentContext) {
+    if (currentContext && currentContext.context) {
       // iterate over children in the current context
       Object.keys(currentContext.context).forEach((key) => {
         const currentObject = currentContext.context[key];
@@ -334,16 +343,42 @@ export function DepthFirstTraversal<T extends {}> (
 // Helper Functions
 
 export function getParentPath(path: string): string {
-  const parts = path.split('.');
-  return parts.slice(0, parts.length -1 ).join('.');
+  try {
+    const parts = path.split('.');
+    return parts.slice(0, parts.length -1 ).join('.');
+  } catch(e) {
+    return '';
+  }
 }
 
 export function getLastPart(path: string): string {
-  const parts = path.split('.');
-  return parts[parts.length - 1];
+  try {
+    const parts = path.split('.');
+    return parts[parts.length - 1];
+  } catch(e) {
+    return '';
+  }
 }
 
 export function getAlmostLastPart(path: string): string {
-  const parts = path.split('.');
-  return parts.slice(parts.length - 2, parts.length - 1)[0];
+  try {
+    const parts = path.split('.');
+    if (parts.length == 1) {
+      return '';
+    }
+    return parts.slice(parts.length - 2, parts.length - 1)[0];
+  } catch(e) {
+    return '';
+  }
+}
+
+export function getPathLength(path: string): number {
+  if (path === '') return 0;
+  try {
+    const parts = path.split('.');
+    return parts.length;
+  } catch(e) {
+    if (path && path !== '') return 1;
+    return 0;
+  }
 }
