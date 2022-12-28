@@ -1,6 +1,6 @@
 import { StateTransitions, StateMachine } from './StateMachine';
 import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holochain/client';
-import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
+import { HolochainClient } from '@holochain-open-dev/cell-client';
 import { getDataStore } from './data/DataStore';
 import { getHolochainClient } from './hcWebsockets';
 import { APP_ID } from "./AppConf";

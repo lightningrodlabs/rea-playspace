@@ -1,4 +1,4 @@
-import { Pathed, TreeDefinition, walkTreeDefinition } from "data-providers";
+import { Pathed, TreeDefinition } from "data-providers";
 import { BreadthFirstTraversal, Constructor, getAlmostLastPart } from "typed-object-tweezers";
 import { TreeState, TreeStore } from "./TreeStore";
 
