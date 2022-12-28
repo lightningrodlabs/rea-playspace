@@ -1,10 +1,6 @@
 import { StateTransitions, StateMachine } from './StateMachine';
-import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holochain/client';
-import { HolochainClient } from '@holochain-open-dev/cell-client';
 import { getDataStore } from './data/DataStore';
-import { getHolochainClient } from './hcWebsockets';
-import { APP_ID } from "./AppConf";
-import { buildModel, LocalstoreProvider, Pathed, ProjectProvider, SignalMessage, ZomeApi } from 'data-providers';
+import { LocalstoreProvider} from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';
 import { DataStore } from './data/DataStore'
 import ReactDOM from 'react-dom';
@@ -36,10 +32,7 @@ and Plans that has a completely different screen to begin with.
  * Application States
  */
  export type AppState =
- | 'connecting'
- | 'setAppInfo'
  | 'createDataStore'
- | 'connectSignalHandlers'
  | 'fetchData'
  | 'loaded'
 
@@ -50,10 +43,7 @@ and Plans that has a completely different screen to begin with.
 * 'currentStatse' => ['next', 'allowed', 'state']
 */
 const AppTransitions: StateTransitions<AppState> = {
- connecting: ['setAppInfo'],
- setAppInfo: ['createDataStore'],
- createDataStore: ['connectSignalHandlers'],
- connectSignalHandlers: ['fetchData'],
+ createDataStore: ['fetchData'],
  fetchData: ['loaded'],
  loaded: ['loaded'],
 }
@@ -63,68 +53,21 @@ const AppTransitions: StateTransitions<AppState> = {
  */
 export type AppStateStore = {
   currentState: AppState
-  holochainClient: HolochainClient
-  appInfo: InstalledAppInfo
   dataStore: DataStore
 }
 
 const initialState: AppStateStore = {
-  currentState: 'connecting',
-  holochainClient: undefined,
-  appInfo: undefined,
+  currentState: 'createDataStore',
   dataStore: undefined
 }
 
 const AppMachine = new StateMachine<AppState, AppStateStore>(initialState, AppTransitions);
 
-AppMachine.on('connecting', async (state: AppStateStore) => {
-  console.log('connecting');
-  state.holochainClient = await getHolochainClient();
-  AppMachine.to('setAppInfo');
-});
-
-AppMachine.on('setAppInfo', async (state: AppStateStore) => {
-  console.log('setAppInfo');
-  state.appInfo = await state.holochainClient.appWebsocket.appInfo({
-    installed_app_id: APP_ID
-  });
-  AppMachine.to('createDataStore');
-});
-
 AppMachine.on('createDataStore', async (state: AppStateStore) => {
   console.log('createDataStore');
-  const cell = state.appInfo.cell_data[0];
-  const zomeApi = new ZomeApi(state.holochainClient, cell.cell_id);
   const dataStore = getDataStore();
-  dataStore.addProvider('project', new ProjectProvider(ModelTree, ModelKinds, zomeApi));
   dataStore.addProvider('localstore', new LocalstoreProvider(ModelTree, ModelKinds));
   state.dataStore = dataStore;
-  AppMachine.to('connectSignalHandlers');
-});
-
-AppMachine.on('connectSignalHandlers', async (state: AppStateStore) => {
-  console.log('connectSignalHandlers');
-
-  const signalCb: AppSignalCb = async (signal: AppSignal) => {
-    const message = signal.data.payload.message;
-    const signalMessage = new SignalMessage(JSON.parse(message));
-    switch (signalMessage.op) {
-      case 'put':
-        if (signalMessage.data) {
-          const path = signalMessage.path;
-          let PDO = buildModel<{}, { id: string }>(ModelTree, ModelKinds, path, signalMessage.data);
-          state.dataStore.setLocal(PDO as Pathed<{ id: string }>);
-        }
-        break;
-      case 'delete':
-        state.dataStore.deleteLocal(signalMessage.path);
-        break;
-      default:
-        console.warn(`Unknown op ${signalMessage.op}`);
-        break;
-    }
-  };
-  state.holochainClient.addSignalHandler(signalCb);
   AppMachine.to('fetchData');
 });
 

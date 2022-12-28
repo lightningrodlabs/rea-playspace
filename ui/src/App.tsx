@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
 import Pi from "./components/layout/Pi";
@@ -69,7 +69,7 @@ const App: React.FC<Props> = ({appStore}) => {
 
   const Main = () => {
     return (
-        <BrowserRouter>
+        <MemoryRouter>
           <div className="container">
             <Header />
             <div className="below-header">
@@ -162,7 +162,7 @@ const App: React.FC<Props> = ({appStore}) => {
             </Modal>
             <Pi onClick={piHandler} />
           </div>
-        </BrowserRouter>
+        </MemoryRouter>
     );
   }
 
