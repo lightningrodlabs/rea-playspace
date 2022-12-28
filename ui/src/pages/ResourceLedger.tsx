@@ -8,10 +8,12 @@ import {
   EconomicResource,
   Process,
   ResourceSpecificationIndex,
-  simulateAccounting
+  simulateAccounting,
+  Unit
 } from "valueflows-models";
 import { usePath } from "yaati";
 import Table from "../components/layout/Table";
+import { Pathed } from "data-providers";
 
 export type ResourceLedgerProps = {};
 
@@ -22,8 +24,8 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
   const economicResources = usePath(`root.economicResource`, store);
   const economicEvents = usePath(`root.economicEvent`, store);
   const agents: Record<string, Agent> = usePath('root.agent', store);
+  const units: Record<string, Unit> = usePath('root.unit', store);
   const resourceSpecifications: Record<string, ResourceSpecification> = usePath('root.resourceSpecification', store);
-  const processSpecifications: Record<string, ProcessSpecification> = usePath('root.processSpecification', store);
 
   useEffect(() => {
     const resourceSpecifications: ResourceSpecificationIndex = store.getCursor('root.resourceSpecification');
@@ -34,7 +36,6 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
       const currProcessRecords = store.getCursor(`root.plan.${planId}.process`);
       if (currProcessRecords) {
         for (let key in currProcessRecords) {
-          console.log(key)
           processes[key] = currProcessRecords[key];
         }
       }
@@ -57,7 +58,31 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
   }, [economicEvents, economicResources]);
 
   const fieldDescriptors = {
-    'name': "Name"
+    'name': "Name",
+    'conforms': "Conforms To",
+    'primary': "Primary Accountable",
+    'accounting' : "Accounting Quantity",
+    'onhand': "Onhand Quantity"
+  }
+  const syntheticFields = {
+    'primary': (data: Pathed<EconomicResource>) => {
+      return agents[data.primaryAccountable].name;
+    },
+    'accounting': (data: Pathed<EconomicResource>) => {
+      console.log(economicResources)
+      console.log(data)
+      const amount = data.accountingQuantity.hasNumericalValue;
+      const unit = (data.accountingQuantity && data.accountingQuantity.hasUnit && data.accountingQuantity.hasUnit != '') ? ` ${units[data.accountingQuantity.hasUnit].name}` : '';
+      return `${amount}${unit}`;
+    },
+    'onhand': (data: Pathed<EconomicResource>) => {
+      const amount = data.onhandQuantity.hasNumericalValue;
+      const unit = (data.onhandQuantity && data.onhandQuantity.hasUnit && data.onhandQuantity.hasUnit != '') ? ` ${units[data.onhandQuantity.hasUnit].name}` : '';
+      return `${amount}${unit}`;
+    },
+    'conforms': (data: Pathed<EconomicResource>) => {
+      return resourceSpecifications[data.conformsTo].name;
+    }
   }
 
   const RenderResources = (): JSX.Element => {
@@ -71,7 +96,8 @@ const ResourceLedger: React.FC<ResourceLedgerProps> = ({}) => {
       return (
         <Table
           datas={economicResourcesList}
-          fieldDescriptors={fieldDescriptors}>
+          fieldDescriptors={fieldDescriptors}
+          syntheticFields={syntheticFields}>
         </Table>
       );
     }

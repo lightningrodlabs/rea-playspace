@@ -313,6 +313,18 @@ export function simulateAccounting(
     }
 
     applyEvent(event, action, [resource, toResource], processes);
+    if(resource && resource.accountingQuantity) {
+      resource.accountingQuantity.hasUnit = event.resourceQuantity.hasUnit;
+    }
+    if(toResource && toResource.accountingQuantity) {
+      toResource.accountingQuantity.hasUnit = event.resourceQuantity.hasUnit;
+    }
+    if(resource && resource.onhandQuantity) {
+      resource.onhandQuantity.hasUnit = event.resourceQuantity.hasUnit;
+    }
+    if(toResource && toResource.onhandQuantity) {
+      toResource.onhandQuantity.hasUnit = event.resourceQuantity.hasUnit;
+    }
   });
 
   // Return the modified objects from the index
