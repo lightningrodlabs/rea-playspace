@@ -218,7 +218,7 @@ const EventInput: React.FC<Props> = ({
       </>
     } else if (resourceVisibility === 'both') {
       return <>
-        <p>One or both of the following need to be filled in. The first field indicates what is being transfered from the provider. The second field indicates how it is represented in the receiver's system.</p>
+        <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='How does the provider inventory this item?'>
             {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
