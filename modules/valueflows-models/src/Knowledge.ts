@@ -346,8 +346,8 @@ export const isInSet = (set: string[], action: string): boolean => {
 export const isTransfer = (action: ActionKey):boolean => {
   return isInSet([
     'transfer',
-    'transfer-all-rights',
-    'transfer-custody'], action);
+    'transferAllRights',
+    'transferCustody'], action);
 }
 
 export interface ActionShape {

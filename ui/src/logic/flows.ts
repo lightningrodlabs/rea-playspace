@@ -266,7 +266,7 @@ export const getAllowedActions = (flow: FlowShape, actions: Action[]): Action[] 
  */
 export const getLabelForFlow = (flow: Flow, resource: ResourceSpecification, provider: Agent, receiver: Agent, actions: Action[], units: Unit[]): string => {
   // default label
-  let label = "Reticualting splines...";
+  let label = "Error creating label.";
 
   // default action, for debugging
   let action = new Action({
