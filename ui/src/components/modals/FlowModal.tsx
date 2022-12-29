@@ -387,6 +387,7 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, planId, closeModal,
           console.log(event.newInventoriedResource);
           const res = new EconomicResource(event.newInventoriedResource);
           const pr = PathFunctor(res, `root.economicResource.${res.id}`);
+          pr.primaryAccountable = event.receiver;
           // TODO: We are omitting the accountingQuantity and onhandQuantity units for now.
           const newInventoriedResource = store.upsert<EconomicResource>(pr, EconomicResource);
           // Figure out which field we're putting the new object on from action.createResource

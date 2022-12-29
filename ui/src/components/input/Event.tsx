@@ -88,7 +88,8 @@ const EventInput: React.FC<Props> = ({
   type ResourceOption = 'neither' | 'resource' | 'toResource' | 'both';
   const [resourceVisibility, setResourceVisibility] = useState<ResourceOption>('resource');
   const [canCreate, setCanCreate] = useState<ResourceOption>('neither');
-  const [selectableEconomicResources, setSelectableEconomicResources] = useState<Array<EconomicResource>>([]);
+  const [providerEconomicResources, setProviderEconomicResources] = useState<Array<EconomicResource>>([]);
+  const [receiverEconomicResources, setReceiverEconomicResources] = useState<Array<EconomicResource>>([]);
 
   const store = getDataStore();
   const actionMap: Record<EventQuantity, Action> = usePath('root.action', store);
@@ -116,12 +117,18 @@ const EventInput: React.FC<Props> = ({
     setState(prevState => {
       return {...prevState, ...eventState };
     });
-    const resources = Object.values(economicResourcesRaw).filter((x) => x.conformsTo == conformingResource.id);
-    setSelectableEconomicResources(resources);
     setActions(getAllowedActions(eventState, Object.values(actionMap)));
     setAgents(Object.values(agentMap));
     setUnits(Object.values(unitMap));
   }, []);
+
+  useEffect(() => {
+    const resources = Object.values(economicResourcesRaw).filter((x) => x.conformsTo == conformingResource.id);
+    const providers = resources.filter((r) => r.primaryAccountable == provider);
+    const receivers = resources.filter((r) => r.primaryAccountable == receiver);
+    setProviderEconomicResources(providers);
+    setReceiverEconomicResources(receivers);
+  }, [provider, receiver]);
 
   useEffect(() => {
     // Set the visibility of the different Measurement input controls
@@ -203,7 +210,7 @@ const EventInput: React.FC<Props> = ({
           <SlSelect required onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
             {canCreate == 'resource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'resource' && <SlDivider />}
-            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
           </SlSelect>
         </div>
       </>;
@@ -214,7 +221,7 @@ const EventInput: React.FC<Props> = ({
           <SlSelect required onSlChange={onSlChange} name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
             {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'toResource' && <SlDivider />}
-            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
           </SlSelect>
         </div>
       </>
@@ -224,7 +231,7 @@ const EventInput: React.FC<Props> = ({
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='How does the provider inventory this item?'>
             <SlMenuItem key='blank' value=''></SlMenuItem>
-            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
           </SlSelect>
         </div>
         <br />
@@ -233,7 +240,7 @@ const EventInput: React.FC<Props> = ({
             <SlMenuItem key='blank' value=''></SlMenuItem>
             {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'toResource' && <SlDivider />}
-            {selectableEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
           </SlSelect>
         </div>
       </>
