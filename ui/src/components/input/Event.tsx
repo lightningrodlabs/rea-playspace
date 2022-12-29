@@ -208,6 +208,7 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
+            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
             {canCreate == 'resource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'resource' && <SlDivider />}
             {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
@@ -219,6 +220,7 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
+            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
             {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'toResource' && <SlDivider />}
             {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
@@ -230,14 +232,14 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='How does the provider inventory this item?'>
-            <SlMenuItem key='blank' value=''></SlMenuItem>
+            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
             {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
           </SlSelect>
         </div>
         <br />
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} required name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='How does the receiver inventory this item? '>
-            <SlMenuItem key='blank' value=''></SlMenuItem>
+            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
             {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
             {canCreate == 'toResource' && <SlDivider />}
             {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
