@@ -198,6 +198,7 @@ const EventInput: React.FC<Props> = ({
       return <></>
     } else if (resourceVisibility === 'resource') {
       return <>
+        <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
             {canCreate == 'resource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
@@ -208,6 +209,7 @@ const EventInput: React.FC<Props> = ({
       </>;
     } else if (resourceVisibility === 'toResource') {
       return <>
+        <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
             {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
