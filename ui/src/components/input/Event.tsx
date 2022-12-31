@@ -258,7 +258,24 @@ const EventInput: React.FC<Props> = ({
       <br />
       <EconomicResourceInput
         name='newInventoriedResource'
-        conformingResource={resourceSpecificationMap[resourceConformsTo]}
+        eventValues={
+          {
+            resourceConformsTo,
+            resourceInventoriedAs,
+            toResourceInventoriedAs,
+            newInventoriedResource,
+            action,
+            provider,
+            receiver,
+            inputOf,
+            outputOf,
+            resourceQuantity,
+            effortQuantity,
+            note,
+            hasPointInTime
+          }
+        }
+        resourceSpecifications={resourceSpecificationMap}
         resourceState={newInventoriedResource}
         agents={agents}
         onChange={onSlChange}

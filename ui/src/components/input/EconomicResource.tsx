@@ -1,11 +1,12 @@
 import { SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
 import { useEffect, useState } from "react";
-import { AgentShape, EconomicResourceShape, ResourceSpecificationShape } from "valueflows-models";
+import { AgentShape, EconomicEventShape, EconomicResourceShape, ResourceSpecificationShape } from "valueflows-models";
 import { slChangeConstructor } from '../util';
 
 interface Props {
   resourceState: EconomicResourceShape;
-  conformingResource: ResourceSpecificationShape;
+  eventValues: EconomicEventShape;
+  resourceSpecifications: Record<string, ResourceSpecificationShape>;
   agents: AgentShape[];
   name: string;
   onChange?: (event: any) => void;
@@ -27,13 +28,13 @@ const initialState: EconomicResourceShape = {
   lot: ''
 };
 
-const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResource, agents, name: fieldName, onChange }) => {
+const EconomicResourceInput: React.FC<Props> = ({ resourceState, eventValues, resourceSpecifications, agents, name: fieldName, onChange }) => {
   const [
     {name, conformsTo, primaryAccountable, trackingIdentifier, currentLocation, note, classifiedAs, image, unitOfEffort, state, stage, containedIn, lot}, setState
   ] = useState({ ...initialState });
 
   useEffect(()=>{
-    setState(prevState => ({ ...prevState, ...resourceState, conformsTo: conformingResource.id }));
+    setState(prevState => ({ ...prevState, stage: eventValues.outputOf, primaryAccountable: eventValues.receiver, conformsTo: eventValues.resourceConformsTo, ...resourceState }));
   },[]);
 
   const onSlChange = slChangeConstructor<EconomicResourceShape>(fieldName, onChange, setState);
@@ -42,11 +43,11 @@ const EconomicResourceInput: React.FC<Props> = ({ resourceState, conformingResou
     <>
       <SlInput label="Name" name="name" value={name} onSlInput={onSlChange}></SlInput>
       <br />
-      <SlInput disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name} onSlInput={onSlChange}></SlInput>
+      <SlInput disabled={conformsTo && conformsTo != null} label="Resource conforms to" name="resourceConformsTo" value={resourceSpecifications[conformsTo]?.name} onSlInput={onSlChange}></SlInput>
       <br/ >
       <SlInput label="Tracking Identifier" name="trackingIdentifier" value={trackingIdentifier} onSlInput={onSlChange}></SlInput>
       <br/ >
-      <SlSelect placeholder="Select Primary Accountable" label="Primary Accountable" name='primaryAccountable' value={primaryAccountable ? primaryAccountable as string : null} onSlChange={onSlChange} clearable required>
+      <SlSelect disabled={primaryAccountable && primaryAccountable != null} placeholder="Select Primary Accountable" label="Primary Accountable" name='primaryAccountable' value={primaryAccountable ? primaryAccountable as string : null} onSlChange={onSlChange} clearable required>
         {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
       </SlSelect>
       <br />
