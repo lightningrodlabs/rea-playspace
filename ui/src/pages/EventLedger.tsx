@@ -15,12 +15,19 @@ const EventLedger: React.FC<Props> = () => {
   const eventRecords = usePath<'root', Root, Pathed<EconomicEvent>>('root.economicEvent', store);
   const [events, setEvents] = useState<Array<Pathed<EconomicEvent>>>([]);
 
+  function getTime(e: EconomicEvent): Date {
+    const times = [e.hasPointInTime, e.hasBegining, e.hasEnd, e.created];
+    return times.find((t) => t && t != null);
+  }
+
   useEffect(()=>{
-    setEvents(Object.values(eventRecords));
+    const sortedEvents = Object.values(eventRecords).sort((a, b) => +getTime(a) - +getTime(b))
+    setEvents(sortedEvents);
   },[eventRecords]);
 
   const fieldDescriptors = {
     'created': "Created",
+    'date': "Date",
     'action': "Action",
     'resourceConformsTo': "Conforms To",
     'resourceInventoriedAs': "Inventoried As",
@@ -33,6 +40,7 @@ const EventLedger: React.FC<Props> = () => {
   }
   const decorators = {
     'created': (created: Date) => <>{`${created ? new Date(created).toISOString().split('T')[0] : ''}`}</>,
+    'date': (created: Date) => <>{`${created ? new Date(created).toISOString().split('T')[0] : ''}`}</>,
     'action': (actionKey: string) => <>{store.getById<Action>(actionKey).label}</>,
     'resourceConformsTo': (resourceConformsTo: string) => <>{resourceConformsTo ? store.getById<ResourceSpecification>(resourceConformsTo).name : ''}</>,
     'resourceInventoriedAs': (resourceInventoriedAs: string) => <>{resourceInventoriedAs ? store.getById<EconomicResource>(resourceInventoriedAs).name : ''}</>,
@@ -42,6 +50,7 @@ const EventLedger: React.FC<Props> = () => {
     'outputOf': (processKey: string) => <>{processKey ? store.getById<Process>(processKey).name : ''}</>,
   }
   const synthetic = {
+    'date': (data: EconomicEvent) => getTime(data),
     'resourceUsed': (data: EconomicEvent) => {
       if (data && data.resourceQuantity && data.resourceQuantity.hasNumericalValue && data.resourceQuantity.hasUnit) {
         const unit = store.getById<Unit>(data.resourceQuantity.hasUnit);
