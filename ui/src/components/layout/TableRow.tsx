@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export type Props = {
   data: Pathed<{id: string}>,
   fields: Array<string>,
-  syntheticFields?: Record<string, (data :Pathed<{id: string}>) => {}>,
+  syntheticFields?: Record<string, (data :Pathed<{id: string}>) => any>,
   fieldDecorators?: Record<string, (data: any) => JSX.Element>
 };
 

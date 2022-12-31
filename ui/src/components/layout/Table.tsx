@@ -6,7 +6,7 @@ import { Dictionary } from "typed-object-tweezers";
 export type Props = {
   datas: Array<Pathed<{id: string}>>,
   fieldDescriptors: Dictionary<string>,
-  syntheticFields?: Record<string, (data: Pathed<{id: string}>) => Object>,
+  syntheticFields?: Record<string, (data: Pathed<{id: string}>) => any>,
   fieldDecorators?: Record<string, (data: any) => JSX.Element>
 };
 
