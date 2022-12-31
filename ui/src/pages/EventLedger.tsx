@@ -30,7 +30,7 @@ const EventLedger: React.FC<Props> = () => {
     'date': "Date",
     'action': "Action",
     'resourceConformsTo': "Conforms To",
-    'resourceInventoriedAs': "Inventoried As",
+    'inventoriedAs': "Inventoried As",
     'resourceUsed': "Resource Quantity",
     'effortUsed': "Effort",
     'provider': "Provider",
@@ -42,8 +42,8 @@ const EventLedger: React.FC<Props> = () => {
     'created': (created: Date) => <>{`${created ? new Date(created).toISOString().split('T')[0] : ''}`}</>,
     'date': (created: Date) => <>{`${created ? new Date(created).toISOString().split('T')[0] : ''}`}</>,
     'action': (actionKey: string) => <>{store.getById<Action>(actionKey).label}</>,
-    'resourceConformsTo': (resourceConformsTo: string) => <>{resourceConformsTo ? store.getById<ResourceSpecification>(resourceConformsTo).name : ''}</>,
-    'resourceInventoriedAs': (resourceInventoriedAs: string) => <>{resourceInventoriedAs ? store.getById<EconomicResource>(resourceInventoriedAs).name : ''}</>,
+    'resourceConformsTo': (resourceSpecKey: string) => <>{resourceSpecKey ? store.getById<ResourceSpecification>(resourceSpecKey).name : ''}</>,
+    'inventoriedAs': (resourceKey: string) => <>{resourceKey ? store.getById<EconomicResource>(resourceKey).name : ''}</>,
     'provider': (agentKey: string) => <>{store.getById<Agent>(agentKey).name}</>,
     'receiver': (agentKey: string) => <>{store.getById<Agent>(agentKey).name}</>,
     'inputOf': (processKey: string) => <>{processKey ? store.getById<Process>(processKey).name : ''}</>,
@@ -51,6 +51,7 @@ const EventLedger: React.FC<Props> = () => {
   }
   const synthetic = {
     'date': (data: EconomicEvent) => getTime(data),
+    'inventoriedAs': (data: EconomicEvent) => (data.toResourceInventoriedAs) ? data.toResourceInventoriedAs : data.resourceInventoriedAs,
     'resourceUsed': (data: EconomicEvent) => {
       if (data && data.resourceQuantity && data.resourceQuantity.hasNumericalValue && data.resourceQuantity.hasUnit) {
         const unit = store.getById<Unit>(data.resourceQuantity.hasUnit);
