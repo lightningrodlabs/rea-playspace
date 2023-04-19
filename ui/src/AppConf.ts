@@ -1,6 +1,9 @@
-export const ZOME_NAME = 'projects';
 // @ts-ignore
 export const APP_ID = import.meta.env.REA_PLAYSPACE_APP_ID;
+// @ts-ignore
+export const ROLE_NAME = import.meta.env.REA_PLAYSPACE_ROLE_NAME;
+// @ts-ignore
+export const ZOME_NAME = import.meta.env.REA_PLAYSPACE_ZOME_NAME;
 // @ts-ignore
 export const APP_PORT = import.meta.env.REA_PLAYSPACE_APP_WS_PORT;
 // @ts-ignore

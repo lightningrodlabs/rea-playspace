@@ -25,8 +25,7 @@
     "vite": "^2.8.0"
   },
   "dependencies": {
-    "@holochain-open-dev/cell-client": "^0.9.1",
-    "@holochain/client": "^0.10.2",
+    "@holochain/client": "^0.12.5",
     "@lit-labs/react": "1.0.7",
     "@scoped-elements/material-web": "0.0.19",
     "@scoped-elements/shoelace": "0.0.8",

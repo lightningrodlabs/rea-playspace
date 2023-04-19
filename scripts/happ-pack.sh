@@ -6,7 +6,7 @@ cargo build --release --target wasm32-unknown-unknown --manifest-path happ/zomes
 
 # Pack DNAs
 # add any additional dnas here, in the same way
-hc dna pack --output=happ/workdir/application.dna happ/workdir
+hc dna pack --output=happ/workdir/playspace.dna happ/workdir
 
 # Pack hApp
-hc app pack --output=happ/workdir/application.happ happ/workdir
+hc app pack --output=happ/workdir/playspace.happ happ/workdir
