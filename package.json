@@ -15,27 +15,18 @@
     "tests"
   ],
   "scripts": {
-    "build": "cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd -",
-
-    "// ## HOLOCHAIN ##":   "",
-    "hc:redo":              "pnpm run hc:happ-pack && pnpm run hc:run",
-    "hc:happ-pack":         "bash scripts/happ-pack.sh",
-    "hc:run":               "sh -c 'set -o allexport; . environments/.env; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "hc:run2":              "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "playground":           "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
-    "playground2":          "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
-    "webhapp-pack":         "pnpm run web-zip && hc web-app pack workdir/",
-
-    "// ## UI ##":          "",
-    "web-lint":             "cd ui && pnpm run lint",
-    "web":                  "cd ui && pnpx vite",
-    "web2":                 "cd ui && pnpx vite --mode dev2",
-    "web-build":            "cd ui && pnpx vite build",
-    "web-zip":              "pnpm run web-build && cd ui/dist && zip -r ../ui.zip .",
-
-    "// ## TEST ##":        "",
-    "test":                 "bash scripts/happ-test.sh"
+    "lint": "cd ui && pnpm run lint",
+    "happ:test": "bash scripts/happ-test.sh",
+    "happ": "bash scripts/happ-pack.sh",
+    "build": "npm run happ && cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd - && cd ui && pnpx vite build && cd -",
+    "zip": "pnpm run build && cd ui/dist && zip -r ../ui.zip .",
+    "webhapp": "pnpm run zip && hc web-app pack workdir/",
+    "launch": "sh -c 'set -o allexport; . environments/.env; set +o allexport; RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./happ/workdir/playspace.happ -w --ui-path ./ui/dist network mdns'"
   },
   "author": "Shane O'Donnell <shane.odonnell@steeltoad.io>, Jillian Ada Burrows <jill@adaburrows.com>, Connor Turland <connor@sprillow.com>",
-  "license": "CAL-1.0"
+  "license": "CAL-1.0",
+  "dependencies": {
+    "@holochain-open-dev/utils": "^0.13.6",
+    "ui": "^0.2.4"
+  }
 }

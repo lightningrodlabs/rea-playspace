@@ -1,6 +1,6 @@
 ---
 manifest_version: "1"
-name: reaplayspacedna
+name: playspacedna
 integrity:
   network_seed: ~
   properties: ~

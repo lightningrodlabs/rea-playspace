@@ -4,39 +4,22 @@ name: Tryorama tests
 on: [ pull_request ]
 
 jobs:
-  tryorama_test:
+  testbuild:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
-    - name: Fetch source code
-      uses: actions/checkout@v2
-    - name: Use Nix
-      uses: cachix/install-nix-action@v16
-      with:
-        nix_path: nixpkgs=channel:nixos-21.11
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Configure Nix substituters
-      run: |
-        set -xe
-        mkdir -p ~/.config/nix/
-        cp ./.github/nix.conf ~/.config/nix/
-    - uses: cachix/cachix-action@v10
-      with:
-        name: holochain-ci
-    - name: Prepare Nix environment
-      run: nix-shell --command "echo Completed"
-    - name: Install deps
-      run: nix-shell --command "pnpm install"
-    - name: Build happ
-      run: nix-shell --command "pnpm run hc:happ-pack"
-    - name: Build ui deps
-      run: nix-shell --command "pnpm build"
-    - name: Run all tests
-      run: nix-shell --command "pnpm test"
+      - uses: actions/checkout@v2
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v18
+        with:
+          install_url: https://releases.nixos.org/nix/nix-2.12.0/install
+          extra_nix_config: |
+            experimental-features = flakes nix-command
+
+      - uses: cachix/cachix-action@v10
+        with:
+          name: holochain-ci
+
+      - name: Install and test
+        run: |
+          nix develop --command bash -c "pnpm i && pnpm run webhapp && pnpm t"
