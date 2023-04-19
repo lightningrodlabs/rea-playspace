@@ -8,23 +8,7 @@ use data::*;
 use tree_clean::{mark_tree, reindex_tree, prune_tree};
 use projects_core::{EntryTypes, LinkTypes, Thing};
 
-#[hdk_extern]
-pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    let mut functions = GrantedFunctions::new();
-    functions.insert((ZomeName::new("projects"), FunctionName::new("remote_update_for_ui")));
-    let grant = ZomeCallCapGrant {
-        access: CapAccess::Unrestricted,
-        functions,
-        tag: "".into(),
-    };
-    create_cap_grant(grant.into())?;
-    debug!("Init success");
-    Ok(InitCallbackResult::Pass)
-}
-
-// /**
-//  *  The UI will call this function when a change has been made when a CRUD operation has occured resulting to a change in UI state
-//  */
+/// The UI will call this function when a change has been made when a CRUD operation has occured resulting to a change in UI state
 #[hdk_extern]
 pub fn ui_updated(message: String) -> ExternResult<()> {
   // get vec of all profiles
@@ -69,7 +53,7 @@ pub fn ui_updated(message: String) -> ExternResult<()> {
   Ok(())
 }
 
-// // agents call this function in other cells. emit_signal will be handled by a signalCallback in frontend
+/// agents call this function in other cells. emit_signal will be handled by a signalCallback in frontend
 #[hdk_extern]
 pub fn remote_update_for_ui(payload: SignalPayload)  -> ExternResult<()> {
     emit_signal(payload.clone())?;

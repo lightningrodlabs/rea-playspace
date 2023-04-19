@@ -1,8 +1,8 @@
 [package]
-authors = ["eric@harris-braun.com"]
+authors = ["eric@harris-braun.com", "jill@adaburrows.com", "shane.odonnell@steeltoad.io"]
 edition = "2021"
 name = "projects_core"
-version = "0.0.1-alpha1"
+version = "0.0.2"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -11,6 +11,6 @@ name = "projects_core"
 [dependencies]
 serde = "1"
 derive_more = "0"
-hdk = {version = "0.0.163", features = ["encoding"]}
-hdi = {version = "0.1.2"}
+hdk = {version = "0.1.1", features = ["encoding"]}
+hdi = {version = "0.2.1"}
 

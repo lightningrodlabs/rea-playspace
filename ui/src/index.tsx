@@ -1,9 +1,8 @@
 import { StateTransitions, StateMachine } from './StateMachine';
-import { AppSignal, AppSignalCb, InstalledAppInfo, InstalledCell } from '@holochain/client';
-import { HolochainClient } from '@holochain-open-dev/cell-client';
+import { AppAgentWebsocket, AppSignal, AppSignalCb } from '@holochain/client';
 import { getDataStore } from './data/DataStore';
-import { getHolochainClient } from './hcWebsockets';
-import { APP_ID } from "./AppConf";
+import { getAppWs } from './hcWebsockets';
+import { APP_ID, ROLE_NAME, ZOME_NAME } from "./AppConf";
 import { buildModel, LocalstoreProvider, Pathed, ProjectProvider, SignalMessage, ZomeApi } from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';
 import { DataStore } from './data/DataStore'
@@ -63,8 +62,8 @@ const AppTransitions: StateTransitions<AppState> = {
  */
 export type AppStateStore = {
   currentState: AppState
-  holochainClient: HolochainClient
-  appInfo: InstalledAppInfo
+  holochainClient: AppAgentWebsocket
+  appInfo: {}
   dataStore: DataStore
 }
 
@@ -79,7 +78,7 @@ const AppMachine = new StateMachine<AppState, AppStateStore>(initialState, AppTr
 
 AppMachine.on('connecting', async (state: AppStateStore) => {
   console.log('connecting');
-  state.holochainClient = await getHolochainClient();
+  state.holochainClient = await getAppWs();
   AppMachine.to('setAppInfo');
 });
 
@@ -88,13 +87,13 @@ AppMachine.on('setAppInfo', async (state: AppStateStore) => {
   state.appInfo = await state.holochainClient.appWebsocket.appInfo({
     installed_app_id: APP_ID
   });
+  console.log(state.appInfo);
   AppMachine.to('createDataStore');
 });
 
 AppMachine.on('createDataStore', async (state: AppStateStore) => {
   console.log('createDataStore');
-  const cell = state.appInfo.cell_data[0];
-  const zomeApi = new ZomeApi(state.holochainClient, cell.cell_id);
+  const zomeApi = new ZomeApi(state.holochainClient, ROLE_NAME, ZOME_NAME);
   const dataStore = getDataStore();
   dataStore.addProvider('project', new ProjectProvider(ModelTree, ModelKinds, zomeApi));
   dataStore.addProvider('localstore', new LocalstoreProvider(ModelTree, ModelKinds));
@@ -106,7 +105,7 @@ AppMachine.on('connectSignalHandlers', async (state: AppStateStore) => {
   console.log('connectSignalHandlers');
 
   const signalCb: AppSignalCb = async (signal: AppSignal) => {
-    const message = signal.data.payload.message;
+    const message = signal.payload as string;
     const signalMessage = new SignalMessage(JSON.parse(message));
     switch (signalMessage.op) {
       case 'put':
@@ -124,7 +123,7 @@ AppMachine.on('connectSignalHandlers', async (state: AppStateStore) => {
         break;
     }
   };
-  state.holochainClient.addSignalHandler(signalCb);
+  state.holochainClient.on("signal", signalCb);
   AppMachine.to('fetchData');
 });
 
