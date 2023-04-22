@@ -32,12 +32,12 @@ jobs:
         with:
           name: holochain-ci
       - name: Prepare Nix environment
-        run: nix-shell --command "echo Completed"
+        run: nix develop --command bash -c "echo Completed"
       - name: Install PNPM and root dependencies
-        run: nix-shell --command "pnpm install --no-frozen-lockfile
+        run: nix develop --command bash -c "pnpm install --no-frozen-lockfile"
       - name: Build all
         run: |
-          nix-shell --run "pnpm run webhapp"
+          nix develop --command bash -c "pnpm run webhapp"
       - name: upload webhapp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
