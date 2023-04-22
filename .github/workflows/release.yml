@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: taiki-e/create-gh-release-action@v1
         env:
           # (required)
@@ -19,31 +19,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch source code
-        uses: actions/checkout@v2
-      - name: Install nix
-        uses: cachix/install-nix-action@v18
-        with:
-          install_url: https://releases.nixos.org/nix/nix-2.12.0/install
-          extra_nix_config: |
-            experimental-features = flakes nix-command
+      - name: Check out source code
+        uses: actions/checkout@v3
 
-      - uses: cachix/cachix-action@v10
+      - name: Install nix
+        uses: cachix/install-nix-action@v19
+        with:
+          install_url: https://releases.nixos.org/nix/nix-2.13.3/install
+
+      - name: Set up cachix
+        uses: cachix/cachix-action@v12
         with:
           name: holochain-ci
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            .cargo/bin/
-            .cargo/registry/index/
-            .cargo/registry/cache/
-            .cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Prepare Nix environment
         run: nix-shell --command "echo Completed"
       - name: Install PNPM and root dependencies
