@@ -7,19 +7,19 @@ jobs:
   testbuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out source code
+        uses: actions/checkout@v3
 
       - name: Install nix
-        uses: cachix/install-nix-action@v18
+        uses: cachix/install-nix-action@v19
         with:
-          install_url: https://releases.nixos.org/nix/nix-2.12.0/install
-          extra_nix_config: |
-            experimental-features = flakes nix-command
+          install_url: https://releases.nixos.org/nix/nix-2.13.3/install
 
-      - uses: cachix/cachix-action@v10
+      - name: Set up cachix
+        uses: cachix/cachix-action@v12
         with:
           name: holochain-ci
 
       - name: Install and test
         run: |
-          nix develop --command bash -c "pnpm install && pnpm run webhapp && pnpm run happ:test"
+          nix develop --command bash -c "pnpm install && pnpm run webhapp && pnpm run test"
