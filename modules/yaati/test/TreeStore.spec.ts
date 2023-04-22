@@ -1,5 +1,5 @@
 import { TreeStore } from '../src';
-import { tree_test, A} from 'data-providers/test/fixtures';
+import { tree_test, A} from './fixtures';
 import { Pathed } from 'data-providers';
 import { GetPath } from 'typed-object-tweezers';
 

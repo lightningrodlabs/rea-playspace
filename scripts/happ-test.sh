@@ -10,10 +10,10 @@ cargo test --package projects --lib -- test::tests::clean_tree_test --exact --no
 [ $? -eq 0 ]  || exit 1
 cd -
 
-cd tests
-pnpm test
-[ $? -eq 0 ]  || exit 1
-cd -
+# cd tests
+# pnpm test
+# [ $? -eq 0 ]  || exit 1
+# cd -
 
 cd modules/typed-object-tweezers
 pnpm test

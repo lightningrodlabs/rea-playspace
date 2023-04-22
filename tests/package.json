@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "TRYORAMA_LOG_LEVEL=info RUST_BACKTRACE=1 WASM_LOG=trace TRYORAMA_HOLOCHAIN_PATH=\"holochain\" node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts | tap-diff"
+    "test": "TRYORAMA_LOG_LEVEL=info RUST_BACKTRACE=1 WASM_LOG=trace TRYORAMA_HOLOCHAIN_PATH=\"holochain\" node --loader ts-node/esm --experimental-specifier-resolution=node --experimental-vm-modules src/index.ts | tap-diff"
   },
   "author": "",
   "license": "CAL-1.0",
@@ -19,7 +19,7 @@
   "devDependencies": {
     "@msgpack/msgpack": "^2.8.0",
     "@detools/tap-diff": "^0.2.2",
-    "@holochain/tryorama": "0.9.1",
+    "@holochain/tryorama": "0.11.2",
     "@types/lodash": "^4.14.185",
     "@types/node": "^18.6.3",
     "@types/tape": "^4.13.2",
@@ -27,6 +27,5 @@
     "eslint": "^8.22.0",
     "prettier": "^2.2.1",
     "ws": "^8.5.0"
-  },
-  "type": "module"
+  }
 }

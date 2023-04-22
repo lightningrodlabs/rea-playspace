@@ -1,22 +1,22 @@
-import { Flavor, BuildFactory, getParentPath, GetPath, Constructor } from "typed-object-tweezers";
+import { Concrete, Flavor, BuildFactory, getParentPath, GetPath, Constructor } from "typed-object-tweezers";
 import { cloneDeep } from "lodash";
 
-/**
+/*
  * Make a pathed version of the data, but allow structural type coercion to T.
  */
-export interface WithPath {
-  path?: string;
-}
-export type Pathed<T> = T & WithPath;
+
+export type MaybeWithPath = { path?: string }
+export type MaybePathed<T> = T & MaybeWithPath
+export type WithPath = Concrete<MaybeWithPath>
+export type Pathed<T> = T & WithPath
+export type TreeNode<T> = { [key: string]: TreeNode<T> | T }
+export type PathedTreeNode<T> = { [key: string]: PathedTreeNode<T> | Pathed<T> }
 
 /**
- * Convert an object of T to a Pathed<T>.
+ * Definition of the kinds of models
+ * Used for constructing objects based on their path
  */
-export function PathFunctor<T> (d: T, path: WithPath["path"]): Pathed<T> {
-  const pathedT: T & WithPath = cloneDeep(d);
-  pathedT.path = path;
-  return pathedT;
-}
+export type ModelKinds = Record<string, Constructor<any>>
 
 /**
  * Definition of an object collection.
@@ -32,7 +32,7 @@ export type TreeEntry = Flavor<{
   singleton?: boolean;
   primaryKey?: string;
   parentKey?: string;
-  substituteWith?: {};
+  substituteWith?: object;
   children?: TreeDefinition;
 }, "TreeEntry">;
 
@@ -54,40 +54,60 @@ export type ObjectValues = Flavor<{
  */
 export type PathData = Flavor<{ kind: string, values: ObjectValues }, "TreeData">;
 
-export type PathWalkerCallback = (treeDefinition: TreeDefinition, currentTreeDatas: Array<PathData>) => void;
+export type PathWalkerCallback = ((treeDefinition: TreeDefinition, currentTreeDatas: Array<PathData>) => void) | undefined;
+
+/**
+ * Convert an object of T to a Pathed<T>.
+ */
+export function PathFunctor<T> (d: T, path: WithPath["path"]): Pathed<T> {
+  const pathedT: Pathed<T> = cloneDeep<T>(d) as Pathed<T>;
+  pathedT.path = path;
+  return pathedT;
+}
 
 /**
  * Merge data from parameter B into A (merge arrays if present, but don't erase data).
  */
-export function mergeObjectDefinitionTrees (A: TreeDefinition, B: TreeDefinition): TreeDefinition {
-  const C: TreeDefinition = A ? cloneDeep(A) : {};
-  for (let key in B) {
-    if (key in C) {
+export function mergeObjectDefinitionTrees (
+  A: TreeDefinition | undefined,
+  B: TreeDefinition | undefined
+): TreeDefinition | undefined {
+  if (A && B) {
+    const C: TreeDefinition = A ? cloneDeep(A) : {};
+    for (const key in B) {
+      if (key in C) {
 
-      // These are just values that can be copied, but on a key by key basis to allow preserving type inference
-      ('singleton' in B[key]) && (C[key].singleton = B[key].singleton);
-      ('primaryKey' in B[key]) && (C[key].primaryKey = B[key].primaryKey);
-      ('parentKey' in B[key]) && (C[key].parentKey = B[key].parentKey);
-      ('substituteWith' in B[key]) && (C[key].substituteWith = B[key].substituteWith);
+        // These are just values that can be copied, but on a key by key basis to allow preserving type inference
+        ('singleton' in B[key]) && (C[key].singleton = B[key].singleton);
+        ('primaryKey' in B[key]) && (C[key].primaryKey = B[key].primaryKey);
+        ('parentKey' in B[key]) && (C[key].parentKey = B[key].parentKey);
+        ('substituteWith' in B[key]) && (C[key].substituteWith = B[key].substituteWith);
 
-      // if children, merge recursively
-      if ('children' in C[key]) {
-        A[key].children = mergeObjectDefinitionTrees(C[key].children, B[key].children);
+        // if children, merge recursively
+        if ('children' in C[key] && 'children' in B[key]) {
+          A[key].children = mergeObjectDefinitionTrees(C[key].children, B[key].children);
+        } else {
+          A[key].children = cloneDeep(B[key].children);
+        }
       } else {
-        A[key].children = cloneDeep(B[key].children);
+        C[key] = cloneDeep(B[key]);
       }
-    } else {
-      C[key] = cloneDeep(B[key]);
     }
+    return C;
+  } else {
+    return A;
   }
-  return A;
 }
 
 /**
  * Walk through the treeDefinition along the path specified calling the walker
  * function and return the treeDatas.
  */
-export function walkTreeDefinition (treeDefinition: TreeDefinition, path: string, walker: PathWalkerCallback = undefined): Array<PathData>{
+export function walkTreeDefinition (
+  treeDefinition: TreeDefinition,
+  path: string,
+  walker: PathWalkerCallback = undefined
+): Array<PathData> {
   const pathDatas = new Array<PathData>();
   const pathParts = path.split('.');
   const pathLength = pathParts.length;
@@ -131,7 +151,7 @@ export function walkTreeDefinition (treeDefinition: TreeDefinition, path: string
       }
 
       // if we have children, go ahead and set that as the next object to traverse
-      if ('children' in currentObjectDef) {
+      if (currentObjectDef['children']) {
         currentTreeDef = currentObjectDef.children;
       }
 
@@ -148,16 +168,20 @@ export function walkTreeDefinition (treeDefinition: TreeDefinition, path: string
  * Given a list of definitions, a path, and some data, create a Pathed<T> that's
  * compatible with T.
  */
-export function buildModel<S, T> (treeDefinition: TreeDefinition, modelKinds: Record<string, Constructor>, path: string, data: S): Pathed<T> | Pathed<{}> {
+export function buildModel<S, T> (
+  treeDefinition: TreeDefinition,
+  modelKinds: ModelKinds,
+  path: string, data: S
+): Pathed<T> {
   const pathDatas = walkTreeDefinition(treeDefinition, path);
   // fetch the last element of the tree datas and get the kind
   const modelData: PathData = pathDatas[pathDatas.length - 1];
   const modelKind = modelData.kind;
   if (modelData.values.singleton || modelData.values.keyValue) {
-    const Factory = BuildFactory(modelKinds[modelKind]);
+    const Factory = BuildFactory<T>(modelKinds[modelKind]);
     return PathFunctor(Factory(data), path);
   } else {
-    return {} as Pathed<{}>;
+    return PathFunctor<T>({} as T, path);
   }
 }
 /**
@@ -169,7 +193,14 @@ export function buildModel<S, T> (treeDefinition: TreeDefinition, modelKinds: Re
  * @param treeDefinition 
  * @param modelKinds 
  */
-export function constructTreeAtPath(tree: {}, data: {}, name: string, path: string, treeDefinition: TreeDefinition, modelKinds: Record<string, Constructor>) {
+export function constructTreeAtPath<S, T = Pathed<S>>(
+  tree: PathedTreeNode<T>,
+  data: S,
+  name: string,
+  path: string,
+  treeDefinition: TreeDefinition,
+  modelKinds: ModelKinds
+) {
   const parentPath = getParentPath(path);
 
   // Get the path datas for validation
@@ -181,7 +212,8 @@ export function constructTreeAtPath(tree: {}, data: {}, name: string, path: stri
    * We can also decode the data payload and check to make sure the keys in the
    * data match up with the path itself. If it doesn't match, throw an error.
    */
-  if (currentData && currentData.values) {
+  if (currentData && currentData.values && currentData.values.primaryKey) {
+    //@ts-ignore
     const expectedKeyValue = data[currentData.values.primaryKey];
     const pathKeyValue = currentData.values.keyValue
     if ( pathKeyValue !== expectedKeyValue) {
@@ -190,6 +222,7 @@ export function constructTreeAtPath(tree: {}, data: {}, name: string, path: stri
     }
   }
   if (parentData && parentData.values && parentData.values.parentKeyValue) {
+    //@ts-ignore
     const expectedParentKeyValue = data[currentData.values.parentKey];
     const pathParentKeyValue = parentData.values.keyValue;
     if ( pathParentKeyValue!== expectedParentKeyValue) {
@@ -197,10 +230,10 @@ export function constructTreeAtPath(tree: {}, data: {}, name: string, path: stri
     }
   }
 
-  const instatiation = buildModel(treeDefinition, modelKinds, path, data);
+  const instatiation = buildModel<S, T>(treeDefinition, modelKinds, path, data);
 
   if (parentPath && parentPath != '') {
-    const parent = GetPath(tree, parentPath);
+    const parent = GetPath<PathedTreeNode<T>,T>(tree, parentPath);
     parent[name] = instatiation;
   } else {
     tree[name] = instatiation;

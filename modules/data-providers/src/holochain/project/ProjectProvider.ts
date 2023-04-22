@@ -1,18 +1,18 @@
 import { DataProvider } from "../../index";
 import { Constructor } from "typed-object-tweezers";
-import { TreeDefinition, Pathed, constructTreeAtPath } from "../../WithPath";
 import { Action, Fiber } from "../../lib/fiber";
 import { ZomeApi } from "./ZomeApi";
-import { TreeNode, ThingInput } from "./types";
 import { SignalMessage } from "./SignalMessage";
-import { BreadthFirst } from "./RustTree";
+import { ThingInput } from "./HolochainTypes";
+import { TreeDefinition, Pathed } from "../../WithPath";
+import { parseTree } from "./HolochainTree";
 
 export class ProjectProvider implements DataProvider {
 
   protected zomeApi: ZomeApi;
   protected fiber: Fiber<void>;
   protected treeDefinition: TreeDefinition;
-  protected modelKinds: Record<string, Constructor>;
+  protected modelKinds: Record<string, Constructor<any>>;
 
   /**
    * Initialize class
@@ -28,11 +28,13 @@ export class ProjectProvider implements DataProvider {
    * Higher-order function returning an async function which fetches the data
    * associated with the path
    */
-  private fetchAction = <T>(path: string, resolve: (r: Pathed<T>) => void): Action<void> => {
+  private fetchAction = <T extends object>(path: string, resolve: (r: Pathed<T>) => void): Action<void> => {
     return async () => {
       const res = await this.zomeApi.get_thing(path);
-      const hydrated = this.parseTree<T>(this.treeDefinition, res);
-      resolve(hydrated[path]);
+      const hydrated = parseTree<T>(this.treeDefinition, res, this.modelKinds);
+      // TODO: This feels like a hack. Need to look at the whole type system.
+      // The objects should alternate between a Pathed<Container> and values of Pathed<T>
+      resolve(hydrated[path] as Pathed<T>);
     }
   }
 
@@ -40,19 +42,23 @@ export class ProjectProvider implements DataProvider {
    * Higher-order function returning an async function which stores the passed item
    */
   private putAction = <T>(item: Pathed<T>): Action<void> => {
-    const itemThing: ThingInput = {
-      path: item.path,
-      data: JSON.stringify(item)
-    };
-    const signal = new SignalMessage({
-      op: 'put',
-      path: item.path,
-      data: item
-    })
-    const signalString = JSON.stringify(signal);
-    return async () => {
-      await this.zomeApi.put_thing(itemThing);
-      await this.zomeApi.signal_call(signalString);
+    if (item.path) {
+      const itemThing: ThingInput = {
+        path: item.path,
+        data: JSON.stringify(item)
+      };
+      const signal = new SignalMessage({
+        op: 'put',
+        path: item.path,
+        data: item
+      })
+      const signalString = JSON.stringify(signal);
+      return async () => {
+        await this.zomeApi.put_thing(itemThing);
+        await this.zomeApi.signal_call(signalString);
+      }
+    } else {
+      return async () => {}
     }
   }
 
@@ -113,46 +119,4 @@ export class ProjectProvider implements DataProvider {
     ]);
   }
 
-  /**
-   * Non-recursive path resolver for the TreeNodes
-   */
-  protected getTreeNodePath(nodes: TreeNode[], idx: number): string {
-    const parts: string[] = [];
-
-    let name = nodes[idx].val.name;
-    parts.unshift(name);
-    let parent = nodes[idx].parent;
-    while (parent !== null) {
-      parts.unshift(nodes[parent].val.name);
-      parent = nodes[parent].parent;
-    }
-    return parts.join('.');
-  }
-
-  /**
-   * Parse the tree from the zome's TreeNode[] into our path addressible struct.
-   *
-   * In the most basic case, we will just fetch 'root'.
-   * That will return every object in the 'tree'
-   * So we start with the root node, and progress through all of it's branches
-   * through to it's children.
-   *
-   * In the case of fetching a path 'root.c.1`, will start at that point with
-   * no prior data to fill in the data for the root, for c, of for any other of
-   * c's descendents besides 1. We start at 'root.c.1' and move towards it's
-   * children.
-   */
-  public parseTree<T>(treeDefinition: TreeDefinition, nodes: TreeNode[]): Record<string, Pathed<T>> {
-    // New tree
-    const tree = {};
-
-    BreadthFirst(nodes, (node, idx) => {
-      // Parse out the data from the node
-      const { name, data: serializedData } = node.val;
-      const data = (serializedData && serializedData !== '') ? JSON.parse(serializedData): {};
-      const path = this.getTreeNodePath(nodes, idx);
-      constructTreeAtPath(tree, data, name, path, treeDefinition, this.modelKinds)
-    });
-    return tree;
-  }
 }

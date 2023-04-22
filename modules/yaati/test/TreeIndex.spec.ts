@@ -1,16 +1,16 @@
 import { TreeStoreWithIndex } from '../src';
-import { tree_test, TreeDef, ModelKinds, A, C} from 'data-providers/test/fixtures';
+import { tree_test, TreeDef, modelKinds, A, C} from './fixtures';
 import { Pathed, PathFunctor} from 'data-providers';
 import { GetPath } from 'typed-object-tweezers';
 
 describe('TreeStoreWithIndex', () => {
   it('should create a snapshot when created', () => {
-    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, ModelKinds);
+    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, modelKinds);
     expect(Tree.getSnapshot()).toEqual(tree_test);
   });
 
   it('should create a snapshot when updated', () => {
-    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, ModelKinds);
+    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, modelKinds);
     const A = Tree.getCursor<Pathed<A>>('root.a.3')
     A.id = '4';
     Tree.setLocal(A);
@@ -18,13 +18,13 @@ describe('TreeStoreWithIndex', () => {
   });
 
   it('should update the index when created', () => {
-    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, ModelKinds);
+    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, modelKinds);
     const A = Tree.getById<Pathed<A>>('3');
     expect(GetPath(Tree.getSnapshot(), 'root.a.3')).toEqual(A);
   });
 
   it('should update the index when a new object is added', () => {
-    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, ModelKinds);
+    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, modelKinds);
     const newC = new C({id: '13'})
     const pathedNewC = PathFunctor(newC, `root.a.3.c.${newC.id}`);
     Tree.setLocal(pathedNewC);
@@ -33,7 +33,7 @@ describe('TreeStoreWithIndex', () => {
   });
 
   it('should update the index when an object is deleted', () => {
-    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, ModelKinds);
+    const Tree = new TreeStoreWithIndex(tree_test, TreeDef, modelKinds);
     const newC = new C({id: '13'})
     const path = `root.a.3.c.${newC.id}`;
     const pathedNewC = PathFunctor(newC, path);

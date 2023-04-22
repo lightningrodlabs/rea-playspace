@@ -1,13 +1,13 @@
-import { LocalstoreProvider } from '../src';
-import { Root, A, B, C, D, ModelKinds, TreeDef, tree_test } from './fixtures';
+import { LocalstoreProvider } from '../src/localstore';
+import { Root, A, B, C, D, modelKinds, TreeDef, tree_test } from './fixtures';
 
-const fakePlasticTree = "{\"root\":{\"id\":\"root\",\"a\":{\"3\":{\"id\":\"3\",\"c\":{\"5\":{\"id\":\"5\"},\"7\":{\"id\":\"7\"}},\"d\":{}}},\"b\":{\"1\":{\"id\":\"1\"}}}}";
+const fakePlasticTree = "{\"root\":{\"id\":\"root\",\"a\":{\"3\":{\"id\":\"3\",\"c\":{\"5\":{\"id\":\"5\"},\"7\":{\"id\":\"7\"},\"path\":\"root.a.3.c\"},\"d\":{}},\"path\":\"root.a\"},\"b\":{\"1\":{\"id\":\"1\"},\"path\":\"root.b\"}}}";
 
 describe ('LocalstoreProvider', () => {
 
   it('should reconstruct a tree from a serialized version', () => {
-    const localstore = new LocalstoreProvider(TreeDef, ModelKinds);
-    const tree = localstore.constructTree(JSON.parse(fakePlasticTree), '');
+    const localstore = new LocalstoreProvider(TreeDef, modelKinds);
+    const tree = localstore.parseTree<Root>(JSON.parse(fakePlasticTree), '');
     expect(tree['root'] instanceof Root).toBeTruthy;
     expect(tree['root'].id).toBe('root');
     expect(tree['root']['a']['3'] instanceof A).toBeTruthy;
@@ -19,7 +19,7 @@ describe ('LocalstoreProvider', () => {
   });
 
   it('should serialize a tree', () => {
-    const localstore = new LocalstoreProvider(TreeDef, ModelKinds);
+    const localstore = new LocalstoreProvider(TreeDef, modelKinds);
     const tree = localstore.serializeTree(tree_test);
     expect(tree).toBe(fakePlasticTree);
   });
