@@ -1,6 +1,5 @@
 import { Dictionary, assignFields, fieldsToJSON } from 'typed-object-tweezers'
-import { TreeNode } from '../src/holochain/project/HolochainTypes'
-import { ModelKinds, TreeDefinition } from '../src/WithPath';
+import { ModelKinds, TreeDefinition } from 'data-providers';
 
 export class Root {
   'a': Dictionary<A> = {}
@@ -159,22 +158,3 @@ export const tree_test = {
     }
   })
 }
-
-/**
- * Paths in the form of data returned from the zome:
- * root
- * root.a.3
- * root.b.1
- * root.a.3.c.5
- * root.a.3.c.7
- */
-export const rust_nodes: TreeNode[] = [
-  {idx: 0, parent: null, children: [1, 2], val: {name: 'root', data: '{"id":"root"}'}},
-  {idx: 1, parent: 0, children: [3], val: {name: 'a', data: ''}},
-  {idx: 2, parent: 0, children: [4], val: {name: 'b', data: ''}},
-  {idx: 3, parent: 1, children: [5], val: {name: '3', data: '{"id":"3"}'}},
-  {idx: 4, parent: 2, children: [], val: {name: '1', data: '{"id":"1"}'}},
-  {idx: 5, parent: 3, children: [6, 7], val: {name: 'c', data: ''}},
-  {idx: 6, parent: 5, children: [], val: {name: '5', data: '{"id":"5"}'}},
-  {idx: 7, parent: 5, children: [], val: {name: '7', data: '{"id":"7"}'}},
-]

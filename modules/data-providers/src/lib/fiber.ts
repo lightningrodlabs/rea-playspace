@@ -21,6 +21,7 @@ export class Fiber<T> {
    */
   constructor() {
     this.actionFiber = Promise.resolve({} as T);
+    this.actionQueue = [];
   }
 
   /**

@@ -8,8 +8,13 @@ export interface DataProvider {
 }
 
 export type {
+  MaybeWithPath,
+  MaybePathed,
   WithPath,
   Pathed,
+  TreeNode,
+  PathedTreeNode,
+  ModelKinds,
   TreeDefinition,
   TreeEntry,
   ObjectValues,

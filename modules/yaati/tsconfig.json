@@ -4,19 +4,24 @@
     "sourceMap": true,
     "declaration": true,
     "noImplicitAny": false,
-    "module": "es6",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "target": "es6",
-    "jsx": "react-jsx",
-    "allowJs": true,
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ES6", "ES2022"],
+    "target": "ES2022",
+    "allowJs": false,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noEmit": true,
     "esModuleInterop": true
   },
   "include": [
     "src",
-    "vite.config.js",
+    "test",
+    "vite.config.ts",
+  ],
+  "exclude": [
+    "test",
+    "node_modules"
   ]
 }

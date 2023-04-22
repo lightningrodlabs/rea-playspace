@@ -1,11 +1,9 @@
 import path from 'node:path';
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts';
 
-module.exports = defineConfig({
+export default defineConfig({
   plugins: [
-    react(),
     dts({
       insertTypesEntry: true,
     })
@@ -16,15 +14,6 @@ module.exports = defineConfig({
       name: 'typed-object-tweezers',
       formats: ['es', 'umd'],
       fileName: (format) => `typed-object-tweezers.${format}.js`
-    },
-    rollupOptions: {
-      external: ['react', 'react-dom'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
-    },
+    }
   }
 });

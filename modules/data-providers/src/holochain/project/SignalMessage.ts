@@ -4,12 +4,12 @@ import { assignFields } from "typed-object-tweezers";
 export type Op = 'put' | 'delete';
 
 export class SignalMessage<S> {
-  op: Op;
+  op?: Op;
   path?: string;
-  entryHash: EntryHash;
+  entryHash?: EntryHash;
   data?: S;
 
-  constructor (message: {}) {
-    assignFields<{}, SignalMessage<S>>(message, this);
+  constructor (message: object) {
+    assignFields<object, SignalMessage<S>>(message, this);
   }
 }

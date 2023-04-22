@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "lint": "cd ui && pnpm run lint",
-    "happ:test": "bash scripts/happ-test.sh",
+    "test": "bash scripts/happ-test.sh",
     "happ": "bash scripts/happ-pack.sh",
     "build": "npm run happ && cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd - && cd ui && pnpx vite build && cd -",
     "zip": "pnpm run build && cd ui/dist && zip -r ../ui.zip .",

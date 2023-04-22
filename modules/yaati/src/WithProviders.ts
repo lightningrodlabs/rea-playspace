@@ -86,10 +86,9 @@ export class IndexedTreeWithProviders<RootKey extends string, R> extends TreeSto
    * const newCommitment = upsert(commitmentUpdates, Commitment);
    */
   public upsert<U> (updates: Pathed<U>, constructor: Constructor<U>): Pathed<U> {
-    const obj: U = new constructor(updates);
-    assignFields<U, U>(updates, obj);
-    const pathedObj = PathFunctor(obj, updates.path);
-    this.set(pathedObj);
+    const obj: Pathed<U> = PathFunctor((new constructor(updates)), updates.path)
+    assignFields(updates, obj);
+    this.set(obj);
     return obj;
   }
 

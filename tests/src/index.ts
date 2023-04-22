@@ -4,9 +4,7 @@ import { reaPlayspaceDnaPath } from './utils';
 import test from 'tape';
 
 async function setup(scenario: Scenario) {
-  const alice = await scenario.addPlayerWithHapp([
-    { path: reaPlayspaceDnaPath},
-  ]);
+  const alice = await scenario.addPlayerWithApp({ path: reaPlayspaceDnaPath});
   return getZomeCaller(alice.cells[0], "projects");
 }
 
