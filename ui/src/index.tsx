@@ -3,7 +3,7 @@ import { getDataStore } from './data/DataStore';
 import { LocalstoreProvider} from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';
 import { DataStore } from './data/DataStore'
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 /*
@@ -79,10 +79,8 @@ AppMachine.on('fetchData', async (state: AppStateStore) => {
 
 AppMachine.on('loaded', async (state: AppStateStore) => {
   console.log('loaded');
-  ReactDOM.render(
-    <App appStore={state} />,
-    document.getElementById('root')
-  );
+  const root = createRoot(document.getElementById('root'))
+  root.render(<App appStore={state} />);
 });
 
 AppMachine.go();

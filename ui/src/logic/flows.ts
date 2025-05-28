@@ -1,6 +1,6 @@
 // EDGE BUSINESS LOGIC
 
-import { Edge, MarkerType, Node } from "react-flow-renderer";
+import { Edge, MarkerType, Node } from "react-flow";
 import { DateToUiString } from "../components/util";
 import { getDataStore } from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";

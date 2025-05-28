@@ -1,5 +1,5 @@
 import { Guid } from "guid-typescript";
-import { XYPosition, Node } from 'react-flow-renderer';
+import { XYPosition, Node } from 'react-flow';
 import { assignFields, fieldsToJSON } from 'typed-object-tweezers';
 
 export interface DisplayNodeShape {

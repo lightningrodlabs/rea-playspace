@@ -1,4 +1,4 @@
 packages:
-- 'modules/*'
-- 'ui'
-- 'tests'
+  - modules/*
+  - ui
+  - tests

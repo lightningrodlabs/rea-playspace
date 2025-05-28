@@ -18,7 +18,7 @@ import ReactFlow, {
   EdgeRemoveChange,
   NodeChange,
   EdgeChange
-} from 'react-flow-renderer';
+} from 'react-flow';
 import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';

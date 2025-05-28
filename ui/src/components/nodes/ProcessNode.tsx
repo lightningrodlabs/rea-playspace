@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Handle, Position } from 'react-flow-renderer';
+import { Handle, Position } from 'react-flow';
 
 interface Data {
   id: string,
