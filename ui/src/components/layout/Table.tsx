@@ -1,12 +1,11 @@
-import React from "react";
-import { Pathed } from "data-providers";
+import React, { JSX } from "react";
 import TableRow from './TableRow';
 import { Dictionary } from "typed-object-tweezers";
 
 export type Props = {
-  datas: Array<Pathed<{id: string}>>,
+  datas: Array<{id: string}>,
   fieldDescriptors: Dictionary<string>,
-  syntheticFields?: Record<string, (data: Pathed<{id: string}>) => any>,
+  syntheticFields?: Record<string, (data: {id: string}) => any>,
   fieldDecorators?: Record<string, (data: any) => JSX.Element>
 };
 
@@ -14,7 +13,7 @@ const Table: React.FC<Props> = ({datas, fieldDescriptors, syntheticFields, field
 
   const headings: JSX.Element[] = Object.values(fieldDescriptors).map((heading: string, index: number) => <th key={`${heading}-${index}`}>{heading}</th>)
 
-  const rows: JSX.Element[] = datas.map((data: Pathed<{id: string}>) => {
+  const rows: JSX.Element[] = datas.map((data: {id: string}) => {
     return(<TableRow
       key={data.id}
       data={data}

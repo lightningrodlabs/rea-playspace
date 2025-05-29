@@ -1,11 +1,10 @@
-import React from "react";
-import { Pathed } from "data-providers";
+import React, { JSX } from "react";
 import { useNavigate } from "react-router-dom";
 
 export type Props = {
-  data: Pathed<{id: string}>,
+  data: {id: string},
   fields: Array<string>,
-  syntheticFields?: Record<string, (data :Pathed<{id: string}>) => any>,
+  syntheticFields?: Record<string, (data :{id: string}) => any>,
   fieldDecorators?: Record<string, (data: any) => JSX.Element>
 };
 
@@ -13,7 +12,7 @@ const TableRow: React.FC<Props> = ({data, fields, syntheticFields, fieldDecorato
 
   const navigate = useNavigate();
 
-  const synthesizeField = (field: string, data: Pathed<{id: string}>): any => {
+  const synthesizeField = (field: string, data: {id: string}): any => {
     if (syntheticFields && syntheticFields[field] && syntheticFields[field] instanceof Function) {
       return syntheticFields[field](data);
     } else {
