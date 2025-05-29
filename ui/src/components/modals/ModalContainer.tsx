@@ -1,5 +1,5 @@
 import { SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
-import React from "react";
+import React, { ReactElement } from "react";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
@@ -8,6 +8,7 @@ interface Props {
   isOpen: boolean;
   closeModal: () => void;
   title?: string
+  children: ReactElement<any, any>
 }
 
 const ModalContainer:React.FC<Props>  = ({isOpen, closeModal, title, children}) => {
