@@ -586,7 +586,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onEdgesChange={onEdgesChange}
             onEdgesDelete={onRemoveEdges}
             onNodesDelete={onRemoveNodes}
-            onEdgeUpdate={onEdgeUpdate}
+            onReconnect={onEdgeUpdate}
             onConnect={onConnect}
             onInit={onInit}
             onDrop={onDrop}
