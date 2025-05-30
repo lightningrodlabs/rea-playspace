@@ -5,7 +5,6 @@ import { ModelTree, ModelKinds } from './data/models/Application';
 import { DataStore } from './data/DataStore'
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import './index.css';
 /*
 
 Application State Management
