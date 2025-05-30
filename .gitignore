@@ -10,8 +10,9 @@ electron/web
 ui/dist/*
 ui/ui.zip
 
-happ/workdir/application.dna
-happ/workdir/application.happ
+**/workdir/*.dna
+**/workdir/*.happ
+**/workdir/*.webhapp
 
 target/
 back/.cargo/
