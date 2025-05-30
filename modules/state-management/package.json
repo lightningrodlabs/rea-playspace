@@ -1,24 +1,27 @@
 {
-  "name": "data-providers",
+  "name": "state-management",
   "version": "0.1.0",
   "description": "",
   "author": "Jillian Ada Burrows <jill@adaburrows.com>",
-  "license": "CAL-1.0",
+  "license": "MIT",
   "type": "module",
-  "source": "./src/index.ts",
-  "main": "./dist/data-providers.umd.js",
-  "module": "./dist/data-providers.es.js",
+  "files": ["dist"],
+  "main": "./dist/state-management.cjs",
+  "module": "./dist/state-management.js",
   "exports": {
     ".": {
-      "import": "./dist/data-providers.es.js",
-      "require": "./dist/data-providers.umd.js"
+      "import": "./dist/state-management.js",
+      "require": "./dist/state-management.cjs"
+    },
+    "./fiber": {
+      "import": "./dist/fiber.js",
+      "require": "./dist/fiber.cjs"
+    },
+    "./state-machine": {
+      "import": "./dist/state-machine.js",
+      "require": "./dist/state-machine.cjs"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "engines": {
     "node": ">=10"
   },
@@ -33,13 +36,6 @@
     "test:ci": "pnpm test",
     "test:watch": "pnpm test -- --watch --verbose"
   },
-  "dependencies": {
-    "@holochain-open-dev/cell-client": "0.9.1",
-    "@holochain/client": "0.19.0",
-    "lodash": "4.17.21",
-    "state-management": "workspace:*",
-    "typed-object-tweezers": "workspace:^"
-  },
   "devDependencies": {
     "@types/jest": "29.5.14",
     "@types/node": "22.15.24",
@@ -50,7 +46,9 @@
     "ts-jest": "29.3.4",
     "typescript": "5.8.3",
     "vite": "^6.3.5",
-    "vite-plugin-dts": "4.5.4",
-    "ws": "^8.18.2"
+    "vite-plugin-dts": "4.5.4"
+  },
+  "dependencies": {
+
   }
 }

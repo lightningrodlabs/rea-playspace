@@ -1,7 +1,7 @@
 import { DataProvider } from "../../index";
 import { Constructor } from "typed-object-tweezers";
 import { TreeDefinition, Pathed, constructTreeAtPath } from "../../WithPath";
-import { Action, Fiber } from "../../lib/fiber";
+import { Action, Fiber } from "state-management/fiber";
 import { ZomeApi } from "./ZomeApi";
 import { TreeNode, ThingInput } from "./types";
 import { SignalMessage } from "./SignalMessage";

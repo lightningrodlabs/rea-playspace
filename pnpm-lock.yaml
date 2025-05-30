@@ -19,6 +19,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      state-management:
+        specifier: workspace:*
+        version: link:../state-management
       typed-object-tweezers:
         specifier: workspace:^
         version: link:../typed-object-tweezers
@@ -399,6 +402,9 @@ importers:
       react-table:
         specifier: workspace:*
         version: link:../modules/react-table
+      state-management:
+        specifier: workspace:*
+        version: link:../modules/state-management
       typed-object-tweezers:
         specifier: workspace:^
         version: link:../modules/typed-object-tweezers

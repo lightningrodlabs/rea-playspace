@@ -24,9 +24,6 @@ export {
   constructTreeAtPath
 } from "./WithPath";
 
-export type { ActionResult, Action } from "./lib/fiber";
-export { Fiber } from "./lib/fiber";
-
 export type { Op } from "./holochain/project";
 export {
   SignalMessage,

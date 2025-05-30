@@ -1,4 +1,4 @@
-import { StateTransitions, StateMachine } from './StateMachine';
+import { StateTransitions, StateMachine } from 'state-management/state-machine';
 import { getDataStore } from './data/DataStore';
 import { LocalstoreProvider} from 'data-providers';
 import { ModelTree, ModelKinds } from './data/models/Application';

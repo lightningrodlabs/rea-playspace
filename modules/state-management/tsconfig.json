@@ -7,7 +7,7 @@
     "module": "es6",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "target": "es6",
-    "allowJs": false,
+    "allowJs": true,
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,

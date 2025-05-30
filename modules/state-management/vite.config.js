@@ -13,10 +13,12 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'data-providers',
-      formats: ['es', 'umd'],
-      fileName: (format) => `data-providers.${format}.js`
-    }
+      entry: {
+        'state-management': resolve(__dirname, 'src/index.ts'),
+        'fiber': resolve(__dirname, 'src/fiber.ts'),
+        'state-machine': resolve(__dirname, 'src/state-machine.ts')
+      },
+      name: 'state-management',
+    },
   }
 });
