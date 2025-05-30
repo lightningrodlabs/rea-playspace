@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Handle, Position } from 'react-flow';
+import { Handle, Position } from '@xyflow/react';
 
 interface Data {
   id: string,

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo, SyntheticEvent } from 'react';
-import ReactFlow, {
+import {
+  ReactFlow,
   ReactFlowProvider,
   Background,
   useNodesState,
@@ -13,12 +14,12 @@ import ReactFlow, {
   Controls,
   Edge,
   Node,
-  updateEdge,
+  reconnectEdge,
   NodeRemoveChange,
   EdgeRemoveChange,
   NodeChange,
   EdgeChange
-} from 'react-flow';
+} from '@xyflow/react';
 import FlowModal from '../modals/FlowModal';
 import ProcessModal from '../modals/ProcessModal';
 import ResourceSpecificationNode from '../nodes/ResourceSpecificationNode';
@@ -33,6 +34,7 @@ import { getAlmostLastPart, assignFields } from 'typed-object-tweezers';
 import { usePath } from 'yaati';
 import { Root } from '../../data/models/Application/Root';
 import { useParams } from 'react-router-dom';
+import '@xyflow/react/dist/style.css'
 
 interface Props {};
 
@@ -158,10 +160,10 @@ const FlowCanvas: React.FC<Props> = () => {
 
         if (reactFlowInstance) {
           // Get the position for the object
-          const position = reactFlowInstance.project({
+          const position = {
             x: xCoord - reactFlowBounds.left,
             y: yCoord - reactFlowBounds.top,
-          });
+          };
 
           // Get the type and the item
           const type = getAlmostLastPart(path);
@@ -400,7 +402,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     // Check if it's allowed
     if (validateFlow(sourceVfType, targetVfType)) {
-      setEdges((egs): Edge[] => updateEdge(edge, newConnection, egs))
+      setEdges((egs): Edge[] => reconnectEdge(edge, newConnection, egs))
 
       // Update display edge params
       const vfEdge: DisplayEdge = store.getById(edge.data.id);
