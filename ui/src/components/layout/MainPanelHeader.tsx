@@ -1,6 +1,8 @@
-import React from "react";
+import React, { JSX } from "react";
 
-export type MainPanelHeaderProps = {};
+export type MainPanelHeaderProps = {
+  children: JSX.Element[]
+};
 
 const MainPanelHeader: React.FC<MainPanelHeaderProps> = ({ children }) => {
   return <div className="main-panel-header">{children}</div>;
