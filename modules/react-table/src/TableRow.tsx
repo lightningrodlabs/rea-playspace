@@ -1,5 +1,4 @@
 import React, { JSX } from "react";
-import { useNavigate } from "react-router-dom";
 
 export type Props = {
   data: {id: string},
@@ -9,8 +8,6 @@ export type Props = {
 };
 
 const TableRow: React.FC<Props> = ({data, fields, syntheticFields, fieldDecorators}) => {
-
-  const navigate = useNavigate();
 
   const synthesizeField = (field: string, data: {id: string}): any => {
     if (syntheticFields && syntheticFields[field] && syntheticFields[field] instanceof Function) {

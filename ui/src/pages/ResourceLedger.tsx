@@ -12,7 +12,7 @@ import {
   Unit
 } from "valueflows-models";
 import { usePath } from "yaati";
-import Table from "../components/layout/Table";
+import Table from "react-table";
 import { Pathed } from "data-providers";
 
 export type ResourceLedgerProps = {};

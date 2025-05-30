@@ -7,7 +7,7 @@ import { Agent } from "valueflows-models";
 import { usePath } from "yaati";
 import { Pathed } from "data-providers";
 import { Root } from "../data/models/Application/Root";
-import Table from "../components/layout/Table";
+import Table from "react-table";
 
 export type Props = {};
 

@@ -7,7 +7,7 @@ import { usePath } from "yaati";
 import { Root } from "../data/models/Application/Root";
 import { Pathed } from "data-providers";
 import { Plan } from "valueflows-models";
-import Table from "../components/layout/Table";
+import Table from "react-table";
 
 export type HomeProps = {}
 
