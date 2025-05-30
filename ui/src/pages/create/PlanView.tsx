@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { SlButton, SlCard, SlInput, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
+import SlCard from '@shoelace-style/shoelace/dist/react/card/index.js';
+import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlTextarea from '@shoelace-style/shoelace/dist/react/textarea/index.js';
 import { Link, useParams } from "react-router-dom";
 import MainPanelHeader from "../../components/layout/MainPanelHeader";
 import { ExtendedPlan } from "../../data/models/Application";

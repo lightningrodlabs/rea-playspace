@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { SlButton, SlCard, SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
+import SlCard from '@shoelace-style/shoelace/dist/react/card/index.js';
+import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlTextarea from '@shoelace-style/shoelace/dist/react/textarea/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { ResourceSpecificationShape, UnitShape, ResourceSpecification } from "valueflows-models";
@@ -150,7 +155,7 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
           onSlChange={onChange}
           value={defaultUnitOfResource}
         >
-          {units.map((unit) => (<SlMenuItem key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+          {units.map((unit) => (<SlOption key={`resource_unit_${unit.id}`} value={unit.id}>{unit.name}</SlOption>))}
         </SlSelect>
         <br />
         <SlSelect
@@ -160,7 +165,7 @@ const ResourceSpecificationView: React.FC<ResourceSpecificationProps> = () => {
           onSlChange={onChange}
           value={defaultUnitOfEffort}
         >
-          {units.map((unit) => (<SlMenuItem key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+          {units.map((unit) => (<SlOption key={`effort_unit_${unit.id}`} value={unit.id}>{unit.name}</SlOption>))}
         </SlSelect>
         <br />
         <SlTextarea

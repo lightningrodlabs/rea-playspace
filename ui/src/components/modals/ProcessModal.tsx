@@ -1,4 +1,8 @@
-import { SlButton, SlInput, SlMenuItem, SlTextarea, SlSelect } from "@shoelace-style/shoelace/dist/react/index";
+import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js';
+import SlTextarea from "@shoelace-style/shoelace/dist/react/textarea/index.js";
 import React, { FormEvent, useEffect, useState } from 'react';
 import { getDataStore } from '../../data/DataStore';
 import { Pathed, PathFunctor } from "data-providers";
@@ -102,10 +106,11 @@ const ProcessModal: React.FC<Props> = ({
         <SlSelect 
           label="Accountable" 
           name='inScopeOf' 
-          value={inScopeOf} 
+          value={inScopeOf ? inScopeOf : null} 
           onSlChange={onChange} 
           required>
-          {agents.map((agent) => (<SlMenuItem key={`agent_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+          <SlOption key="default" value="null"></SlOption>
+          {agents.map((agent) => (<SlOption key={`agent_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
         </SlSelect>
         <br />
         <SlTextarea

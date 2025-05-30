@@ -1,4 +1,6 @@
-import { SlAlert, SlIcon, SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
+import SlAlert from '@shoelace-style/shoelace/dist/react/alert/index.js';
+import SlIcon from '@shoelace-style/shoelace/dist/react/icon/index.js';
+import SlIconButton from '@shoelace-style/shoelace/dist/react/icon-button/index.js';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Pathed } from "data-providers";

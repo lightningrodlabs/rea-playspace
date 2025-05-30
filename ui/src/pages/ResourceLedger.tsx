@@ -1,5 +1,5 @@
-import { SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
-import React, { useEffect, useState } from "react";
+import SlIconButton from '@shoelace-style/shoelace/dist/react/icon-button/index.js';
+import React, { JSX, useEffect, useState } from "react";
 import { getDataStore } from "../data/DataStore";
 import {
   Agent,

@@ -1,5 +1,5 @@
-import { SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
-import { useEffect, useState } from "react";
+import SlIconButton from '@shoelace-style/shoelace/dist/react/icon-button/index.js';
+import { JSX, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";
 import { Action, Agent, EconomicEvent, EconomicResource, Process, ResourceSpecification, Unit } from "valueflows-models";

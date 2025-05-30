@@ -1,4 +1,7 @@
-import { SlInput, SlMenuItem, SlSelect, SlTextarea } from "@shoelace-style/shoelace/dist/react/index";
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js'
+import SlTextarea from '@shoelace-style/shoelace/dist/react/textarea/index.js';
 import { useEffect, useState } from "react";
 import { AgentShape, EconomicEventShape, EconomicResourceShape, ResourceSpecificationShape } from "valueflows-models";
 import { slChangeConstructor } from '../util';
@@ -48,7 +51,7 @@ const EconomicResourceInput: React.FC<Props> = ({ resourceState, eventValues, re
       <SlInput label="Tracking Identifier" name="trackingIdentifier" value={trackingIdentifier} onSlInput={onSlChange}></SlInput>
       <br/ >
       <SlSelect disabled={primaryAccountable && primaryAccountable != null} placeholder="Select Primary Accountable" label="Primary Accountable" name='primaryAccountable' value={primaryAccountable ? primaryAccountable as string : null} onSlChange={onSlChange} clearable required>
-        {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        {agents.map((agent) => (<SlOption key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
       </SlSelect>
       <br />
       <SlInput disabled label="Stage" name="stage" value={stage}></SlInput>

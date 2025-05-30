@@ -1,4 +1,7 @@
-import { SlCard, SlInput, SlRadio, SlRadioGroup } from '@shoelace-style/shoelace/dist/react/index';
+import SlCard from '@shoelace-style/shoelace/dist/react/card/index.js';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlRadio from '@shoelace-style/shoelace/dist/react/radio/index.js';
+import SlRadioGroup from '@shoelace-style/shoelace/dist/react/radio-group/index.js';
 import React, { useEffect, useState } from 'react';
 import { GeoDataShape } from 'valueflows-models';
 import { slChangeConstructor } from '../util';

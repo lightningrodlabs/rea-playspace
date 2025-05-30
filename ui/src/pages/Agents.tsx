@@ -1,4 +1,5 @@
-import { SlAvatar, SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
+import SlAvatar from "@shoelace-style/shoelace/dist/react/avatar/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDataStore } from "../data/DataStore";

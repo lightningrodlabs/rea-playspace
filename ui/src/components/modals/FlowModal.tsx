@@ -1,4 +1,10 @@
-import { SlButton, SlButtonGroup, SlCheckbox, SlDivider, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react/index";
+import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import SlButtonGroup from '@shoelace-style/shoelace/dist/react/button-group/index.js';
+import SlCheckbox from '@shoelace-style/shoelace/dist/react/checkbox/index.js';
+import SlDivider from '@shoelace-style/shoelace/dist/react/divider/index.js';
+import SlIcon from '@shoelace-style/shoelace/dist/react/icon/index.js';
+import SlIconButton from '@shoelace-style/shoelace/dist/react/icon-button/index.js';
+import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import React, { useEffect, useState, useRef } from 'react';
 import { Pathed, PathFunctor } from 'data-providers';
 import {

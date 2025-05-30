@@ -1,4 +1,6 @@
-import { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace/dist/react/index';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js';
 import React, { useEffect, useState } from 'react';
 import {  MeasurementShape, UnitShape, Measurement } from 'valueflows-models';
 import { slChangeConstructor } from '../util';
@@ -47,7 +49,7 @@ const MeasurementInput: React.FC<Props> = ({label, name, defaultUnit, value, uni
           <SlInput className="measurementValue" label={`${label} quantity`} type="number" name="hasNumericalValue" clearable onSlInput={onSlChange} valueAsNumber={hasNumericalValue} value={hasNumericalValue.toString()}></SlInput>
           <span className='measurementSpacer'></span>
           <SlSelect disabled={disableUnit} className="measurementUnit" label={`${label} unit`} name="hasUnit" onSlChange={onSlChange} clearable value={hasUnit}>
-            {units.map((unit) => (<SlMenuItem key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlMenuItem>))}
+            {units.map((unit) => (<SlOption key={`unit_${unit.id}`} value={unit.id}>{unit.name}</SlOption>))}
           </SlSelect>
         </div>
       </>

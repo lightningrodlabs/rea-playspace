@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { SlButton, SlDrawer, SlIconButton } from "@shoelace-style/shoelace/dist/react/index";
+import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import SlDrawer from '@shoelace-style/shoelace/dist/react/drawer/index.js';
+import SlIconButton from '@shoelace-style/shoelace/dist/react/icon-button/index.js';
 import { useNavigate } from 'react-router-dom';
 
 export type HeaderProps = {};

@@ -1,4 +1,4 @@
-import { SlInput } from "@shoelace-style/shoelace/dist/react/index";
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
 import { Process } from "valueflows-models";
 import { getDataStore } from "../../data/DataStore";
 

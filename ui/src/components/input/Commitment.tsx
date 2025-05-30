@@ -1,4 +1,7 @@
-import { SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react/index';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js'
+import SlTextarea from '@shoelace-style/shoelace/dist/react/textarea/index.js';
 import React, { useEffect, useState } from 'react';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';
@@ -127,7 +130,7 @@ const CommitmentInput: React.FC<Props> = ({
       {inputOrOutputOf(inputOf as string, outputOf as string)}
       <div className='form-row'>
         <SlSelect className='half-form-width' disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
-          {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
+          {actions.map((act) => (<SlOption key={`action_${act.id}`} value={act.id}>{act.label}</SlOption>))}
         </SlSelect>
         <div className='field-spacer'></div>
         <SlInput className='half-form-width' disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
@@ -139,11 +142,11 @@ const CommitmentInput: React.FC<Props> = ({
       <br />
       <div className='form-row'>
       <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
-        {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        {agents.map((agent) => (<SlOption key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
       </SlSelect>
       <div className='field-spacer'></div>
       <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
-        {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+        {agents.map((agent) => (<SlOption key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
       </SlSelect>
       </div>
       <br />

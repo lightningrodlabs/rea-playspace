@@ -1,4 +1,9 @@
-import { SlCard, SlDivider, SlInput, SlMenuItem, SlSelect, SlTextarea } from '@shoelace-style/shoelace/dist/react/index';
+import SlCard from '@shoelace-style/shoelace/dist/react/card/index.js';
+import SlDivider from '@shoelace-style/shoelace/dist/react/divider/index.js';
+import SlInput from '@shoelace-style/shoelace/dist/react/input/index.js';
+import SlOption from '@shoelace-style/shoelace/dist/react/option/index.js';
+import SlSelect from '@shoelace-style/shoelace/dist/react/select/index.js'
+import SlTextarea from '@shoelace-style/shoelace/dist/react/textarea/index.js';
 import React, { useEffect, useState } from 'react';
 import MeasurementInput from './Measurement';
 import { DateToInputValueString, slChangeConstructor } from '../util';
@@ -208,10 +213,10 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
-            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
-            {canCreate == 'resource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            <SlOption key='blank' value=''>&nbsp;</SlOption>
+            {canCreate == 'resource' && <SlOption key={'new'} value='new'>Create a new EconomicResource.</SlOption>}
             {canCreate == 'resource' && <SlDivider />}
-            {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {providerEconomicResources.map((res) => (<SlOption key={`resource_${res.id}`} value={res.id}>{res.name}</SlOption>))}
           </SlSelect>
         </div>
       </>;
@@ -220,10 +225,10 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect required onSlChange={onSlChange} name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='Please select the EconomicResource this Event will change.'>
-            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
-            {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            <SlOption key='blank' value=''>&nbsp;</SlOption>
+            {canCreate == 'toResource' && <SlOption key={'new'} value='new'>Create a new EconomicResource.</SlOption>}
             {canCreate == 'toResource' && <SlDivider />}
-            {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {receiverEconomicResources.map((res) => (<SlOption key={`resource_${res.id}`} value={res.id}>{res.name}</SlOption>))}
           </SlSelect>
         </div>
       </>
@@ -232,17 +237,17 @@ const EventInput: React.FC<Props> = ({
         <p>If you choose to not inventory the item, it will not appear in the accounting.</p>
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} name='resourceInventoriedAs' value={resourceInventoriedAs} label='How does the provider inventory this item?'>
-            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
-            {providerEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            <SlOption key='blank' value=''>&nbsp;</SlOption>
+            {providerEconomicResources.map((res) => (<SlOption key={`resource_${res.id}`} value={res.id}>{res.name}</SlOption>))}
           </SlSelect>
         </div>
         <br />
         <div className='form-row'>
           <SlSelect onSlChange={onSlChange} required name='toResourceInventoriedAs' value={toResourceInventoriedAs} label='How does the receiver inventory this item? '>
-            <SlMenuItem key='blank' value=''>&nbsp;</SlMenuItem>
-            {canCreate == 'toResource' && <SlMenuItem key={'new'} value='new'>Create a new EconomicResource.</SlMenuItem>}
+            <SlOption key='blank' value=''>&nbsp;</SlOption>
+            {canCreate == 'toResource' && <SlOption key={'new'} value='new'>Create a new EconomicResource.</SlOption>}
             {canCreate == 'toResource' && <SlDivider />}
-            {receiverEconomicResources.map((res) => (<SlMenuItem key={`resource_${res.id}`} value={res.id}>{res.name}</SlMenuItem>))}
+            {receiverEconomicResources.map((res) => (<SlOption key={`resource_${res.id}`} value={res.id}>{res.name}</SlOption>))}
           </SlSelect>
         </div>
       </>
@@ -288,7 +293,7 @@ const EventInput: React.FC<Props> = ({
       {inputOrOutputOf(inputOf as string, outputOf as string)}
       <div className='form-row'>
         <SlSelect className='half-form-width' disabled={disabled('action')} placeholder="Select action" label="Action" name='action' value={action as string} onSlChange={onSlChange} required>
-          {actions.map((act) => (<SlMenuItem key={`action_${act.id}`} value={act.id}>{act.label}</SlMenuItem>))}
+          {actions.map((act) => (<SlOption key={`action_${act.id}`} value={act.id}>{act.label}</SlOption>))}
         </SlSelect>
         <div className='field-spacer'></div>
         <SlInput className='half-form-width' disabled label="Resource conforms to" name="resourceConformsTo" value={conformingResource?.name}></SlInput>
@@ -300,11 +305,11 @@ const EventInput: React.FC<Props> = ({
       <br />
       <div className='form-row'>
         <SlSelect className='half-form-width' disabled={disabled('provider')} placeholder="Select agent" label="From" name='provider' value={provider ? provider as string : null} onSlChange={onSlChange} required>
-          {agents.map((agent) => (<SlMenuItem key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+          {agents.map((agent) => (<SlOption key={`provider_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
         </SlSelect>
         <div className='field-spacer'></div>
         <SlSelect className='half-form-width' disabled={disabled('receiver')} placeholder="Select agent" label="To" name='receiver' value={receiver ? receiver as string : null} onSlChange={onSlChange} required>
-          {agents.map((agent) => (<SlMenuItem key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlMenuItem>))}
+          {agents.map((agent) => (<SlOption key={`receiver_${agent.id}`} value={agent.id}>{agent.name}</SlOption>))}
         </SlSelect>
       </div>
       <br />
