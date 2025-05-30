@@ -61,9 +61,9 @@ const Home: React.FC<HomeProps> = () => {
         After you have those basic necessities, make a <Link to={"plans"}>Plan</Link> or two.
       </p>
       <hr />
-      <p>
+      <div>
         <RenderPlans />
-      </p>
+      </div>
     </>
   );
 };
