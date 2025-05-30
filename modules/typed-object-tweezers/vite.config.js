@@ -17,14 +17,5 @@ module.exports = defineConfig({
       formats: ['es', 'umd'],
       fileName: (format) => `typed-object-tweezers.${format}.js`
     },
-    rollupOptions: {
-      external: ['react', 'react-dom'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
-    },
   }
 });
