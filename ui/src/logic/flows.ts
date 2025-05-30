@@ -4,7 +4,6 @@ import { Edge, MarkerType, Node } from "react-flow";
 import { DateToUiString } from "../components/util";
 import { getDataStore } from "../data/DataStore";
 import { DisplayEdge, DisplayNode } from "../data/models/Application/Display";
-import { ModelKinds } from "../data/models/Application";
 import { getAlmostLastPart } from "typed-object-tweezers";
 import {
   Action,
@@ -20,25 +19,6 @@ import {
   MeasurementShape,
   FlowShape
 } from "valueflows-models";
-
-/**
- * Given an ID, it returns the DisplayNode, it's associated Valueflows object and type.
- * This differs from Edges in that there is only one object associated with it, while
- * DisplayEdges have many objects associated with them.
- */
-export const getDisplayNodeBy = (id: string): any => {
-  const store = getDataStore();
-  const displayNode: DisplayNode = store.getById(id);
-  const vfType = getAlmostLastPart(displayNode.vfPath);
-  const T = ModelKinds[vfType];
-  const vfNode: typeof T = store.getCursor(displayNode.vfPath);
-
-  return {
-    displayNode,
-    vfType,
-    vfNode
-  }
-}
 
 /**
  * Returns the first flow associated with the edge, always returns the commitment if present

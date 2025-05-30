@@ -20,7 +20,6 @@ import {
   getEventDefaultsFromCommitment,
   getEventDefaultsFromEvent,
   getCommitmentAndEvents,
-  getDisplayNodeBy,
   getLabelForFlow,
   getConformingResource,
   getProvider,
@@ -92,8 +91,8 @@ const FlowModal: React.FC<Props> = ({vfPath, source, target, planId, closeModal,
     const store = getDataStore();
 
     // Grab vfTypes and vfNodes off the DisplayNodes
-    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
-    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = store.getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = store.getDisplayNodeBy(target);
     const initialState = flowDefaults[`${sourceVfType}-${targetVfType}`](planId, sourceVfNode, targetVfNode);
     setInitial(initialState);
 

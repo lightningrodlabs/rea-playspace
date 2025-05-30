@@ -13,7 +13,7 @@ import { Root } from "./models/Application/Root";
 import { LocalstoreProvider, Pathed, PathFunctor, TreeDefinition } from "data-providers";
 import { IndexedTreeWithProviders, TreeState } from "yaati";
 import { ModelTree, ModelKinds } from './models/Application';
-import { BreadthFirstTraversal, Constructor } from "typed-object-tweezers";
+import { BreadthFirstTraversal, Constructor, getAlmostLastPart } from "typed-object-tweezers";
 import { DEFAULT_DATA_PROVIDER } from "../AppConf";
 
 /**
@@ -88,8 +88,34 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   }
 
   // Display* helpers
+
+  /**
+   * 
+   * @param planId 
+   * @returns 
+   */
   public getDisplayNodes(planId: string): Pathed<DisplayNode>[] {
     return Object.values(this.getCursor(`root.plan.${planId}.displayNode`));
+  }
+
+  /**
+   * Given an ID, it returns the DisplayNode, it's associated Valueflows object and type.
+   * This differs from Edges in that there is only one object associated with it, while
+   * DisplayEdges have many objects associated with them.
+   * @param planId
+   * @returns
+   */
+  public getDisplayNodeBy(id: string): any {
+    const displayNode: DisplayNode = this.getById(id);
+    const vfType = getAlmostLastPart(displayNode.vfPath);
+    const T = ModelKinds[vfType];
+    const vfNode: typeof T = this.getCursor(displayNode.vfPath);
+
+    return {
+      displayNode,
+      vfType,
+      vfNode
+    }
   }
 
   public getDisplayEdges(planId: string): Pathed<DisplayEdge>[] {

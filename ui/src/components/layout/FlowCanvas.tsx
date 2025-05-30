@@ -28,7 +28,7 @@ import { DisplayEdge, DisplayEdgeShape, DisplayNode, Position } from "../../data
 import ProcessNode from '../nodes/ProcessNode';
 import { Pathed, PathFunctor } from 'data-providers';
 import { Flow, ProcessShape, Process, ResourceSpecification, Commitment, EconomicEvent} from 'valueflows-models';
-import { flowUpdates, displayEdgeToEdge, getDisplayNodeBy, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
+import { flowUpdates, displayEdgeToEdge, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
 import { getAlmostLastPart, assignFields } from 'typed-object-tweezers';
 import { usePath } from 'yaati';
 import { Root } from '../../data/models/Application/Root';
@@ -345,8 +345,8 @@ const FlowCanvas: React.FC<Props> = () => {
     const {source, sourceHandle, target, targetHandle} = params;
 
     // Grab vfTypes and vfNodes off the DisplayNodes
-    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
-    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = store.getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = store.getDisplayNodeBy(target);
 
     // If the connection is valid, open the flow modal
     if (validateFlow(sourceVfType, targetVfType)) {
@@ -395,8 +395,8 @@ const FlowCanvas: React.FC<Props> = () => {
     const {source, sourceHandle, target, targetHandle} = newConnection;
 
     // Grab vfTypes and vfNodes off the DisplayNodes
-    const { vfType: sourceVfType, vfNode: sourceVfNode } = getDisplayNodeBy(source);
-    const { vfType: targetVfType, vfNode: targetVfNode } = getDisplayNodeBy(target);
+    const { vfType: sourceVfType, vfNode: sourceVfNode } = store.getDisplayNodeBy(source);
+    const { vfType: targetVfType, vfNode: targetVfNode } = store.getDisplayNodeBy(target);
 
     // Check if it's allowed
     if (validateFlow(sourceVfType, targetVfType)) {
