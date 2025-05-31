@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "@shoelace-style/shoelace/dist/themes/light.css";
-import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
+import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/layout/Header";
