@@ -1,22 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "sourceMap": true,
-    "declaration": true,
-    "noImplicitAny": false,
-    "module": "es6",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "target": "es6",
-    "allowJs": true,
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "esModuleInterop": true
   },
-  "include": [
-    "src",
-    "vite.config.js",
-  ]
+  "include": ["src/**/*"],
+  "extends": "../../tsconfig.json",
 }

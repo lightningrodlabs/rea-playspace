@@ -3,22 +3,20 @@
   "version": "0.1.0",
   "description": "",
   "author": "Jillian Ada Burrows <jill@adaburrows.com>",
-  "license": "CAL-1.0",
+  "license": "MIT",
+  "type": "module",
   "source": "./src/index.ts",
   "main": "./dist/yaati.umd.js",
-  "module": "./dist/yaati.es.js",
+  "module": "./dist/yaati.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/yaati.es.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/yaati.js",
       "require": "./dist/yaati.umd.js"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "README.md"
-  ],
+  "files": ["dist"],
   "engines": {
     "node": ">=10"
   },

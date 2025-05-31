@@ -15,8 +15,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'data-providers',
-      formats: ['es', 'umd'],
-      fileName: (format) => `data-providers.${format}.js`
+      fileName: 'data-providers'
     }
   }
 });

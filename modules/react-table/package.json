@@ -4,27 +4,25 @@
   "description": "",
   "author": "Jillian Ada Burrows <jill@adaburrows.com>",
   "license": "MIT",
+  "type": "module",
   "source": "./src/index.tsx",
   "main": "./dist/react-table.umd.js",
-  "module": "./dist/react-table.es.js",
+  "module": "./dist/react-table.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/react-table.es.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/react-table.js",
       "require": "./dist/react-table.umd.js"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "README.md"
-  ],
+  "files": ["dist"],
   "engines": {
     "node": ">=10"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp ./src/* ./dist/src/",
+    "build": "vite build",
     "clean": "rm -rf ./dist",
     "lint": "eslint . --ignore-path .gitignore --ext .ts",
     "check": "tsc --noEmit",

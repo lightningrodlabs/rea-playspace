@@ -4,16 +4,18 @@
   "description": "",
   "author": "Jillian Ada Burrows <jill@adaburrows.com>",
   "license": "CAL-1.0",
+  "type":"module",
   "source": "./src/index.ts",
   "main": "./dist/typed-object-tweezers.umd.js",
-  "module": "./dist/typed-object-tweezers.es.js",
+  "module": "./dist/typed-object-tweezers.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/typed-object-tweezers.es.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/typed-object-tweezers.js",
       "require": "./dist/typed-object-tweezers.umd.js"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
   "files": [
     "dist",
     "src",

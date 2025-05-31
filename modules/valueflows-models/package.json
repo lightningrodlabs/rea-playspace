@@ -4,21 +4,19 @@
   "description": "",
   "author": "Jillian Ada Burrows <jill@adaburrows.com>",
   "license": "CAL-1.0",
+  "type": "module",
   "source": "./src/index.ts",
   "main": "./dist/valueflows-models.umd.js",
-  "module": "./dist/valueflows-models.es.js",
+  "module": "./dist/valueflows-models.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/valueflows-models.es.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/valueflows-models.js",
       "require": "./dist/valueflows-models.umd.js"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "README.md"
-  ],
+  "files": ["dist"],
   "engines": {
     "node": ">=10"
   },

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "sourceMap": false,
+    "noImplicitAny": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext"],
+    "target": "es6",
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "noEmit": true
+  }
+}

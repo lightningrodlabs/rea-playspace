@@ -1,9 +1,12 @@
-import path from 'node:path';
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts';
 
-module.exports = defineConfig({
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+export default defineConfig({
   plugins: [
     react(),
     dts({
@@ -12,10 +15,9 @@ module.exports = defineConfig({
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'yaati',
-      formats: ['es', 'umd'],
-      fileName: (format) => `yaati.${format}.js`
+      'fileName': 'yaati'
     },
     rollupOptions: {
       external: ['react', 'react-dom'],

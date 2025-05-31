@@ -10,14 +10,17 @@
   "module": "./dist/state-management.js",
   "exports": {
     ".": {
+      "types": "./dist/state-management.d.ts",
       "import": "./dist/state-management.js",
       "require": "./dist/state-management.cjs"
     },
     "./fiber": {
+      "types": "./dist/fiber.d.ts",
       "import": "./dist/fiber.js",
       "require": "./dist/fiber.cjs"
     },
     "./state-machine": {
+      "types": "./dist/state-machine.d.ts",
       "import": "./dist/state-machine.js",
       "require": "./dist/state-machine.cjs"
     }

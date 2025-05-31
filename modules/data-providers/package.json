@@ -7,14 +7,15 @@
   "type": "module",
   "source": "./src/index.ts",
   "main": "./dist/data-providers.umd.js",
-  "module": "./dist/data-providers.es.js",
+  "module": "./dist/data-providers.js",
   "exports": {
     ".": {
-      "import": "./dist/data-providers.es.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/data-providers.js",
       "require": "./dist/data-providers.umd.js"
     }
   },
-  "types": "./dist/type_entry_point.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "README.md"
