@@ -19,18 +19,17 @@ import EventLedger from "./pages/EventLedger";
 import Agents from "./pages/Agents";
 import ResourceSpecifications from "./pages/ResourceSpecifications";
 import ResourceLedger from "./pages/ResourceLedger";
-import { AppStateStore } from './index';
 import ProcessSpecifications from "./pages/ProcessSpecifications";
 
 Modal.setAppElement("#root");
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/');
 
-interface Props {
-  appStore: AppStateStore
+interface Props<Store> {
+  appStore: Store
 }
 
-const App: React.FC<Props> = ({appStore}) => {
+export default function App<AppStore>({appStore}: Props<AppStore>) {
   const [isModelOpen, setIsModalOpen] = useState(false);
   const [rsEdit, setRsEdit] = useState<ResourceSpecificationShape>();
 
@@ -170,5 +169,3 @@ const App: React.FC<Props> = ({appStore}) => {
     </div>
   );
 };
-
-export default App;
