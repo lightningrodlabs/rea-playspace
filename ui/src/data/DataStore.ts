@@ -14,7 +14,6 @@ import { LocalstoreProvider, Pathed, PathFunctor, TreeDefinition } from "data-pr
 import { IndexedTreeWithProviders, TreeState } from "yaati";
 import { ModelTree, ModelKinds } from './models/Application';
 import { BreadthFirstTraversal, Constructor, getAlmostLastPart } from "typed-object-tweezers";
-import { DEFAULT_DATA_PROVIDER } from "../AppConf";
 
 /**
  * Our lovely data store
@@ -193,7 +192,8 @@ export class DataStore extends IndexedTreeWithProviders<'root', Root> {
   }
 }
 
-const dataStore = new DataStore({} as TreeState<'root', Root>, ModelTree, ModelKinds, DEFAULT_DATA_PROVIDER);
+// @ts-ignore
+const dataStore = new DataStore({} as TreeState<'root', Root>, ModelTree, ModelKinds, import.meta.env.REA_PLAYSPACE_DATA_PROVIDER);
 
 /**
  * Fetches DataStore

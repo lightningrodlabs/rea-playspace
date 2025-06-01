@@ -1,10 +1,9 @@
-import { StateTransitions, StateMachine } from 'state-management/state-machine';
-import { getDataStore } from './data/DataStore';
-import { LocalstoreProvider} from 'data-providers';
-import { ModelTree, ModelKinds } from './data/models/Application';
-import { DataStore } from './data/DataStore'
 import { createRoot } from 'react-dom/client';
+import { StateTransitions, StateMachine } from 'state-management/state-machine';
+import { LocalstoreProvider} from 'data-providers';
+import { DataStore, getDataStore, ModelTree, ModelKinds } from './data';
 import App from './App';
+
 /*
 
 Application State Management
