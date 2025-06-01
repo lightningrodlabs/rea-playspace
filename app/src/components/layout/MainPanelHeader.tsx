@@ -1,7 +1,7 @@
 import React, { JSX } from "react";
 
 export type MainPanelHeaderProps = {
-  children: JSX.Element[]
+  children: JSX.Element | JSX.Element[]
 };
 
 const MainPanelHeader: React.FC<MainPanelHeaderProps> = ({ children }) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MainPanelHeader from "../components/layout/MainPanelHeader";
 import { useNavigate } from "react-router-dom";
