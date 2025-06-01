@@ -1,4 +1,5 @@
 packages:
   - modules/*
-  - ui
+  - app
+  - holochain
   - tests

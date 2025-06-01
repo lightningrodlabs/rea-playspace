@@ -1,6 +1,22 @@
 {
-  "name": "rea-playspace-ui",
+  "name": "app",
   "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/app.cjs",
+  "module": "./dist/app.js",
+  "exports": {
+    ".": {
+      "types": "./dist/app.d.ts",
+      "import": "./dist/app.js",
+      "require": "./dist/app.cjs"
+    },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "import": "./dist/data.js",
+      "require": "./dist/data.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "lint": "tsc",
@@ -22,7 +38,8 @@
     "react-refresh-typescript": "2.0.10",
     "terser": "^5.40.0",
     "typescript": "5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "4.5.4"
   },
   "dependencies": {
     "@holochain/client": "0.19.0",
