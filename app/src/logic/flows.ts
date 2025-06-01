@@ -20,6 +20,10 @@ import {
   FlowShape
 } from "valueflows-models";
 
+export type OurEdge = Edge & {
+  data: { id : string}
+}
+
 /**
  * Returns the first flow associated with the edge, always returns the commitment if present
  */
@@ -500,7 +504,7 @@ function summarizeEvents(events: EconomicEvent[]):EconomicEvent {
  * TODO: maybe submit a PR to React Flows to either export the function that
  * builds these IDs, or make it more amenable to unique external IDs.
  */
-export const displayEdgeToEdge = (displayEdge: DisplayEdge): Edge => {
+export const displayEdgeToEdge = (displayEdge: DisplayEdge): OurEdge => {
   return {
     id: `reactflow__edge-${displayEdge.source}${displayEdge.sourceHandle || ''}-${displayEdge.target}${displayEdge.targetHandle || ''}`,
     source: displayEdge.source,

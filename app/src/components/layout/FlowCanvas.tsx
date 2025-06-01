@@ -12,7 +12,6 @@ import {
   applyEdgeChanges,
   MiniMap,
   Controls,
-  Edge,
   Node,
   reconnectEdge,
   NodeRemoveChange,
@@ -29,7 +28,7 @@ import { DisplayEdge, DisplayEdgeShape, DisplayNode, Position } from "../../data
 import ProcessNode from '../nodes/ProcessNode';
 import { Pathed, PathFunctor } from 'data-providers';
 import { Flow, ProcessShape, Process, ResourceSpecification, Commitment, EconomicEvent} from 'valueflows-models';
-import { flowUpdates, displayEdgeToEdge, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
+import { type OurEdge, flowUpdates, displayEdgeToEdge, validateFlow as validateFlow, displayNodeToNode } from '../../logic/flows';
 import { getAlmostLastPart, assignFields } from 'typed-object-tweezers';
 import { usePath } from 'yaati';
 import { Root } from '../../data/models/Application/Root';
@@ -49,7 +48,7 @@ const FlowCanvas: React.FC<Props> = () => {
   const displayNodes = usePath<'root', Root, DisplayNode>(`root.plan.${planId}.displayNode`, store);
   const displayEdges = usePath<'root', Root, DisplayEdge>(`root.plan.${planId}.displayEdge`, store);
   const [nodes, setNodes] = useNodesState([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const [edges, setEdges] = useEdgesState<OurEdge>([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | undefined>(undefined);
   /**
    * we should probably add a more sophisticated state machine for this since we have:
@@ -393,7 +392,7 @@ const FlowCanvas: React.FC<Props> = () => {
    *   `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`
    * I do not like this. -JB
    */
-  const onEdgeUpdate = (edge: Edge, newConnection: Connection) => {
+  const onEdgeUpdate = (edge: OurEdge, newConnection: Connection) => {
     const {source, sourceHandle, target, targetHandle} = newConnection;
 
     // Grab vfTypes and vfNodes off the DisplayNodes
@@ -402,7 +401,7 @@ const FlowCanvas: React.FC<Props> = () => {
 
     // Check if it's allowed
     if (validateFlow(sourceVfType, targetVfType)) {
-      setEdges((egs): Edge[] => reconnectEdge(edge, newConnection, egs))
+      setEdges((egs): OurEdge[] => reconnectEdge(edge, newConnection, egs))
 
       // Update display edge params
       const vfEdge: DisplayEdge = store.getById(edge.data.id);
@@ -439,7 +438,7 @@ const FlowCanvas: React.FC<Props> = () => {
   /**
    * Edit an edge when it's double clicked
    */
-  const onEdgeEdit = (event: SyntheticEvent, edge: Edge) => {
+  const onEdgeEdit = (event: SyntheticEvent, edge: OurEdge) => {
     const vfEdge = store.getById(edge.data.id) as DisplayEdge;
     setSelectedDisplayEdge(vfEdge.id);
     setSource(vfEdge.source);
@@ -484,7 +483,7 @@ const FlowCanvas: React.FC<Props> = () => {
    * times with the same data for some weird bug deep inside React Flow. This
    * handler is always called with a unique set of edges.
    */
-  const onRemoveEdges = (edges: Edge[]) => {
+  const onRemoveEdges = (edges: OurEdge[]) => {
     edges.forEach((edge) => {
       const edgeId = edge.data.id;
       const edgeToDelete = store.getById<Pathed<DisplayEdge>>(edgeId);
@@ -546,7 +545,7 @@ const FlowCanvas: React.FC<Props> = () => {
             onRemoveEdge(change);
             break;
           default:
-            setEdges((es) => applyEdgeChanges([change], es));
+            setEdges((es) => applyEdgeChanges([change], es) as OurEdge[]);
             break;
         }
       });

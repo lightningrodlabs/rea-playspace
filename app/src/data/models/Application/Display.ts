@@ -45,7 +45,7 @@ export class DisplayNode implements Node {
   vfPath: string;
   planId: string;
   type?: string;
-  data: Object;
+  data: Record<string, unknown>;
 
   constructor(init: DisplayNodeShape) {
     assignFields<DisplayNodeShape, DisplayNode>(init, this);
