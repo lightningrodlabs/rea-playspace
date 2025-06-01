@@ -1,11 +1,10 @@
-import { HolochainClient } from '@holochain-open-dev/cell-client';
-import { CellId } from '@holochain/client';
+import { CellId, AppWebsocket } from '@holochain/client';
 import { AddOutput, TreeNode, ThingInput } from '../src/holochain/project/types';
 import { ProjectProvider, ZomeApi } from '../src/holochain/project';
 import { Root, A, B, C, D, ModelKinds, TreeDef, rust_nodes, tree_test } from './fixtures';
 
 const zome_mock: ZomeApi = {
-  client: {} as HolochainClient,
+  client: {} as AppWebsocket,
   cellId: {} as CellId,
   put_thing: async (input: ThingInput): Promise<AddOutput> => {
     return {} as Promise<AddOutput>;

@@ -35,7 +35,6 @@
     "test:watch": "pnpm test -- --watch --verbose"
   },
   "dependencies": {
-    "@holochain-open-dev/cell-client": "0.9.1",
     "@holochain/client": "0.19.0",
     "lodash": "4.17.21",
     "state-management": "workspace:*",
