@@ -2,7 +2,7 @@
   description = "Flake for Holochain app development";
 
   inputs = {
-    holonix.url = "github:holochain/holonix?ref=main-0.5";
+    holonix.url = "./holonix";
 
     nixpkgs.follows = "holonix/nixpkgs";
     flake-parts.follows = "holonix/flake-parts";
@@ -16,9 +16,18 @@
       devShells.default = pkgs.mkShell {
         inputsFrom = [ inputs'.holonix.devShells.default ];
 
-        packages = (with pkgs; [
+        packages = (with inputs'.holonix.packages; [
+          holochain
+          hc
+          hcterm
+          bootstrap-srv
+          lair-keystore
+          hc-scaffold
+          hn-introspect
+          rust
+        ]) ++ (with pkgs; [
           nodejs_22
-          nodePackages.pnpm
+          pnpm
           binaryen
         ]);
 
