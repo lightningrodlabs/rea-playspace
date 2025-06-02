@@ -17,7 +17,8 @@
         inputsFrom = [ inputs'.holonix.devShells.default ];
 
         packages = (with pkgs; [
-          nodejs_20
+          nodejs_22
+          nodePackages.pnpm
           binaryen
         ]);
 
