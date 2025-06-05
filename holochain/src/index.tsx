@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import { StateTransitions, StateMachine } from 'state-management/state-machine';
 import { AppWebsocket, AppSignal} from '@holochain/client';
-import { buildModel, LocalstoreProvider, Pathed, ProjectProvider, SignalMessage, ZomeApi } from 'data-providers';
+import { buildModel, LocalstoreProvider, Pathed } from 'data-providers';
+import { ProjectProvider, SignalMessage, ZomeApi } from "./project-provider"
 import { DataStore, getDataStore, ModelTree, ModelKinds } from 'app/data';
 import App from 'app';
 
