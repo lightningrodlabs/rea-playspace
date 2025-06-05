@@ -18,15 +18,6 @@
   "scripts": {
     "build": "cd modules/state-management && pnpm build && cd - && cd modules/typed-object-tweezers && pnpm build && cd - && cd modules/react-table && pnpm build && cd - && cd modules/valueflows-models && pnpm build && cd - && cd modules/data-providers && pnpm build && cd - && cd modules/yaati && pnpm build && cd - && cd app && pnpm build && cd -",
 
-    "// ## HOLOCHAIN ##":   "",
-    "hc:redo":              "pnpm run hc:happ-pack && pnpm run hc:run",
-    "hc:happ-pack":         "bash scripts/happ-pack.sh",
-    "hc:run":               "sh -c 'set -o allexport; . environments/.env; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "hc:run2":              "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "playground":           "sh -c 'set -o allexport; . environments/.env; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
-    "playground2":          "sh -c 'set -o allexport; . environments/.env.dev2; set +o allexport; npx @holochain-playground/cli ws://localhost:$REA_PLAYSPACE_ADMIN_WS_PORT'",
-    "webhapp-pack":         "pnpm run web-zip && hc web-app pack workdir/",
-
     "// ## APP ##":          "",
     "web-lint":             "cd app && pnpm run lint",
     "web":                  "cd app && pnpx vite",
