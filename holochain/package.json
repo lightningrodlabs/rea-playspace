@@ -9,11 +9,11 @@
     "preview": "vite preview",
 
     "// ## HOLOCHAIN ##":   "",
-    "hc:redo":              "pnpm run hc:happ-pack && pnpm run hc:run",
-    "hc:happ-pack":         "bash scripts/happ-pack.sh",
-    "hc:run":               "sh -c 'set -o allexport; . .env.1; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "hc:run2":              "sh -c 'set -o allexport; . .env.2; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
-    "webhapp-pack":         "pnpm run web-zip && hc web-app pack workdir/"
+    "redo":         "pnpm run hc:happ-pack && pnpm run hc:run",
+    "happ-pack":    "bash scripts/happ-pack.sh",
+    "run":          "sh -c 'set -o allexport; . .env.1; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
+    "run2":         "sh -c 'set -o allexport; . .env.2; set +o allexport; rm -rf $REA_PLAYSPACE_ROOT$REA_PLAYSPACE_DIR; . scripts/happ-run.sh'",
+    "webhapp-pack": "pnpm run web-zip && hc web-app pack workdir/"
   },
   "devDependencies": {
     "@types/eslint": "9.6.1",

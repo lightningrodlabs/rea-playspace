@@ -1,14 +1,13 @@
 ---
 manifest_version: "1"
-name: reaplayspacedna
+name: rea_playspace
 integrity:
-  network_seed: ~
-  properties: ~
-  origin_time: 1644620719000
+  network_seed: null
+  properties: null
   zomes:
-    - name: projects_core
+    - name: projects_integrity
       hash: ~
-      bundled: ../../target/wasm32-unknown-unknown/release/projects_core.wasm
+      bundled: ../../target/wasm32-unknown-unknown/release/projects_integrity.wasm
       dependencies: ~
 coordinator:
   zomes:

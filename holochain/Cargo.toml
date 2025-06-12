@@ -1,0 +1,22 @@
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
+
+[workspace]
+members = ["dnas/*/zomes/coordinator/*", "dnas/*/zomes/integrity/*"]
+resolver = "2"
+
+[workspace.dependencies]
+hdi = "=0.6.2"
+hdk = "=0.5.2"
+serde = "1.0"
+rand = "0.8.5"
+tracing = "*"
+
+[workspace.dependencies.projects]
+path = "dnas/projects/zomes/coordinator/projects"
+
+[workspace.dependencies.projects_integrity]
+path = "dnas/projects/zomes/integrity/projects"

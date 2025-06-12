@@ -1,6 +1,0 @@
-[workspace]
-resolver = "2"
-members = [
-    "happ/zomes/projects",
-    "happ/zomes/projects_core",
-]

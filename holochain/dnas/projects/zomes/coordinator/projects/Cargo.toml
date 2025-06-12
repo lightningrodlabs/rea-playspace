@@ -1,0 +1,15 @@
+[package]
+edition = "2021"
+name = "projects"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "projects"
+
+[dependencies]
+hdk = { workspace = true }
+projects_integrity = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+
