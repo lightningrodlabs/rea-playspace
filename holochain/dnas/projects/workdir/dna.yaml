@@ -7,12 +7,12 @@ integrity:
   zomes:
     - name: projects_integrity
       hash: ~
-      bundled: ../../target/wasm32-unknown-unknown/release/projects_integrity.wasm
+      bundled: ../../../target/wasm32-unknown-unknown/release/projects_integrity.wasm
       dependencies: ~
 coordinator:
   zomes:
     - name: projects
       hash: ~
-      bundled: ../../target/wasm32-unknown-unknown/release/projects.wasm
+      bundled: ../../../target/wasm32-unknown-unknown/release/projects.wasm
       dependencies:
-        - name: projects_core
+        - name: projects_integrity

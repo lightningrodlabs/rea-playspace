@@ -1,5 +1,6 @@
 use hdk::prelude::{*};
 use holo_hash::{ActionHashB64, EntryHashB64};
+use projects_integrity::Thing;
 
 // returned after successful write to DHT
 #[derive(Serialize, Deserialize, Debug)]
@@ -13,6 +14,37 @@ pub struct AddOutput {
 pub struct ThingInput {
   pub path: String,
   pub data: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AuthoredThing {
+    pub thing: Thing,
+    pub author: AgentPubKey,
+    pub address: ActionHash,
+}
+
+impl TryFrom<Record> for AuthoredThing {
+    type Error = WasmError;
+
+    fn try_from(value: Record) -> ExternResult<Self> {
+        let maybe_thing: Option<Thing> = value.entry.to_app_option().map_err(|e| {
+            wasm_error!(WasmErrorInner::Guest(format!(
+                "Failed to deserialize Thing: {:?}",
+                e
+            )))
+        })?;
+
+        return match maybe_thing {
+            Some(thing) => Ok(AuthoredThing {
+                thing,
+                author: value.action().author().clone(),
+                address: value.action_address().clone(),
+            }),
+            None => Err(wasm_error!(WasmErrorInner::Guest(
+                "Not a Thing Record".to_string()
+            ))),
+        }
+    }
 }
 
 // Sent back to UI
