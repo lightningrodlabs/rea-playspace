@@ -1,31 +1,21 @@
 mod types;
 
 use hdk::prelude::*;
-use tracing::{info};
-use crate::types::{ThingInput, AuthoredThing};
+use crate::types::{ThingInput, AuthoredThing, Content, Collection};
 use projects_integrity::{EntryTypes, LinkTypes, Thing};
-
 
 #[hdk_extern]
 pub fn put_thing(input: ThingInput) -> ExternResult<AuthoredThing> {
-  info!("putting thing {} with path {}", input.data, input.path);
+  let tree_path = Path::from(input.path.clone()).typed(LinkTypes::Tree)?;
+  let _ = tree_path.ensure();
 
   let thing = Thing{data: input.data.clone()};
-
   let thing_hash = create_entry(&EntryTypes::Thing(thing))?;
-  let all_things_path = Path::from("all_things");
-  create_link(
-    all_things_path.path_entry_hash()?,
-    thing_hash.clone(),
-    LinkTypes::AllThings,
-    (),
-  )?;
 
-  let input_path = Path::from(input.path.clone()).typed(LinkTypes::PathedThings)?;
   create_link(
-    input_path.path_entry_hash()?, 
+    tree_path.path_entry_hash()?,
     thing_hash.clone(),
-    LinkTypes::PathedThings,
+    LinkTypes::Leaf,
     ()
   )?;
 
@@ -36,29 +26,31 @@ pub fn put_thing(input: ThingInput) -> ExternResult<AuthoredThing> {
   Ok(record.try_into()?)
 }
 
-// #[hdk_extern]
-// pub fn get_thing_by_path(path_str: String) -> ExternResult<AuthoredThing> {
-//   info!("getting thing with path {}", path_str.clone());
-//   let path = Path::from(path_str.clone());
-
-//   let val = Content {
-//     name: String::from(path_str.clone()),
-//     data: match get_path(path.clone().typed(LinkTypes::PathedThings)?)? {
-//       Some(thing) => thing.data,
-//       None => "".into()
-//     }
-//   };
-
-//   let mut tree = Tree::new(val);
-//   build_tree(&mut tree, 0, path.clone())?;
-//   Ok(Some(tree))
-// }
+#[hdk_extern]
+pub fn delete_thing(path_str: String) -> ExternResult<Vec<ActionHash>> {
+  let path = Path::from(path_str).typed(LinkTypes::Tree)?;
+  let links = get_links(
+      GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::Leaf)?.build(),
+  )?;
+  let mut out = Vec::with_capacity(links.len());
+  for link in links {
+    if let Some(hash) = link.target.into_action_hash() {
+      delete_link(link.create_link_hash)?;
+      out.push(delete_entry(hash)?)
+    }
+  }
+  Ok(out)
+}
 
 #[hdk_extern]
-pub fn get_latest_thing(path_str: String) -> ExternResult<Option<AuthoredThing>> {
-  let path = Path::from(path_str);
+pub fn get_thing(path_str: String) -> ExternResult<Option<AuthoredThing>> {
+  let path = Path::from(path_str).typed(LinkTypes::Tree)?;
+  get_latest_thing_from_path(path)
+}
+
+pub fn get_latest_thing_from_path(path: TypedPath) -> ExternResult<Option<AuthoredThing>> {
   let links = get_links(
-    GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::PathedThings)?.build(),
+    GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::Leaf)?.build(),
   )?;
   let latest_link = links
     .into_iter()
@@ -80,7 +72,7 @@ pub fn get_latest_thing(path_str: String) -> ExternResult<Option<AuthoredThing>>
   let maybe_authored_thing = match latest_thing_record {
     Some(record) => {
       let maybe_thing = record.entry.to_app_option().map_err(|e| {
-        wasm_error!(WasmErrorInner::Guest(format!("Failed to deserialize Dino: {:?}",e)))
+        wasm_error!(WasmErrorInner::Guest(format!("Failed to deserialize Thing: {:?}",e)))
       })?;
       return match maybe_thing {
         Some(thing) => Ok(Some(AuthoredThing {
@@ -98,88 +90,32 @@ pub fn get_latest_thing(path_str: String) -> ExternResult<Option<AuthoredThing>>
 }
 
 #[hdk_extern]
-pub fn get_all_things() -> ExternResult<Vec<AuthoredThing>> {
-  get_all_things_with_options(GetOptions::network())
+pub fn get_all_children(path_str: String) -> ExternResult<Collection<Content<AuthoredThing>>> {
+  get_all_children_with_options(path_str, GetOptions::network())
 }
 
 #[hdk_extern]
-pub fn get_all_things_local() -> ExternResult<Vec<AuthoredThing>> {
-  get_all_things_with_options(GetOptions::local())
+pub fn get_all_children_local(path_str: String) -> ExternResult<Collection<Content<AuthoredThing>>> {
+  get_all_children_with_options(path_str, GetOptions::local())
 }
 
-fn get_all_things_with_options(get_options: GetOptions) -> ExternResult<Vec<AuthoredThing>> {
-  let path = Path::from("all_things");
-  let links = get_links(
-    GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::AllThings)?
-      .get_options(get_options.strategy)
-      .build(),
-  )?;
+fn get_all_children_with_options(path_str: String, get_options: GetOptions) -> ExternResult<Collection<Content<AuthoredThing>>> {
 
-  let mut out = Vec::with_capacity(links.len());
-  for link in links {
-    if let Ok(action_hash) = link.target.try_into() {
-      let maybe_record = get::<ActionHash>(action_hash, get_options.clone())?;
+  let path: TypedPath = Path::from(path_str.clone()).typed(LinkTypes::Tree)?;
 
-      if let Some(thing) = maybe_record.map(TryInto::try_into).transpose()? {
-        out.push(thing);
-      }
+  let children_paths = path.children_paths()?;
+  let count = children_paths.len();
+  let mut data = Vec::with_capacity(count);
+  let mut log = Vec::with_capacity(count * 3);
+  for path in children_paths {
+    let current_path: &Vec<Component> = path.as_ref();
+    let name = String::try_from(&current_path[current_path.len()-1])
+      .map_err(|e| wasm_error!(WasmErrorInner::Guest(e.into())))?;
+    // log.push(format!("getting child {:?}", path.clone()));
+    if let Ok(Some(authored_thing)) = get_latest_thing_from_path(path.clone()) {
+      // log.push(format!("have authored thing {:?}", authored_thing));
+      data.push(Content{name, data: authored_thing});
     }
   }
-
-  Ok(out)
+  Ok(Collection{root: path_str.clone(), count, data, log})
 }
-
-#[hdk_extern]
-pub fn delete_thing(original_thing_hash: ActionHash) -> ExternResult<ActionHash> {
-  let path = Path::from("all_things");
-  let links = get_links(
-    GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::AllThings)?.build(),
-  )?;
-  for link in links {
-    if let Some(hash) = link.target.into_action_hash() {
-      if hash == original_thing_hash {
-        delete_link(link.create_link_hash)?;
-      }
-    }
-  }
-  let links = get_links(
-    GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::PathedThings)?.build(),
-  )?;
-  for link in links {
-    if let Some(hash) = link.target.into_action_hash() {
-      if hash == original_thing_hash {
-        delete_link(link.create_link_hash)?;
-      }
-    }
-  }
-  delete_entry(original_thing_hash)
-}
-
-#[hdk_extern]
-pub fn delete_thing_by_path(path_str: String) -> ExternResult<Vec<ActionHash>> {
-  let path = Path::from(path_str);
-  let links = get_links(
-      GetLinksInputBuilder::try_new(path.path_entry_hash()?, LinkTypes::PathedThings)?.build(),
-  )?;
-  let mut out = Vec::with_capacity(links.len());
-  for link in links {
-    if let Some(hash) = link.target.into_action_hash() {
-      delete_link(link.create_link_hash)?;
-
-      let all_things_path = Path::from("all_things");
-      let all_things_links = get_links(
-        GetLinksInputBuilder::try_new(all_things_path.path_entry_hash()?, LinkTypes::AllThings)?.build(),
-      )?;
-      for link in all_things_links {
-        if let Some(all_links_hash) = link.target.into_action_hash() {
-          if hash == all_links_hash {
-            delete_link(link.create_link_hash)?;
-          }
-        }
-      }
-      out.push(delete_entry(hash)?)
-    }
-  }
-  Ok(out)
-}
-

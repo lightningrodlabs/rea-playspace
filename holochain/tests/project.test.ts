@@ -61,25 +61,28 @@ await runScenario(async scenario => {
 
     await dhtSync([alice, beto], alice.cells[0].cell_id[0]);
 
-    // Alice gets all hellos
-    const hellosAlice: Array<any> = await aliceCell.callZome({
+    const helloBetoFromAlice: any = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "get_all_things",
-      payload: undefined,
+      fn_name: "get_thing",
+      payload: "stuff.hola",
     });
 
-    // confirm that both hellos are present
-    assert.equal(hellosAlice.length, 2);
-    assert.equal(hellosAlice[0].thing.data, JSON.stringify(hi));
-    assert.deepEqual(hellosAlice[0].author, aliceCell.cell_id[1]);
-    assert.equal(hellosAlice[1].thing.data, JSON.stringify(hola));
-    assert.deepEqual(hellosAlice[1].author, betoCell.cell_id[1]);
+    const helloAliceFromBeto: any = await betoCell.callZome({
+      zome_name: "projects",
+      fn_name: "get_thing",
+      payload: "stuff.hi",
+    });
+
+    assert.equal(helloAliceFromBeto.thing.data, JSON.stringify(hi));
+    assert.deepEqual(helloAliceFromBeto.author, aliceCell.cell_id[1]);
+    assert.equal(helloBetoFromAlice.thing.data, JSON.stringify(hola));
+    assert.deepEqual(helloBetoFromAlice.author, betoCell.cell_id[1]);
   })
 
-  test("get_latest_thing retrieves only the latest put thing and nothing after delete", async () => {
+  test("get_thing retrieves only the latest put thing and nothing after delete", async () => {
     const betoHola: any = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "get_latest_thing",
+      fn_name: "get_thing",
       payload: "stuff.hola",
     });
 
@@ -87,7 +90,7 @@ await runScenario(async scenario => {
 
     const didDelete = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "delete_thing_by_path",
+      fn_name: "delete_thing",
       payload: "stuff.hola",
     });
     assert.ok(didDelete)
@@ -96,7 +99,7 @@ await runScenario(async scenario => {
 
     const betoHolaAfterDelete: any = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "get_latest_thing",
+      fn_name: "get_thing",
       payload: "stuff.hola",
     });
     assert.isNull(betoHolaAfterDelete)
@@ -112,7 +115,7 @@ await runScenario(async scenario => {
 
     const betoHolaTheSecond: any = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "get_latest_thing",
+      fn_name: "get_thing",
       payload: "stuff.hola",
     });
 
@@ -120,13 +123,21 @@ await runScenario(async scenario => {
     assert.equal(betoHolaTheSecond.thing.data, JSON.stringify(hola));
   })
 
-  test("create children to a path", async () => {
-    const betoHola: any = await aliceCell.callZome({
+  test("get children for a path", async () => {
+    const betoChildren: any = await aliceCell.callZome({
       zome_name: "projects",
-      fn_name: "get_latest_thing",
+      fn_name: "get_all_children",
       payload: "stuff",
     });
-    console.log(betoHola);
+
+    assert.equal(betoChildren.count, 2)
+    assert.equal(betoChildren.root, "stuff")
+    const foundHola = betoChildren.data.find((d) => d.name == 'hola');
+    assert.equal(foundHola.data.thing.data, JSON.stringify(hola));
+    assert.deepEqual(foundHola.data.author, betoCell.cell_id[1]);
+    const foundHi = betoChildren.data.find((d) => d.name == 'hi');
+    assert.equal(foundHi.data.thing.data, JSON.stringify(hi));
+    assert.deepEqual(foundHi.data.author, aliceCell.cell_id[1]);
   })
 
 });

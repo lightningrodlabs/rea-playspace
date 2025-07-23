@@ -49,9 +49,17 @@ impl TryFrom<Record> for AuthoredThing {
 
 // Sent back to UI
 #[derive(Clone, Serialize, Deserialize, Debug, Default, PartialEq)]
-pub struct Content {
+pub struct Content<T> {
     pub name: String,
-    pub data: String,
+    pub data: T,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, Default, PartialEq)]
+pub struct Collection<T> {
+    pub root: String,
+    pub count: usize,
+    pub data: Vec<T>,
+    pub log: Vec<String>,
 }
 
 // Remote call input

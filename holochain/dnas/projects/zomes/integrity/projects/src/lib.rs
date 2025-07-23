@@ -16,8 +16,8 @@ pub enum EntryTypes {
 
 #[hdk_link_types]
 pub enum LinkTypes {
-    AllThings,
-    PathedThings,
+    Leaf,
+    Tree
 }
 
 /// Validation you perform during the genesis process. Nobody else on the network performs it, only you.
